@@ -165,8 +165,8 @@ class ReflectBackendService {
   /**
    * Removes the connection from the current board group
    * and, if newBoardId isn't falsy, adds it to the new
-   * board group for the specified board id.
-   * @param newBoardId The id of the board to join.
+   * board group for the specified board ID.
+   * @param newBoardId The ID of the board to join.
    */
   public switchToBoard = (newBoardId: string) => {
     if (this._currentBoardId !== undefined && this._currentBoardId !== null && this.isConnected()) {

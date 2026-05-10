@@ -24,6 +24,7 @@ export interface FeedbackBoardProps {
   team: WebApiTeam;
   workflowPhase: WorkflowPhase;
   nonHiddenWorkItemTypes: WorkItemType[];
+  focusModeNonHiddenWorkItemTypes?: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   isAnonymous: boolean;
   hideFeedbackItems: boolean;
@@ -48,7 +49,7 @@ export interface IColumnItem {
   hideFeedbackItems?: boolean;
 }
 
-const findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): string | null => {
+export const findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): string | null => {
   for (const columnId of Object.keys(columns)) {
     const activeItem = columns[columnId]?.columnItems.find(columnItem => columnItem.feedbackItem.timerState);
     if (activeItem) {
@@ -57,6 +58,21 @@ const findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): stri
   }
 
   return null;
+};
+
+export const findColumnItemById = (feedbackItemId: string, currentColumns: { [id: string]: IColumn }, currentColumnIds: string[]): IColumnItem | undefined => {
+  for (const columnId of currentColumnIds) {
+    const columnItem = currentColumns[columnId]?.columnItems.find(item => item.feedbackItem.id === feedbackItemId);
+    if (columnItem) {
+      return columnItem;
+    }
+  }
+
+  return undefined;
+};
+
+export const clearActiveTimerFeedbackItemId = (activeTimerFeedbackItemId: string | null, feedbackItemId: string): string | null => {
+  return activeTimerFeedbackItemId === feedbackItemId ? null : activeTimerFeedbackItemId;
 };
 
 const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
@@ -77,7 +93,7 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   return resetFocusForStateColumns;
 };
 
-export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
+export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -94,16 +110,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   const prevBoardModifiedDateRef = useRef<Date | undefined>(board.modifiedDate);
   const prevTeamIdRef = useRef<string>(team.id);
 
-  const findColumnItemById = useCallback((feedbackItemId: string, currentColumns: { [id: string]: IColumn }, currentColumnIds: string[]): IColumnItem | undefined => {
-    for (const columnId of currentColumnIds) {
-      const columnItem = currentColumns[columnId]?.columnItems.find(item => item.feedbackItem.id === feedbackItemId);
-      if (columnItem) {
-        return columnItem;
-      }
-    }
-
-    return undefined;
-  }, []);
+  const getColumnItemById = useCallback(findColumnItemById, []);
 
   const refreshFeedbackItems = useCallback(
     async (updatedFeedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean): Promise<void> => {
@@ -166,10 +173,10 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   const stopTimerById = useCallback(
     async (feedbackItemId: string): Promise<void> => {
       setColumns(currentColumns => {
-        const columnItem = findColumnItemById(feedbackItemId, currentColumns, columnIds);
+        const columnItem = getColumnItemById(feedbackItemId, currentColumns, columnIds);
 
         if (!columnItem || !columnItem.feedbackItem.timerState) {
-          setActiveTimerFeedbackItemId(prev => (prev === feedbackItemId ? null : prev));
+          setActiveTimerFeedbackItemId(prev => clearActiveTimerFeedbackItemId(prev, feedbackItemId));
           return currentColumns;
         }
 
@@ -192,10 +199,10 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
           feedbackItemId,
         });
       } finally {
-        setActiveTimerFeedbackItemId(prev => (prev === feedbackItemId ? null : prev));
+        setActiveTimerFeedbackItemId(prev => clearActiveTimerFeedbackItemId(prev, feedbackItemId));
       }
     },
-    [board.id, columnIds, findColumnItemById, refreshFeedbackItems],
+    [board.id, columnIds, getColumnItemById, refreshFeedbackItems],
   );
 
   const requestTimerStart = useCallback(
@@ -211,7 +218,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   );
 
   const handleTimerStopped = useCallback((feedbackItemId: string) => {
-    setActiveTimerFeedbackItemId(prev => (prev === feedbackItemId ? null : prev));
+    setActiveTimerFeedbackItemId(prev => clearActiveTimerFeedbackItemId(prev, feedbackItemId));
   }, []);
 
   const addFeedbackItems = useCallback((columnId: string, feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItemsParam: boolean) => {
@@ -306,7 +313,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       boardTitle: board.title,
       defaultActionItemAreaPath,
       defaultActionItemIteration,
-      nonHiddenWorkItemTypes,
+      nonHiddenWorkItemTypes: focusModeNonHiddenWorkItemTypes ?? nonHiddenWorkItemTypes,
       allWorkItemTypes,
       hideFeedbackItems,
       onVoteCasted: () => {
@@ -319,7 +326,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       removeFeedbackItemFromColumn,
       refreshFeedbackItems,
     };
-  }, [columns, columnIds, workflowPhase, team, board.id, board.title, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
+  }, [columns, columnIds, workflowPhase, team, board.id, board.title, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
 
   const initColumns = useCallback(() => {
     const columnProperties = board.columns;
@@ -335,7 +342,8 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         col.accentColor = "#0078d4";
       }
 
-      col.notes = col.notes ?? "";
+      const normalizedNotes = col.notes ?? "";
+      col.notes = normalizedNotes;
 
       const column: IColumn = {
         columnProperties: col,
@@ -344,7 +352,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       };
       stateColumns[col.id] = column;
       newColumnIds.push(col.id);
-      newColumnNotes[col.id] = col.notes ?? "";
+      newColumnNotes[col.id] = normalizedNotes;
     });
 
     setColumns(stateColumns);
@@ -454,7 +462,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
 
   const handleColumnNotesChange = useCallback(
     (columnId: string, notes: string) => {
-      const previousNotes = columnNotes[columnId] ?? "";
+      const previousNotes = columnNotes[columnId];
 
       setColumns(previousColumns => {
         const updatedColumns = { ...previousColumns };
@@ -706,7 +714,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         isFocusModalHidden: true,
         groupIds: [] as string[],
         showColumnEditButton: !!canCurrentUserEditBoard,
-        columnNotes: columnNotes[columnId] ?? "",
+        columnNotes: columnNotes[columnId],
         onColumnNotesChange: (notes: string) => handleColumnNotesChange(columnId, notes),
         onVoteCasted: () => {
           if (onVoteCasted) {

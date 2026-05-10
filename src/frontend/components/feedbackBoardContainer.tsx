@@ -12,6 +12,7 @@ import FeedbackCarousel, { type FocusModeModel } from "./feedbackCarousel";
 
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
+import { workService } from "../dal/azureDevOpsWorkService";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
 import { userDataService } from "../dal/userDataService";
@@ -142,6 +143,7 @@ export interface FeedbackBoardContainerState {
    */
   projectTeams: WebApiTeam[];
   nonHiddenWorkItemTypes: WorkItemType[];
+  focusModeNonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   isMobileBoardActionsDialogHidden: boolean;
   isMobileTeamSelectorDialogHidden: boolean;
@@ -216,6 +218,7 @@ const initialState: FeedbackBoardContainerState = {
   isTeamDataLoaded: false,
   isTeamSelectorCalloutVisible: false,
   nonHiddenWorkItemTypes: [],
+  focusModeNonHiddenWorkItemTypes: [],
   projectTeams: [],
   teamBoardDeletedDialogMessage: "",
   teamBoardDeletedDialogTitle: "",
@@ -795,6 +798,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
   );
 
   const setSupportedWorkItemTypesForProject = React.useCallback(async (): Promise<void> => {
+    const currentTeamId = stateRef.current.currentTeam?.id;
     const allWorkItemTypes: WorkItemType[] = await workItemService.getWorkItemTypesForCurrentProject();
     const hiddenWorkItemTypes: WorkItemTypeReference[] = await workItemService.getHiddenWorkItemTypes();
 
@@ -802,8 +806,14 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
 
     const nonHiddenWorkItemTypes = allWorkItemTypes.filter(workItemType => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1);
 
+    const requirementWorkItemTypeNames = currentTeamId ? await workService.getRequirementBacklogWorkItemTypeNames(currentTeamId) : [];
+    const focusModeNonHiddenWorkItemTypes = requirementWorkItemTypeNames.length
+      ? nonHiddenWorkItemTypes.filter(workItemType => requirementWorkItemTypeNames.includes(workItemType.name))
+      : nonHiddenWorkItemTypes;
+
     setState({
       nonHiddenWorkItemTypes: nonHiddenWorkItemTypes,
+      focusModeNonHiddenWorkItemTypes: focusModeNonHiddenWorkItemTypes,
       allWorkItemTypes: allWorkItemTypes,
     });
   }, [setState]);
@@ -2261,6 +2271,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                     displayBoard={true}
                     workflowPhase={state.currentBoard.activePhase}
                     nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
+                    focusModeNonHiddenWorkItemTypes={state.focusModeNonHiddenWorkItemTypes}
                     allWorkItemTypes={state.allWorkItemTypes}
                     onFocusModeModelChange={focusModeModel => {
                       setState({ focusModeModel });

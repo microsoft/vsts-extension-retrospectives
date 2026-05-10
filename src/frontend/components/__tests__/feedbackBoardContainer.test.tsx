@@ -16,6 +16,7 @@ import { itemDataService } from "../../dal/itemDataService";
 import BoardDataService from "../../dal/boardDataService";
 import { azureDevOpsCoreService } from "../../dal/azureDevOpsCoreService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
+import { workService } from "../../dal/azureDevOpsWorkService";
 import { getService } from "azure-devops-extension-sdk";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
@@ -101,6 +102,7 @@ jest.mock("../../dal/boardDataService");
 jest.mock("../../dal/reflectBackendService");
 jest.mock("../../dal/azureDevOpsCoreService");
 jest.mock("../../dal/azureDevOpsWorkItemService");
+jest.mock("../../dal/azureDevOpsWorkService");
 jest.mock("../../dal/userDataService");
 jest.mock("../../dal/itemDataService");
 jest.mock("../boardSummaryTable", () => () => <div data-testid="board-summary-table" />);
@@ -292,6 +294,7 @@ describe("FeedbackBoardContainer additional coverage", () => {
   const boardDataServiceMock = BoardDataService as unknown as jest.Mocked<typeof BoardDataService>;
   const azureCoreMock = azureDevOpsCoreService as unknown as jest.Mocked<typeof azureDevOpsCoreService>;
   const workItemServiceMock = workItemService as unknown as jest.Mocked<typeof workItemService>;
+  const workServiceMock = workService as unknown as jest.Mocked<typeof workService>;
   const reflectMock = reflectBackendService as unknown as jest.Mocked<typeof reflectBackendService>;
   const userDataServiceMock = userDataService as unknown as jest.Mocked<typeof userDataService>;
   const itemDataServiceMock = itemDataService as unknown as jest.Mocked<typeof itemDataService>;
@@ -318,6 +321,7 @@ describe("FeedbackBoardContainer additional coverage", () => {
 
     workItemServiceMock.getWorkItemTypesForCurrentProject?.mockResolvedValue([{ name: "Task" } as unknown as WorkItemType]);
     workItemServiceMock.getHiddenWorkItemTypes?.mockResolvedValue([{ name: "Hidden" } as unknown as WorkItemTypeReference]);
+    workServiceMock.getRequirementBacklogWorkItemTypeNames?.mockResolvedValue(["Task"]);
 
     userDataServiceMock.getMostRecentVisit?.mockResolvedValue(undefined as any);
     userDataServiceMock.addVisit?.mockResolvedValue(undefined as any);

@@ -219,6 +219,82 @@ describe("Action Item Display component", () => {
     expect(container.querySelector(".add-action-item-wrapper")).toBeTruthy();
   });
 
+  it("renders add work item types alphabetically", async () => {
+    const propsWithMultipleTypes = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [
+        { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any,
+        { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any,
+        { name: "User Story", referenceName: "Microsoft.VSTS.WorkItemTypes.UserStory", icon: { url: "story-icon.png" }, _links: {} } as any,
+      ],
+    };
+
+    const { container } = render(<ActionItemDisplay {...propsWithMultipleTypes} />);
+    const menu = await openAddWorkItemMenu(container);
+    const buttons = within(menu).getAllByRole("button");
+
+    expect(buttons.map(button => button.textContent?.trim())).toEqual(["Link existing work item", "Bug", "Task", "User Story"]);
+  });
+
+  it("renders link existing work item followed by work item types", async () => {
+    const propsWithMultipleTypes = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [
+        { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any,
+        { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any,
+      ],
+    };
+
+    const { container } = render(<ActionItemDisplay {...propsWithMultipleTypes} />);
+    const menu = await openAddWorkItemMenu(container);
+    const buttons = within(menu).getAllByRole("button");
+
+    expect(buttons.map(button => button.textContent?.trim())).toEqual(["Link existing work item", "Bug", "Task"]);
+  });
+
+  it("opens menu below by default", async () => {
+    const propsWithTypes = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any],
+    };
+
+    const { container } = render(<ActionItemDisplay {...propsWithTypes} />);
+    const menu = await openAddWorkItemMenu(container);
+
+    expect(menu.classList.contains("popout-container-below")).toBe(true);
+  });
+
+  it("opens menu above when shouldShowAddWorkItemMenuBelow is false", async () => {
+    const propsWithTypes = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      shouldShowAddWorkItemMenuBelow: false,
+      nonHiddenWorkItemTypes: [{ name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any],
+    };
+
+    const { container } = render(<ActionItemDisplay {...propsWithTypes} />);
+    const menu = await openAddWorkItemMenu(container);
+
+    expect(menu.classList.contains("popout-container-below")).toBe(false);
+  });
+
+  it("shows only link existing work item when menu opens above with no available types", async () => {
+    const propsEmpty = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [] as any[],
+    };
+    const { container } = render(<ActionItemDisplay {...propsEmpty} />);
+    const menu = await openAddWorkItemMenu(container);
+    const buttons = within(menu).getAllByRole("button");
+
+    expect(buttons.map(button => button.textContent?.trim())).toEqual(["Link existing work item"]);
+    expect(container.querySelector(".separator")).toBeNull();
+  });
+
   it("handles empty nonHiddenWorkItemTypes", () => {
     const propsEmpty = {
       ...defaultTestProps,
@@ -227,6 +303,20 @@ describe("Action Item Display component", () => {
     };
     const { container } = render(<ActionItemDisplay {...propsEmpty} />);
     expect(container.querySelector(".add-action-item-wrapper")).toBeTruthy();
+  });
+
+  it("handles undefined nonHiddenWorkItemTypes", async () => {
+    const propsWithoutTypes = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: undefined as any,
+    };
+
+    const { container } = render(<ActionItemDisplay {...propsWithoutTypes} />);
+    const menu = await openAddWorkItemMenu(container);
+    const buttons = within(menu).getAllByRole("button");
+
+    expect(buttons.map(button => button.textContent?.trim())).toEqual(["Link existing work item"]);
   });
 
   it("renders with different team and board configurations", () => {
@@ -427,7 +517,7 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
+      expect(getByPlaceholderText("Enter the exact work item ID")).toBeTruthy();
     });
   });
 
@@ -444,7 +534,7 @@ describe("Action Item Display component", () => {
     fireEvent.keyDown(linkButton, { key: "Enter", code: "Enter" });
 
     await waitFor(() => {
-      expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
+      expect(getByPlaceholderText("Enter the exact work item ID")).toBeTruthy();
     });
   });
 
@@ -496,17 +586,17 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
+      expect(getByPlaceholderText("Enter the exact work item ID")).toBeTruthy();
     });
 
     // Enter invalid input
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "abc" } });
 
     await waitFor(() => {
       const linkButton = container.querySelector(".link-existing-work-item-dialog .button") as HTMLButtonElement;
       expect(linkButton?.disabled).toBe(true);
-      expect(queryByText("The work item you are looking for was not found. Please verify the id.")).toBeNull();
+      expect(queryByText("The work item you are looking for was not found. Please verify the ID.")).toBeNull();
     });
   });
 
@@ -521,14 +611,14 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      const searchBox = getByPlaceholderText("Enter the exact work item id");
+      const searchBox = getByPlaceholderText("Enter the exact work item ID");
 
       // Enter invalid input
       fireEvent.change(searchBox, { target: { value: "abc" } });
     });
 
     // Clear input
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "" } });
 
     await waitFor(() => {
@@ -549,7 +639,7 @@ describe("Action Item Display component", () => {
 
     await openLinkExistingDialog(container);
 
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "0" } });
 
     await waitFor(() => {
@@ -584,7 +674,7 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      const searchBox = getByPlaceholderText("Enter the exact work item id");
+      const searchBox = getByPlaceholderText("Enter the exact work item ID");
       fireEvent.change(searchBox, { target: { value: "789" } });
     });
 
@@ -607,12 +697,12 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      const searchBox = getByPlaceholderText("Enter the exact work item id");
+      const searchBox = getByPlaceholderText("Enter the exact work item ID");
       fireEvent.change(searchBox, { target: { value: "999" } });
     });
 
     await waitFor(() => {
-      expect(getByText("The work item you are looking for was not found. Please verify the id.")).toBeTruthy();
+      expect(getByText("The work item you are looking for was not found. Please verify the ID.")).toBeTruthy();
     });
   });
 
@@ -643,7 +733,7 @@ describe("Action Item Display component", () => {
 
     // Enter work item id
     await waitFor(() => {
-      const searchBox = getByPlaceholderText("Enter the exact work item id");
+      const searchBox = getByPlaceholderText("Enter the exact work item ID");
       fireEvent.change(searchBox, { target: { value: "789" } });
     });
 
@@ -677,7 +767,7 @@ describe("Action Item Display component", () => {
     const dialog = await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
+      expect(getByPlaceholderText("Enter the exact work item ID")).toBeTruthy();
     });
 
     const cancelButton = dialog.querySelector(".default.button") as HTMLButtonElement;
@@ -877,7 +967,7 @@ describe("Action Item Display component", () => {
 
     await openLinkExistingDialog(container);
 
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "12345" } });
 
     await waitFor(() => {
@@ -949,7 +1039,7 @@ describe("Action Item Display component", () => {
 
     await openLinkExistingDialog(container);
 
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "   " } });
 
     await waitFor(() => {

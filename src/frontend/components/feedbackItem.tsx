@@ -938,8 +938,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const groupItemsCount = (props.groupedItemProps?.groupedCount ?? 0) + 1;
   const currentColumnItems = props.columns[props.columnId]?.columnItems;
-  const itemPosition = currentColumnItems ? currentColumnItems.findIndex(columnItem => columnItem.feedbackItem.id === props.id) + 1 : 0;
-  const totalItemsInColumn = currentColumnItems?.length || 0;
+  const numberedColumnItems = [...(currentColumnItems ?? [])].sort((left, right) => new Date(right.feedbackItem.createdDate).getTime() - new Date(left.feedbackItem.createdDate).getTime());
+  const itemPosition = numberedColumnItems.findIndex(columnItem => columnItem.feedbackItem.id === props.id) + 1;
+  const totalItemsInColumn = numberedColumnItems.length;
 
   const hideFeedbackItems = props.workflowPhase === "Collect" && props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id;
   const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : props.title;
@@ -1124,7 +1125,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             </div>
           </div>
           {isGroupedCarouselItem && isMainItem && state.isShowingGroupedChildrenTitles && <GroupedFeedbackList childrenIds={childrenIds} columnItems={columnItems} columns={props.columns} currentColumnId={props.columnId} hideFeedbackItems={props.hideFeedbackItems} isFocusModalHidden={props.isFocusModalHidden} />}
-          <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={displayTitle} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} />}</div>
+          <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={displayTitle} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} shouldShowAddWorkItemMenuBelow={props.isFocusModalHidden} />}</div>
         </DocumentCard>
       </div>
       <dialog ref={deleteFeedbackDialogRef} className="delete-feedback-item-dialog" aria-label="Delete Feedback" onClose={() => setStateMerge({ isDeleteItemConfirmationDialogHidden: true })}>

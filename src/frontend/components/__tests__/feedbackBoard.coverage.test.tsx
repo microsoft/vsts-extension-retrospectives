@@ -2,7 +2,7 @@ import React from "react";
 import { act, render, waitFor } from "@testing-library/react";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 
-import FeedbackBoard, { FeedbackBoardProps } from "../../components/feedbackBoard";
+import FeedbackBoard, { FeedbackBoardProps, clearActiveTimerFeedbackItemId, findActiveTimerFeedbackItemId, findColumnItemById } from "../../components/feedbackBoard";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { itemDataService } from "../../dal/itemDataService";
 import { workService } from "../../dal/azureDevOpsWorkService";
@@ -201,6 +201,43 @@ beforeAll(() => {
 });
 
 describe("FeedbackBoard targeted coverage", () => {
+  it("covers active timer lookup across missing and active columns", () => {
+    expect(
+      findActiveTimerFeedbackItemId({
+        "missing-col": undefined as any,
+        "idle-col": {
+          columnProperties: {} as any,
+          columnItems: [{ feedbackItem: createItem({ id: "idle-item", timerState: false }), actionItems: [] }],
+        },
+        "active-col": {
+          columnProperties: {} as any,
+          columnItems: [{ feedbackItem: createItem({ id: "active-item", timerState: true }), actionItems: [] }],
+        },
+      }),
+    ).toBe("active-item");
+  });
+
+  it("covers missing-column item lookup", () => {
+    expect(
+      findColumnItemById(
+        "missing-item",
+        {
+          "missing-col": undefined as any,
+          "present-col": {
+            columnProperties: {} as any,
+            columnItems: [{ feedbackItem: createItem({ id: "present-item" }), actionItems: [] }],
+          },
+        },
+        ["missing-col", "present-col"],
+      ),
+    ).toBeUndefined();
+  });
+
+  it("covers active timer clearing helper branches", () => {
+    expect(clearActiveTimerFeedbackItemId("timer-a", "timer-a")).toBeNull();
+    expect(clearActiveTimerFeedbackItemId("timer-b", "timer-a")).toBe("timer-b");
+  });
+
   it("covers board owner and notes nullish branches", async () => {
     renderBoard({
       userId: "someone-else",
@@ -361,6 +398,21 @@ describe("FeedbackBoard targeted coverage", () => {
     expect(onVoteCasted).toHaveBeenCalled();
   });
 
+  it("prefers focus mode work item types when provided", async () => {
+    const onFocusModeModelChange = jest.fn();
+    const defaultTypes = [{ name: "Default", referenceName: "Default.Type", icon: { url: "default.png" } } as any];
+    const focusTypes = [{ name: "Focus", referenceName: "Focus.Type", icon: { url: "focus.png" } } as any];
+
+    renderBoard({ onFocusModeModelChange, workflowPhase: WorkflowPhase.Vote, nonHiddenWorkItemTypes: defaultTypes, focusModeNonHiddenWorkItemTypes: focusTypes });
+
+    await waitFor(() => {
+      expect(onFocusModeModelChange).toHaveBeenCalled();
+    });
+
+    const model = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1][0];
+    expect(model.nonHiddenWorkItemTypes).toBe(focusTypes);
+  });
+
   it("covers focus mode vote callback when prop is undefined", async () => {
     const onFocusModeModelChange = jest.fn();
     renderBoard({ onVoteCasted: undefined, onFocusModeModelChange, workflowPhase: WorkflowPhase.Vote });
@@ -444,6 +496,35 @@ describe("FeedbackBoard targeted coverage", () => {
       document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
       document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
       document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    });
+  });
+
+  it("covers stopped-timer handoff when a new timer starts", async () => {
+    renderBoard({ workflowPhase: WorkflowPhase.Vote });
+
+    await waitFor(() => {
+      expect(getLatestColumnPropsById("col-1")).toBeTruthy();
+    });
+
+    const columnProps = getLatestColumnPropsById("col-1");
+    await act(async () => {
+      columnProps.addFeedbackItems("col-1", [createItem({ id: "timer-a", timerState: false })], false, false, false, false, false);
+    });
+
+    await act(async () => {
+      columnProps.requestTimerStart("timer-a");
+    });
+
+    await waitFor(() => {
+      expect(getLatestColumnPropsById("col-1").activeTimerFeedbackItemId).toBe("timer-a");
+    });
+
+    await act(async () => {
+      getLatestColumnPropsById("col-1").requestTimerStart("timer-b");
+    });
+
+    await waitFor(() => {
+      expect(itemDataService.flipTimer).toHaveBeenCalledWith("board-1", "timer-a", null);
     });
   });
 

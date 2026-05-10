@@ -2,7 +2,7 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { IWorkItemFormNavigationService, WorkItemTrackingServiceIds } from "azure-devops-extension-api/WorkItemTracking";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { getService, getUser } from "azure-devops-extension-sdk";
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
@@ -26,11 +26,26 @@ export interface ActionItemDisplayProps {
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   allowAddNewActionItem: boolean;
+  shouldShowAddWorkItemMenuBelow?: boolean;
 
   onUpdateActionItem: (feedbackItemId: IFeedbackItemDocument) => void;
 }
 
-export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackItemId, feedbackItemTitle, team, boardId, boardTitle, defaultIteration, defaultAreaPath, actionItems, nonHiddenWorkItemTypes, allWorkItemTypes, allowAddNewActionItem, onUpdateActionItem }) => {
+export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({
+  feedbackItemId,
+  feedbackItemTitle,
+  team,
+  boardId,
+  boardTitle,
+  defaultIteration,
+  defaultAreaPath,
+  actionItems,
+  nonHiddenWorkItemTypes,
+  allWorkItemTypes,
+  allowAddNewActionItem,
+  shouldShowAddWorkItemMenuBelow = true,
+  onUpdateActionItem,
+}) => {
   const trackActivity = useTrackMetric(reactPlugin, "ActionItemDisplay");
 
   const [isLinkedWorkItemLoaded, setIsLinkedWorkItemLoaded] = useState(false);
@@ -42,6 +57,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
   const addWorkItemMenuRef = useRef<HTMLDivElement>(null);
   const addWorkItemWrapperRef = useRef<HTMLDivElement>(null);
   const linkExistingWorkItemDialogRef = useRef<HTMLDialogElement>(null);
+
+  const visibleWorkItemTypes = useMemo(() => {
+    return [...(nonHiddenWorkItemTypes ?? [])].sort((left, right) => left.name.localeCompare(right.name));
+  }, [nonHiddenWorkItemTypes]);
 
   useEffect(() => {
     if (initialRender) {
@@ -178,6 +197,24 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
     });
   }, [actionItems, renderWorkItemCard]);
 
+  const renderLinkExistingWorkItemButton = useCallback(() => {
+    return (
+      <button
+        className="list-item"
+        onClick={handleLinkExistingWorkItemClick}
+        onKeyDown={e => {
+          if (e.key === "Enter") {
+            e.stopPropagation();
+            handleLinkExistingWorkItemClick();
+          }
+        }}
+      >
+        {getIconElement("link")}
+        <span>Link existing work item</span>
+      </button>
+    );
+  }, [handleLinkExistingWorkItemClick]);
+
   return (
     <div className="action-item-display-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {allowAddNewActionItem && (
@@ -187,22 +224,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
             <span>Add work item</span>
           </button>
           {isWorkItemTypeListCalloutVisible && (
-            <div ref={addWorkItemMenuRef} className="popout-container" role="menu" aria-label="Add work item menu">
-              <button
-                className="list-item"
-                onClick={handleLinkExistingWorkItemClick}
-                onKeyDown={e => {
-                  if (e.key === "Enter") {
-                    e.stopPropagation();
-                    handleLinkExistingWorkItemClick();
-                  }
-                }}
-              >
-                {getIconElement("link")}
-                <span>Link existing work item</span>
-              </button>
-              <div role="separator" className="separator" />
-              {nonHiddenWorkItemTypes.map(item => {
+            <div ref={addWorkItemMenuRef} className={`popout-container ${shouldShowAddWorkItemMenuBelow ? "popout-container-below" : ""}`.trim()} role="menu" aria-label="Add work item menu">
+              {renderLinkExistingWorkItemButton()}
+              {visibleWorkItemTypes.length > 0 && <div role="separator" className="separator" />}
+              {visibleWorkItemTypes.map(item => {
                 return (
                   <button key={item.referenceName} className="list-item" onClick={e => handleClickWorkItemType(e, item)} aria-label={`Add work item type ${item.name}`}>
                     <img className="work-item-type-icon" alt={`icon for work item type ${item.name}`} src={item.icon.url} />
@@ -224,10 +249,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
         </div>
         <div className="subText">
           <div className="form-group">
-            <input className="search-box" placeholder="Enter the exact work item id" role="searchbox" onChange={handleInputChange}></input>
+            <input className="search-box" placeholder="Enter the exact work item ID" role="searchbox" onChange={handleInputChange}></input>
             <div className="output-container">
               {isLinkedWorkItemLoaded && linkedWorkItem && renderWorkItemCard(linkedWorkItem, true)}
-              {isLinkedWorkItemLoaded && !linkedWorkItem && <div className="work-item-not-found">The work item you are looking for was not found. Please verify the id.</div>}
+              {isLinkedWorkItemLoaded && !linkedWorkItem && <div className="work-item-not-found">The work item you are looking for was not found. Please verify the ID.</div>}
             </div>
           </div>
         </div>
