@@ -671,11 +671,10 @@ export const PropellerIcon = () => {
     <svg className="icon-propeller" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M0 0h24v24H0z" fill="none" />
       <g>
-        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" />
-        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" transform="rotate(72 12 12)" />
-        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" transform="rotate(144 12 12)" />
-        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" transform="rotate(216 12 12)" />
-        <ellipse cx="12" cy="6.2" rx="2.8" ry="5" transform="rotate(288 12 12)" />
+        <ellipse cx="12" cy="7" rx="3" ry="4.5" />
+        <ellipse cx="12" cy="7" rx="3" ry="4.5" transform="rotate(120 12 12)" />
+        <ellipse cx="12" cy="7" rx="3" ry="4.5" transform="rotate(240 12 12)" />
+        <circle cx="12" cy="12" r="3" />
       </g>
     </svg>
   );
