@@ -5,19 +5,17 @@ You can find the changelog of the Retrospective Extension below.
 ## v1.92.53
 
 * Fix: team admins can now edit board columns, not just the board owner.
-* Fix: grouped feedback items collapsed state could incorrectly apply to non-main items.
-* Fix: hidden feedback items in grouped lists no longer expose placeholder text to the DOM; screen reader label is set on the list item instead.
-* Fix: clipboard copy now works correctly inside Azure DevOps by using copy-event interception instead of the blocked `navigator.clipboard` API.
+* Fix: grouped feedback items now correctly display the aggregated vote sum on the collapsed parent item only.
+* Fix: hidden feedback items now display blurred user-entered text and announce "Hidden feedback" to screen readers, consistent with how feedback cards handle hidden content.
+* Fix: clipboard copy now works correctly by using copy-event interception instead of the blocked `navigator.clipboard` API.
 * Fix: copying a board link or email summary now shows a failure toast when the clipboard operation is unsuccessful.
-* Fix: SignalR reconnect watchdog switched from a fixed 5-second poll to exponential backoff (5s → 60s cap) to reduce unnecessary reconnect noise.
+* Fix: SignalR reconnect watchdog switched from a fixed 5-second poll to incremental backoff (5s → 60s cap) to reduce unnecessary reconnect noise.
 * Fix: permissions table row checkboxes now correctly aligned using the `cell-checkbox` class.
-* Fix: Speedboat template column corrected from "Propellors" to "Propellers" with more representative icons.
-* Fix: board delete confirmation dialog now quotes the board name and marks the warning emoji as `aria-hidden`.
+* Fix: Speedboat template column spelling corrected and updated with more representative icons.
 * Feature: replaced Fluent UI `Pivot`/`PivotItem` in the board metadata form with a native accessible tab list.
-* Feature: column notes now display as a custom hover tooltip instead of relying on the browser's `title` attribute.
+* Feature: column notes now display as a custom hover tooltip for improved user experience.
 * Feature: added new icons — Forward Circle, Propeller, and Dangerous.
-* Feature: Focus Mode button now uses a dedicated focus icon; the previous icon is reassigned to the Repeat column icon.
-* Feature: added clipboard copy failure localization strings in English, Spanish, German, and French.
+* Feature: Continue icon changed from Focus icon to a Repeat column icon.
 * Style: updated board accent color palette to more accessible, consistent values.
 * Style: permissions panel search bar and warning banner spacing now consistent whether or not the warning is visible.
 
