@@ -39,5 +39,11 @@ describe("icons", () => {
       const { container } = render(icon);
       expect(container.querySelector(".icon-adjust")).toBeTruthy();
     });
+
+    it("resolves legacy font awesome class strings", () => {
+      const icon = getIconElement("fa-solid fa-magnifying-glass");
+      const { container } = render(icon);
+      expect(container.querySelector(".icon-search")).toBeTruthy();
+    });
   });
 });

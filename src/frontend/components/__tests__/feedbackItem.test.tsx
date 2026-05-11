@@ -340,7 +340,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
             notes: "",
           },
@@ -1004,7 +1004,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: feedbackItem.columnId,
             title: "Keyboard Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
             notes: "",
           },
@@ -1139,7 +1139,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: columnId,
             title: "Keyboard Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
             notes: "",
           },
@@ -4509,7 +4509,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: feedbackItem.columnId,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
             notes: "",
           },
@@ -4622,7 +4622,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
             notes: "",
           },
@@ -4734,7 +4734,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -4815,7 +4815,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -4942,7 +4942,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5025,7 +5025,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5116,7 +5116,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5202,7 +5202,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5285,7 +5285,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5372,7 +5372,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5381,7 +5381,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: secondColumnId,
             title: "Second Column",
-            iconClass: "far fa-frown",
+            iconClass: "frown",
             accentColor: "#ff0000",
           },
           columnItems: [] as any[],
@@ -5484,7 +5484,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [
@@ -5579,7 +5579,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5688,7 +5688,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5786,7 +5786,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5795,7 +5795,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: secondColumnId,
             title: "Second Column",
-            iconClass: "far fa-frown",
+            iconClass: "frown",
             accentColor: "#ff0000",
           },
           columnItems: [] as any[],
@@ -5895,7 +5895,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -5981,7 +5981,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6087,7 +6087,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [
@@ -6168,7 +6168,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem1, actionItems: [] as any[] }],
@@ -6248,7 +6248,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6335,7 +6335,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6417,7 +6417,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6512,7 +6512,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6591,7 +6591,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6669,7 +6669,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6755,7 +6755,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6829,7 +6829,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -6907,7 +6907,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7010,7 +7010,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7133,7 +7133,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [
@@ -7223,7 +7223,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7317,7 +7317,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: childItem, actionItems: [] as any[] }],
@@ -7405,7 +7405,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7495,7 +7495,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7568,7 +7568,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7649,7 +7649,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7747,7 +7747,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7819,7 +7819,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: mockItem, actionItems: [] as any[] }],
@@ -7901,7 +7901,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: newItem, actionItems: [] as any[] }],
@@ -7982,7 +7982,7 @@ describe("Feedback Item", () => {
           columnProperties: {
             id: testColumnUuidOne,
             title: "Test Column",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
           },
           columnItems: [{ feedbackItem: childItem, actionItems: [] as any[] }],
@@ -8093,7 +8093,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       lastEditedDate: doc.createdDate.toISOString(),
       upvotes: 0,
       accentColor: testColumns[testColumnUuidOne]?.columnProperties?.accentColor ?? "#008000",
-      iconClass: testColumns[testColumnUuidOne]?.columnProperties?.iconClass ?? "far fa-smile",
+      iconClass: testColumns[testColumnUuidOne]?.columnProperties?.iconClass ?? "smile",
       workflowPhase: "Vote",
       team: { id: "team-1" },
       originalColumnId: doc.originalColumnId,
@@ -8185,7 +8185,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
           columnProperties: {
             id: secondColumnId,
             title: "Second Column",
-            iconClass: "far fa-frown",
+            iconClass: "frown",
             accentColor: "#ff0000",
           },
           columnItems: [] as any[],
@@ -8871,7 +8871,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
         columnProperties: {
           id: testColumnUuidOne,
           title: "Test Column",
-          iconClass: "far fa-smile",
+          iconClass: "smile",
           accentColor: "#008000",
         },
         columnItems: [
@@ -8884,7 +8884,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
         columnProperties: {
           id: testColumnUuidTwo,
           title: "Other Column",
-          iconClass: "far fa-frown",
+          iconClass: "frown",
           accentColor: "#FF0000",
         },
         columnItems: [] as any[],
@@ -10630,7 +10630,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
           columnProperties: {
             id: "current-col",
             title: "Current",
-            iconClass: "far fa-smile",
+            iconClass: "smile",
             accentColor: "#008000",
             notes: "",
           },

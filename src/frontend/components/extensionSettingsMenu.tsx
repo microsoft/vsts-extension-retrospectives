@@ -43,7 +43,7 @@ const keyboardShortcuts: KeyboardShortcut[] = [
   { keys: ["Delete"], description: "Delete feedback item", category: "Actions" },
 
   // Column actions
-  { keys: ["E"], description: "Edit column notes", category: "Column" },
+  { keys: ["e"], description: "Edit column notes", category: "Column" },
 ];
 
 const processImportedData = async (importedData: IExportImportDataSchema[]) => {
@@ -219,7 +219,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
               whatsNewDialogRef.current!.showModal();
             }}
           >
-            {getIconElement("celebration")}
+            {getIconElement("new-releases")}
             What&apos;s new
           </button>
           <button

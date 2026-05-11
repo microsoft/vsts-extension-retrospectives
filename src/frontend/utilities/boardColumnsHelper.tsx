@@ -2,7 +2,7 @@ import { IFeedbackColumn } from "../interfaces/feedback";
 import { generateUUID } from "./random";
 
 export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] => {
-  const NEXT_ACTION = "One action to try next.";
+  const NEXT_ACTION = "One action to try next cycle.";
 
   switch (templateId) {
     case "start-stop-continue":
@@ -202,7 +202,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d", //red
-          iconClass: "exclamation",
+          iconClass: "block",
           id: generateUUID(),
           title: "Impediments",
           notes: "",
@@ -233,7 +233,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#8063bf", //purple
-          iconClass: "check-circle",
+          iconClass: "celebration",
           id: generateUUID(),
           title: "Done",
           notes: "",

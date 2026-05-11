@@ -467,7 +467,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                             setIsChooseColumnAccentColorDialogHidden(false);
                           }}
                         >
-                          <i className={cn("feedback-column-card-accent-color", "fas fa-square")} style={{ color: columnCard.column.accentColor }} />
+                          <i className={cn("feedback-column-card-accent-color", "square")} style={{ color: columnCard.column.accentColor }} />
                         </button>
                         <EditableDocumentCardTitle
                           isDisabled={columnCard.markedForDeletion}
@@ -668,7 +668,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                         }}
                       >
                         <i
-                          className={"fas fa-square"}
+                          className={"square"}
                           style={{
                             color: accentColor.colorCode,
                           }}

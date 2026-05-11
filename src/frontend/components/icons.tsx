@@ -118,6 +118,24 @@ export const ExclamationIcon = () => {
   );
 };
 
+export const BlockIcon = () => {
+  return (
+    <svg className="icon-block" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.68L5.68 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.68L18.32 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z" />
+    </svg>
+  );
+};
+
+export const NewReleasesIcon = () => {
+  return (
+    <svg className="icon-new-releases" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <path d="M23 12l-2.44-2.79.34-3.69-3.61-.82-1.89-3.2L12 2.96 8.6 1.5 6.71 4.69 3.1 5.5l.34 3.7L1 12l2.44 2.79-.34 3.7 3.61.82 1.89 3.19L12 21.04l3.4 1.47 1.89-3.2 3.61-.82-.34-3.69L23 12zm-10 3h-2v-2h2v2zm0-4h-2V7h2v4z" />
+    </svg>
+  );
+};
+
 export const PersonIcon = () => {
   return (
     <svg className="icon-person" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -483,9 +501,13 @@ export const SadFaceIcon = () => {
 
 export const AngryFaceIcon = () => {
   return (
-    <svg className="icon-angry-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-angry-face" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
       <path d="M0 0h24v24H0V0z" fill="none" />
-      <path d="M12 13.5c-2.33 0-4.31 1.46-5.11 3.5h10.22c-.8-2.04-2.78-3.5-5.11-3.5zM7.82 12l1.06-1.06L9.94 12 11 10.94 9.94 9.88 11 8.82 9.94 7.76 8.88 8.82 7.82 7.76 6.76 8.82l1.06 1.06-1.06 1.06zm4.17-10C6.47 2 2 6.47 2 12s4.47 10 9.99 10S22 17.53 22 12 17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm4.18-12.24l-1.06 1.06-1.06-1.06L13 8.82l1.06 1.06L13 10.94 14.06 12l1.06-1.06L16.18 12l1.06-1.06-1.06-1.06 1.06-1.06z" />
+      <path d="M12 13.5c-2.33 0-4.31 1.46-5.11 3.5h10.22c-.8-2.04-2.78-3.5-5.11-3.5zM7.82 12l1.06 1.06zm4.17-10C6.47 2 2 6.47 2 12s4.47 10 9.99 10S22 17.53 22 12 17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm4.18-12.24l-1.06" />
+      <path d="M7 7.8L9.6 8.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+      <path d="M17 7.8L14.4 8.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+      <circle cx="15.5" cy="10" r="1.5" />
+      <circle cx="8.5" cy="10" r="1.5" />
     </svg>
   );
 };
@@ -809,7 +831,7 @@ export const GearsIcon = () => {
   return (
     <svg className="icon-gears" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <rect fill="none" height="24" width="24" />
-      <path d="M10,13c0.55,0,1,0.45,1,1s-0.45,1-1,1s-1-0.45-1-1S9.45,13,10,13 M10,11c-1.66,0-3,1.34-3,3s1.34,3,3,3s3-1.34,3-3 S11.66,11,10,11L10,11z M18.5,9l1.09-2.41L22,5.5l-2.41-1.09L18.5,2l-1.09,2.41L15,5.5l2.41,1.09L18.5,9z M21.28,12.72L20.5,11 l-0.78,1.72L18,13.5l1.72,0.78L20.5,16l0.78-1.72L23,13.5L21.28,12.72z M16.25,14c0-0.12,0-0.25-0.01-0.37l1.94-1.47l-2.5-4.33 l-2.24,0.94c-0.2-0.13-0.42-0.26-0.64-0.37L12.5,6h-5L7.2,8.41C6.98,8.52,6.77,8.65,6.56,8.78L4.32,7.83l-2.5,4.33l1.94,1.47 C3.75,13.75,3.75,13.88,3.75,14s0,0.25,0.01,0.37l-1.94,1.47l2.5,4.33l2.24-0.94c0.2,0.13,0.42,0.26,0.64,0.37L7.5,22h5l0.3-2.41 c0.22-0.11,0.43-0.23,0.64-0.37l2.24,0.94l2.5-4.33l-1.94-1.47C16.25,14.25,16.25,14.12,16.25,14z M14.83,17.64l-1.73-0.73 c-0.56,0.6-1.3,1.04-2.13,1.23L10.73,20H9.27l-0.23-1.86c-0.83-0.19-1.57-0.63-2.13-1.23l-1.73,0.73l-0.73-1.27l1.49-1.13 c-0.12-0.39-0.18-0.8-0.18-1.23c0-0.43,0.06-0.84,0.18-1.23l-1.49-1.13l0.73-1.27l1.73,0.73c0.56-0.6,1.3-1.04,2.13-1.23L9.27,8 h1.47l0.23,1.86c0.83,0.19,1.57,0.63,2.13,1.23l1.73-0.73l0.73,1.27l-1.49,1.13c0.12,0.39,0.18,0.8,0.18,1.23 c0,0.43-0.06,0.84-0.18,1.23l1.49,1.13L14.83,17.64z" />
+      <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.4.12-.61l-1.92-3.32c-.12-.22-.37-.3-.59-.22l-2.39.96c-.5-.38-1.05-.69-1.67-.94l-.36-2.54A.5.5 0 0 0 13.97 2h-3.94c-.25 0-.46.18-.49.42l-.36 2.54c-.62.25-1.17.56-1.67.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.61 8.48c-.12.21-.07.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.51.51 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.38 1.05.69 1.67.94l.36 2.54c.03.24.24.42.49.42h3.94c.25 0 .46-.18.49-.42l.36-2.54c.62-.25 1.17-.56 1.67-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.51.51 0 0 0-.12-.61l-2.03-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
     </svg>
   );
 };
@@ -886,11 +908,14 @@ export const LogoutIcon = () => {
 };
 
 export const availableIcons: { id: string; tags: string[]; name: string; icon: React.ReactElement }[] = [
+  // Keep legacy Font Awesome tokens (fas/far/fa-solid/fa-regular) in tags for backward compatibility.
+  // Existing boards can store these older values, and getIconElement relies on them to map to current icons.
   { id: "happy-face", tags: ["fas fa-cart-plus", "far fa-smile"], name: "Smile", icon: <HappyFaceIcon /> },
   { id: "sad-face", tags: ["far fa-frown"], name: "Frown", icon: <SadFaceIcon /> },
   { id: "angry-face", tags: ["far fa-angry"], name: "Angry", icon: <AngryFaceIcon /> },
   { id: "help", tags: ["fas fa-question", "far fa-question"], name: "Question", icon: <HelpIcon /> },
   { id: "exclamation", tags: ["fas fa-exclamation", "fas fa-exclamation-triangle", "far fa-exclamation"], name: "Exclamation", icon: <ExclamationIcon /> },
+  { id: "block", tags: [], name: "Block", icon: <BlockIcon /> },
   { id: "coffee", tags: ["fas fa-coffee"], name: "Coffee", icon: <CoffeeIcon /> },
   { id: "rocket-launch", tags: ["fas fa-rocket", "fas fa-fan"], name: "Rocket", icon: <RocketLaunchIcon /> },
   { id: "play-circle", tags: ["far fa-circle-play"], name: "Play", icon: <PlayCircleIcon /> },
@@ -919,10 +944,10 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "search", tags: ["search", "fa-solid fa-magnifying-glass"], name: "Search", icon: <SearchIcon /> },
   { id: "electric-bolt", tags: ["electric-bolt", "fa-solid fa-bolt"], name: "Electric Bolt", icon: <ElectricBoltIcon /> },
   { id: "psychological-safety", tags: ["psychological-safety", "fa-regular fa-handshake"], name: "Psychological Safety", icon: <PsychologicalSafetyIcon /> },
-  { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
+  { id: "balance", tags: ["balanced", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
   { id: "gears", tags: ["gears", "fa-solid fa-gears"], name: "Gears", icon: <GearsIcon /> },
   { id: "eye", tags: ["eye", "far fa-eye"], name: "Eye", icon: <EyeIcon /> },
-  { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
+  { id: "speed", tags: ["square-poll", "fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
   { id: "add", tags: [], name: "Add", icon: <AddIcon /> },
   { id: "edit", tags: [], name: "Edit", icon: <EditIcon /> },
   { id: "link", tags: [], name: "Link", icon: <LinkIcon /> },
@@ -967,6 +992,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "group-work", tags: [], name: "Group Work", icon: <GroupWorkIcon /> },
   { id: "undo", tags: [], name: "Undo", icon: <UndoIcon /> },
   { id: "logout", tags: [], name: "Logout", icon: <LogoutIcon /> },
+  { id: "new-releases", tags: [], name: "New Releases", icon: <NewReleasesIcon /> },
 ];
 
 export function getIconElement(iconId: string | undefined | null): React.ReactElement {

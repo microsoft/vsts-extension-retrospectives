@@ -280,7 +280,7 @@ describe("feedback interfaces and helpers", () => {
       const column: IFeedbackColumn = {
         id: "col1",
         title: "What went well?",
-        iconClass: "far fa-smile",
+        iconClass: "smile",
         accentColor: "#008000",
       };
       expect(column.id).toBe("col1");
@@ -372,8 +372,8 @@ describe("feedback interfaces and helpers", () => {
         areaPaths: ["Area1", "Area2"],
         iterations: ["Sprint 1", "Sprint 2"],
         columns: [
-          { id: "col1", title: "Good", iconClass: "far fa-smile", accentColor: "#008000" },
-          { id: "col2", title: "Bad", iconClass: "far fa-frown", accentColor: "#cc293d" },
+          { id: "col1", title: "Good", iconClass: "smile", accentColor: "#008000" },
+          { id: "col2", title: "Bad", iconClass: "frown", accentColor: "#cc293d" },
         ],
         modifiedDate: new Date("2025-10-16"),
         modifiedBy: { id: "user2" } as any,

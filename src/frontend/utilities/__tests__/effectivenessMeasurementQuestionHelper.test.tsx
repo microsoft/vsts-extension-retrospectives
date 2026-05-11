@@ -76,22 +76,3 @@ describe("getQuestionTooltip", () => {
     expect(result).toEqual(expectedTooltip);
   });
 });
-
-describe("getQuestionFontAwesomeClass", () => {
-  it("should return the font awesome class for a valid question id", () => {
-    const questionId = 1;
-    const expectedClass = "fa-solid fa-magnifying-glass";
-
-    const result = getQuestionIconClassName(questionId);
-
-    expect(result).toBe(expectedClass);
-  });
-
-  it("should return an empty string for an invalid question id", () => {
-    const questionId = 10;
-
-    const result = getQuestionIconClassName(questionId);
-
-    expect(result).toBe("");
-  });
-});

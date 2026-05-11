@@ -248,7 +248,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[3]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "exclamation",
+          iconClass: "block",
           id: "uuid-4",
           title: "Impediments",
           notes: "",
@@ -284,7 +284,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[3]).toEqual({
           accentColor: "#8063bf",
-          iconClass: "check-circle",
+          iconClass: "celebration",
           id: "uuid-4",
           title: "Done",
           notes: "",
@@ -352,7 +352,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -381,7 +381,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -410,7 +410,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -439,7 +439,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -468,7 +468,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -497,7 +497,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });

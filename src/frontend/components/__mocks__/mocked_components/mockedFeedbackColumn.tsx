@@ -64,7 +64,7 @@ testColumnsObj[testColumnUuidOne] = {
   columnProperties: {
     id: testColumnUuidOne,
     title: "Test Feedback Column One",
-    iconClass: "far fa-smile",
+    iconClass: "smile",
     accentColor: "#008000",
     notes: "",
   },
@@ -79,7 +79,7 @@ testColumnsObj[testColumnUuidTwo] = {
   columnProperties: {
     id: testColumnUuidTwo,
     title: testColumnTwoTitle,
-    iconClass: "far fa-smile",
+    iconClass: "smile",
     accentColor: "#008100",
     notes: "",
   },
@@ -258,7 +258,7 @@ testGroupColumnsObj[testGroupColumnUuidOne] = {
   columnProperties: {
     id: testGroupColumnUuidOne,
     title: "Test Group Feedback Column One",
-    iconClass: "far fa-smile",
+    iconClass: "smile",
     accentColor: "#008000",
     notes: "",
   },
@@ -277,7 +277,7 @@ testGroupColumnsObj[testGroupColumnUuidTwo] = {
   columnProperties: {
     id: testGroupColumnUuidTwo,
     title: "Test Group Feedback Column Two",
-    iconClass: "far fa-smile",
+    iconClass: "smile",
     accentColor: "#008000",
     notes: "",
   },
