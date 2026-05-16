@@ -303,6 +303,22 @@ export const AddCircleIcon = () => {
   );
 };
 
+export const AddBoxIcon = () => {
+  return (
+    <svg className="icon-add-box" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m0 16H5V5h14zm-8-2h2v-4h4v-2h-4V7h-2v4H7v2h4z" />
+    </svg>
+  );
+};
+
+export const MinusBoxIcon = () => {
+  return (
+    <svg className="icon-minus-box" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m0 16H5V5h14zM7 11h10v2H7z" />
+    </svg>
+  );
+};
+
 export const ContentCopyIcon = () => {
   return (
     <svg className="icon-content-copy" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -445,19 +461,51 @@ export const DeleteIcon = () => {
   );
 };
 
-export const AdjustIcon = () => {
+export const FocusIcon = () => {
   return (
-    <svg className="icon-adjust" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M0 0h24v24H0V0z" fill="none" />
-      <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm7 3c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm7-11h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4z" />
+    <svg className="icon-focus" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+            <path d="M0 0h24v24H0V0z" fill="none" />
+                  <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm7 3c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm7-11h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4z" />
+                      </svg>
+  );
+};
+
+export const RepeatIcon = () => {
+  return (
+    <svg
+      className="icon-repeat"
+      xmlns="http://www.w3.org/2000/svg"
+      height="24"
+      width="24"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+      <g transform="translate(12 12) scale(1,-1) scale(0.82) translate(-12 -12)">
+        <path d="M12 6V3L8 7l4 4V8c2.21 0 4 1.79 4 4 0 .73-.2 1.41-.54 2l1.46 1.46C17.6 14.46 18 13.27 18 12c0-3.31-2.69-6-6-6z" />
+        <path d="M8 12c0-.73.2-1.41.54-2L7.08 8.54C6.4 9.54 6 10.73 6 12c0 3.31 2.69 6 6 6v3l4-4-4-4v3c-2.21 0-4-1.79-4-4z" />
+      </g>
     </svg>
   );
 };
 
-export const ForwardCircleIcon = () => {
+export const BullseyeIcon = () => {
   return (
-    <svg className="icon-forward-circle" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-      <path d="M480-280q83 0 141.5-58.5T680-480h-60q0 58-41 99t-99 41q-58 0-99-41t-41-99q0-58 41-99t99-41h3l-49 50 42 43 120-120-120-120-43 43 44 44q-82 2-139.5 60T280-480q0 83 58.5 141.5T480-280Zm0 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+    <svg
+      className="icon-target"
+      xmlns="http://www.w3.org/2000/svg"
+      height="24"
+      width="24"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M0 0h24v24H0z" fill="none" />
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="8" fill="white" />
+      <circle cx="12" cy="12" r="6" fill="currentColor" />
+      <circle cx="12" cy="12" r="4" fill="white" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
     </svg>
   );
 };
@@ -490,7 +538,19 @@ export const HappyFaceIcon = () => {
 
 export const SadFaceIcon = () => {
   return (
-    <svg className="icon-sad-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+   <svg className="icon-sad-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <circle cx="15.5" cy="9.5" r="1.5" />
+      <circle cx="8.5" cy="9.5" r="1.5" />
+      <path d="M16.5 13 c0-.7-.5-1.2-.9-1.7 -.4.5-.9 1-.9 1.7 0 .5.4.9.9.9 s.9-.4.9-.9z" />
+      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-6c-2.33 0-4.32 1.45-5.12 3.5h1.67c.69-1.19 1.97-2 3.45-2s2.75.81 3.45 2h1.67c-.8-2.05-2.79-3.5-5.12-3.5z" />
+    </svg>
+  );
+};
+
+export const FrownFaceIcon = () => {
+  return (
+    <svg className="icon-frown-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M0 0h24v24H0V0z" fill="none" />
       <circle cx="15.5" cy="9.5" r="1.5" />
       <circle cx="8.5" cy="9.5" r="1.5" />
@@ -607,6 +667,15 @@ export const ConstructionIcon = () => {
   );
 };
 
+export const ComputerIcon = () => {
+  return (
+    <svg className="icon-computer" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M20 18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H4C2.9 2 2 2.9 2 4v12c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 4h16v12H4V4z" />
+    </svg>
+  );
+};
+
 export const PlumbingIcon = () => {
   return (
     <svg className="icon-plumbing" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -626,9 +695,9 @@ export const PlumbingIcon = () => {
 
 export const ExploreIcon = () => {
   return (
-    <svg className="icon-explore" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M0 0h24v24H0z" fill="none" />
-      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1.41 2L5 17.59V5h12.59zM6.41 19L19 6.41V19H6.41zM6 7h5v1.5H6zm10 5.5h-1.5v2h-2V16h2v2H16v-2h2v-1.5h-2z" />
+    <svg className="icon-explore" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m-5.5-2.5 7.51-3.49L17.5 6.5 9.99 9.99zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1" />
     </svg>
   );
 };
@@ -800,17 +869,8 @@ export const ElectricBoltIcon = () => {
 export const PsychologicalSafetyIcon = () => {
   return (
     <svg className="icon-psychological-safety" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <g>
-        <rect fill="none" height="24" width="24" />
-      </g>
-      <g>
-        <g>
-          <path d="M19.94,9.06C19.5,5.73,16.57,3,13,3C9.47,3,6.57,5.61,6.08,9l-1.93,3.48C3.74,13.14,4.22,14,5,14h1l0,2c0,1.1,0.9,2,2,2h1 v3h7l0-4.68C18.62,15.07,20.35,12.24,19.94,9.06z M14.89,14.63L14,15.05V19h-3v-3H8v-4H6.7l1.33-2.33C8.21,7.06,10.35,5,13,5 c2.76,0,5,2.24,5,5C18,12.09,16.71,13.88,14.89,14.63z" />
-          <path d="M12.5,12.54c-0.41,0-0.74,0.31-0.74,0.73c0,0.41,0.33,0.74,0.74,0.74c0.42,0,0.73-0.33,0.73-0.74 C13.23,12.85,12.92,12.54,12.5,12.54z" />
-          <path d="M12.5,7c-1.03,0-1.74,0.67-2,1.45l0.96,0.4c0.13-0.39,0.43-0.86,1.05-0.86c0.95,0,1.13,0.89,0.8,1.36 c-0.32,0.45-0.86,0.75-1.14,1.26c-0.23,0.4-0.18,0.87-0.18,1.16h1.06c0-0.55,0.04-0.65,0.13-0.82c0.23-0.42,0.65-0.62,1.09-1.27 c0.4-0.59,0.25-1.38-0.01-1.8C13.95,7.39,13.36,7,12.5,7z" />
-        </g>
-      </g>
-    </svg>
+            <path d="M12.22 19.85c-.18.18-.5.21-.71 0-.18-.18-.21-.5 0-.71l3.39-3.39-1.41-1.41-3.39 3.39c-.19.2-.51.19-.71 0-.21-.21-.18-.53 0-.71l3.39-3.39-1.41-1.41-3.39 3.39c-.18.18-.5.21-.71 0-.19-.19-.19-.51 0-.71l3.39-3.39-1.42-1.41-3.39 3.39c-.18.18-.5.21-.71 0-.19-.2-.19-.51 0-.71L9.52 8.4l1.87 1.86c.95.95 2.59.94 3.54 0 .98-.98.98-2.56 0-3.54l-1.86-1.86.28-.28c.78-.78 2.05-.78 2.83 0l4.24 4.24c.78.78.78 2.05 0 2.83zm9.61-6.78c1.56-1.56 1.56-4.09 0-5.66l-4.24-4.24c-1.56-1.56-4.09-1.56-5.66 0l-.28.28-.28-.28c-1.56-1.56-4.09-1.56-5.66 0L2.17 6.71C.75 8.13.62 10.34 1.77 11.9l1.45-1.45c-.39-.75-.26-1.7.37-2.33l3.54-3.54c.78-.78 2.05-.78 2.83 0l3.56 3.56c.18.18.21.5 0 .71s-.53.18-.71 0L9.52 5.57l-5.8 5.79c-.98.97-.98 2.56 0 3.54.39.39.89.63 1.42.7.07.52.3 1.02.7 1.42s.9.63 1.42.7c.07.52.3 1.02.7 1.42s.9.63 1.42.7c.07.54.31 1.03.7 1.42.47.47 1.1.73 1.77.73s1.3-.26 1.77-.73z" />
+                </svg>
   );
 };
 
@@ -829,9 +889,23 @@ export const BalanceIcon = () => {
 
 export const GearsIcon = () => {
   return (
-    <svg className="icon-gears" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg
+      className="icon-gears"
+      xmlns="http://www.w3.org/2000/svg"
+      height="24"
+      width="24"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
       <rect fill="none" height="24" width="24" />
-      <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.4.12-.61l-1.92-3.32c-.12-.22-.37-.3-.59-.22l-2.39.96c-.5-.38-1.05-.69-1.67-.94l-.36-2.54A.5.5 0 0 0 13.97 2h-3.94c-.25 0-.46.18-.49.42l-.36 2.54c-.62.25-1.17.56-1.67.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.61 8.48c-.12.21-.07.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.51.51 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.38 1.05.69 1.67.94l.36 2.54c.03.24.24.42.49.42h3.94c.25 0 .46-.18.49-.42l.36-2.54c.62-.25 1.17-.56 1.67-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.51.51 0 0 0-.12-.61l-2.03-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+      {/* Upper-left gear */}
+      <g transform="translate(-1,-1.25) scale(0.725)">
+        <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.4.12-.61l-1.92-3.32c-.12-.22-.37-.3-.59-.22l-2.39.96c-.5-.38-1.05-.69-1.67-.94l-.36-2.54A.5.5 0 0 0 13.97 2h-3.94c-.25 0-.46.18-.49.42l-.36 2.54c-.62.25-1.17.56-1.67.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.61 8.48c-.12.21-.07.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.51.51 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.38 1.05.69 1.67.94l.36 2.54c.03.24.24.42.49.42h3.94c.25 0 .46-.18.49-.42l.36-2.54c.62-.25 1.17-.56 1.67-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.51.51 0 0 0-.12-.61l-2.03-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+      </g>
+      {/* Lower-right gear */}
+      <g transform="translate(8,8.25) scale(0.725)">
+        <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.4.12-.61l-1.92-3.32c-.12-.22-.37-.3-.59-.22l-2.39.96c-.5-.38-1.05-.69-1.67-.94l-.36-2.54A.5.5 0 0 0 13.97 2h-3.94c-.25 0-.46.18-.49.42l-.36 2.54c-.62.25-1.17.56-1.67.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.61 8.48c-.12.21-.07.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.51.51 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.38 1.05.69 1.67.94l.36 2.54c.03.24.24.42.49.42h3.94c.25 0 .46-.18.49-.42l.36-2.54c.62-.25 1.17-.56 1.67-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.51.51 0 0 0-.12-.61l-2.03-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+      </g>
     </svg>
   );
 };
@@ -907,107 +981,105 @@ export const LogoutIcon = () => {
   );
 };
 
-export const availableIcons: { id: string; tags: string[]; name: string; icon: React.ReactElement }[] = [
+export const availableIcons: { id: string; tags: string[]; selectable: boolean; name: string; icon: React.ReactElement }[] = [
   // Keep legacy Font Awesome tokens (fas/far/fa-solid/fa-regular) in tags for backward compatibility.
   // Existing boards can store these older values, and getIconElement relies on them to map to current icons.
-  { id: "happy-face", tags: ["fas fa-cart-plus", "far fa-smile"], name: "Smile", icon: <HappyFaceIcon /> },
-  { id: "sad-face", tags: ["far fa-frown"], name: "Frown", icon: <SadFaceIcon /> },
-  { id: "angry-face", tags: ["far fa-angry"], name: "Angry", icon: <AngryFaceIcon /> },
-  { id: "help", tags: ["fas fa-question", "far fa-question"], name: "Question", icon: <HelpIcon /> },
-  { id: "exclamation", tags: ["fas fa-exclamation", "fas fa-exclamation-triangle", "far fa-exclamation"], name: "Exclamation", icon: <ExclamationIcon /> },
-  { id: "block", tags: [], name: "Block", icon: <BlockIcon /> },
-  { id: "coffee", tags: ["fas fa-coffee"], name: "Coffee", icon: <CoffeeIcon /> },
-  { id: "rocket-launch", tags: ["fas fa-rocket", "fas fa-fan"], name: "Rocket", icon: <RocketLaunchIcon /> },
-  { id: "play-circle", tags: ["far fa-circle-play"], name: "Play", icon: <PlayCircleIcon /> },
-  { id: "stop-circle", tags: ["far fa-circle-stop"], name: "Stop", icon: <StopCircleIcon /> },
-  { id: "adjust", tags: ["far fa-circle-dot", "fa-bullseye", "forward-circle", "fa-circle-arrow-right"], name: "Repeat", icon: <ForwardCircleIcon /> },
-  { id: "focus", tags: [], name: "Focus", icon: <AdjustIcon /> },
-  { id: "thumb-up", tags: ["far fa-thumbs-up"], name: "Thumb Up", icon: <ThumbUpIcon /> },
-  { id: "thumb-down", tags: ["fas fa-skull-crossbones", "far fa-thumbs-down"], name: "Thumb Down", icon: <ThumbDownIcon /> },
-  { id: "thumb-up-down", tags: ["far fa-thumbs-up-down"], name: "Thumb Up/Down", icon: <ThumbUpDownIcon /> },
-  { id: "plumbing", tags: [], name: "Plumbing", icon: <PlumbingIcon /> },
-  { id: "forum", tags: ["far fa-comments"], name: "Forum", icon: <ForumIcon /> },
-  { id: "explore", tags: ["far fa-compass"], name: "Explore", icon: <ExploreIcon /> },
-  { id: "star", tags: ["far fa-star", "fas fa-star"], name: "Star", icon: <StarIcon /> },
-  { id: "menu-book", tags: ["fas fa-book"], name: "Book", icon: <MenuBookIcon /> },
-  { id: "light-bulb", tags: ["far fa-lightbulb"], name: "Light Bulb", icon: <LightBulbIcon /> },
-  { id: "delete", tags: ["fas fa-trash"], name: "Delete", icon: <DeleteIcon /> },
-  { id: "add-circle", tags: ["fa-plus", "fa-plus-circle", "far fa-square-plus"], name: "Add Circle", icon: <AddCircleIcon /> },
-  { id: "lock", tags: ["fas fa-lock"], name: "Lock", icon: <LockIcon /> },
-  { id: "birthday-cake", tags: ["fas fa-birthday-cake"], name: "Birthday Cake", icon: <BirthdayCakeIcon /> },
-  { id: "construction", tags: ["fas fa-chalkboard", "fas fa-construction", "far fa-plumbing", "far fa-wrench", "fas fa-wrench"], name: "Construction", icon: <ConstructionIcon /> },
-  { id: "arrow-circle-down", tags: ["fa-arrow-circle-down", "far fa-circle-down"], name: "Arrow Down", icon: <ArrowCircleDownIcon /> },
-  { id: "arrow-circle-up", tags: ["fa-arrow-circle-up", "far fa-circle-up"], name: "Arrow Up", icon: <ArrowCircleUpIcon /> },
-  { id: "check-circle", tags: ["fa-check-circle", "far fa-square-check"], name: "Check", icon: <CheckCircleIcon /> },
-  { id: "anchor", tags: ["fas fa-anchor"], name: "Anchor", icon: <AnchorIcon /> },
-  { id: "support", tags: ["fas fa-life-ring"], name: "Support", icon: <SupportIcon /> },
-  { id: "search", tags: ["search", "fa-solid fa-magnifying-glass"], name: "Search", icon: <SearchIcon /> },
-  { id: "electric-bolt", tags: ["electric-bolt", "fa-solid fa-bolt"], name: "Electric Bolt", icon: <ElectricBoltIcon /> },
-  { id: "psychological-safety", tags: ["psychological-safety", "fa-regular fa-handshake"], name: "Psychological Safety", icon: <PsychologicalSafetyIcon /> },
-  { id: "balance", tags: ["balanced", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
-  { id: "gears", tags: ["gears", "fa-solid fa-gears"], name: "Gears", icon: <GearsIcon /> },
-  { id: "eye", tags: ["eye", "far fa-eye"], name: "Eye", icon: <EyeIcon /> },
-  { id: "speed", tags: ["square-poll", "fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
-  { id: "add", tags: [], name: "Add", icon: <AddIcon /> },
-  { id: "edit", tags: [], name: "Edit", icon: <EditIcon /> },
-  { id: "link", tags: [], name: "Link", icon: <LinkIcon /> },
-  { id: "sms", tags: [], name: "SMS", icon: <SMSIcon /> },
-  { id: "note-add", tags: [], name: "Note Add", icon: <NoteAddIcon /> },
-  { id: "hourglass-top", tags: [], name: "Hourglass Top", icon: <HourglassTopIcon /> },
-  { id: "assignment-turned-in", tags: [], name: "Assignment Turned In", icon: <AssignmentTurnedInIcon /> },
-  { id: "close", tags: [], name: "Close", icon: <CloseIcon /> },
-  { id: "celebration", tags: [], name: "Celebration", icon: <CelebrationIcon /> },
-  { id: "cloud", tags: [], name: "Cloud", icon: <CloudIcon /> },
-  { id: "cloud-upload", tags: [], name: "Cloud Upload", icon: <CloudUploadIcon /> },
-  { id: "cloud-download", tags: [], name: "Cloud Download", icon: <CloudDownloadIcon /> },
-  { id: "arrow-circle-down", tags: [], name: "Arrow Circle Down", icon: <ArrowCircleDownIcon /> },
-  { id: "arrow-circle-up", tags: [], name: "Arrow Circle Up", icon: <ArrowCircleUpIcon /> },
-  { id: "person", tags: [], name: "Person", icon: <PersonIcon /> },
-  { id: "people", tags: [], name: "People", icon: <PeopleIcon /> },
-  { id: "insights", tags: [], name: "Insights", icon: <InsightsIcon /> },
-  { id: "assessment", tags: [], name: "Assessment", icon: <AssessmentIcon /> },
-  { id: "reviews", tags: [], name: "Reviews", icon: <ReviewsIcon /> },
-  { id: "chevron-up", tags: [], name: "Chevron Up", icon: <ChevronUpIcon /> },
-  { id: "chevron-down", tags: [], name: "Chevron Down", icon: <ChevronDownIcon /> },
-  { id: "chevron-left", tags: [], name: "Chevron Left", icon: <ChevronLeftIcon /> },
-  { id: "chevron-right", tags: [], name: "Chevron Right", icon: <ChevronRightIcon /> },
-  { id: "privacy-tip", tags: [], name: "Privacy Tip", icon: <PrivacyTipIcon /> },
-  { id: "keyboard", tags: [], name: "Keyboard", icon: <KeyboardIcon /> },
-  { id: "volunteer-activism", tags: [], name: "Volunteer Activism", icon: <VolunteerActivismIcon /> },
-  { id: "contact-phone", tags: [], name: "Contact Phone", icon: <ContactPhoneIcon /> },
-  { id: "pause-circle", tags: [], name: "Pause Circle", icon: <PauseCircleIcon /> },
-  { id: "refresh", tags: [], name: "Refresh", icon: <RefreshIcon /> },
-  { id: "link-off", tags: [], name: "Link Off", icon: <LinkOffIcon /> },
-  { id: "table-chart", tags: [], name: "Table Chart", icon: <TableChartIcon /> },
-  { id: "info", tags: [], name: "Info", icon: <InfoIcon /> },
-  { id: "content-copy", tags: [], name: "Content Copy", icon: <ContentCopyIcon /> },
-  { id: "sim-card-download", tags: [], name: "Sim Card Download", icon: <SimCardDownloadIcon /> },
-  { id: "forward-to-inbox", tags: [], name: "Forward To Inbox", icon: <ForwardToInboxIcon /> },
-  { id: "source", tags: [], name: "Source", icon: <SourceIcon /> },
-  { id: "inventory", tags: [], name: "Inventory", icon: <InventoryIcon /> },
-  { id: "more-horizontal", tags: [], name: "More Horizontal", icon: <MoreHorizontalIcon /> },
-  { id: "more-vertical", tags: [], name: "More Vertical", icon: <MoreVerticalIcon /> },
-  { id: "report-problem", tags: [], name: "Report Problem", icon: <ReportProblemIcon /> },
-  { id: "open-with", tags: [], name: "Open With", icon: <OpenWithIcon /> },
-  { id: "group-work", tags: [], name: "Group Work", icon: <GroupWorkIcon /> },
-  { id: "undo", tags: [], name: "Undo", icon: <UndoIcon /> },
-  { id: "logout", tags: [], name: "Logout", icon: <LogoutIcon /> },
-  { id: "new-releases", tags: [], name: "New Releases", icon: <NewReleasesIcon /> },
+  // selectable: true means the icon appears in the column icon selection list.
+  { id: "happy-face", tags: ["far fa-smile"], selectable: true, name: "Smile", icon: <HappyFaceIcon /> },
+  { id: "arrow-circle-up", tags: ["fa-arrow-circle-up", "far fa-circle-up"], selectable: true, name: "Arrow Up", icon: <ArrowCircleUpIcon /> },
+  { id: "add-box", tags: ["fas fa-cart-plus"], selectable: true, name: "Add Box", icon: <AddBoxIcon /> },
+  { id: "rocket-launch", tags: ["fas fa-rocket"], selectable: true, name: "Rocket", icon: <RocketLaunchIcon /> },
+  { id: "bullseye", tags: ["fab fa-bullseye"], selectable: true, name: "Bullseye", icon: <BullseyeIcon /> },
+  { id: "forum", tags: ["far fa-comments"], selectable: true, name: "Forum", icon: <ForumIcon /> },
+  { id: "coffee", tags: [], selectable: true, name: "Coffee", icon: <CoffeeIcon /> },
+  { id: "frown-face", tags: ["far fa-frown"], selectable: true, name: "Frown", icon: <FrownFaceIcon /> },
+  { id: "arrow-circle-down", tags: ["fa-arrow-circle-down", "far fa-circle-down"], selectable: true, name: "Arrow Down", icon: <ArrowCircleDownIcon /> },
+  { id: "minus-box", tags: [], selectable: true, name: "Minus Box", icon: <MinusBoxIcon /> },
+  { id: "anchor", tags: ["fas fa-anchor"], selectable: true, name: "Anchor", icon: <AnchorIcon /> },
+  { id: "block", tags: [], selectable: true, name: "Block", icon: <BlockIcon /> },
+  { id: "eye", tags: ["eye", "far fa-eye"], selectable: true, name: "Eye", icon: <EyeIcon /> },
+  { id: "menu-book", tags: ["fas fa-book"], selectable: true, name: "Book", icon: <MenuBookIcon /> },
+  { id: "help", tags: ["fas fa-question", "far fa-question"], selectable: true, name: "Question", icon: <HelpIcon /> },
+  { id: "repeat", tags: ["far fa-circle-dot", "fa-circle-arrow-right", "repeat"], selectable: true, name: "Repeat", icon: <RepeatIcon /> },
+  { id: "thumb-up", tags: ["far fa-thumbs-up"], selectable: true, name: "Thumb Up", icon: <ThumbUpIcon /> },
+  { id: "lock", tags: ["fas fa-lock"], selectable: true, name: "Lock", icon: <LockIcon /> },
+  { id: "explore", tags: ["far fa-compass"], selectable: true, name: "Explore", icon: <ExploreIcon /> },
+  { id: "celebration", tags: [], selectable: true, name: "Celebration", icon: <CelebrationIcon /> },
+  { id: "light-bulb", tags: ["far fa-lightbulb"], selectable: true, name: "Light Bulb", icon: <LightBulbIcon /> },
+  { id: "exclamation", tags: ["fas fa-exclamation", "fas fa-exclamation-triangle", "far fa-exclamation"], selectable: true, name: "Exclamation", icon: <ExclamationIcon /> },
+  { id: "check-circle", tags: ["fa-check-circle", "far fa-square-check"], selectable: true, name: "Check", icon: <CheckCircleIcon /> },
+  { id: "thumb-down", tags: ["far fa-thumbs-down"], selectable: true, name: "Thumb Down", icon: <ThumbDownIcon /> },
+  { id: "plumbing", tags: ["far fa-plumbing", "far fa-wrench", "fas fa-wrench"], selectable: true, name: "Plumbing", icon: <PlumbingIcon /> },
+  { id: "support", tags: ["fas fa-life-ring"], selectable: true, name: "Support", icon: <SupportIcon /> },
+  { id: "computer", tags: ["fas fa-chalkboard"], selectable: true, name: "Computer", icon: <ComputerIcon /> },
+  { id: "star", tags: ["far fa-star", "fas fa-star"], selectable: true, name: "Star", icon: <StarIcon /> },
+  { id: "search", tags: ["search", "fa-solid fa-magnifying-glass"], selectable: false, name: "Search", icon: <SearchIcon /> },
+  { id: "electric-bolt", tags: ["electric-bolt", "fa-solid fa-bolt"], selectable: false, name: "Electric Bolt", icon: <ElectricBoltIcon /> },
+  { id: "balance", tags: ["balanced", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], selectable: false, name: "Balance", icon: <BalanceIcon /> },
+  { id: "psychological-safety", tags: ["psychological-safety", "fa-regular fa-handshake"], selectable: false, name: "Handshake", icon: <PsychologicalSafetyIcon /> },
+  { id: "speed", tags: ["square-poll", "fa-solid fa-square-poll-vertical"], selectable: false, name: "Speed", icon: <SpeedIcon /> },
+  { id: "gears", tags: ["gears", "fa-solid fa-gears"], selectable: false, name: "Gears", icon: <GearsIcon /> },
+  { id: "angry-face", tags: ["far fa-angry"], selectable: false, name: "Mad", icon: <AngryFaceIcon /> },
+  { id: "propeller-icon", tags: ["fas fa-fan"], selectable: false, name: "Propeller", icon: <PropellerIcon /> },
+  { id: "dangerous-icon", tags: ["fas fa-skull-crossbones"], selectable: false, name: "Dangerous", icon: <DangerousIcon /> },
+  { id: "add-circle", tags: ["fa-plus", "fa-plus-circle", "far fa-square-plus"], selectable: false, name: "Add Circle", icon: <AddCircleIcon /> },
+  { id: "play-circle", tags: ["far fa-circle-play"], selectable: false, name: "Play", icon: <PlayCircleIcon /> },
+  { id: "stop-circle", tags: ["far fa-circle-stop"], selectable: false, name: "Stop", icon: <StopCircleIcon /> },
+  { id: "thumb-up-down", tags: ["far fa-thumbs-up-down"], selectable: false, name: "Thumbs Up/Down", icon: <ThumbUpDownIcon /> },
+  { id: "delete", tags: ["fas fa-trash"], selectable: false, name: "Delete", icon: <DeleteIcon /> },
+  { id: "birthday-cake", tags: ["fas fa-birthday-cake"], selectable: false, name: "Birthday", icon: <BirthdayCakeIcon /> },
+  { id: "construction", tags: ["fas fa-construction"], selectable: false, name: "Construction", icon: <ConstructionIcon /> },
+  { id: "sad-face", tags: [], selectable: false, name: "Sad", icon: <SadFaceIcon /> },
+  { id: "focus", tags: [], selectable: false, name: "Focus", icon: <FocusIcon /> },
+  { id: "add", tags: [], selectable: false, name: "Add", icon: <AddIcon /> },
+  { id: "edit", tags: [], selectable: false, name: "Edit", icon: <EditIcon /> },
+  { id: "link", tags: [], selectable: false, name: "Link", icon: <LinkIcon /> },
+  { id: "sms", tags: [], selectable: false, name: "SMS", icon: <SMSIcon /> },
+  { id: "note-add", tags: [], selectable: false, name: "Note Add", icon: <NoteAddIcon /> },
+  { id: "hourglass-top", tags: [], selectable: false, name: "Hourglass Top", icon: <HourglassTopIcon /> },
+  { id: "assignment-turned-in", tags: [], selectable: false, name: "Assignment Turned In", icon: <AssignmentTurnedInIcon /> },
+  { id: "close", tags: [], selectable: false, name: "Close", icon: <CloseIcon /> },
+  { id: "cloud", tags: [], selectable: false, name: "Cloud", icon: <CloudIcon /> },
+  { id: "cloud-upload", tags: [], selectable: false, name: "Cloud Upload", icon: <CloudUploadIcon /> },
+  { id: "cloud-download", tags: [], selectable: false, name: "Cloud Download", icon: <CloudDownloadIcon /> },
+  { id: "person", tags: [], selectable: false, name: "Person", icon: <PersonIcon /> },
+  { id: "people", tags: [], selectable: false, name: "People", icon: <PeopleIcon /> },
+  { id: "insights", tags: [], selectable: false, name: "Insights", icon: <InsightsIcon /> },
+  { id: "assessment", tags: [], selectable: false, name: "Assessment", icon: <AssessmentIcon /> },
+  { id: "reviews", tags: [], selectable: false, name: "Reviews", icon: <ReviewsIcon /> },
+  { id: "chevron-up", tags: [], selectable: false, name: "Chevron Up", icon: <ChevronUpIcon /> },
+  { id: "chevron-down", tags: [], selectable: false, name: "Chevron Down", icon: <ChevronDownIcon /> },
+  { id: "chevron-left", tags: [], selectable: false, name: "Chevron Left", icon: <ChevronLeftIcon /> },
+  { id: "chevron-right", tags: [], selectable: false, name: "Chevron Right", icon: <ChevronRightIcon /> },
+  { id: "privacy-tip", tags: [], selectable: false, name: "Privacy Tip", icon: <PrivacyTipIcon /> },
+  { id: "keyboard", tags: [], selectable: false, name: "Keyboard", icon: <KeyboardIcon /> },
+  { id: "volunteer-activism", tags: [], selectable: false, name: "Volunteer Activism", icon: <VolunteerActivismIcon /> },
+  { id: "contact-phone", tags: [], selectable: false, name: "Contact Phone", icon: <ContactPhoneIcon /> },
+  { id: "pause-circle", tags: [], selectable: false, name: "Pause Circle", icon: <PauseCircleIcon /> },
+  { id: "refresh", tags: [], selectable: false, name: "Refresh", icon: <RefreshIcon /> },
+  { id: "link-off", tags: [], selectable: false, name: "Link Off", icon: <LinkOffIcon /> },
+  { id: "table-chart", tags: [], selectable: false, name: "Table Chart", icon: <TableChartIcon /> },
+  { id: "info", tags: [], selectable: false, name: "Info", icon: <InfoIcon /> },
+  { id: "content-copy", tags: [], selectable: false, name: "Content Copy", icon: <ContentCopyIcon /> },
+  { id: "sim-card-download", tags: [], selectable: false, name: "Sim Card Download", icon: <SimCardDownloadIcon /> },
+  { id: "forward-to-inbox", tags: [], selectable: false, name: "Forward To Inbox", icon: <ForwardToInboxIcon /> },
+  { id: "source", tags: [], selectable: false, name: "Source", icon: <SourceIcon /> },
+  { id: "inventory", tags: [], selectable: false, name: "Inventory", icon: <InventoryIcon /> },
+  { id: "more-horizontal", tags: [], selectable: false, name: "More Horizontal", icon: <MoreHorizontalIcon /> },
+  { id: "more-vertical", tags: [], selectable: false, name: "More Vertical", icon: <MoreVerticalIcon /> },
+  { id: "report-problem", tags: [], selectable: false, name: "Report Problem", icon: <ReportProblemIcon /> },
+  { id: "open-with", tags: [], selectable: false, name: "Open With", icon: <OpenWithIcon /> },
+  { id: "group-work", tags: [], selectable: false, name: "Group Work", icon: <GroupWorkIcon /> },
+  { id: "undo", tags: [], selectable: false, name: "Undo", icon: <UndoIcon /> },
+  { id: "logout", tags: [], selectable: false, name: "Logout", icon: <LogoutIcon /> },
+  { id: "new-releases", tags: [], selectable: false, name: "New Releases", icon: <NewReleasesIcon /> },
 ];
 
 export function getIconElement(iconId: string | undefined | null): React.ReactElement {
-  if (iconId === "propeller-icon") {
-    return <PropellerIcon />;
-  }
-
-  if (iconId === "dangerous-icon") {
-    return <DangerousIcon />;
-  }
-
   const foundIcon = availableIcons.find(icon => icon.id === iconId || icon.tags.includes(iconId));
 
   if (!foundIcon) {
-    return <PlayCircleIcon />;
+    return <ForumIcon />;
   }
 
   return foundIcon.icon;

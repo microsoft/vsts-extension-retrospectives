@@ -131,7 +131,6 @@ jobs:
           echo "camelCase" >> base.txt
           echo "useCallback" >> base.txt
           echo "useState" >> base.txt
-          echo "AdjustIcon" >> base.txt
           echo "reconnection" >> base.txt
           echo "ZTNA" >> base.txt
           echo "WebSocket" >> base.txt

@@ -23,7 +23,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#f6af08", //yellow
-          iconClass: "adjust",
+          iconClass: "repeat",
           id: generateUUID(),
           title: "Continue",
           notes: "",
@@ -40,7 +40,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d", //red
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: generateUUID(),
           title: "Improve",
           notes: "",
@@ -282,7 +282,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: generateUUID(),
           title: "What obstructs clarity?",
           notes: "",
@@ -306,7 +306,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: generateUUID(),
           title: "What drains energy?",
           notes: "",
@@ -330,7 +330,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: generateUUID(),
           title: "What undermines pyschological safety?",
           notes: "",
@@ -354,7 +354,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: generateUUID(),
           title: "What hinders work-life balance?",
           notes: "",
@@ -378,7 +378,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: generateUUID(),
           title: "What reduces confidence in team?",
           notes: "",
@@ -402,7 +402,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: generateUUID(),
           title: "What decreases efficiency?",
           notes: "",
@@ -426,7 +426,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: generateUUID(),
           title: "What didn't go well?",
           notes: "",

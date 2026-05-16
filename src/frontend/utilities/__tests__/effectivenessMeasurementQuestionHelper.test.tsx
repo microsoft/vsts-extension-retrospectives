@@ -76,3 +76,15 @@ describe("getQuestionTooltip", () => {
     expect(result).toEqual(expectedTooltip);
   });
 });
+
+describe("getQuestionIconClassName", () => {
+  it("should return the icon class name for a valid question ID", () => {
+    const result = getQuestionIconClassName(1);
+    expect(result).toBe("search");
+  });
+
+  it("should return an empty string for an invalid question ID", () => {
+    const result = getQuestionIconClassName(99);
+    expect(result).toBe("");
+  });
+});

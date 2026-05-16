@@ -39,7 +39,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "adjust",
+          iconClass: "repeat",
           id: "uuid-3",
           title: "Continue",
           notes: "",
@@ -61,7 +61,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: "uuid-2",
           title: "Improve",
           notes: "",
@@ -343,7 +343,7 @@ describe("boardColumnsHelper", () => {
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "sad-face",
+            iconClass: "frown-face",
             id: "uuid-2",
             title: "What obstructs clarity?",
             notes: "",
@@ -372,7 +372,7 @@ describe("boardColumnsHelper", () => {
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "sad-face",
+            iconClass: "frown-face",
             id: "uuid-2",
             title: "What drains energy?",
             notes: "",
@@ -401,7 +401,7 @@ describe("boardColumnsHelper", () => {
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "sad-face",
+            iconClass: "frown-face",
             id: "uuid-2",
             title: "What undermines pyschological safety?",
             notes: "",
@@ -430,7 +430,7 @@ describe("boardColumnsHelper", () => {
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "sad-face",
+            iconClass: "frown-face",
             id: "uuid-2",
             title: "What hinders work-life balance?",
             notes: "",
@@ -459,7 +459,7 @@ describe("boardColumnsHelper", () => {
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "sad-face",
+            iconClass: "frown-face",
             id: "uuid-2",
             title: "What reduces confidence in team?",
             notes: "",
@@ -488,7 +488,7 @@ describe("boardColumnsHelper", () => {
           });
           expect(result[1]).toEqual({
             accentColor: "#cc293d",
-            iconClass: "sad-face",
+            iconClass: "frown-face",
             id: "uuid-2",
             title: "What decreases efficiency?",
             notes: "",
@@ -518,7 +518,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -538,7 +538,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -558,7 +558,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",
@@ -578,7 +578,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[1]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "sad-face",
+          iconClass: "frown-face",
           id: "uuid-2",
           title: "What didn't go well?",
           notes: "",

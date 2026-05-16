@@ -36,7 +36,7 @@ export interface IFeedbackColumnCard {
 
 const maxColumnCount = 5;
 
-const allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.length > 0);
+const allIconClassNames = availableIcons.filter(icon => icon.selectable);
 
 const allAccentColors: { friendlyName: string; colorCode: string }[] = [
   {
