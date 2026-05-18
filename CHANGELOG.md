@@ -6,7 +6,9 @@ You can find the changelog of the Retrospective Extension below.
 
 * Ensures editing a retrospective updates the intended board name and prevents accidental renames.
 * Prevents duplicate-name side effects that can impact board retrieval when updating board metadata.
-* Improves Create and Edit Retrospective dialog name-validation feedback.
+* Improves Create and Edit Retrospective dialog name-validation feedback, including consistent top and bottom validation messaging.
+* Simplifies board-configuration wording in Board Settings, including the required-name indicator, Max Votes label text, Collect phase helper text, and warning copy.
+* Adjusts board-configuration layout and spacing, including title-input sizing, max-votes input width, and dialog width responsiveness.
 * Validated across create, sprint, copy, and edit flows, including switched boards with General or Permissions edits.
 * Confirms feedback items remain visible after board-name updates.
 
