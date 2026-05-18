@@ -12,10 +12,12 @@ You can find the changelog of the Retrospective Extension below.
 * Fix: SignalR reconnect watchdog switched from a fixed 5-second poll to incremental backoff (5s → 60s cap) to reduce unnecessary reconnect noise.
 * Fix: permissions table row checkboxes now correctly aligned using the `cell-checkbox` class.
 * Fix: Speedboat template column spelling corrected and updated with more representative icons.
-* Feature: replaced Fluent UI `Pivot`/`PivotItem` in the board metadata form with a native accessible tab list.
+* Fix: hardened icon compatibility by adding missing legacy icon mappings, improving the fallback icon when no match is found, and covering gaps in the icon catalog used by existing boards.
+* Feature: replaced Fluent UI `Pivot` and `PivotItem` in the board metadata form with a native accessible tab list.
 * Feature: column notes now display as a custom hover tooltip for improved user experience.
-* Feature: added new icons — Forward Circle, Propeller, and Dangerous.
-* Feature: Continue icon changed from Focus icon to a Repeat column icon.
+* Feature: expanded and cleaned up the column icon selection list with curated selectable icons, including added Compass and Computer options and duplicate-icon cleanup.
+* Feature: added new icons — Forward Circle, Propeller, Dangerous, Block, Add Box, Minus Box, and New Releases.
+* Feature: Continue icon changed from Focus icon to a Repeat column icon, and legacy plus template icon mappings were updated to use the newer icon set.
 * Style: updated board accent color palette to more accessible, consistent values.
 * Style: permissions panel search bar and warning banner spacing now consistent whether or not the warning is visible.
 
