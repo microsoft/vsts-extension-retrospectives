@@ -2,6 +2,15 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.53
+
+* Fix: improve Add work item behavior in Act and Focus flows by sorting available work item types alphabetically, keeping Link existing work item as the first option, and correcting menu placement to avoid clipping in modal contexts.
+* Fix: limit Focus mode Add work item type options to the team's requirement backlog types, with fallback to project-visible types when backlog metadata is unavailable.
+* Fix: preserve feedback card numbering by created date even when Act-phase display order is vote-sorted, keeping card IDs stable and intuitive.
+* Chore: update repository and backend CI to .NET SDK 10.0.203.
+
+From [GitHub PR #1701](https://github.com/microsoft/vsts-extension-retrospectives/pull/1701)
+
 ## v1.92.52
 
 * Fix: improve archived board delete messaging in History and harden loading-state recovery to avoid indefinite spinner states after data-load failures. From [GitHub PR #1578](https://github.com/microsoft/vsts-extension-retrospectives/pull/1578)
