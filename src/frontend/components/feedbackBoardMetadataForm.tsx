@@ -328,45 +328,39 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   }, []);
 
   return (
-    <div className="flex flex-col flex-nowrap" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+    <div className="flex flex-col flex-nowrap px-5 py-3" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <Pivot>
         <PivotItem headerText={"General"} aria-label="Board General Settings">
           <div className="board-metadata-form">
             <section className="board-metadata-edit-column-settings">
               <h2 className="board-metadata-form-section-header">Board Settings</h2>
               <div className="board-metadata-form-section-subheader board-metadata-title-row">
-                <label htmlFor="title-input-container">
-                  Retrospective&nbsp;Name:
+                <label id="retrospective-name" htmlFor="retrospective-title-input">
+                  Retrospective Name:
                 </label>
-                <input
-                  aria-label="Please enter new retrospective title"
-                  aria-required={true}
-                  placeholder={placeholderText}
-                  className="title-input-container"
-                  id="retrospective-title-input"
-                  style={{ margin: "0 4px 0 8px" }}
-                  value={title}
-                  maxLength={100}
-                  onChange={handleInputChange}
-                />
-                {topNameValidationMessage && (
-                  <>
-                    {/* Keep the trailing non-breaking space for visual alignment with the section divider. */}
-                    <span className="input-validation-message">
-                      {topNameValidationMessage}
-                      <>&nbsp;</>
-                    </span>
-                  </>
-                )}
+                  <input
+                    aria-label="Please enter new retrospective title"
+                    aria-required={true}
+                    aria-describedby="retrospective-name"
+                    placeholder={placeholderText}
+                    className="title-input-container"
+                    id="retrospective-title-input"
+                    value={title}
+                    maxLength={100}
+                    onChange={handleInputChange}
+                  />
+                  <span></span>
+                  <span className="input-validation-message">
+                    {title.length === 0 ? "Required field" : null}
+                    {title.length > 0 && BoardDataService.checkIfBoardNameIsTaken(currentBoard.id, title) ? "Name not unique" : null}
+                  </span>
               </div>
-              <hr></hr>
-              <div className="board-metadata-form-section-subheader">
+              <div className="board-metadata-form-section-subheader board-metadata-title-row">
                 <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
                   Max Votes per User:
                 </label>
-                <input className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />
+                <input className="title-input-container" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />
               </div>
-              <hr></hr>
               <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation</div>
               <div className="board-metadata-form-section-subheader">
                 <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">

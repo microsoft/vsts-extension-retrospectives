@@ -1428,11 +1428,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-edit-column-settings {
-    @apply p-2;
+    @apply py-2;
   }
 
   & .board-metadata-form-section-subheader {
-    @apply font-semibold w-full flex items-center m-1 text-(--text-primary-color);
+    @apply font-semibold w-full grid grid-cols-[1fr_1fr] items-center m-1 text-(--text-primary-color);
 
     & label {
       @apply flex-1 text-start;
@@ -1441,18 +1441,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .board-metadata-title-row {
     @apply pr-2.5;
-
-    & .title-input-container {
-      flex: 0 1 36ch;
-      min-width: 0;
-      max-width: 36ch;
-    }
-
-    & #retrospective-title-input {
-      width: min(36ch, 100%);
-      min-width: min(12ch, 100%);
-      max-width: 36ch;
-    }
   }
 
   & .ms-Checkbox.is-checked .ms-Checkbox-checkbox {
@@ -1588,11 +1576,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .title-input-container {
-    @apply text-base font-semibold flex flex-col items-center pb-0.5 flex-1;
-  }
-
-  & #retrospective-title-input {
-    @apply text-right;
+    @apply text-base font-semibold flex flex-col items-center p-1 flex-1 border border-(--text-primary-color) text-right placeholder:text-right;
   }
 
   & #retrospective-title-input::placeholder {
@@ -1601,14 +1585,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .title-input-container.column-template-dropdown {
     @apply inline-flex bg-(--background-color) font-normal ml-2.5 w-2/3;
-  }
-
-  & .title-input-container.max-vote-counter {
-    @apply flex-none w-8;
-  }
-
-  & .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
-    @apply w-full;
   }
 
   & .title-input-container .ms-TextField-wrapper {
@@ -1633,7 +1609,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-metadata-dialog .input-validation-message {
-  @apply text-error font-semibold;
+  @apply text-error text-xs;
 }
 
 .board-metadata-dialog {

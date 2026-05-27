@@ -1661,7 +1661,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     );
   };
 
-  const updateCurrentVoteCount = async () => {
+  const updateCurrentVoteCount = React.useCallback(async () => {
     const state = stateRef.current;
     const boardItem = await itemDataService.getBoardItem(state.currentTeam.id, state.currentBoard.id);
     if (!boardItem) {
@@ -1669,7 +1669,14 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     }
 
     setState(getVoteMetricsState(boardItem));
-  };
+  }, [getVoteMetricsState, setState]);
+
+  const handleFocusModeModelChange = React.useCallback(
+    (focusModeModel: FocusModeModel) => {
+      setState({ focusModeModel });
+    },
+    [setState],
+  );
 
   const updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
     if (!updatedBoard) {
@@ -2330,9 +2337,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
                     workflowPhase={state.currentBoard.activePhase}
                     nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
                     allWorkItemTypes={state.allWorkItemTypes}
-                    onFocusModeModelChange={focusModeModel => {
-                      setState({ focusModeModel });
-                    }}
+                    onFocusModeModelChange={handleFocusModeModelChange}
                     isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
                     hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
                     userId={state.currentUserId}
