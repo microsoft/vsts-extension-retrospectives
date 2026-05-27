@@ -375,6 +375,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       await initializeProjectTeams(initialCurrentTeam);
 
       setState({ ...initializedTeamAndBoardState, isTeamDataLoaded: true });
+      reflectBackendService.switchToTeam(initialCurrentTeam ? initialCurrentTeam.id : undefined);
+      reflectBackendService.switchToBoard(initialCurrentBoard ? initialCurrentBoard.id : undefined);
     } catch (error) {
       appInsights.trackException(error, {
         action: "initializeTeamAndBoardState",
@@ -432,6 +434,8 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     reflectBackendService.removeOnReceiveNewBoard(handleBoardCreated);
     reflectBackendService.removeOnReceiveDeletedBoard(handleBoardDeleted);
     reflectBackendService.removeOnReceiveUpdatedBoard(handleBoardUpdated);
+    reflectBackendService.switchToBoard(undefined);
+    reflectBackendService.switchToTeam(undefined);
     if (boardTimerIntervalIdRef.current !== undefined) {
       window.clearInterval(boardTimerIntervalIdRef.current);
       boardTimerIntervalIdRef.current = undefined;
@@ -462,6 +466,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
     const prevActiveTab = prevActiveTabRef.current;
 
     if (prevCurrentTeam !== undefined && prevCurrentTeam !== state.currentTeam && state.currentTeam) {
+      reflectBackendService.switchToTeam(state.currentTeam.id);
       appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: state.currentTeam.id } });
     }
 
@@ -570,6 +575,7 @@ export const FeedbackBoardContainer = React.forwardRef<FeedbackBoardContainerHan
       const state = stateRef.current;
 
       if (prevState.currentTeam !== state.currentTeam && state.currentTeam) {
+        reflectBackendService.switchToTeam(state.currentTeam.id);
         appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: state.currentTeam.id } });
       }
 
