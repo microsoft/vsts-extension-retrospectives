@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace CollaborationStateService
 {
@@ -7,7 +7,13 @@ namespace CollaborationStateService
   {
     public static void Main(string[] args)
     {
-      WebHost.CreateDefaultBuilder(args).UseStartup<Startup>().Build().Run();
+      Host.CreateDefaultBuilder(args)
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+          webBuilder.UseStartup<Startup>();
+        })
+        .Build()
+        .Run();
     }
   }
 }

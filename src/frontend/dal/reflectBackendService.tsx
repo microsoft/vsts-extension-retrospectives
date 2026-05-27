@@ -26,6 +26,7 @@ const enum ReflectBackendSignals {
 class ReflectBackendService {
   private static signalRHubUrl = new URL("/collaborationUpdates", config.CollaborationStateServiceUrl);
 
+  private _currentTeamId: string;
   private _currentBoardId: string;
   private _signalRConnection: HubConnection;
   private _appToken: string;
@@ -162,6 +163,10 @@ class ReflectBackendService {
     this._signalRConnection.off(signal, callback);
   };
 
+  public switchToTeam = (newTeamId: string) => {
+    this._currentTeamId = newTeamId;
+  };
+
   /**
    * Removes the connection from the current board group
    * and, if newBoardId isn't falsy, adds it to the new
@@ -169,11 +174,11 @@ class ReflectBackendService {
    * @param newBoardId The id of the board to join.
    */
   public switchToBoard = (newBoardId: string) => {
-    if (this._currentBoardId !== undefined && this._currentBoardId !== null && this.isConnected()) {
+    if (this._currentBoardId !== undefined && this._currentBoardId !== null && this._currentBoardId !== newBoardId && this.isConnected()) {
       this._signalRConnection.send(ReflectBackendSignals.LeaveReflectBoardGroup, this._currentBoardId);
     }
 
-    if (newBoardId && this.isConnected()) {
+    if (newBoardId && this._currentBoardId !== newBoardId && this.isConnected()) {
       this.joinBoardGroup(newBoardId);
     }
     this._currentBoardId = newBoardId;
@@ -186,6 +191,10 @@ class ReflectBackendService {
    */
   public broadcastNewItem = (columnId: string, feedbackItemId: string) => {
     if (!this._connectionAvailable) {
+      return;
+    }
+
+    if (!this._currentBoardId) {
       return;
     }
 
@@ -202,6 +211,10 @@ class ReflectBackendService {
       return;
     }
 
+    if (this._currentTeamId && this._currentTeamId !== teamId) {
+      return;
+    }
+
     this._signalRConnection.send(ReflectBackendSignals.BroadcastNewBoard, teamId, boardId);
   };
 
@@ -212,6 +225,10 @@ class ReflectBackendService {
    */
   public broadcastUpdatedBoard = (teamId: string, boardId: string) => {
     if (!this._connectionAvailable) {
+      return;
+    }
+
+    if (this._currentTeamId && this._currentTeamId !== teamId) {
       return;
     }
 
@@ -228,6 +245,10 @@ class ReflectBackendService {
       return;
     }
 
+    if (this._currentTeamId && this._currentTeamId !== teamId) {
+      return;
+    }
+
     this._signalRConnection.send(ReflectBackendSignals.BroadcastDeletedBoard, teamId, boardId);
   };
 
@@ -241,6 +262,10 @@ class ReflectBackendService {
       return;
     }
 
+    if (!this._currentBoardId) {
+      return;
+    }
+
     this._signalRConnection.send(ReflectBackendSignals.BroadcastUpdatedItem, this._currentBoardId, columnId, feedbackItemId);
   };
 
@@ -251,6 +276,10 @@ class ReflectBackendService {
    */
   public broadcastDeletedItem = (columnId: string, feedbackItemId: string) => {
     if (!this._connectionAvailable) {
+      return;
+    }
+
+    if (!this._currentBoardId) {
       return;
     }
 

@@ -105,6 +105,8 @@ describe("ReflectBackendService", () => {
     mockSend.mockResolvedValue(undefined);
     mockGetAppToken.mockResolvedValue("mock-token");
     mockDecodeJwt.mockReturnValue({ exp: Math.floor(Date.now() / 1000) + 3600 });
+    (reflectBackendService as unknown as { _currentBoardId?: string; _currentTeamId?: string })._currentBoardId = undefined;
+    (reflectBackendService as unknown as { _currentBoardId?: string; _currentTeamId?: string })._currentTeamId = undefined;
   });
 
   describe("constructor", () => {
@@ -113,6 +115,7 @@ describe("ReflectBackendService", () => {
       expect(typeof reflectBackendService.startConnection).toBe("function");
       expect(typeof reflectBackendService.retryConnection).toBe("function");
       expect(typeof reflectBackendService.switchToBoard).toBe("function");
+      expect(typeof reflectBackendService.switchToTeam).toBe("function");
     });
   });
 
@@ -232,6 +235,15 @@ describe("ReflectBackendService", () => {
       expect(mockSend).toHaveBeenCalledWith("joinReflectBoardGroup", "board-456");
     });
 
+    it("should not leave and rejoin the same board", () => {
+      reflectBackendService.switchToBoard("board-123");
+      mockSend.mockClear();
+
+      reflectBackendService.switchToBoard("board-123");
+
+      expect(mockSend).not.toHaveBeenCalled();
+    });
+
     it("should leave board when switching to null", () => {
       reflectBackendService.switchToBoard("board-123");
       mockSend.mockClear();
@@ -246,6 +258,7 @@ describe("ReflectBackendService", () => {
   describe("broadcast methods", () => {
     beforeEach(async () => {
       await reflectBackendService.startConnection();
+      reflectBackendService.switchToTeam("team-1");
       reflectBackendService.switchToBoard("board-123");
       mockSend.mockClear();
     });
@@ -278,6 +291,24 @@ describe("ReflectBackendService", () => {
     it("broadcastDeletedBoard should send correct signal", () => {
       reflectBackendService.broadcastDeletedBoard("team-1", "board-1");
       expect(mockSend).toHaveBeenCalledWith("broadcastDeletedBoard", "team-1", "board-1");
+    });
+
+    it("board broadcasts should return early for a different current team", () => {
+      reflectBackendService.broadcastNewBoard("team-2", "board-1");
+      reflectBackendService.broadcastUpdatedBoard("team-2", "board-1");
+      reflectBackendService.broadcastDeletedBoard("team-2", "board-1");
+
+      expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it("item broadcasts should return early without a current board", () => {
+      (reflectBackendService as unknown as { _currentBoardId?: string })._currentBoardId = undefined;
+
+      reflectBackendService.broadcastNewItem("column-1", "item-1");
+      reflectBackendService.broadcastUpdatedItem("column-1", "item-1");
+      reflectBackendService.broadcastDeletedItem("column-1", "item-1");
+
+      expect(mockSend).not.toHaveBeenCalled();
     });
   });
 
