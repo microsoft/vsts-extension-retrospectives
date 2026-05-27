@@ -37,10 +37,10 @@ jobs:
               - 'src/backend.tests/**'
 
       - if: steps.changes.outputs.src == 'true'
-              run: |
-                        dotnet restore --locked-mode
-                                  dotnet build
-                                          name: Build
+        name: Build
+        run: |
+          dotnet restore --locked-mode
+          dotnet build
         working-directory: 'src/backend'
 
       - if: steps.changes.outputs.src == 'true'
