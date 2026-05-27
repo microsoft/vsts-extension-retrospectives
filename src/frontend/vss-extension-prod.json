@@ -18,9 +18,6 @@
   "content": {
     "details": {
       "path": "./assets/PACKAGE-DESCRIPTION.md"
-    },
-    "license": {
-      "path": "./assets/LICENSE.md"
     }
   },
   "targets": [
