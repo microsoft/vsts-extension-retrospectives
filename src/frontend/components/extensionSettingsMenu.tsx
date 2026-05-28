@@ -10,6 +10,7 @@ import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import { getIconElement } from "./icons";
+import { t } from "../utilities/localization";
 
 interface IExportImportDataSchema {
   team: WebApiTeam;
@@ -178,13 +179,13 @@ export const ExtensionSettingsMenu: React.FC = () => {
     <div className="extension-settings-menu" ref={menuRootRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <button onClick={() => primeDirectiveDialogRef.current!.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
         {getIconElement("privacy-tip")}
-        <span className="hidden lg:inline">Directive</span>
+        <span className="hidden lg:inline">{t("prime_directive")}</span>
       </button>
 
       <details className="flex items-center relative">
-        <summary aria-label="Data Import/Export" title="Data Import/Export" className="extension-settings-button">
+        <summary aria-label={t("data_import_export")} title={t("data_import_export")} className="extension-settings-button">
           {getIconElement("cloud")}
-          <span className="hidden lg:inline">Data</span>
+          <span className="hidden lg:inline">{t("common_data")}</span>
         </summary>
 
         <div className="callout-menu right">
@@ -194,7 +195,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             }}
           >
             {getIconElement("cloud-upload")}
-            Import Data
+            {t("import_data")}
           </button>
           <button
             onClick={() => {
@@ -202,15 +203,15 @@ export const ExtensionSettingsMenu: React.FC = () => {
             }}
           >
             {getIconElement("cloud-download")}
-            Export Data
+            {t("export_data")}
           </button>
         </div>
       </details>
 
       <details className="flex items-center relative">
-        <summary aria-label="Retrospective Help" title="Retrospective Help" className="extension-settings-button">
+        <summary aria-label={t("retrospective_help")} title={t("retrospective_help")} className="extension-settings-button">
           {getIconElement("help")}
-          <span className="hidden lg:inline">Help</span>
+          <span className="hidden lg:inline">{t("common_help")}</span>
         </summary>
 
         <div className="callout-menu right">
@@ -220,7 +221,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             }}
           >
             {getIconElement("celebration")}
-            What&apos;s new
+            {t("whats_new")}
           </button>
           <button
             onClick={() => {
@@ -228,7 +229,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             }}
           >
             {getIconElement("keyboard")}
-            Keyboard shortcuts
+            {t("keyboard_shortcuts")}
           </button>
           <button
             onClick={() => {
@@ -236,7 +237,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             }}
           >
             {getIconElement("menu-book")}
-            User guide
+            {t("user_guide")}
           </button>
           <button
             onClick={() => {
@@ -244,7 +245,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
             }}
           >
             {getIconElement("volunteer-activism")}
-            Volunteer
+            {t("volunteer")}
           </button>
           <button
             onClick={() => {
@@ -252,34 +253,34 @@ export const ExtensionSettingsMenu: React.FC = () => {
             }}
           >
             {getIconElement("contact-phone")}
-            Contact us
+            {t("contact_us")}
           </button>
         </div>
       </details>
 
       <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onCancel={() => primeDirectiveDialogRef.current!.close()}>
         <div className="header">
-          <h2 className="title">The Prime Directive</h2>
+          <h2 className="title">{t("the_prime_directive")}</h2>
           <button onClick={() => primeDirectiveDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
-        <div className="subText">The purpose of the Prime Directive is to set the stage for a respectful and constructive retrospective. By embracing this mindset, we create an environment where everyone feels safe to share openly, learn together, and improve as a team.</div>
-        <strong className="subText">&apos;Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.&apos;</strong>
+        <div className="subText">{t("prime_directive_purpose")}</div>
+        <strong className="subText">{t("prime_directive_statement")}</strong>
         <em className="subText">--Norm Kerth, Project Retrospectives: A Handbook for Team Review</em>
         <div className="inner">
           <button className="button" onClick={() => window.open("https://retrospectivewiki.org", "_blank")}>
-            Open Retrospective Wiki
+            {t("open_retrospective_wiki")}
           </button>
           <button className="default button" onClick={() => primeDirectiveDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>
 
       <dialog className="whats-new-dialog" aria-label="What is New" ref={whatsNewDialogRef} onCancel={() => whatsNewDialogRef.current!.close()}>
         <div className="header">
-          <h2 className="title">What&apos;s New</h2>
+          <h2 className="title">{t("whats_new")}</h2>
           <button onClick={() => whatsNewDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
@@ -299,33 +300,33 @@ export const ExtensionSettingsMenu: React.FC = () => {
             Open change log
           </button>
           <button className="default button" onClick={() => whatsNewDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>
 
       <dialog className="user-guide-dialog" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onCancel={() => userGuideDialogRef.current!.close()}>
         <div className="header">
-          <h2 className="title">Retrospectives User Guide</h2>
+          <h2 className="title">{t("user_guide")}</h2>
           <button onClick={() => userGuideDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
-        <div className="subText">The purpose of the retrospective is to build a practice of gathering feedback and continuously improving by acting on that feedback. The Retrospective extension and Team Assessment feature are valuable tools supporting that process.</div>
-        <div className="subText">For instructions on getting started, using the Retrospective extension and Team Assessment feature, and best practices for running effective retrospectives, open the user guide documented in the Readme file.</div>
+        <div className="subText">{t("user_guide_purpose")}</div>
+        <div className="subText">{t("user_guide_instructions")}</div>
         <div className="inner">
           <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md", "_blank")}>
-            Open user guide
+            {t("open_user_guide")}
           </button>
           <button className="default button" onClick={() => userGuideDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>
 
       <dialog className="volunteer-dialog" aria-label="Volunteer" ref={volunteerDialogRef} onCancel={() => volunteerDialogRef.current!.close()}>
         <div className="header">
-          <h2 className="title">Volunteer</h2>
+          <h2 className="title">{t("volunteer")}</h2>
           <button onClick={() => volunteerDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
@@ -335,22 +336,22 @@ export const ExtensionSettingsMenu: React.FC = () => {
         <div className="subText">Want to contribute? Join us and become part of our community! 🙋</div>
         <div className="inner">
           <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CONTRIBUTING.md", "_blank")}>
-            Open contributing guidelines
+            {t("open_contributing_guidelines")}
           </button>
           <button className="default button" onClick={() => volunteerDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>
 
       <dialog className="keyboard-shortcuts-dialog" aria-label="Keyboard Shortcuts" ref={keyboardShortcutsDialogRef} onCancel={() => keyboardShortcutsDialogRef.current!.close()}>
         <div className="header">
-          <h2 className="title">Keyboard Shortcuts</h2>
+          <h2 className="title">{t("keyboard_shortcuts")}</h2>
           <button onClick={() => keyboardShortcutsDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
-        <div className="subText">Use these keyboard shortcuts to navigate and interact with the retrospective board.</div>
+        <div className="subText">{t("keyboard_shortcuts_instructions")}</div>
         <div className="subText">
           {Object.entries(
             keyboardShortcuts.reduce(
@@ -369,7 +370,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
                 <thead>
                   <tr>
                     <th scope="col">{category} Shortcuts</th>
-                    <th scope="col">Description</th>
+                    <th scope="col">{t("common_description")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -393,7 +394,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
         <div className="inner">
           <button className="default button" onClick={() => keyboardShortcutsDialogRef.current!.close()}>
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>

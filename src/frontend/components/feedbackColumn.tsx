@@ -13,6 +13,7 @@ import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkIt
 import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement } from "./icons";
+import { t } from "../utilities/localization";
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -466,9 +467,9 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
       </div>
       <div className={cn("feedback-column-content", isCollapsed && "hide-collapse")}>
         {workflowPhase === WorkflowPhase.Collect && (
-          <button className="create-button" title="Add new feedback" aria-label="Add new feedback" onClick={createEmptyFeedbackItem}>
+          <button className="create-button" title={t("add_new_feedback")} aria-label={t("add_new_feedback")} onClick={createEmptyFeedbackItem}>
             {getIconElement("add")}
-            Add new feedback
+            {t("add_new_feedback")}
           </button>
         )}
         {isDataLoaded && (
@@ -477,9 +478,9 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
           </ul>
         )}
       </div>
-      <dialog ref={editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label="Edit column notes">
+      <dialog ref={editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label={t("edit_column_notes")}>
         <div className="header">
-          <h2 className="title">Edit column notes</h2>
+          <h2 className="title">{t("edit_column_notes")}</h2>
           <button type="button" onClick={() => editColumnNotesDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
@@ -487,17 +488,17 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
         <div className="subText">
           <div className="form-group">
             <label id="column-notes-label" htmlFor="column-notes-textarea">
-              Column notes
+              {t("column_notes")}
             </label>
             <textarea id="column-notes-textarea" aria-labelledby="column-notes-label" aria-invalid="false" value={columnNotesDraft} onChange={handleColumnNotesDraftChange} />
           </div>
         </div>
         <div className="inner">
           <button type="button" className="button" onClick={saveColumnNotes}>
-            Save
+            {t("common_save")}
           </button>
           <button type="button" className="button default" onClick={() => editColumnNotesDialogRef.current!.close()}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>

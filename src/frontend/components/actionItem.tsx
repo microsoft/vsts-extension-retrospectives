@@ -8,6 +8,7 @@ import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getIconElement } from "./icons";
+import { t } from "../utilities/localization";
 
 export interface ActionItemProps {
   feedbackItemId: string;
@@ -135,10 +136,10 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
               onConfirmUnlinkWorkItem(actionItem.id);
             }}
           >
-            Remove
+            {t("common_remove")}
           </button>
           <button className="default button" onClick={() => unlinkWorkItemDialogRef.current!.close()}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>

@@ -20,6 +20,7 @@ import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelpe
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement, MoreVerticalIcon } from "./icons";
+import { t } from "../utilities/localization";
 
 export interface IFeedbackItemColumnContext {
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
@@ -1162,10 +1163,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         </div>
         <div className="inner">
           <button className="button" onClick={onConfirmDeleteFeedbackItem}>
-            Delete
+            {t("common_delete")}
           </button>
           <button className="default button" onClick={hideDeleteItemConfirmationDialog}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>
@@ -1195,7 +1196,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
               </button>
             ))}
           <button className="default button" onClick={hideMoveFeedbackItemDialog}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>
@@ -1282,10 +1283,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         <div className="subText">{`Are you sure you want to remove the feedback "${displayTitle}" from its current group?`}</div>
         <div className="inner">
           <button className="button" onClick={onConfirmRemoveFeedbackItemFromGroup}>
-            Remove Feedback from Group
+            {t("remove_feedback_from_group")}
           </button>
           <button className="default button" onClick={hideRemoveFeedbackItemFromGroupConfirmationDialog}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>
