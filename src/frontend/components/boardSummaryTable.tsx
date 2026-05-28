@@ -505,7 +505,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
     return (
       <div className="spinner" aria-live="assertive">
         <div></div>
-        <span>Loading...</span>
+        <span>{t("common_loading")}...</span>
       </div>
     );
   }
@@ -518,7 +518,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
       </table>
       <dialog
         className="delete-board-dialog"
-        aria-label="Delete Retrospective Board"
+        aria-label={t("delete_retrospective_board")}
         ref={deleteBoardDialogRef}
         onClose={() => {
           deleteBoardDialogRef.current!.close();
@@ -526,13 +526,13 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         }}
       >
         <div className="header">
-          <h2 className="title">Delete Retrospective Board</h2>
+          <h2 className="title">{t("delete_retrospective_board")}</h2>
           <button
             onClick={() => {
               deleteBoardDialogRef.current!.close();
               setOpenDialogBoardId(null);
             }}
-            aria-label="Close"
+            aria-label={t("common_close")}
           >
             {getIconElement("close")}
           </button>
@@ -545,7 +545,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         </div>
         <div className="inner">
           <button className="button" onClick={handleConfirmDelete}>
-            Delete
+            {t("common_delete")}
           </button>
           <button
             className="default button"
@@ -554,7 +554,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
               setOpenDialogBoardId(null);
             }}
           >
-            Close
+            {t("common_close")}
           </button>
         </div>
       </dialog>

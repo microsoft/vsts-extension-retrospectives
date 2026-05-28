@@ -20,7 +20,7 @@ describe("effectivenessMeasurementQuestionHelper", () => {
 describe("getQuestionName", () => {
   it("should return the question title if the question exists", () => {
     const questionId = 1;
-    const expectedTitle = "I clearly understand what is expected of me on this team";
+    const expectedTitle = questions[0].title;
 
     const result = getQuestionName(questionId);
 
@@ -60,7 +60,7 @@ describe("getQuestionShortName", () => {
 describe("getQuestionTooltip", () => {
   it("should return the tooltip for a valid question ID", () => {
     const questionId = 1;
-    const expectedTooltip = "Only about 50% employees strongly indicate they know what is expected of them at work according to https://www.gallup.com/workplace/236567/obsolete-annual-reviews-gallup-advice.aspx (Gallup). Furthermore, clarity of expectations is statistically linked to many important organizational outcomes. Getting expectations right relates to better customer perceptions of service quality, productivity, retention of employees and safety. Substantial gains in clarity of expectations connect to productivity gains of 5% to 10%, and link to 10% to 20% fewer safety incidents, for example.";
+    const expectedTooltip = questions[0].tooltip;
 
     const result = getQuestionTooltip(questionId);
 

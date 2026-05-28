@@ -142,6 +142,9 @@ jobs:
           echo "memoizing" >> base.txt
           echo "websocket" >> base.txt
           echo "customizable" >> base.txt
+          echo "Bain" >> base.txt
+          echo "Edmondson" >> base.txt
+          echo "Forsgren" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'

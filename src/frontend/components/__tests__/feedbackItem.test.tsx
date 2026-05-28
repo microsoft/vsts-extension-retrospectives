@@ -8639,7 +8639,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
       const dialog = document.querySelector('dialog[aria-label="Group Feedback"]') as HTMLDialogElement | null;
       expect(dialog?.open).toBe(false);
     });
-
   });
 
   test("FeedbackItemHelper groups items", async () => {
@@ -11212,7 +11211,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       card.appendChild(editorContainer);
 
       const focusSpy = jest.spyOn(textarea, "focus");
-      await act(async () => { ref.current?.startEditingTitle(); });
+      await act(async () => {
+        ref.current?.startEditingTitle();
+      });
       expect(focusSpy).toHaveBeenCalled();
     });
 
@@ -11230,7 +11231,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       ref.current!.itemElement = overrideEl;
 
       const clickSpy = jest.spyOn(titleEl, "click");
-      await act(async () => { ref.current?.startEditingTitle(); });
+      await act(async () => {
+        ref.current?.startEditingTitle();
+      });
       expect(clickSpy).toHaveBeenCalled();
     });
 
@@ -11248,7 +11251,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       ref.current!.itemElement = overrideEl;
 
       const clickSpy = jest.spyOn(containerEl, "click");
-      await act(async () => { ref.current?.startEditingTitle(); });
+      await act(async () => {
+        ref.current?.startEditingTitle();
+      });
       expect(clickSpy).toHaveBeenCalled();
     });
 
@@ -11267,7 +11272,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       ref.current!.itemElement = overrideEl;
       const focusSpy = jest.spyOn(input, "focus");
-      await act(async () => { ref.current?.startEditingTitle(); });
+      await act(async () => {
+        ref.current?.startEditingTitle();
+      });
       expect(focusSpy).toHaveBeenCalled();
     });
   });
@@ -11285,7 +11292,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
       // Should not throw - item is not in the column
-      await act(async () => { ref.current?.navigateToAdjacentCard("next"); });
+      await act(async () => {
+        ref.current?.navigateToAdjacentCard("next");
+      });
     });
   });
 
@@ -11299,7 +11308,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       // Remove all card controls
       container.querySelectorAll('[data-card-control="true"], .editable-text-container, .non-editable-text-container').forEach(el => el.remove());
 
-      await act(async () => { ref.current?.focusCardControl("next"); });
+      await act(async () => {
+        ref.current?.focusCardControl("next");
+      });
       // Should not throw or change focus
     });
 
@@ -11328,7 +11339,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       expect(document.activeElement).toBe(ctrl1);
 
       // Prev from first → wraps to last
-      await act(async () => { ref.current?.focusCardControl("prev"); });
+      await act(async () => {
+        ref.current?.focusCardControl("prev");
+      });
       expect(document.activeElement).toBe(ctrl3);
       document.body.removeChild(overrideEl);
     });
@@ -11354,7 +11367,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       document.body.appendChild(overrideEl);
       ref.current!.itemElement = overrideEl;
 
-      await act(async () => { ref.current?.focusCardControl("prev"); });
+      await act(async () => {
+        ref.current?.focusCardControl("prev");
+      });
       expect(document.activeElement).toBe(ctrl2);
       document.body.removeChild(overrideEl);
     });
@@ -11385,7 +11400,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       render(<FeedbackItem {...props} ref={ref} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
-      await act(async () => { ref.current?.markFeedbackItemForDelete(true); });
+      await act(async () => {
+        ref.current?.markFeedbackItemForDelete(true);
+      });
       expect(toggleGroupExpand).toHaveBeenCalled();
     });
   });
@@ -11397,7 +11414,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       render(<FeedbackItem {...props} ref={ref} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
-      await act(async () => { await ref.current?.initiateDeleteFeedbackItem(); });
+      await act(async () => {
+        await ref.current?.initiateDeleteFeedbackItem();
+      });
       expect(props.removeFeedbackItemFromColumn).toHaveBeenCalledWith(props.columnId, props.id, false);
     });
 
@@ -11409,7 +11428,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       render(<FeedbackItem {...props} ref={ref} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
-      await act(async () => { await ref.current?.initiateDeleteFeedbackItem(); });
+      await act(async () => {
+        await ref.current?.initiateDeleteFeedbackItem();
+      });
       expect(itemDataService.deleteFeedbackItem).toHaveBeenCalledWith(props.boardId, props.id);
       expect(props.refreshFeedbackItems).not.toHaveBeenCalled();
     });
@@ -11429,7 +11450,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
         // Show dialog again - should not call showModal since it's already open
         const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
         card.focus();
-        await act(async () => { fireEvent.keyDown(card, { key: "m" }); });
+        await act(async () => {
+          fireEvent.keyDown(card, { key: "m" });
+        });
         expect(showModalSpy).not.toHaveBeenCalled();
       }
     });
@@ -11466,7 +11489,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       const card = document.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       card.focus();
-      await act(async () => { fireEvent.keyDown(card, { key: "t" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "t" });
+      });
       await waitFor(() => expect(itemDataService.flipTimer).toHaveBeenCalledWith(props.boardId, props.id, existingTimerId));
       clearInterval(existingTimerId);
     });
@@ -11510,7 +11535,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
       const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
-      await act(async () => { fireEvent.click(menuButton); });
+      await act(async () => {
+        fireEvent.click(menuButton);
+      });
       expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
 
       // Dispatch pointerdown on document body (outside menu and button)
@@ -11531,7 +11558,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
       const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
-      await act(async () => { fireEvent.click(menuButton); });
+      await act(async () => {
+        fireEvent.click(menuButton);
+      });
       expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
 
       // Dispatch pointerdown on the button itself
@@ -11589,7 +11618,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       card.focus();
 
-      await act(async () => { fireEvent.keyDown(card, { key: "v" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "v" });
+      });
       expect(updateVoteSpy).not.toHaveBeenCalled();
     });
   });
@@ -11622,7 +11653,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       card.focus();
-      await act(async () => { fireEvent.keyDown(card, { key: "v" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "v" });
+      });
       expect(updateVoteSpy).not.toHaveBeenCalled();
     });
   });
@@ -11658,7 +11691,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       card.focus();
-      await act(async () => { fireEvent.keyDown(card, { key: "a" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "a" });
+      });
       // No action should be triggered for non-main item
     });
   });
@@ -11690,7 +11725,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       card.focus();
-      await act(async () => { fireEvent.keyDown(card, { key: "t" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "t" });
+      });
       expect(props.requestTimerStart).toHaveBeenCalled();
     });
   });
@@ -11723,7 +11760,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       // Open the menu
       const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
-      await act(async () => { fireEvent.click(menuButton); });
+      await act(async () => {
+        fireEvent.click(menuButton);
+      });
 
       // For non-main items, hideMainItem=true items should be visible
       const menuItems = container.querySelectorAll('[role="menuitem"]');
@@ -11779,7 +11818,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       expect(focusBtn?.textContent).toContain("Items");
 
       // Click to toggle titles
-      await act(async () => { fireEvent.click(focusBtn as HTMLElement); });
+      await act(async () => {
+        fireEvent.click(focusBtn as HTMLElement);
+      });
     });
 
     test("renders non-focus group button for collapsed main grouped item", async () => {
@@ -11823,7 +11864,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       expect(groupBtn).toBeInTheDocument();
 
       // Click to toggle group expand
-      await act(async () => { fireEvent.click(groupBtn as HTMLElement); });
+      await act(async () => {
+        fireEvent.click(groupBtn as HTMLElement);
+      });
       expect(props.groupedItemProps.toggleGroupExpand).toHaveBeenCalled();
     });
   });
@@ -11934,7 +11977,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       card.focus();
-      await act(async () => { fireEvent.keyDown(card, { key: "v" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "v" });
+      });
       expect(updateVoteSpy).not.toHaveBeenCalled();
     });
 
@@ -11952,7 +11997,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       card.focus();
-      await act(async () => { fireEvent.keyDown(card, { key: "g" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "g" });
+      });
       expect(ref.current?.state.isGroupFeedbackItemDialogHidden).toBe(true);
     });
 
@@ -11964,7 +12011,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
       card.focus();
-      await act(async () => { fireEvent.keyDown(card, { key: "m" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "m" });
+      });
       expect(ref.current?.state.isMoveFeedbackItemDialogHidden).toBe(true);
     });
   });
@@ -11979,11 +12028,15 @@ describe("FeedbackItem additional coverage (merged)", () => {
       const menuButton = container.querySelector(".contextual-menu-button") as HTMLElement;
 
       // Open menu
-      await act(async () => { fireEvent.click(menuButton); });
+      await act(async () => {
+        fireEvent.click(menuButton);
+      });
       expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(false);
 
       // Close menu by clicking again
-      await act(async () => { fireEvent.click(menuButton); });
+      await act(async () => {
+        fireEvent.click(menuButton);
+      });
       expect(ref.current?.state.isMobileFeedbackItemActionsDialogHidden).toBe(true);
     });
   });
@@ -12058,7 +12111,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
       card.focus();
 
       // Enter should trigger editing (not be blocked by hidden check)
-      await act(async () => { fireEvent.keyDown(card, { key: "Enter" }); });
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "Enter" });
+      });
       // No error means startEditingTitle was called successfully
     });
   });
@@ -12098,16 +12153,275 @@ describe("FeedbackItem additional coverage (merged)", () => {
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
       // Mark for deletion
-      await act(async () => { ref.current?.markFeedbackItemForDelete(true); });
+      await act(async () => {
+        ref.current?.markFeedbackItemForDelete(true);
+      });
 
       // Trigger animation end
       const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`);
       if (card) {
         jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(parentItem);
-        await act(async () => { fireEvent.animationEnd(card); });
+        await act(async () => {
+          fireEvent.animationEnd(card);
+        });
         expect(props.removeFeedbackItemFromColumn).toHaveBeenCalled();
         expect(props.refreshFeedbackItems).toHaveBeenCalled();
       }
+    });
+  });
+
+  describe("Branch coverage: remaining feedback item edge paths", () => {
+    test("startEditingTitle does nothing when no editable target exists", async () => {
+      const props = makeProps({ workflowPhase: "Collect" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const overrideElement = document.createElement("div");
+      ref.current!.itemElement = overrideElement;
+
+      expect(() => ref.current?.startEditingTitle()).not.toThrow();
+    });
+
+    test("navigateToAdjacentCard handles missing columns and falsy next item ids", async () => {
+      const propsWithMissingColumn = makeProps({ columnId: "missing-column", columns: testColumns, columnIds: testColumnIds });
+      const missingColumnRef = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { unmount } = render(<FeedbackItem {...propsWithMissingColumn} ref={missingColumnRef} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      expect(() => missingColumnRef.current?.navigateToAdjacentCard("next")).not.toThrow();
+      unmount();
+
+      jest.clearAllMocks();
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(makeDoc({ id: "current-with-empty-next" }));
+      jest.spyOn(itemDataService, "getVotes").mockReturnValue(0);
+      jest.spyOn(itemDataService, "getVotesForGroupedItems").mockReturnValue(0);
+      jest.spyOn(itemDataService, "getVotesForGroupedItemsByUser").mockReturnValue("0" as any);
+
+      const currentItem = makeDoc({ id: "current-with-empty-next" });
+      const itemWithoutId = makeDoc({ id: "" });
+      const columns = makeColumns([currentItem, itemWithoutId]);
+      const props = makeProps({ id: currentItem.id, columns });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      expect(() => ref.current?.navigateToAdjacentCard("next")).not.toThrow();
+    });
+
+    test("dialog show helpers skip showModal when dialogs are already open", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      const deleteDialog = container.querySelector(".delete-feedback-item-dialog") as HTMLDialogElement;
+      const moveDialog = container.querySelector(".move-feedback-item-dialog") as HTMLDialogElement;
+      const groupDialog = container.querySelector(".retrospectives-group-feedback-item-dialog") as HTMLDialogElement;
+      const removeDialog = container.querySelector(".remove-feedback-item-from-group-dialog") as HTMLDialogElement;
+
+      deleteDialog.showModal();
+      moveDialog.showModal();
+      groupDialog.showModal();
+      removeDialog.showModal();
+
+      const deleteShowSpy = jest.spyOn(deleteDialog, "showModal");
+      const moveShowSpy = jest.spyOn(moveDialog, "showModal");
+      const groupShowSpy = jest.spyOn(groupDialog, "showModal");
+      const removeShowSpy = jest.spyOn(removeDialog, "showModal");
+
+      fireEvent.keyDown(card, { key: "Delete" });
+      fireEvent.keyDown(card, { key: "m" });
+      fireEvent.keyDown(card, { key: "g" });
+      ref.current?.showRemoveFeedbackItemFromGroupConfirmationDialog();
+
+      expect(deleteShowSpy).not.toHaveBeenCalled();
+      expect(moveShowSpy).not.toHaveBeenCalled();
+      expect(groupShowSpy).not.toHaveBeenCalled();
+      expect(removeShowSpy).not.toHaveBeenCalled();
+    });
+
+    test("menu callbacks skip showModal when their dialogs are already open", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        ref.current?.setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+
+      const deleteDialog = container.querySelector(".delete-feedback-item-dialog") as HTMLDialogElement;
+      const moveDialog = container.querySelector(".move-feedback-item-dialog") as HTMLDialogElement;
+      const groupDialog = container.querySelector(".retrospectives-group-feedback-item-dialog") as HTMLDialogElement;
+
+      deleteDialog.showModal();
+      const deleteShowSpy = jest.spyOn(deleteDialog, "showModal");
+      fireEvent.click(screen.getByRole("menuitem", { name: "Delete feedback" }));
+      expect(deleteShowSpy).not.toHaveBeenCalled();
+
+      await act(async () => {
+        ref.current?.setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+      moveDialog.showModal();
+      const moveShowSpy = jest.spyOn(moveDialog, "showModal");
+      fireEvent.click(screen.getByRole("menuitem", { name: "Move feedback to different column" }));
+      expect(moveShowSpy).not.toHaveBeenCalled();
+
+      await act(async () => {
+        ref.current?.setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+      groupDialog.showModal();
+      const groupShowSpy = jest.spyOn(groupDialog, "showModal");
+      fireEvent.click(screen.getByRole("menuitem", { name: "Group feedback" }));
+      expect(groupShowSpy).not.toHaveBeenCalled();
+    });
+
+    test("markFeedbackItemForDelete default argument works for ungrouped items", async () => {
+      const props = makeProps();
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        ref.current?.markFeedbackItemForDelete();
+      });
+
+      expect(ref.current?.state.isMarkedForDeletion).toBe(true);
+      expect(ref.current?.state.isLocalDelete).toBe(false);
+    });
+
+    test("vote handlers tolerate updateVote returning null", async () => {
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true, refreshFeedbackItems: jest.fn(), onVoteCasted: jest.fn() });
+      const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(null as any);
+      render(<FeedbackItem {...props} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: /Vote up/i }));
+      });
+
+      await waitFor(() => expect(updateVoteSpy).toHaveBeenCalled());
+      expect(props.refreshFeedbackItems).not.toHaveBeenCalled();
+    });
+
+    test("drop handler ignores self drops and falls back to local storage id", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem").mockResolvedValue(undefined as any);
+      jest.spyOn(localStorageHelper, "getIdValue").mockReturnValue("fallback-drop-id");
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+      fireEvent.drop(card, {
+        dataTransfer: {
+          getData: (format: string) => (format === "text/plain" ? props.id : ""),
+        },
+      });
+      expect(dropSpy).not.toHaveBeenCalled();
+
+      fireEvent.drop(card, {
+        dataTransfer: {
+          getData: () => "",
+        },
+      });
+      expect(dropSpy).toHaveBeenCalledWith(expect.any(Object), "fallback-drop-id", props.id);
+    });
+
+    test("external delete callback ignores other items and already marked items", async () => {
+      const deletedItemCallbacks: Array<(columnId: string, feedbackItemId: string) => void> = [];
+      jest.spyOn(reflectBackendService, "onReceiveDeletedItem").mockImplementation(callback => {
+        deletedItemCallbacks.push(callback);
+      });
+      jest.spyOn(reflectBackendService, "removeOnReceiveDeletedItem").mockImplementation(() => undefined);
+
+      const props = makeProps({ id: "external-delete-branch" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(deletedItemCallbacks.length).toBeGreaterThan(0));
+
+      act(() => {
+        deletedItemCallbacks[0](props.columnId, "different-item");
+      });
+      expect(ref.current?.state.isMarkedForDeletion).toBe(false);
+
+      act(() => {
+        ref.current?.markFeedbackItemForDelete(false);
+        deletedItemCallbacks[0](props.columnId, props.id);
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.animationEnd(card);
+      expect(props.removeFeedbackItemFromColumn).toHaveBeenCalledTimes(1);
+    });
+
+    test("act shortcut does nothing when add action button is absent", async () => {
+      const props = makeProps({ workflowPhase: "Act", team: { id: "team-1" }, boardTitle: "Board", defaultActionItemAreaPath: "area", defaultActionItemIteration: "iter" });
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      expect(() => fireEvent.keyDown(card, { key: "a" })).not.toThrow();
+    });
+
+    test("act shortcut uses override item element when present", async () => {
+      const props = makeProps({ workflowPhase: "Act", team: { id: "team-1" }, boardTitle: "Board", defaultActionItemAreaPath: "area", defaultActionItemIteration: "iter" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const overrideElement = document.createElement("div");
+      const addActionButton = document.createElement("button");
+      addActionButton.setAttribute("aria-label", "Add action item from override");
+      const clickSpy = jest.spyOn(addActionButton, "click");
+      overrideElement.appendChild(addActionButton);
+      ref.current!.itemElement = overrideElement;
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.keyDown(card, { key: "a" });
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+
+    test("pressing Enter on a group search result groups the selected item", async () => {
+      const candidate = makeDoc({ id: "keyboard-search-result", title: "Keyboard Search Result" });
+      const props = makeProps({ workflowPhase: "Group", columns: makeColumns([makeDoc({ id: "item-1" }), candidate]) });
+      jest.spyOn(itemDataService, "addFeedbackItemAsChild").mockResolvedValue({
+        updatedParentFeedbackItem: makeDoc({ id: candidate.id }),
+        updatedChildFeedbackItem: makeDoc({ id: props.id }),
+        updatedGrandchildFeedbackItems: [],
+        updatedOldParentFeedbackItem: undefined,
+      } as any);
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        ref.current?.setState({ isGroupFeedbackItemDialogHidden: false, searchTerm: "keyboard", searchedFeedbackItems: [candidate] });
+      });
+
+      expect(screen.getByText("Keyboard Search Result")).toBeInTheDocument();
+      const searchResult = document.querySelector(".feedback-item-search-result-item") as HTMLButtonElement;
+      expect(searchResult).toBeInTheDocument();
+      await act(async () => {
+        fireEvent.keyDown(searchResult, { key: "Enter" });
+      });
+
+      await waitFor(() => expect(itemDataService.addFeedbackItemAsChild).toHaveBeenCalled());
     });
   });
 });

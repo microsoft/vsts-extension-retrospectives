@@ -13,6 +13,7 @@ import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetr
 import ActionItem from "./actionItem";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { getIconElement } from "./icons";
+import { t } from "../utilities/localization";
 
 export interface ActionItemDisplayProps {
   feedbackItemId: string;
@@ -182,12 +183,12 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
     <div className="action-item-display-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {allowAddNewActionItem && (
         <div className="add-action-item-wrapper" ref={addWorkItemWrapperRef}>
-          <button ref={addWorkItemButtonRef} className="add-action-item-button" aria-label="Add work item" data-automation-id="actionItemDataAutomation" onClick={toggleSelectorCallout}>
+          <button ref={addWorkItemButtonRef} className="add-action-item-button" aria-label={t("common_add_work_item")} data-automation-id="actionItemDataAutomation" onClick={toggleSelectorCallout}>
             {getIconElement("add")}
-            <span>Add work item</span>
+            <span>{t("common_add_work_item")}</span>
           </button>
           {isWorkItemTypeListCalloutVisible && (
-            <div ref={addWorkItemMenuRef} className="popout-container" role="menu" aria-label="Add work item menu">
+            <div ref={addWorkItemMenuRef} className="popout-container" role="menu" aria-label={t("common_add_work_item_menu")}>
               <button
                 className="list-item"
                 onClick={handleLinkExistingWorkItemClick}
@@ -199,7 +200,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
                 }}
               >
                 {getIconElement("link")}
-                <span>Link existing work item</span>
+                <span>{t("common_link_existing_work_item")}</span>
               </button>
               <div role="separator" className="separator" />
               {nonHiddenWorkItemTypes.map(item => {
@@ -217,7 +218,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
       {renderAllWorkItemCards()}
       <dialog ref={linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onClose={() => linkExistingWorkItemDialogRef.current!.close()}>
         <div className="header">
-          <h2 className="title">Link existing work item</h2>
+          <h2 className="title">{t("common_link_existing_work_item")}</h2>
           <button onClick={() => linkExistingWorkItemDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
@@ -233,10 +234,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
         </div>
         <div className="inner">
           <button className="button" disabled={!linkedWorkItem} onClick={linkExistingWorkItem}>
-            Link work item
+            {t("common_link_work_item")}
           </button>
           <button className="default button" onClick={() => linkExistingWorkItemDialogRef.current!.close()}>
-            Cancel
+            {t("common_cancel")}
           </button>
         </div>
       </dialog>

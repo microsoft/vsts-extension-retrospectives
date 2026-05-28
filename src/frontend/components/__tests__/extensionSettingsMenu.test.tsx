@@ -82,6 +82,16 @@ describe("ExtensionSettingsMenu", () => {
     return iconButton ?? closeButtons[0];
   };
 
+  const getHelpMenuDetails = (): HTMLElement => {
+    const helpMenuDetails = screen.getByTitle("Retrospective Help").closest("details") as HTMLElement;
+    if (!helpMenuDetails.hasAttribute("open")) {
+      fireEvent.click(screen.getByTitle("Retrospective Help"));
+    }
+    return helpMenuDetails;
+  };
+
+  const getHelpMenuButton = (name: string): HTMLElement => within(getHelpMenuDetails()).getByRole("button", { name });
+
   beforeEach(() => {
     windowOpenSpy = jest.spyOn(window, "open").mockImplementation(() => null);
 
@@ -167,7 +177,7 @@ describe("ExtensionSettingsMenu", () => {
   it("opens retrospective wiki", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Prime Directive"));
-    fireEvent.click(screen.getByText("Open Retrospective Wiki"));
+    fireEvent.click(screen.getByRole("button", { name: "Open retrospective wiki" }));
     expect(windowOpenSpy).toHaveBeenCalledWith("https://retrospectivewiki.org", "_blank");
   });
 
@@ -175,10 +185,10 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("What's new"));
+      fireEvent.click(getHelpMenuButton("What's new"));
     });
     await waitFor(() => {
-      expect(screen.getByText("What's New")).toBeInTheDocument();
+      expect(screen.getByRole("dialog", { name: "What is New" })).toHaveAttribute("open");
     });
   });
 
@@ -186,10 +196,10 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("User guide"));
+      fireEvent.click(getHelpMenuButton("User guide"));
     });
     await waitFor(() => {
-      expect(screen.getByText("Retrospectives User Guide")).toBeInTheDocument();
+      expect(screen.getByRole("dialog", { name: "Retrospectives User Guide" })).toHaveAttribute("open");
     });
   });
 
@@ -208,10 +218,10 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("Keyboard shortcuts"));
+      fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
     });
     await waitFor(() => {
-      expect(screen.getByText("Keyboard Shortcuts")).toBeInTheDocument();
+      expect(screen.getByRole("dialog", { name: "Keyboard Shortcuts" })).toHaveAttribute("open");
     });
   });
 
@@ -219,16 +229,16 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("Keyboard shortcuts"));
+      fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
     });
+    const dialog = screen.getByRole("dialog", { name: "Keyboard Shortcuts" });
     await waitFor(() => {
-      expect(screen.getByText("Keyboard Shortcuts")).toBeInTheDocument();
+      expect(dialog).toHaveAttribute("open");
     });
 
-    const dialog = screen.getByRole("dialog", { name: "Keyboard Shortcuts" });
     fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
-      expect(screen.queryByText("Keyboard Shortcuts")).not.toBeVisible();
+      expect(dialog).not.toHaveAttribute("open");
     });
   });
 
@@ -236,7 +246,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("Contact us"));
+      fireEvent.click(getHelpMenuButton("Contact us"));
     });
     expect(windowOpenSpy).toHaveBeenCalledWith("https://github.com/microsoft/vsts-extension-retrospectives/issues", "_blank");
   });
@@ -293,7 +303,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("What's new"));
+      fireEvent.click(getHelpMenuButton("What's new"));
     });
 
     const dialog = screen.getByRole("dialog", { name: "What is New" });
@@ -309,7 +319,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("User guide"));
+      fireEvent.click(getHelpMenuButton("User guide"));
     });
 
     const dialog = screen.getByRole("dialog", { name: "Retrospectives User Guide" });
@@ -341,7 +351,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("Keyboard shortcuts"));
+      fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
     });
 
     const dialog = screen.getByRole("dialog", { name: "Keyboard Shortcuts" });
@@ -363,14 +373,14 @@ describe("ExtensionSettingsMenu", () => {
     expect(primeDirectiveDialog).not.toHaveAttribute("open");
 
     fireEvent.click(screen.getByTitle("Retrospective Help"));
-    fireEvent.click(screen.getByText("What's new"));
+    fireEvent.click(getHelpMenuButton("What's new"));
     const whatsNewDialog = screen.getByRole("dialog", { name: "What is New" });
     expect(whatsNewDialog).toHaveAttribute("open");
     fireEvent(whatsNewDialog, new Event("cancel", { bubbles: false, cancelable: true }));
     expect(whatsNewDialog).not.toHaveAttribute("open");
 
     fireEvent.click(screen.getByTitle("Retrospective Help"));
-    fireEvent.click(screen.getByText("User guide"));
+    fireEvent.click(getHelpMenuButton("User guide"));
     const userGuideDialog = screen.getByRole("dialog", { name: "Retrospectives User Guide" });
     expect(userGuideDialog).toHaveAttribute("open");
     fireEvent(userGuideDialog, new Event("cancel", { bubbles: false, cancelable: true }));
@@ -384,7 +394,7 @@ describe("ExtensionSettingsMenu", () => {
     expect(volunteerDialog).not.toHaveAttribute("open");
 
     fireEvent.click(screen.getByTitle("Retrospective Help"));
-    fireEvent.click(screen.getByText("Keyboard shortcuts"));
+    fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
     const keyboardShortcutsDialog = screen.getByRole("dialog", { name: "Keyboard Shortcuts" });
     expect(keyboardShortcutsDialog).toHaveAttribute("open");
     fireEvent(keyboardShortcutsDialog, new Event("cancel", { bubbles: false, cancelable: true }));
@@ -406,15 +416,15 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("What's new"));
-    });
-    await waitFor(() => {
-      expect(screen.getByText("What's New")).toBeInTheDocument();
+      fireEvent.click(getHelpMenuButton("What's new"));
     });
     const dialog = screen.getByRole("dialog", { name: "What is New" });
+    await waitFor(() => {
+      expect(dialog).toHaveAttribute("open");
+    });
     fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
-      expect(screen.queryByText("What's New")).not.toBeVisible();
+      expect(dialog).not.toHaveAttribute("open");
     });
   });
 
@@ -422,7 +432,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("What's new"));
+      fireEvent.click(getHelpMenuButton("What's new"));
     });
     await waitFor(() => {
       fireEvent.click(screen.getByText("Open change log"));
@@ -434,7 +444,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("User guide"));
+      fireEvent.click(getHelpMenuButton("User guide"));
     });
     await waitFor(() => {
       fireEvent.click(screen.getByText("Open user guide"));
@@ -446,15 +456,15 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu />);
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
-      fireEvent.click(screen.getByText("User guide"));
-    });
-    await waitFor(() => {
-      expect(screen.getByText("Retrospectives User Guide")).toBeInTheDocument();
+      fireEvent.click(getHelpMenuButton("User guide"));
     });
     const dialog = screen.getByRole("dialog", { name: "Retrospectives User Guide" });
+    await waitFor(() => {
+      expect(dialog).toHaveAttribute("open");
+    });
     fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
-      expect(screen.queryByText("Retrospectives User Guide")).not.toBeVisible();
+      expect(dialog).not.toHaveAttribute("open");
     });
   });
 

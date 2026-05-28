@@ -568,9 +568,9 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 <div className="subText">{`Are you sure you want to remove columns from '${currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`}</div>
                 <div className="inner">
                   <button onClick={handleDeleteColumnConfirm}>
-                    Confirm
+                    {t("common_confirm")}
                   </button>
-                  <button className="default button" onClick={hideDeleteColumnConfirmationDialog}>Cancel</button>
+                  <button className="default button" onClick={hideDeleteColumnConfirmationDialog}>{t("common_cancel")}</button>
                 </div>
               </dialog>
             )}
@@ -606,7 +606,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 </div>
                 <div className="inner">
                   <button className="default button" onClick={() => chooseColumnIconDialogRef.current!.close()}>
-                    Close
+                    {t("common_close")}
                   </button>
                 </div>
               </dialog>
