@@ -318,7 +318,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const markFeedbackItemForDelete = useCallback(
     (isLocalDelete: boolean = false) => {
-      if (groupedItemPropsRef.current?.isMainItem && groupedItemPropsRef.current?.isGroupExpanded) {
+      if (groupedItemPropsRef.current?.isMainItem && groupedItemPropsRef.current.isGroupExpanded) {
         groupedItemPropsRef.current.toggleGroupExpand();
       }
 
@@ -565,10 +565,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       e:
         | React.DragEvent<HTMLDivElement>
         | {
-          preventDefault: () => void;
-          stopPropagation: () => void;
-          dataTransfer?: { dropEffect?: string };
-        },
+            preventDefault: () => void;
+            stopPropagation: () => void;
+            dataTransfer?: { dropEffect?: string };
+          },
     ) => {
       if (!stateRef.current.isBeingDragged) {
         e.preventDefault();
@@ -586,8 +586,8 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       e:
         | React.DragEvent<HTMLDivElement>
         | {
-          dataTransfer: { effectAllowed: string; setData: (format: string, data: string) => void };
-        },
+            dataTransfer: { effectAllowed: string; setData: (format: string, data: string) => void };
+          },
     ) => {
       if (groupedItemPropsRef.current) {
         groupedItemPropsRef.current.setIsGroupBeingDragged(true);
@@ -1200,12 +1200,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           </button>
         </div>
       </dialog>
-      <dialog
-        ref={groupFeedbackDialogRef}
-        className="retrospectives-group-feedback-item-dialog"
-        aria-label="Group Feedback"
-        onClose={() => setStateMerge({ isGroupFeedbackItemDialogHidden: true, searchedFeedbackItems: [], searchTerm: "" })}
-      >
+      <dialog ref={groupFeedbackDialogRef} className="retrospectives-group-feedback-item-dialog" aria-label="Group Feedback" onClose={() => setStateMerge({ isGroupFeedbackItemDialogHidden: true, searchedFeedbackItems: [], searchTerm: "" })}>
         <div className="header">
           <h2 className="title">Group Feedback</h2>
           <button onClick={hideGroupFeedbackItemDialog} aria-label="Close">
