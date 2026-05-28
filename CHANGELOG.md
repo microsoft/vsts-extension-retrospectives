@@ -2,6 +2,18 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.53
+
+* Ensures editing a retrospective updates the intended board name and prevents accidental renames.
+* Prevents duplicate-name side effects that can impact board retrieval when updating board metadata.
+* Improves Create and Edit Retrospective dialog name-validation feedback, including consistent top and bottom validation messaging.
+* Simplifies board-configuration wording in Board Settings, including the required-name indicator, Max Votes label text, Collect phase helper text, and warning copy.
+* Adjusts board-configuration layout and spacing, including title-input sizing, max-votes input width, and dialog width responsiveness.
+* Validated across create, sprint, copy, and edit flows, including switched boards with General or Permissions edits.
+* Confirms feedback items remain visible after board-name updates.
+
+From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospectives/pull/1696)
+
 ## v1.92.52
 
 * Fix: improve archived board delete messaging in History and harden loading-state recovery to avoid indefinite spinner states after data-load failures. From [GitHub PR #1578](https://github.com/microsoft/vsts-extension-retrospectives/pull/1578)
