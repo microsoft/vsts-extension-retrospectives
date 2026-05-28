@@ -179,6 +179,24 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
     });
   }, [actionItems, renderWorkItemCard]);
 
+  const renderLinkExistingWorkItemButton = useCallback(() => {
+    return (
+      <button
+        className="list-item"
+        onClick={handleLinkExistingWorkItemClick}
+        onKeyDown={e => {
+          if (e.key === "Enter") {
+            e.stopPropagation();
+            handleLinkExistingWorkItemClick();
+          }
+        }}
+      >
+        {getIconElement("link")}
+        <span>{t("common_link_existing_work_item")}</span>
+      </button>
+    );
+  }, [handleLinkExistingWorkItemClick]);
+
   return (
     <div className="action-item-display-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {allowAddNewActionItem && (
@@ -189,20 +207,8 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
           </button>
           {isWorkItemTypeListCalloutVisible && (
             <div ref={addWorkItemMenuRef} className="popout-container" role="menu" aria-label={t("common_add_work_item_menu")}>
-              <button
-                className="list-item"
-                onClick={handleLinkExistingWorkItemClick}
-                onKeyDown={e => {
-                  if (e.key === "Enter") {
-                    e.stopPropagation();
-                    handleLinkExistingWorkItemClick();
-                  }
-                }}
-              >
-                {getIconElement("link")}
-                <span>{t("common_link_existing_work_item")}</span>
-              </button>
-              <div role="separator" className="separator" />
+              {renderLinkExistingWorkItemButton()}
+              {nonHiddenWorkItemTypes.length > 0 && <div role="separator" className="separator" />}
               {nonHiddenWorkItemTypes.map(item => {
                 return (
                   <button key={item.referenceName} className="list-item" onClick={e => handleClickWorkItemType(e, item)} aria-label={`Add work item type ${item.name}`}>
