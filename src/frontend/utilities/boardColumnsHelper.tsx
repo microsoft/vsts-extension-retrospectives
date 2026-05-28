@@ -2,7 +2,7 @@ import { IFeedbackColumn } from "../interfaces/feedback";
 import { generateUUID } from "./random";
 
 export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] => {
-  const NEXT_ACTION = "One action to try next.";
+  const NEXT_ACTION = "One action to try next cycle.";
 
   switch (templateId) {
     case "start-stop-continue":
@@ -239,13 +239,13 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           notes: "",
         },
       ];
-    case "speedboat": // Speedboat retrospective - Propellors, Life Preserver, Anchors, Rocks
+    case "speedboat": // Speedboat retrospective - Propellers, Life Preserver, Anchors, Rocks
       return [
         {
           accentColor: "#008000", //green
           iconClass: "rocket-launch",
           id: generateUUID(),
-          title: "Propellors",
+          title: "Propellers",
           notes: "",
         },
         {
