@@ -397,7 +397,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               <div className="board-metadata-form-section-information">
                 {getIconElement("exclamation")} You can create a maximum of {maxColumnCount} columns in a retrospective
               </div>
-              {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Warning: Existing feedback items may not be available after changing the board template!</div>}
+              {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Changing template after feedback entered may result in loss of feedback!</div>}
               <div className="board-metadata-form-section-subheader">
                 <label htmlFor="column-template-dropdown">Apply template:</label>
                 <select onChange={handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">
@@ -667,21 +667,21 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         </PivotItem>
       </Pivot>
       <div className="inner">
-        <span className="input-validation-message">{error}</span>
+        {error && <span className="input-validation-message">{getIconElement("report-problem")} {error}</span>}
         <button
           className="metadata-form-save-button"
           onClick={async event => {
             if (title.trim().length === 0) {
-              setError("⚠️ Retrospective Board name is required");
+              setError("Retrospective Board name is required");
               retrospectiveNameInputRef.current?.focus();
               return;
             }
             if (columnCards.every(columnCard => columnCard.markedForDeletion)) {
-              setError("⚠️ At least one column must be active");
+              setError("At least one column must be active");
               return;
             }
             if (await BoardDataService.checkIfBoardNameIsTaken(teamId, title.trim())) {
-              setError("⚠️ A board with this name already exists");
+              setError("A board with this name already exists");
               return;
             }
             setError("");
