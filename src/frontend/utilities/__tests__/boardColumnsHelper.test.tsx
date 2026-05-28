@@ -301,7 +301,7 @@ describe("boardColumnsHelper", () => {
           accentColor: "#008000",
           iconClass: "rocket-launch",
           id: "uuid-1",
-          title: "Propellors",
+          title: "Propellers",
           notes: "",
         });
         expect(result[1]).toEqual({
@@ -352,7 +352,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -381,7 +381,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -410,7 +410,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -439,7 +439,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -468,7 +468,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
@@ -497,7 +497,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#0078d4",
             iconClass: "check-circle",
             id: "uuid-3",
-            title: "One action to try next.",
+            title: "One action to try next cycle.",
             notes: "",
           });
         });
