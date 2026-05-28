@@ -48,7 +48,7 @@ export interface IColumnItem {
   hideFeedbackItems?: boolean;
 }
 
-const findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): string | null => {
+export const findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): string | null => {
   for (const columnId of Object.keys(columns)) {
     const activeItem = columns[columnId]?.columnItems.find(columnItem => columnItem.feedbackItem.timerState);
     if (activeItem) {
@@ -57,6 +57,29 @@ const findActiveTimerFeedbackItemId = (columns: { [id: string]: IColumn }): stri
   }
 
   return null;
+};
+
+export const findColumnItemById = (feedbackItemId: string, currentColumns: { [id: string]: IColumn }, currentColumnIds: string[]): IColumnItem | undefined => {
+  for (const columnId of currentColumnIds) {
+    const columnItem = currentColumns[columnId]?.columnItems.find(item => item.feedbackItem.id === feedbackItemId);
+    if (columnItem) {
+      return columnItem;
+    }
+  }
+
+  return undefined;
+};
+
+export const getActiveTimerFeedbackItemIdAfterStop = (activeTimerFeedbackItemId: string | null, stoppedFeedbackItemId: string): string | null => {
+  return activeTimerFeedbackItemId === stoppedFeedbackItemId ? null : activeTimerFeedbackItemId;
+};
+
+export const getTextOrEmpty = (value?: string | null): string => {
+  return value ?? "";
+};
+
+export const getColumnNotesOrEmpty = (columnNotes: { [columnId: string]: string }, columnId: string): string => {
+  return getTextOrEmpty(columnNotes[columnId]);
 };
 
 const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
@@ -93,17 +116,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   const prevBoardIdRef = useRef<string>(board.id);
   const prevBoardModifiedDateRef = useRef<Date | undefined>(board.modifiedDate);
   const prevTeamIdRef = useRef<string>(team.id);
-
-  const findColumnItemById = useCallback((feedbackItemId: string, currentColumns: { [id: string]: IColumn }, currentColumnIds: string[]): IColumnItem | undefined => {
-    for (const columnId of currentColumnIds) {
-      const columnItem = currentColumns[columnId]?.columnItems.find(item => item.feedbackItem.id === feedbackItemId);
-      if (columnItem) {
-        return columnItem;
-      }
-    }
-
-    return undefined;
-  }, []);
 
   const refreshFeedbackItems = useCallback(
     async (updatedFeedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean): Promise<void> => {
@@ -169,7 +181,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         const columnItem = findColumnItemById(feedbackItemId, currentColumns, columnIds);
 
         if (!columnItem || !columnItem.feedbackItem.timerState) {
-          setActiveTimerFeedbackItemId(prev => (prev === feedbackItemId ? null : prev));
+          setActiveTimerFeedbackItemId(prev => getActiveTimerFeedbackItemIdAfterStop(prev, feedbackItemId));
           return currentColumns;
         }
 
@@ -192,10 +204,10 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
           feedbackItemId,
         });
       } finally {
-        setActiveTimerFeedbackItemId(prev => (prev === feedbackItemId ? null : prev));
+        setActiveTimerFeedbackItemId(prev => getActiveTimerFeedbackItemIdAfterStop(prev, feedbackItemId));
       }
     },
-    [board.id, columnIds, findColumnItemById, refreshFeedbackItems],
+    [board.id, columnIds, refreshFeedbackItems],
   );
 
   const requestTimerStart = useCallback(
@@ -211,7 +223,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   );
 
   const handleTimerStopped = useCallback((feedbackItemId: string) => {
-    setActiveTimerFeedbackItemId(prev => (prev === feedbackItemId ? null : prev));
+    setActiveTimerFeedbackItemId(prev => getActiveTimerFeedbackItemIdAfterStop(prev, feedbackItemId));
   }, []);
 
   const addFeedbackItems = useCallback((columnId: string, feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItemsParam: boolean) => {
@@ -335,7 +347,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         col.accentColor = "#0078d4";
       }
 
-      col.notes = col.notes ?? "";
+      col.notes = getTextOrEmpty(col.notes);
 
       const column: IColumn = {
         columnProperties: col,
@@ -344,7 +356,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       };
       stateColumns[col.id] = column;
       newColumnIds.push(col.id);
-      newColumnNotes[col.id] = col.notes ?? "";
+      newColumnNotes[col.id] = getTextOrEmpty(col.notes);
     });
 
     setColumns(stateColumns);
@@ -467,7 +479,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
 
   const handleColumnNotesChange = useCallback(
     (columnId: string, notes: string) => {
-      const previousNotes = columnNotes[columnId] ?? "";
+      const previousNotes = getColumnNotesOrEmpty(columnNotes, columnId);
 
       setColumns(previousColumns => {
         const updatedColumns = { ...previousColumns };
@@ -719,7 +731,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         isFocusModalHidden: true,
         groupIds: [] as string[],
         showColumnEditButton: !!canCurrentUserEditBoard,
-        columnNotes: columnNotes[columnId] ?? "",
+        columnNotes: getColumnNotesOrEmpty(columnNotes, columnId),
         onColumnNotesChange: (notes: string) => handleColumnNotesChange(columnId, notes),
         onVoteCasted: () => {
           if (onVoteCasted) {
