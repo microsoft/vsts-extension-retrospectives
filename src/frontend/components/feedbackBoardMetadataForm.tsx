@@ -674,7 +674,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
           onClick={async event => {
             if (title.trim().length === 0) {
               setError("Retrospective Board name is required");
-              retrospectiveNameInputRef.current?.focus();
+              retrospectiveNameInputRef.current!.focus();
               return;
             }
             const activeColumnCards = columnCards.filter(columnCard => !columnCard.markedForDeletion);
