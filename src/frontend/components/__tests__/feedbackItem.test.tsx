@@ -12110,4 +12110,259 @@ describe("FeedbackItem additional coverage (merged)", () => {
       }
     });
   });
+
+  describe("Branch coverage: remaining feedback item edge paths", () => {
+    test("startEditingTitle does nothing when no editable target exists", async () => {
+      const props = makeProps({ workflowPhase: "Collect" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const overrideElement = document.createElement("div");
+      ref.current!.itemElement = overrideElement;
+
+      expect(() => ref.current?.startEditingTitle()).not.toThrow();
+    });
+
+    test("navigateToAdjacentCard handles missing columns and falsy next item ids", async () => {
+      const propsWithMissingColumn = makeProps({ columnId: "missing-column", columns: testColumns, columnIds: testColumnIds });
+      const missingColumnRef = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { unmount } = render(<FeedbackItem {...propsWithMissingColumn} ref={missingColumnRef} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      expect(() => missingColumnRef.current?.navigateToAdjacentCard("next")).not.toThrow();
+      unmount();
+
+      jest.clearAllMocks();
+      jest.spyOn(itemDataService, "isVoted").mockResolvedValue("0");
+      jest.spyOn(itemDataService, "getFeedbackItem").mockResolvedValue(makeDoc({ id: "current-with-empty-next" }));
+      jest.spyOn(itemDataService, "getVotes").mockReturnValue(0);
+      jest.spyOn(itemDataService, "getVotesForGroupedItems").mockReturnValue(0);
+      jest.spyOn(itemDataService, "getVotesForGroupedItemsByUser").mockReturnValue("0" as any);
+
+      const currentItem = makeDoc({ id: "current-with-empty-next" });
+      const itemWithoutId = makeDoc({ id: "" });
+      const columns = makeColumns([currentItem, itemWithoutId]);
+      const props = makeProps({ id: currentItem.id, columns });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+      expect(() => ref.current?.navigateToAdjacentCard("next")).not.toThrow();
+    });
+
+    test("dialog show helpers skip showModal when dialogs are already open", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      const deleteDialog = container.querySelector(".delete-feedback-item-dialog") as HTMLDialogElement;
+      const moveDialog = container.querySelector(".move-feedback-item-dialog") as HTMLDialogElement;
+      const groupDialog = container.querySelector(".retrospectives-group-feedback-item-dialog") as HTMLDialogElement;
+      const removeDialog = container.querySelector(".remove-feedback-item-from-group-dialog") as HTMLDialogElement;
+
+      deleteDialog.showModal();
+      moveDialog.showModal();
+      groupDialog.showModal();
+      removeDialog.showModal();
+
+      const deleteShowSpy = jest.spyOn(deleteDialog, "showModal");
+      const moveShowSpy = jest.spyOn(moveDialog, "showModal");
+      const groupShowSpy = jest.spyOn(groupDialog, "showModal");
+      const removeShowSpy = jest.spyOn(removeDialog, "showModal");
+
+      fireEvent.keyDown(card, { key: "Delete" });
+      fireEvent.keyDown(card, { key: "m" });
+      fireEvent.keyDown(card, { key: "g" });
+      ref.current?.showRemoveFeedbackItemFromGroupConfirmationDialog();
+
+      expect(deleteShowSpy).not.toHaveBeenCalled();
+      expect(moveShowSpy).not.toHaveBeenCalled();
+      expect(groupShowSpy).not.toHaveBeenCalled();
+      expect(removeShowSpy).not.toHaveBeenCalled();
+    });
+
+    test("menu callbacks skip showModal when their dialogs are already open", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        ref.current?.setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+
+      const deleteDialog = container.querySelector(".delete-feedback-item-dialog") as HTMLDialogElement;
+      const moveDialog = container.querySelector(".move-feedback-item-dialog") as HTMLDialogElement;
+      const groupDialog = container.querySelector(".retrospectives-group-feedback-item-dialog") as HTMLDialogElement;
+
+      deleteDialog.showModal();
+      const deleteShowSpy = jest.spyOn(deleteDialog, "showModal");
+      fireEvent.click(screen.getByRole("menuitem", { name: "Delete feedback" }));
+      expect(deleteShowSpy).not.toHaveBeenCalled();
+
+      await act(async () => {
+        ref.current?.setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+      moveDialog.showModal();
+      const moveShowSpy = jest.spyOn(moveDialog, "showModal");
+      fireEvent.click(screen.getByRole("menuitem", { name: "Move feedback to different column" }));
+      expect(moveShowSpy).not.toHaveBeenCalled();
+
+      await act(async () => {
+        ref.current?.setState({ isMobileFeedbackItemActionsDialogHidden: false });
+      });
+      groupDialog.showModal();
+      const groupShowSpy = jest.spyOn(groupDialog, "showModal");
+      fireEvent.click(screen.getByRole("menuitem", { name: "Group feedback" }));
+      expect(groupShowSpy).not.toHaveBeenCalled();
+    });
+
+    test("markFeedbackItemForDelete default argument works for ungrouped items", async () => {
+      const props = makeProps();
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        ref.current?.markFeedbackItemForDelete();
+      });
+
+      expect(ref.current?.state.isMarkedForDeletion).toBe(true);
+      expect(ref.current?.state.isLocalDelete).toBe(false);
+    });
+
+    test("vote handlers tolerate updateVote returning null", async () => {
+      const props = makeProps({ workflowPhase: "Vote", isFocusModalHidden: true, refreshFeedbackItems: jest.fn(), onVoteCasted: jest.fn() });
+      const updateVoteSpy = jest.spyOn(itemDataService, "updateVote").mockResolvedValue(null as any);
+      render(<FeedbackItem {...props} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: /Vote up/i }));
+      });
+
+      await waitFor(() => expect(updateVoteSpy).toHaveBeenCalled());
+      expect(props.refreshFeedbackItems).not.toHaveBeenCalled();
+    });
+
+    test("drop handler ignores self drops and falls back to local storage id", async () => {
+      const props = makeProps({ workflowPhase: "Group" });
+      const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem").mockResolvedValue(undefined as any);
+      jest.spyOn(localStorageHelper, "getIdValue").mockReturnValue("fallback-drop-id");
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+      fireEvent.drop(card, {
+        dataTransfer: {
+          getData: (format: string) => (format === "text/plain" ? props.id : ""),
+        },
+      });
+      expect(dropSpy).not.toHaveBeenCalled();
+
+      fireEvent.drop(card, {
+        dataTransfer: {
+          getData: () => "",
+        },
+      });
+      expect(dropSpy).toHaveBeenCalledWith(expect.any(Object), "fallback-drop-id", props.id);
+    });
+
+    test("external delete callback ignores other items and already marked items", async () => {
+      const deletedItemCallbacks: Array<(columnId: string, feedbackItemId: string) => void> = [];
+      jest.spyOn(reflectBackendService, "onReceiveDeletedItem").mockImplementation(callback => {
+        deletedItemCallbacks.push(callback);
+      });
+      jest.spyOn(reflectBackendService, "removeOnReceiveDeletedItem").mockImplementation(() => undefined);
+
+      const props = makeProps({ id: "external-delete-branch" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(deletedItemCallbacks.length).toBeGreaterThan(0));
+
+      act(() => {
+        deletedItemCallbacks[0](props.columnId, "different-item");
+      });
+      expect(ref.current?.state.isMarkedForDeletion).toBe(false);
+
+      act(() => {
+        ref.current?.markFeedbackItemForDelete(false);
+        deletedItemCallbacks[0](props.columnId, props.id);
+      });
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.animationEnd(card);
+      expect(props.removeFeedbackItemFromColumn).toHaveBeenCalledTimes(1);
+    });
+
+    test("act shortcut does nothing when add action button is absent", async () => {
+      const props = makeProps({ workflowPhase: "Act", team: { id: "team-1" }, boardTitle: "Board", defaultActionItemAreaPath: "area", defaultActionItemIteration: "iter" });
+      const { container } = render(<FeedbackItem {...props} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      expect(() => fireEvent.keyDown(card, { key: "a" })).not.toThrow();
+    });
+
+    test("act shortcut uses override item element when present", async () => {
+      const props = makeProps({ workflowPhase: "Act", team: { id: "team-1" }, boardTitle: "Board", defaultActionItemAreaPath: "area", defaultActionItemIteration: "iter" });
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      const { container } = render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const overrideElement = document.createElement("div");
+      const addActionButton = document.createElement("button");
+      addActionButton.setAttribute("aria-label", "Add action item from override");
+      const clickSpy = jest.spyOn(addActionButton, "click");
+      overrideElement.appendChild(addActionButton);
+      ref.current!.itemElement = overrideElement;
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      fireEvent.keyDown(card, { key: "a" });
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+
+    test("pressing Enter on a group search result groups the selected item", async () => {
+      const candidate = makeDoc({ id: "keyboard-search-result", title: "Keyboard Search Result" });
+      const props = makeProps({ workflowPhase: "Group", columns: makeColumns([makeDoc({ id: "item-1" }), candidate]) });
+      jest.spyOn(itemDataService, "addFeedbackItemAsChild").mockResolvedValue({
+        updatedParentFeedbackItem: makeDoc({ id: candidate.id }),
+        updatedChildFeedbackItem: makeDoc({ id: props.id }),
+        updatedGrandchildFeedbackItems: [],
+        updatedOldParentFeedbackItem: undefined,
+      } as any);
+
+      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
+      render(<FeedbackItem {...props} ref={ref} />);
+
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await act(async () => {
+        ref.current?.setState({ isGroupFeedbackItemDialogHidden: false, searchTerm: "keyboard", searchedFeedbackItems: [candidate] });
+      });
+
+      expect(screen.getByText("Keyboard Search Result")).toBeInTheDocument();
+      const searchResult = document.querySelector(".feedback-item-search-result-item") as HTMLButtonElement;
+      expect(searchResult).toBeInTheDocument();
+      await act(async () => {
+        fireEvent.keyDown(searchResult, { key: "Enter" });
+      });
+
+      await waitFor(() => expect(itemDataService.addFeedbackItemAsChild).toHaveBeenCalled());
+    });
+  });
 });

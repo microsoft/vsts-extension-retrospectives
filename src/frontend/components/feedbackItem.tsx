@@ -204,20 +204,20 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const startEditingTitle = useCallback(() => {
     const element = (itemElementOverrideRef.current ?? itemElementRef.current) as HTMLElement | null;
 
-    const activeEditor = element?.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
+    const activeEditor = element.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
     if (activeEditor) {
       activeEditor.focus();
       return;
     }
 
-    const titleText = element?.querySelector(".editable-text") as HTMLElement | null;
+    const titleText = element.querySelector(".editable-text") as HTMLElement | null;
     if (titleText) {
       titleText.focus();
       titleText.click();
       return;
     }
 
-    const container = element?.querySelector(".non-editable-text-container, .editable-text-container") as HTMLElement | null;
+    const container = element.querySelector(".non-editable-text-container, .editable-text-container") as HTMLElement | null;
     if (container) {
       container.focus();
       container.click();
@@ -237,7 +237,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       const nextIndex = direction === "prev" ? (currentIndex > 0 ? currentIndex - 1 : currentIndex) : currentIndex < visibleItems.length - 1 ? currentIndex + 1 : currentIndex;
 
       if (nextIndex !== currentIndex) {
-        const nextItemId = visibleItems[nextIndex]?.feedbackItem.id;
+        const nextItemId = visibleItems[nextIndex].feedbackItem.id;
         if (nextItemId) {
           const nextItemElement = document.querySelector(`[data-feedback-item-id="${nextItemId}"]`) as HTMLElement | null;
           nextItemElement?.focus();
@@ -250,7 +250,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const focusCardControl = useCallback((direction: "prev" | "next") => {
     const element = (itemElementOverrideRef.current ?? itemElementRef.current) as HTMLElement | null;
 
-    const focusableControls = Array.from(element?.querySelectorAll(['[data-card-control="true"]', ".editable-text-container", ".non-editable-text-container"].join(",")) ?? []) as HTMLElement[];
+    const focusableControls = Array.from(element.querySelectorAll(['[data-card-control="true"]', ".editable-text-container", ".non-editable-text-container"].join(","))) as HTMLElement[];
     const visibleControls = focusableControls.filter(control => control.getAttribute("aria-hidden") !== "true" && !control.hasAttribute("disabled"));
 
     if (!visibleControls.length) {
@@ -282,7 +282,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const hideDeleteItemConfirmationDialog = useCallback(() => {
     setStateMerge({ isDeleteItemConfirmationDialogHidden: true });
-    deleteFeedbackDialogRef.current?.close();
+    deleteFeedbackDialogRef.current!.close();
   }, [setStateMerge]);
 
   const showRemoveFeedbackItemFromGroupConfirmationDialog = useCallback(() => {
@@ -295,7 +295,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const hideRemoveFeedbackItemFromGroupConfirmationDialog = useCallback(() => {
     setStateMerge({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: true });
-    removeFeedbackFromGroupDialogRef.current?.close();
+    removeFeedbackFromGroupDialogRef.current!.close();
   }, [setStateMerge]);
 
   const onConfirmRemoveFeedbackItemFromGroup = useCallback(() => {
@@ -372,7 +372,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const hideMoveFeedbackItemDialog = useCallback(() => {
     setStateMerge({ isMoveFeedbackItemDialogHidden: true });
-    moveFeedbackDialogRef.current?.close();
+    moveFeedbackDialogRef.current!.close();
   }, [setStateMerge]);
 
   const showGroupFeedbackItemDialog = useCallback(() => {
@@ -381,13 +381,13 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     if (dialog && !dialog.open) {
       dialog.showModal();
       const searchInput = dialog.querySelector('input[id="feedback-item-search-input"]') as HTMLInputElement | null;
-      searchInput?.focus();
+      searchInput!.focus();
     }
   }, [setStateMerge]);
 
   const hideGroupFeedbackItemDialog = useCallback(() => {
     setStateMerge({ isGroupFeedbackItemDialogHidden: true, searchedFeedbackItems: [], searchTerm: "" });
-    groupFeedbackDialogRef.current?.close();
+    groupFeedbackDialogRef.current!.close();
   }, [setStateMerge]);
 
   const toggleShowGroupedChildrenTitles = useCallback(() => {
@@ -406,7 +406,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   );
 
   const onVote = useCallback(
-    async (feedbackItemId: string, decrement: boolean = false) => {
+    async (feedbackItemId: string, decrement: boolean) => {
       const updatedFeedbackItem = await itemDataService.updateVote(props.boardId, teamId, getUserIdentity().id, feedbackItemId, decrement);
       appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemUpvoted, properties: { boardId: props.boardId, feedbackItemId: props.id } });
 
@@ -490,7 +490,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     async (newTitle: string) => {
       await onFeedbackItemDocumentCardTitleSave(props.id, newTitle, props.newlyCreated);
       const element = (itemElementOverrideRef.current ?? itemElementRef.current) as HTMLElement | null;
-      element?.focus();
+      element.focus();
     },
     [onFeedbackItemDocumentCardTitleSave, props.id, props.newlyCreated],
   );
@@ -610,7 +610,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const dropFeedbackItemOnFeedbackItem = useCallback(
     async (e: React.DragEvent<HTMLDivElement>) => {
-      const droppedItemId = e.dataTransfer?.getData("text/plain") || e.dataTransfer?.getData("text") || localStorageHelper.getIdValue();
+      const droppedItemId = e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("text") || localStorageHelper.getIdValue();
       if (props.id !== droppedItemId) {
         FeedbackItemHelper.handleDropFeedbackItemOnFeedbackItem(props, droppedItemId, props.id);
       }
@@ -653,7 +653,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       const menu = mobileActionsMenuRef.current;
       const button = mobileActionsButtonRef.current;
 
-      if (menu?.contains(target) || button?.contains(target)) {
+      if ((menu && menu.contains(target)) || (button && button.contains(target))) {
         return;
       }
 
@@ -690,7 +690,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   useEffect(() => {
     if (props.shouldHaveFocus) {
-      itemElementRef.current?.focus();
+      itemElementRef.current!.focus();
     }
   }, [props.shouldHaveFocus]);
 
@@ -775,8 +775,8 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         case "a":
           if (props.workflowPhase === WorkflowPhase.Act && isMainItem) {
             e.preventDefault();
-            const element = (itemElementOverrideRef.current ?? itemElementRef.current) as HTMLElement | null;
-            const addActionButton = element?.querySelector('[aria-label*="Add action item"]');
+            const element = (itemElementOverrideRef.current ?? itemElementRef.current) as HTMLElement;
+            const addActionButton = element.querySelector('[aria-label*="Add action item"]');
             (addActionButton as HTMLElement | null)?.click();
           }
           break;
@@ -801,9 +801,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       handleItemKeyDownRef.current(event);
     };
 
-    element?.addEventListener("keydown", listener);
+    element!.addEventListener("keydown", listener);
     return () => {
-      element?.removeEventListener("keydown", listener);
+      element!.removeEventListener("keydown", listener);
     };
   }, []);
 
@@ -863,14 +863,14 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             if (isFocusButton) {
               toggleShowGroupedChildrenTitles();
             } else {
-              props.groupedItemProps?.toggleGroupExpand();
+              props.groupedItemProps!.toggleGroupExpand();
             }
           }}
         >
           {isFocusButton && state.isShowingGroupedChildrenTitles && getIconElement("chevron-down")}
           {isFocusButton && !state.isShowingGroupedChildrenTitles && getIconElement("chevron-right")}
-          {!isFocusButton && props.groupedItemProps?.isGroupExpanded && getIconElement("chevron-down")}
-          {!isFocusButton && !props.groupedItemProps?.isGroupExpanded && getIconElement("chevron-right")}
+          {!isFocusButton && props.groupedItemProps!.isGroupExpanded && getIconElement("chevron-down")}
+          {!isFocusButton && !props.groupedItemProps!.isGroupExpanded && getIconElement("chevron-right")}
           {isFocusButton ? `${props.groupCount + 1} Items` : `${groupItemsCount} Items`}
         </button>
       );
@@ -932,8 +932,8 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   };
 
   const isNotGroupedItem = !props.groupedItemProps;
-  const isMainItem = isNotGroupedItem || props.groupedItemProps?.isMainItem;
-  const isMainCollapsedItem = !isNotGroupedItem && !props.groupedItemProps?.isGroupExpanded;
+  const isMainItem = isNotGroupedItem || props.groupedItemProps!.isMainItem;
+  const isMainCollapsedItem = !isNotGroupedItem && !props.groupedItemProps!.isGroupExpanded;
   const isGroupedCarouselItem = props.isGroupedCarouselItem;
   const childrenIds = props.groupIds;
 
@@ -1122,7 +1122,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                               role="menuitem"
                               onClick={() => {
                                 hideMobileFeedbackItemActionsDialog();
-                                menuItem.onClick?.();
+                                menuItem.onClick();
                               }}
                             >
                               {getIconElement(menuItem.iconName)}
@@ -1143,7 +1143,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             {feedbackCreationInformationContent()}
             <div className="card-footer">
               <div className="card-id">#{itemPosition}</div>
-              {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && props.groupedItemProps?.isGroupExpanded) ? <span className="feedback-yourvote-count">[My Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[My Votes: {groupedVotesByUser}]</span>}</div>}
+              {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && props.groupedItemProps!.isGroupExpanded) ? <span className="feedback-yourvote-count">[My Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[My Votes: {groupedVotesByUser}]</span>}</div>}
             </div>
           </div>
           {isGroupedCarouselItem && isMainItem && state.isShowingGroupedChildrenTitles && <GroupedFeedbackList childrenIds={childrenIds} columnItems={columnItems} columns={props.columns} currentColumnId={props.columnId} hideFeedbackItems={props.hideFeedbackItems} isFocusModalHidden={props.isFocusModalHidden} />}
