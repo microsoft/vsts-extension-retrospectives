@@ -434,7 +434,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
 
     & .input-validation-message {
-      @apply text-task-yellow text-sm;
+      @apply flex items-center gap-1 text-task-yellow text-sm;
+
+      & svg {
+        @apply w-4 h-4;
+      }
     }
 
     & button {
