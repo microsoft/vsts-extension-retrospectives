@@ -1,8 +1,6 @@
 import React, { ChangeEvent, useState, useEffect, useRef, useCallback } from "react";
 import { List } from "@fluentui/react/lib/List";
-import { DocumentCardType, DocumentCard } from "@fluentui/react/lib/DocumentCard";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
-import { cn } from "../utilities/classNameHelper";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
 import BoardDataService from "../dal/boardDataService";
@@ -139,7 +137,6 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
 
   const [title, setTitle] = useState(initialState.title);
   const [initialTitle] = useState(initialState.initialTitle);
-  const [isBoardNameTaken, setIsBoardNameTaken] = useState(false);
   const [columnCards, setColumnCards] = useState<IFeedbackColumnCard[]>(initialState.columnCards);
   const [maxVotesPerUser, setMaxVotesPerUser] = useState(initialState.maxVotesPerUser);
   const [isIncludeTeamEffectivenessMeasurement, setIsIncludeTeamEffectivenessMeasurement] = useState(initialState.isIncludeTeamEffectivenessMeasurement);
@@ -151,10 +148,13 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   const [columnCardBeingEdited, setColumnCardBeingEdited] = useState<IFeedbackColumnCard | null>(null);
   const [isChooseColumnIconDialogOpen, setIsChooseColumnIconDialogOpen] = useState(false);
   const [permissions, setPermissions] = useState<IFeedbackBoardDocumentPermissions>(initialState.permissions);
+  const [error, setError] = useState<string >("");
 
   const chooseColumnIconDialogRef = useRef<HTMLDialogElement>(null);
   const deleteColumnConfirmDialogRef = useRef<HTMLDialogElement>(null);
   const chooseColumnAccentColorDialogRef = useRef<HTMLDialogElement>(null);
+
+  const retrospectiveNameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (columnCardBeingEdited && isChooseColumnIconDialogOpen) {
@@ -193,21 +193,12 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
 
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
-    setIsBoardNameTaken(false);
   }, []);
 
   const handleFormSubmit = useCallback(
     async (event: Pick<React.SyntheticEvent, "preventDefault" | "stopPropagation">) => {
       event.preventDefault();
       event.stopPropagation();
-
-      const isTaken = await BoardDataService.checkIfBoardNameIsTaken(teamId, title);
-      if (isTaken) {
-        if (initialTitle !== title) {
-          setIsBoardNameTaken(true);
-          return;
-        }
-      }
 
       if (isNewBoardCreation && !isDuplicatingBoard) {
         await BoardDataService.saveSetting("lastVotes", maxVotesPerUser);
@@ -271,6 +262,48 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     setMaxVotesPerUser(Number((event.target as HTMLInputElement | HTMLTextAreaElement).value));
   }, []);
 
+  const retrospectiveNameInput = React.useMemo(
+    () => <input ref={retrospectiveNameInputRef} aria-label="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} aria-describedby="retrospective-name-label" className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />,
+    [handleInputChange, placeholderText, title],
+  );
+
+  const maxVotesPerUserInput = React.useMemo(
+    () => <input className="title-input-container" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />,
+    [handleMaxVotePerUserChange, maxVotesPerUser],
+  );
+
+  const customTeamAssessmentQuestionInputs = React.useMemo(
+    () =>
+      customTeamAssessmentQuestions.map((question, index) => (
+        <div key={index} className="flex gap-2 items-center mt-2 w-full border border-gray-300 p-2">
+          <input
+            aria-label={`Custom team assessment question ${index + 1}`}
+            className="grow"
+            maxLength={200}
+            placeholder="Enter a custom team assessment question"
+            value={question}
+            onChange={event => {
+              setCustomTeamAssessmentQuestions(previousQuestions => {
+                const nextQuestions = [...previousQuestions];
+                nextQuestions[index] = event.target.value;
+                return nextQuestions;
+              });
+            }}
+          />
+          <button
+            className="feedback-column-card-delete-button"
+            title="Delete"
+            aria-label={`Remove custom team assessment question ${index + 1}`}
+            type="button"
+            onClick={() => setCustomTeamAssessmentQuestions(previousQuestions => previousQuestions.filter((_, currentIndex) => currentIndex !== index))}
+          >
+            {getIconElement("delete")}
+          </button>
+        </div>
+      )),
+    [customTeamAssessmentQuestions],
+  );
+
   const showDeleteColumnConfirmationDialog = useCallback(() => {
     setIsDeleteColumnConfirmationDialogHidden(false);
   }, []);
@@ -290,19 +323,6 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     setColumnCardBeingEdited(null);
   }, []);
 
-  const isSaveButtonEnabled = useCallback(() => {
-    if (!title.trim()) {
-      return false;
-    }
-
-    const nonDeletedColumns = columnCards.filter(columnCard => !columnCard.markedForDeletion);
-    if (nonDeletedColumns.find(columnCard => !columnCard.column.title.trim())) {
-      return false;
-    }
-
-    return true;
-  }, [title, columnCards]);
-
   const handleColumnsTemplateChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
     const columns = getColumnsByTemplateId(event.target.value);
     setColumnCards(
@@ -319,32 +339,29 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   }, []);
 
   return (
-    <div className="flex flex-col flex-nowrap" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+    <div className="flex flex-col flex-nowrap px-5 py-3" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <Pivot>
         <PivotItem headerText={"General"} aria-label="Board General Settings">
           <div className="board-metadata-form">
             <section className="board-metadata-edit-column-settings">
               <h2 className="board-metadata-form-section-header">Board Settings</h2>
-              <div className="board-metadata-form-section-subheader">
-                <label htmlFor="title-input-container">
-                  Retrospective Name<span style={{ color: "rgb(255 72 94)", position: "relative", fontSize: "0.8em", bottom: "6px", margin: "0 4px" }}>(*)</span>:
+              <div className="board-metadata-form-section-subheader board-metadata-title-row">
+                <label id="retrospective-name-label" htmlFor="retrospective-title-input">
+                  Retrospective Name:
                 </label>
-                <input aria-label="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />
-                {isBoardNameTaken && <span className="input-validation-message">A board with this name already exists. Please choose a different name.</span>}
+                {retrospectiveNameInput}
               </div>
-              <hr></hr>
               <div className="board-metadata-form-section-subheader">
                 <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                  Max Votes per User (Current: {isNewBoardCreation ? maxVotesPerUser : currentBoard.maxVotesPerUser}):
+                  Max Votes per User:
                 </label>
-                <input className="title-input-container max-vote-counter" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />
+                {maxVotesPerUserInput}
               </div>
-              <hr></hr>
               <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation</div>
               <div className="board-metadata-form-section-subheader">
                 <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
                   <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />
-                  <span>Hide the feedback of others until after Collect phase</span>
+                  <span>Hide feedback during Collect phase</span>
                 </label>
               </div>
               <div className="board-metadata-form-section-subheader">
@@ -366,32 +383,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
               <section className="board-metadata-edit-column-settings">
                 <h2 className="board-metadata-form-section-header">Custom Team Assessment Questions</h2>
-                <div className="board-metadata-form-section-subheader flex-col">
-                  {customTeamAssessmentQuestions.map((question, index) => (
-                    <div key={index} className="flex gap-2 items-center mt-2 w-full border border-gray-300 p-2">
-                      <input
-                        aria-label={`Custom team assessment question ${index + 1}`}
-                        className="grow"
-                        maxLength={200}
-                        placeholder="Enter a custom team assessment question"
-                        value={question}
-                        onChange={event => {
-                          const nextQuestions = [...customTeamAssessmentQuestions];
-                          nextQuestions[index] = event.target.value;
-                          setCustomTeamAssessmentQuestions(nextQuestions);
-                        }}
-                      />
-                      <button
-                        className="feedback-column-card-delete-button"
-                        title="Delete"
-                        aria-label={`Remove custom team assessment question ${index + 1}`}
-                        type="button"
-                        onClick={() => setCustomTeamAssessmentQuestions(customTeamAssessmentQuestions.filter((_, currentIndex) => currentIndex !== index))}
-                      >
-                        {getIconElement("delete")}
-                      </button>
-                    </div>
-                  ))}
+                <div className="board-metadata-form-section-subheader grid-cols-1!">
+                  {customTeamAssessmentQuestionInputs}
                 </div>
                 <button type="button" className="create-feedback-column-card-button" aria-label="Add custom question" onClick={() => setCustomTeamAssessmentQuestions([...customTeamAssessmentQuestions, ""])}>
                   {getIconElement("add")}
@@ -432,7 +425,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 items={columnCards}
                 onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
                   return (
-                    <DocumentCard className={cn("feedback-column-card", columnCard.markedForDeletion && "marked-for-deletion")} type={DocumentCardType.compact}>
+                    <div className={columnCard.markedForDeletion ? "feedback-column-card marked-for-deletion" : "feedback-column-card"}>
                       <div className="flex grow items-center">
                         <button
                           className="feedback-column-card-icon-button"
@@ -455,7 +448,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                             setIsChooseColumnAccentColorDialogHidden(false);
                           }}
                         >
-                          <i className={cn("feedback-column-card-accent-color", "fas fa-square")} style={{ color: columnCard.column.accentColor }} />
+                          <i className="feedback-column-card-accent-color fas fa-square" style={{ color: columnCard.column.accentColor }} />
                         </button>
                         <EditableDocumentCardTitle
                           isDisabled={columnCard.markedForDeletion}
@@ -531,7 +524,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                           </button>
                         )}
                       </div>
-                    </DocumentCard>
+                    </div>
                   );
                 }}
               />
@@ -645,6 +638,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                       <button
                         key={accentColor.friendlyName}
                         aria-label={"Choose the color " + accentColor.friendlyName}
+                        title={"Choose the color " + accentColor.friendlyName}
                         className="choose-feedback-column-accent-color-button"
                         onClick={() => {
                           columnCardBeingEdited.column.accentColor = accentColor.colorCode;
@@ -673,16 +667,30 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         </PivotItem>
       </Pivot>
       <div className="inner">
+        <span className="input-validation-message">{error}</span>
         <button
-          disabled={!isSaveButtonEnabled()}
-          onClick={event => {
+          className="metadata-form-save-button"
+          onClick={async event => {
+            if (title.trim().length === 0) {
+              setError("⚠️ Retrospective Board name is required");
+              retrospectiveNameInputRef.current?.focus();
+              return;
+            }
+            if (columnCards.every(columnCard => columnCard.markedForDeletion)) {
+              setError("⚠️ At least one column must be active");
+              return;
+            }
+            if (await BoardDataService.checkIfBoardNameIsTaken(teamId, title.trim())) {
+              setError("⚠️ A board with this name already exists");
+              return;
+            }
+            setError("");
             if (isNewBoardCreation || columnCards.every(columnCard => !columnCard.markedForDeletion)) {
               handleFormSubmit(event);
             } else {
               showDeleteColumnConfirmationDialog();
             }
           }}
-          className="metadata-form-save-button"
         >
           {t("common_save")}
         </button>

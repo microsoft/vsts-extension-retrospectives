@@ -7,34 +7,21 @@ import { isHostedAzureDevOps } from "./utilities/azureDevOpsContextHelper";
 import { getProjectId } from "./utilities/servicesHelper";
 import { initializeLocale, t } from "./utilities/localization";
 import { reactPlugin } from "./utilities/telemetryClient";
-import FeedbackBoardContainer, { FeedbackBoardContainerProps } from "./components/feedbackBoardContainer";
+import FeedbackBoardContainer from "./components/feedbackBoardContainer";
 
 initializeLocale();
 
 sdkInit({ applyTheme: true })
   .then(async () => {
     const root = createRoot(document.getElementById("root"));
-    const renderApp = (application: React.ReactNode) => {
-      root.render(
-        <AppInsightsErrorBoundary
-          onError={() => {
-            return <h1>{t("app_error_boundary_heading")}</h1>;
-          }}
-          appInsights={reactPlugin}
-        >
-          {application}
-        </AppInsightsErrorBoundary>,
-      );
-    };
 
     const [hostedAzureDevOps, projectId] = await Promise.all([isHostedAzureDevOps(), getProjectId()]);
 
-    const feedbackBoardContainerProps: FeedbackBoardContainerProps = {
-      isHostedAzureDevOps: hostedAzureDevOps,
-      projectId,
-    };
-
-    renderApp(<FeedbackBoardContainer {...feedbackBoardContainerProps} />);
+    root.render(
+      <AppInsightsErrorBoundary onError={() => <h1>{t("app_error_boundary_heading")}</h1>} appInsights={reactPlugin}>
+        <FeedbackBoardContainer isHostedAzureDevOps={hostedAzureDevOps} projectId={projectId} />
+      </AppInsightsErrorBoundary>,
+    );
   })
   .catch(error => {
     console.error("Failed to initialize the Retrospectives extension:", error);

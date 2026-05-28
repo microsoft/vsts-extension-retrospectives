@@ -338,6 +338,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply bg-(--callout-background-color);
 }
 
+.retrospectives-board-metadata-dialog,
 .confirm-changes-dialog,
 .delete-feedback-item-dialog,
 .move-feedback-item-dialog,
@@ -362,7 +363,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .preview-email-dialog,
 .carousel-dialog,
 .sprint-retrospective-dialog {
-  @apply w-1/2 bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl max-h-[80vh];
+  @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
   & table {
     @apply w-full border-collapse text-left;
@@ -431,6 +432,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .inner {
     @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
+
+    & .input-validation-message {
+      @apply text-task-yellow text-sm;
+    }
 
     & button {
       @apply flex items-center gap-1 px-4 py-2 rounded text-sm border border-(--border-subtle-color) cursor-pointer bg-(--text-primary-color) text-[rgb(var(--palette-neutral-0))];
@@ -1428,11 +1433,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-edit-column-settings {
-    @apply p-2;
+    @apply py-2;
   }
 
   & .board-metadata-form-section-subheader {
-    @apply font-semibold w-full flex items-center m-1 text-(--text-primary-color);
+    @apply font-semibold w-full grid grid-cols-[1fr_1fr] items-center my-1 text-(--text-primary-color);
 
     & label {
       @apply flex-1 text-start;
@@ -1484,7 +1489,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .feedback-column-card {
-    @apply bg-(---nav-vertical-background-color) text-(--text-primary-color) h-15 mt-2.5 items-center max-w-full;
+    @apply flex items-center max-w-full bg-(---nav-vertical-background-color) text-(--text-primary-color) h-15 mt-2.5;
 
     & :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
       @apply bg-transparent! m-2 border-none text-(--text-primary-color) cursor-pointer;
@@ -1568,15 +1573,18 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .input-validation-message {
-    @apply text-error;
+    @apply text-sm text-error;
+  }
+  & .title-input-container {
+    @apply text-base font-semibold flex flex-col items-center p-1 flex-1 border border-(--text-primary-color) text-right placeholder:text-right;
   }
 
-  & .title-input-container {
-    @apply text-base font-semibold flex flex-col items-center pb-0.5 flex-1;
+  & select.title-input-container {
+    @apply text-left;
   }
 
   & .title-input-container.column-template-dropdown {
-    @apply inline-flex bg-(--background-color) font-normal ml-2.5 w-2/3;
+    @apply bg-(--background-color) font-normal;
   }
 
   & .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
@@ -1610,14 +1618,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .choose-column-icon-dialog .choose-feedback-column-icon-button {
   @apply text-3xl h-12 m-1;
-}
-
-.retrospectives-board-metadata-dialog {
-  @apply w-125 max-w-125 max-h-full right-0 top-0 bottom-0 bg-(--background-color);
-}
-
-.retrospectives-board-metadata-dialog .ms-Dialog-title {
-  @apply text-(--text-primary-color);
 }
 
 .ms-Checkbox:not(.is-checked):hover .ms-Checkbox-checkmark {
@@ -1966,6 +1966,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .extension-menu-close-button,
 .team-effectiveness-submit-button {
   @apply bg-primary text-white;
+
+  &:disabled {
+    @apply bg-(--text-disabled-color) text-black/40 border-(--text-disabled-color) cursor-not-allowed;
+  }
 }
 
 .feedbackItem {
