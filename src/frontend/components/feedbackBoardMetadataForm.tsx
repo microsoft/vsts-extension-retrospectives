@@ -148,7 +148,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   const [columnCardBeingEdited, setColumnCardBeingEdited] = useState<IFeedbackColumnCard | null>(null);
   const [isChooseColumnIconDialogOpen, setIsChooseColumnIconDialogOpen] = useState(false);
   const [permissions, setPermissions] = useState<IFeedbackBoardDocumentPermissions>(initialState.permissions);
-  const [error, setError] = useState<string >("");
+  const [error, setError] = useState<string>("");
 
   const chooseColumnIconDialogRef = useRef<HTMLDialogElement>(null);
   const deleteColumnConfirmDialogRef = useRef<HTMLDialogElement>(null);
@@ -193,6 +193,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
 
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
+    setError("");
   }, []);
 
   const handleFormSubmit = useCallback(
@@ -676,11 +677,18 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               retrospectiveNameInputRef.current?.focus();
               return;
             }
-            if (columnCards.every(columnCard => columnCard.markedForDeletion)) {
+            const activeColumnCards = columnCards.filter(columnCard => !columnCard.markedForDeletion);
+            if (activeColumnCards.length === 0) {
               setError("At least one column must be active");
               return;
             }
-            if (await BoardDataService.checkIfBoardNameIsTaken(teamId, title.trim())) {
+            if (activeColumnCards.some(columnCard => columnCard.column.title.trim().length === 0)) {
+              setError("Column name is required");
+              return;
+            }
+            const isDuplicateBoardName = await BoardDataService.checkIfBoardNameIsTaken(teamId, title.trim());
+            const isExistingBoardNameUnchanged = !isNewBoardCreation && title.trim() === initialTitle.trim();
+            if (isDuplicateBoardName && !isExistingBoardNameUnchanged) {
               setError("A board with this name already exists");
               return;
             }
