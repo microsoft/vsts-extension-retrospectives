@@ -2,6 +2,11 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## Unpublished
+
+* Improved board switching so users can reliably switch teams and boards while loading retrospective data. From [GitHub PR #1678](https://github.com/microsoft/vsts-extension-retrospectives/pull/1678)
+* Refined feedback board state handling and styling for a smoother board-management experience.
+
 ## v1.92.53
 
 * Ensures editing a retrospective updates the intended board name and prevents accidental renames.
