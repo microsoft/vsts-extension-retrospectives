@@ -457,7 +457,11 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
     await user.type(titleInput, "   ");
 
     const submitButton = screen.getByRole("button", { name: /save/i });
-    expect(submitButton).toBeDisabled();
+    await user.click(submitButton);
+
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(titleInput).toHaveFocus();
   });
 
   it("should enable submit button when title is valid", async () => {
@@ -909,23 +913,24 @@ describe("FeedbackBoardMetadataForm - Form Submission Extended", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const saveButton = screen.getByRole("button", { name: /save/i });
-    expect(saveButton).toBeDisabled();
+    await user.click(saveButton);
+
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
   });
 
-  it("should disable save button when no columns exist", async () => {
+  it("should show an error when no active columns exist", async () => {
     const user = userEvent.setup();
+    mockedProps.isNewBoardCreation = false;
+    mockedProps.currentBoard = { ...testExistingBoard, columns: [] };
+
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-    const deleteButtons = screen.getAllByTitle("Delete");
-
-    // Delete all but one column
-    for (let i = 0; i < deleteButtons.length - 1; i++) {
-      await user.click(deleteButtons[i]);
-    }
-
     const saveButton = screen.getByRole("button", { name: /save/i });
-    // Save should still be disabled if no title
-    expect(saveButton).toBeDisabled();
+    await user.click(saveButton);
+
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText(/at least one column must be active/i)).toBeInTheDocument();
   });
 });
 
@@ -1170,7 +1175,7 @@ describe("FeedbackBoardMetadataForm - Targeted Coverage (uncovered lines)", () =
     }
   });
 
-  it("should disable Save when a column has an empty title", async () => {
+  it("should show an error when a column has an empty title", async () => {
     const user = userEvent.setup();
     const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
@@ -1196,8 +1201,10 @@ describe("FeedbackBoardMetadataForm - Targeted Coverage (uncovered lines)", () =
     // Click outside to trigger the blur handler which saves empty value
     await user.click(document.body);
 
-    // Save should be disabled because a column has an empty title
-    expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
+    const saveButton = screen.getByRole("button", { name: /save/i });
+    await user.click(saveButton);
+
+    expect(screen.getByText(/column name is required/i)).toBeInTheDocument();
   });
 
   it("should update a column title via EditableDocumentCardTitle onSave", async () => {
@@ -1306,7 +1313,10 @@ describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
     const saveButton = screen.getByRole("button", { name: /save/i });
-    expect(saveButton).toBeDisabled();
+    await user.click(saveButton);
+
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
   });
 
   it("should handle whitespace-only board names", async () => {
@@ -1317,7 +1327,10 @@ describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
     await user.type(titleInput, "   ");
 
     const saveButton = screen.getByRole("button", { name: /save/i });
-    expect(saveButton).toBeDisabled();
+    await user.click(saveButton);
+
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
   });
 });
 
