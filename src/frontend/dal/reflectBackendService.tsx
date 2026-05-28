@@ -41,7 +41,7 @@ class ReflectBackendService {
       .withUrl(ReflectBackendService.signalRHubUrl.href, { accessTokenFactory: this.retrieveValidToken })
       .withKeepAliveInterval(10000)
       .withServerTimeout(20000)
-      .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+      .withAutomaticReconnect([0, 2000, 5000, 10000, 30000, 60000])
       .configureLogging(LogLevel.Error)
       .build();
     this._connectionAvailable = false;

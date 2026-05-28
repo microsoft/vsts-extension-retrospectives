@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "id": "retrospective-vsts-extension-dev",
+  "id": "team-retrospectives-dev",
   "publisher": "<publisher id>",
   "version": "0.0.1",
   "name": "Retrospectives (Dev)",
