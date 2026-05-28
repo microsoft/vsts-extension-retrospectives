@@ -2374,7 +2374,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           </button>
         </div>
         {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
-          <div className="team-assessment-no-data">
+          <div className="subText">
             <p>{t("feedback_board_team_assessment_no_history")}</p>
             <p>{t("feedback_board_team_assessment_trends")}</p>
           </div>
