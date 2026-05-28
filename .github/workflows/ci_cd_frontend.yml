@@ -141,6 +141,7 @@ jobs:
           echo "favorability-band" >> base.txt
           echo "memoizing" >> base.txt
           echo "websocket" >> base.txt
+          echo "customizable" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'
