@@ -2,7 +2,7 @@ import React from "react";
 import { act, render, waitFor } from "@testing-library/react";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 
-import FeedbackBoard, { FeedbackBoardProps } from "../../components/feedbackBoard";
+import FeedbackBoard, { FeedbackBoardProps, findActiveTimerFeedbackItemId, findColumnItemById, getActiveTimerFeedbackItemIdAfterStop, getColumnNotesOrEmpty, getTextOrEmpty, IColumn } from "../../components/feedbackBoard";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { itemDataService } from "../../dal/itemDataService";
 import { workService } from "../../dal/azureDevOpsWorkService";
@@ -201,6 +201,38 @@ beforeAll(() => {
 });
 
 describe("FeedbackBoard targeted coverage", () => {
+  it("covers defensive helper branches for timers, missing columns, and empty notes", () => {
+    const inactiveColumn: IColumn = {
+      columnProperties: createBoard().columns[0],
+      columnItems: [],
+    };
+    const activeColumn: IColumn = {
+      columnProperties: createBoard().columns[1],
+      columnItems: [
+        {
+          feedbackItem: createItem({ id: "active-timer-item", timerState: true }),
+          actionItems: [],
+        },
+      ],
+    };
+    const columnsWithMissingEntry = {
+      missing: undefined as unknown as IColumn,
+      inactive: inactiveColumn,
+      active: activeColumn,
+    };
+
+    expect(findActiveTimerFeedbackItemId(columnsWithMissingEntry)).toBe("active-timer-item");
+    expect(findColumnItemById("active-timer-item", columnsWithMissingEntry, ["missing", "inactive", "active"])?.feedbackItem.id).toBe("active-timer-item");
+    expect(findColumnItemById("unknown-item", columnsWithMissingEntry, ["missing"])).toBeUndefined();
+    expect(getActiveTimerFeedbackItemIdAfterStop("active-timer-item", "active-timer-item")).toBeNull();
+    expect(getActiveTimerFeedbackItemIdAfterStop("active-timer-item", "different-item")).toBe("active-timer-item");
+    expect(getTextOrEmpty("saved note")).toBe("saved note");
+    expect(getTextOrEmpty(undefined)).toBe("");
+    expect(getTextOrEmpty(null)).toBe("");
+    expect(getColumnNotesOrEmpty({ "col-1": "saved note" }, "col-1")).toBe("saved note");
+    expect(getColumnNotesOrEmpty({}, "missing-col")).toBe("");
+  });
+
   it("covers board owner and notes nullish branches", async () => {
     renderBoard({
       userId: "someone-else",
@@ -386,20 +418,7 @@ describe("FeedbackBoard targeted coverage", () => {
     });
 
     const oldColumnProps = getLatestColumnPropsById("old-col");
-    rerender(
-      <FeedbackBoard
-        displayBoard={true}
-        board={nextBoard}
-        team={baseTeam}
-        workflowPhase={WorkflowPhase.Vote}
-        nonHiddenWorkItemTypes={[]}
-        allWorkItemTypes={[]}
-        isAnonymous={false}
-        hideFeedbackItems={false}
-        userId="owner-1"
-        onColumnNotesChange={onColumnNotesChange}
-      />,
-    );
+    rerender(<FeedbackBoard displayBoard={true} board={nextBoard} team={baseTeam} workflowPhase={WorkflowPhase.Vote} nonHiddenWorkItemTypes={[]} allWorkItemTypes={[]} isAnonymous={false} hideFeedbackItems={false} userId="owner-1" onColumnNotesChange={onColumnNotesChange} />);
 
     await act(async () => {
       await oldColumnProps.onColumnNotesChange("temp");
@@ -462,20 +481,7 @@ describe("FeedbackBoard targeted coverage", () => {
       oldColumnProps.requestTimerStart("timer-a");
     });
 
-    rerender(
-      <FeedbackBoard
-        displayBoard={true}
-        board={secondBoard}
-        team={baseTeam}
-        workflowPhase={WorkflowPhase.Vote}
-        nonHiddenWorkItemTypes={[]}
-        allWorkItemTypes={[]}
-        isAnonymous={false}
-        hideFeedbackItems={false}
-        userId="owner-1"
-        onColumnNotesChange={jest.fn().mockResolvedValue(undefined)}
-      />,
-    );
+    rerender(<FeedbackBoard displayBoard={true} board={secondBoard} team={baseTeam} workflowPhase={WorkflowPhase.Vote} nonHiddenWorkItemTypes={[]} allWorkItemTypes={[]} isAnonymous={false} hideFeedbackItems={false} userId="owner-1" onColumnNotesChange={jest.fn().mockResolvedValue(undefined)} />);
 
     await act(async () => {
       oldColumnProps.requestTimerStart("timer-b");
