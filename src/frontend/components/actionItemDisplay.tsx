@@ -1,8 +1,9 @@
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { IWorkItemFormNavigationService, WorkItemTrackingServiceIds } from "azure-devops-extension-api/WorkItemTracking";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { getService, getUser } from "azure-devops-extension-sdk";
-import React, { useState, useRef, useEffect, useCallback } from "react";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
@@ -197,6 +198,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
     );
   }, [handleLinkExistingWorkItemClick]);
 
+  const visibleWorkItemTypes = useMemo(() => {
+    return [...(nonHiddenWorkItemTypes ?? [])].sort((left, right) => left.name.localeCompare(right.name));
+  }, [nonHiddenWorkItemTypes]);
+
   return (
     <div className="action-item-display-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {allowAddNewActionItem && (
@@ -208,8 +213,8 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
           {isWorkItemTypeListCalloutVisible && (
             <div ref={addWorkItemMenuRef} className="popout-container" role="menu" aria-label={t("common_add_work_item_menu")}>
               {renderLinkExistingWorkItemButton()}
-              {nonHiddenWorkItemTypes.length > 0 && <div role="separator" className="separator" />}
-              {nonHiddenWorkItemTypes.map(item => {
+              {visibleWorkItemTypes.length > 0 && <div role="separator" className="separator" />}
+              {visibleWorkItemTypes.map(item => {
                 return (
                   <button key={item.referenceName} className="list-item" onClick={e => handleClickWorkItemType(e, item)} aria-label={`Add work item type ${item.name}`}>
                     <img className="work-item-type-icon" alt={`icon for work item type ${item.name}`} src={item.icon.url} />
