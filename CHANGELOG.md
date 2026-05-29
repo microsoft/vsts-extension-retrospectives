@@ -2,7 +2,7 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## v1.92.53
+## v1.92.54
 
 * Fix: team admins can now edit board columns, not just the board owner.
 * Fix: grouped feedback items now correctly display the aggregated vote sum on the collapsed parent item only.
