@@ -961,8 +961,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
   const groupItemsCount = (props.groupedItemProps?.groupedCount ?? 0) + 1;
   const currentColumnItems = props.columns[props.columnId]?.columnItems;
-  const itemPosition = currentColumnItems ? currentColumnItems.findIndex(columnItem => columnItem.feedbackItem.id === props.id) + 1 : 0;
-  const totalItemsInColumn = currentColumnItems?.length || 0;
+
+  const numberedColumnItems = [...(currentColumnItems ?? [])].sort((left, right) => new Date(right.feedbackItem.createdDate).getTime() - new Date(left.feedbackItem.createdDate).getTime());
+  const itemPosition = numberedColumnItems.findIndex(columnItem => columnItem.feedbackItem.id === props.id) + 1;
+  const totalItemsInColumn = numberedColumnItems.length;
 
   const hideFeedbackItems = props.workflowPhase === "Collect" && props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id;
   const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : props.title;
