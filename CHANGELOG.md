@@ -4,7 +4,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.54
 
-* Fix: team admins can now edit board columns, not just the board owner.
+* Fix: team admins can now edit board column notess, not just the board owner.
 * Fix: grouped feedback items now correctly display the aggregated vote sum on the collapsed parent item only.
 * Fix: hidden feedback items now display blurred user-entered text and announce "Hidden feedback" to screen readers, consistent with how feedback cards handle hidden content.
 * Fix: clipboard copy now works correctly by using copy-event interception instead of the blocked `navigator.clipboard` API.
