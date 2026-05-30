@@ -457,10 +457,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .whats-new-dialog {
   & .subText.li {
-    @apply py-1;
+    @apply py-0;
   }
 
-  & .subText + .subText.li {
+  & .subText.li + .subText.li {
+    @apply -mt-1;
+  }
+
+  & .subText:not(.li) + .subText.li {
     @apply mt-2;
   }
 
