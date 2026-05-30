@@ -366,12 +366,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
   & table {
-
-.whats-new-dialog {
-  & .subText.li + .subText.li {
-    @apply -mt-2;
-  }
-}
     @apply w-full border-collapse text-left;
 
     & tr {
@@ -458,6 +452,20 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply w-4 h-4;
       }
     }
+  }
+}
+
+.whats-new-dialog {
+  & .subText.li {
+    @apply py-1;
+  }
+
+  & .subText + .subText.li {
+    @apply mt-2;
+  }
+
+  & .subText.li + .subText:not(.li) {
+    @apply mt-2;
   }
 }
 
