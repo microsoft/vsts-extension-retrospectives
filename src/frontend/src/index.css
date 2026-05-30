@@ -1560,6 +1560,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     &.error-border {
       @apply border-error;
+
+      &:focus,
+      &:focus-visible {
+        border-color: var(--color-error);
+        outline: 2px solid var(--color-error);
+      }
     }
   }
 
