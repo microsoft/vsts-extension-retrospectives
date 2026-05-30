@@ -84,13 +84,13 @@ describe("localization", () => {
   it("preserves placeholders when interpolation values are missing", () => {
     initializeLocale("en-US");
 
-    expect(t("feedback_board_create_example", { other: "value" })).toBe("{{date}} Retrospective");
+    expect(t("feedback_board_create_example", { other: "value" })).toBe("Example: {{date}} Retrospective");
   });
 
   it("replaces placeholders when interpolation values are provided", () => {
     initializeLocale("en-US");
 
-    expect(t("feedback_board_create_example", { date: "May 2026" })).toBe("May 2026 Retrospective");
+    expect(t("feedback_board_create_example", { date: "May 2026" })).toBe("Example: May 2026 Retrospective");
   });
 
   it("trims the locale and updates document language when set explicitly", () => {
