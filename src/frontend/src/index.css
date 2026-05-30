@@ -1444,6 +1444,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
   }
 
+  & .board-metadata-board-settings-section {
+    @apply pb-0;
+
+    & .board-metadata-form-option-row:last-child {
+      @apply mb-0;
+    }
+  }
+
   @media (max-width: 768px) {
     & .board-metadata-form-option-row {
       @apply grid-cols-1;
