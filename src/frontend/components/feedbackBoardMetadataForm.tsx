@@ -361,7 +361,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
       <Pivot>
         <PivotItem headerText={"General"} aria-label="Board General Settings">
           <div className="board-metadata-form">
-            <section className="board-metadata-edit-column-settings">
+            <section className="board-metadata-edit-column-settings board-metadata-board-settings-section">
               <h2 className="board-metadata-form-section-header">Board Settings</h2>
               <div className="board-metadata-form-section-subheader board-metadata-title-row">
                 <label id="retrospective-name-label" htmlFor="retrospective-title-input">
@@ -381,21 +381,21 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />
                   <span>Hide feedback during Collect phase</span>
                 </label>
-                <span className="board-metadata-form-option-helper">Feedback displayed in the Group, Vote, and Act phases.</span>
+                <span className="board-metadata-form-option-helper">Feedback displayed in Group, Vote, and Act phases.</span>
               </div>
               <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
                 <label className="flex items-center gap-2" htmlFor="feedback-display-names-checkbox">
                   <input id="feedback-display-names-checkbox" type="checkbox" aria-label="Make participant feedback anonymous. This selection cannot be modified after board creation." checked={isBoardAnonymous} disabled={!isNewBoardCreation} onChange={handleIsAnonymousCheckboxChange} />
                   <span>Make participant feedback anonymous</span>
                 </label>
-                <span className="board-metadata-form-option-helper">Participant names not tracked.</span>
+                <span className="board-metadata-form-option-helper">Participant names not tracked on board, nor in summary.</span>
               </div>
               <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
                 <label className="flex items-center gap-2" htmlFor="include-team-assessment-checkbox">
                   <input id="include-team-assessment-checkbox" type="checkbox" aria-label="Include Team Assessment. This selection cannot be modified after board creation." checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
                   <span>Include Team Assessment</span>
                 </label>
-                <span className="board-metadata-form-option-helper">All responses stored anonymously.</span>
+                <span className="board-metadata-form-option-helper">Team assessment responses always stored anonymously.</span>
               </div>
             </section>
             {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
