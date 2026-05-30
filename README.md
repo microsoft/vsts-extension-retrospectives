@@ -82,7 +82,7 @@ Please enter the appropriate information:
 - **Max Votes per User**: The maximum number of votes a participant has to use in the "Vote" phase.
 - **Include Team Assessment**: Include a Team Assessment link at the top of the board.
 - **Obscure the feedback of others until after Collect phase**: When selected, users cannot see other users input until they have moved to another phase. Other users' feedback will be blurred.
-- **Do not display names in feedback**: When checked, anonymize who creates individual feedback items.
+- **Make participant feedback anonymous**: When checked, participant names are hidden on individual feedback items.
 - **Columns Settings**: You can either apply from a pre-populated template or individually select and configure columns yourself.
 
 ![A screenshot showing the dropdown of available templates for the retrospective board. They represent the different columns that can be included.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/select-a-template.png)
@@ -90,7 +90,7 @@ Please enter the appropriate information:
 **Notes:**
 
 - Retrospective Title is the minimum 'required' information (other fields can stay at default as needed). Once the title is provided, the `Save` button is enabled. Save the retrospective using the `Save` button.
-- The system will remember your selection for maximum votes, team assessment, obscure feedback, and do not display names when saving and use those setting as your defaults for the next a board you create.
+- The system will remember your selection for maximum votes, team assessment, obscure feedback, and anonymous feedback when saving and use those setting as your defaults for the next a board you create.
 - The **Permission** tab allows the board owner or team admin to restrict access to the retrospective board by team or by individual. By default the retrospective board is accessible to everyone in the project.
 
 ### 5. Select An Existing Retrospective Board
@@ -121,7 +121,7 @@ In this phase feedback is collected from all participants. Users can add feedbac
 
 ![A screenshot of an example retrospective board column, showing the example user Avery Axolotl writing in a feedback item that says 'Accidentally deleted my branch on remote. Dang!'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/write-new-feedback-item.png)
 
-If when creating a retrospective, the checkbox for "Do not display names on feedback" is checked, then the cards will show no names, appearing anonymous.
+If when creating a retrospective, the checkbox for "Make participant feedback anonymous" is checked, then cards will show no names.
 
 If when creating a retrospective, the checkbox for 'Obscure the feedback of others during the Collect Phase' was checked, then while typing, the feedback of others will not be shown, even if anonymous. You can only edit items that you have created in this mode.
 
@@ -208,7 +208,7 @@ improvement.
 Create a new retrospective using the steps above with the following exceptions:
 
 - 'Include Team Assessment' is checked
-- 'Do not display names in feedback' is checked
+- 'Make participant feedback anonymous' is checked
 - Note: You do not need to select a template. The template will be modified after the assessment is complete
 - Share the link to the retrospective with the team
 

@@ -179,7 +179,7 @@ describe("Board Metadata Form", () => {
       const user = userEvent.setup();
       render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
       expect(displayNamesCheckbox).not.toBeChecked();
 
@@ -265,7 +265,7 @@ describe("Board Metadata Form", () => {
       const user = userEvent.setup();
       render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
       expect(displayNamesCheckbox).not.toBeChecked();
 
@@ -354,7 +354,7 @@ describe("Board Metadata Form", () => {
     it("should properly set display names settings", () => {
       render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
       expect(displayNamesCheckbox).toBeInTheDocument();
       expect(displayNamesCheckbox.checked).toBe(testExistingBoard.isAnonymous);
@@ -417,7 +417,7 @@ describe("Board Metadata Form", () => {
     it("should properly set display names settings", () => {
       render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
       expect(displayNamesCheckbox).toBeInTheDocument();
       expect(displayNamesCheckbox.checked).toBe(testExistingBoard.isAnonymous);
@@ -804,7 +804,7 @@ describe("FeedbackBoardMetadataForm - Checkbox Options", () => {
     const user = userEvent.setup();
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-    const checkbox = screen.getByLabelText(/Do not display names in feedback/i);
+    const checkbox = screen.getByLabelText(/Make participant feedback anonymous/i);
     expect(checkbox).toBeInTheDocument();
 
     await user.click(checkbox);
@@ -1411,7 +1411,7 @@ describe("FeedbackBoardMetadataForm - ComponentDidMount Settings Loading", () =>
 
     const teamAssessmentCheckbox = screen.getByLabelText(/include team assessment/i) as HTMLInputElement;
     const obscureFeedbackCheckbox = screen.getByRole("checkbox", { name: /only show feedback after collect phase/i }) as HTMLInputElement;
-    const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+    const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
     expect(teamAssessmentCheckbox).not.toBeChecked();
     expect(obscureFeedbackCheckbox).toBeChecked();

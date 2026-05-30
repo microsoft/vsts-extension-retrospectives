@@ -1428,6 +1428,32 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
   }
 
+  & .board-metadata-form-option-helper {
+    @apply italic text-sm font-thin text-(--text-secondary-color);
+  }
+
+  & .board-metadata-form-option-row {
+    @apply grid-cols-[1fr_1fr] items-start;
+
+    & > label {
+      @apply self-start;
+    }
+
+    & > .board-metadata-form-option-helper {
+      @apply text-left self-start;
+    }
+  }
+
+  @media (max-width: 768px) {
+    & .board-metadata-form-option-row {
+      @apply grid-cols-1;
+
+      & > .board-metadata-form-option-helper {
+        @apply pl-7;
+      }
+    }
+  }
+
   & .ms-Checkbox.is-checked .ms-Checkbox-checkbox {
     @apply bg-(--background-color);
   }
