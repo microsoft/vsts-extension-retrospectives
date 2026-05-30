@@ -15,7 +15,7 @@ From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospective
 * Refines Create and Edit Retrospective metadata UX, including helper text, dialog-title consistency, and simplified example board name.
 * Fixes a regression introduced during metadata dialog updates where selecting a column icon could close the parent Create or Edit dialog and discard in-progress changes.
 * Aligns dialog title styling across Create, Copy, Edit, Archive, and Summary experiences for a more consistent visual experience.
-* Reverts dialog backdrop styling from blurred background to shaded background for better consistency and context visibility.
+* Reverts dialog backdrop styling from blurred background to shaded background for better context visibility and consistency with ADO.
 
 From [GitHub PR #1728](https://github.com/microsoft/vsts-extension-retrospectives/pull/1728)
 
