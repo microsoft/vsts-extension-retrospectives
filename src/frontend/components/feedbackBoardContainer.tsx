@@ -1578,7 +1578,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     return (
       <dialog className="board-metadata-dialog" ref={dialogRef} role="dialog" aria-label={dialogTitle} onClose={onDialogClose}>
         <div className="header">
-          <h2 className="ms-Dialog-title">{dialogTitle}</h2>
+          <h2 className="title">{dialogTitle}</h2>
           <button type="button" onClick={onDismiss} aria-label="Close">
             {getIconElement("close")}
           </button>

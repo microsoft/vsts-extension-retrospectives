@@ -336,7 +336,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     setIsChooseColumnIconDialogOpen(true);
   }, []);
 
-  const handleChooseColumnIconDialogClose = useCallback(() => {
+  const handleChooseColumnIconDialogClose = useCallback((event?: React.SyntheticEvent<HTMLDialogElement>) => {
+    event?.stopPropagation();
     setIsChooseColumnIconDialogOpen(false);
     setColumnCardBeingEdited(null);
   }, []);
@@ -635,7 +636,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 ref={chooseColumnAccentColorDialogRef}
                 className="choose-column-accent-color-dialog"
                 aria-label="Choose Column Color"
-                onClose={() => {
+                onClose={event => {
+                  event.stopPropagation();
                   setIsChooseColumnAccentColorDialogHidden(true);
                   setColumnCardBeingEdited(null);
                 }}
