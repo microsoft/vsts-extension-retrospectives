@@ -321,6 +321,15 @@ export const ReportProblemIcon = () => {
   );
 };
 
+export const ReportIcon = () => {
+  return (
+    <svg className="icon-report" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27L15.73 3zM11 7h2v6h-2V7zm0 8h2v2h-2v-2z" />
+    </svg>
+  );
+};
+
 export const SimCardDownloadIcon = () => {
   return (
     <svg className="icon-sim-card-download" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -926,6 +935,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "inventory", tags: [], name: "Inventory", icon: <InventoryIcon /> },
   { id: "more-horizontal", tags: [], name: "More Horizontal", icon: <MoreHorizontalIcon /> },
   { id: "more-vertical", tags: [], name: "More Vertical", icon: <MoreVerticalIcon /> },
+  { id: "report", tags: [], name: "Report", icon: <ReportIcon /> },
   { id: "report-problem", tags: [], name: "Report Problem", icon: <ReportProblemIcon /> },
   { id: "open-with", tags: [], name: "Open With", icon: <OpenWithIcon /> },
   { id: "group-work", tags: [], name: "Group Work", icon: <GroupWorkIcon /> },

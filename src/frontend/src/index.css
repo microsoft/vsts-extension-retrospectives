@@ -434,7 +434,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
 
     & .input-validation-message {
-      @apply flex items-center gap-1 text-task-yellow text-sm;
+      @apply flex items-center gap-1 text-error text-sm;
 
       & svg {
         @apply w-4 h-4;
@@ -1557,6 +1557,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
   & .title-input-container {
     @apply text-base font-semibold flex flex-col items-center p-1 flex-1 border border-(--text-primary-color) text-right placeholder:text-right;
+
+    &.error-border {
+      @apply border-error;
+    }
   }
 
   & select.title-input-container {
