@@ -1737,6 +1737,26 @@ describe("FeedbackBoardMetadataForm - Dialog Dismissal", () => {
       expect(screen.queryByText(/choose column color/i)).not.toBeInTheDocument();
     });
   });
+
+  it("should not close the parent dialog when an icon is selected", async () => {
+    const user = userEvent.setup();
+    const parentOnClose = jest.fn();
+
+    const { container } = render(
+      <dialog onClose={parentOnClose}>
+        <FeedbackBoardMetadataForm {...mockedProps} />
+      </dialog>,
+    );
+
+    const changeIconButtons = Array.from(container.querySelectorAll('button[aria-label="Change column icon"]')) as HTMLButtonElement[];
+    await user.click(changeIconButtons[0]);
+
+    const iconButtons = Array.from(container.querySelectorAll(".choose-feedback-column-icon-button")) as HTMLButtonElement[];
+    expect(iconButtons.length).toBeGreaterThan(0);
+    await user.click(iconButtons[0]);
+
+    expect(parentOnClose).not.toHaveBeenCalled();
+  });
 });
 
 describe("FeedbackBoardMetadataForm - Save Button Disabled States", () => {
