@@ -263,9 +263,26 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     setMaxVotesPerUser(Number((event.target as HTMLInputElement | HTMLTextAreaElement).value));
   }, []);
 
+  const titleValidationErrors = ["Field 'Retrospective Name' cannot be empty.", "Field 'Retrospective Name' must be unique."];
+  const hasTitleValidationError = titleValidationErrors.includes(error);
+
   const retrospectiveNameInput = React.useMemo(
-    () => <input ref={retrospectiveNameInputRef} aria-label="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} aria-describedby="retrospective-name-label" className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />,
-    [handleInputChange, placeholderText, title],
+    () => (
+      <input
+        ref={retrospectiveNameInputRef}
+        aria-label="Please enter new retrospective title"
+        aria-required={true}
+        aria-invalid={hasTitleValidationError}
+        placeholder={placeholderText}
+        aria-describedby="retrospective-name-label"
+        className={`title-input-container${hasTitleValidationError ? " error-border" : ""}`}
+        id="retrospective-title-input"
+        value={title}
+        maxLength={100}
+        onChange={handleInputChange}
+      />
+    ),
+    [handleInputChange, hasTitleValidationError, placeholderText, title],
   );
 
   const maxVotesPerUserInput = React.useMemo(
@@ -668,12 +685,12 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         </PivotItem>
       </Pivot>
       <div className="inner">
-        {error && <span className="input-validation-message">{getIconElement("report-problem")} {error}</span>}
+        {error && <span className="input-validation-message">{getIconElement("report")} {error}</span>}
         <button
           className="metadata-form-save-button"
           onClick={async event => {
             if (title.trim().length === 0) {
-              setError("Retrospective Board name is required");
+              setError("Field 'Retrospective Name' cannot be empty.");
               retrospectiveNameInputRef.current!.focus();
               return;
             }
@@ -689,7 +706,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             const isDuplicateBoardName = await BoardDataService.checkIfBoardNameIsTaken(teamId, title.trim());
             const isExistingBoardNameUnchanged = !isNewBoardCreation && title.trim() === initialTitle.trim();
             if (isDuplicateBoardName && !isExistingBoardNameUnchanged) {
-              setError("A board with this name already exists");
+              setError("Field 'Retrospective Name' must be unique.");
+              retrospectiveNameInputRef.current!.focus();
               return;
             }
             setError("");

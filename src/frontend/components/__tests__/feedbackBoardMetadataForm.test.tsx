@@ -460,7 +460,7 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
     await user.click(submitButton);
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
     expect(titleInput).toHaveFocus();
   });
 
@@ -916,7 +916,7 @@ describe("FeedbackBoardMetadataForm - Form Submission Extended", () => {
     await user.click(saveButton);
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
   });
 
   it("should show an error when no active columns exist", async () => {
@@ -1316,7 +1316,7 @@ describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
     await user.click(saveButton);
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
   });
 
   it("should handle whitespace-only board names", async () => {
@@ -1330,7 +1330,7 @@ describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
     await user.click(saveButton);
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
   });
 });
 
@@ -1543,7 +1543,7 @@ describe("FeedbackBoardMetadataForm - Form Submission Advanced", () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/a board with this name already exists/i)).toBeInTheDocument();
+      expect(screen.getByText(/field 'retrospective name' must be unique\./i)).toBeInTheDocument();
     });
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
@@ -1799,14 +1799,14 @@ describe("FeedbackBoardMetadataForm - Input Change Handler", () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/a board with this name already exists/i)).toBeInTheDocument();
+      expect(screen.getByText(/field 'retrospective name' must be unique\./i)).toBeInTheDocument();
     });
 
     // Change the title to clear the error
     await user.type(titleInput, " Modified");
 
     await waitFor(() => {
-      expect(screen.queryByText(/a board with this name already exists/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/field 'retrospective name' must be unique\./i)).not.toBeInTheDocument();
     });
   });
 });
