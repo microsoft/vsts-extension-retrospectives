@@ -461,7 +461,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .subText.li + .subText.li {
-    @apply -mt-1;
+    @apply mt-1;
   }
 
   & .subText:not(.li) + .subText.li {
