@@ -450,6 +450,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                           aria-label="Change column icon"
                           title="Change column icon"
                           disabled={columnCard.markedForDeletion}
+                          type="button"
                           onClick={() => {
                             openChooseColumnIconDialog(columnCard);
                           }}
@@ -592,10 +593,10 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               </dialog>
             )}
             {columnCardBeingEdited && isChooseColumnIconDialogOpen && (
-              <dialog className="choose-column-icon-dialog" aria-label="Choose Column Icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
+              <dialog className="choose-column-icon-dialog" aria-label="Choose column icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
                 <div className="header">
-                  <h2 className="title">Choose Column Icon</h2>
-                  <button onClick={() => chooseColumnIconDialogRef.current!.close()} aria-label="Close">
+                  <h2 className="title">Choose column icon</h2>
+                  <button type="button" onClick={() => chooseColumnIconDialogRef.current!.close()} aria-label="Close">
                     {getIconElement("close")}
                   </button>
                 </div>
@@ -609,6 +610,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                           aria-label={`Choose the icon: ${iconOption.name}`}
                           className="choose-feedback-column-icon-button"
                           key={iconOption.id}
+                          type="button"
                           onClick={() => {
                             columnCardBeingEdited.column.iconClass = iconOption.id;
                             setColumnCards([...columnCards]);
@@ -622,7 +624,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   </div>
                 </div>
                 <div className="inner">
-                  <button className="default button" onClick={() => chooseColumnIconDialogRef.current!.close()}>
+                  <button type="button" className="default button" onClick={() => chooseColumnIconDialogRef.current!.close()}>
                     {t("common_close")}
                   </button>
                 </div>
