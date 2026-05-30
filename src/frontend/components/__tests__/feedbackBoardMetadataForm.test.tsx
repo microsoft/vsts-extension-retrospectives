@@ -3,7 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from "react";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mockUuid } from "../__mocks__/uuid/v4";
@@ -1756,6 +1756,31 @@ describe("FeedbackBoardMetadataForm - Dialog Dismissal", () => {
     await user.click(iconButtons[0]);
 
     expect(parentOnClose).not.toHaveBeenCalled();
+  });
+
+  it("should handle icon dialog close callback when event is undefined", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const changeIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
+    await user.click(changeIconButtons[0]);
+
+    const iconDialog = container.querySelector("dialog.choose-column-icon-dialog") as HTMLDialogElement | null;
+    expect(iconDialog).toBeTruthy();
+
+    if (!iconDialog) return;
+
+    const reactPropsKey = Object.keys(iconDialog).find(key => key.startsWith("__reactProps$"));
+    expect(reactPropsKey).toBeTruthy();
+
+    if (!reactPropsKey) return;
+
+    const onCloseHandler = (iconDialog as unknown as Record<string, { onClose?: (event?: unknown) => void }>)[reactPropsKey]?.onClose;
+    expect(typeof onCloseHandler).toBe("function");
+
+    await act(async () => {
+      onCloseHandler?.();
+    });
   });
 });
 

@@ -8,7 +8,7 @@ You can find the changelog of the Retrospective Extension below.
 * Prevents duplicate-name side effects that can impact board retrieval when updating board metadata.
 * Improves Create and Edit Retrospective dialog name-validation feedback, including consistent validation messaging for missing or duplicate board name.
 * Simplifies board-configuration wording in Board Settings, including the required-name indicator, Max Votes label, and hidden feedback option.
-* Reintroduces textboxes for user selections for cleaner visuals.
+* Reintroduces borders for user input fields for cleaner visuals.
 
 From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospectives/pull/1696)
 
@@ -17,6 +17,8 @@ From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospective
 * Aligns dialog title styling across Create, Copy, Edit, Archive, and Summary experiences for a more consistent visual experience.
 
 From [GitHub PR #1728](https://github.com/microsoft/vsts-extension-retrospectives/pull/1728)
+
+* Test code coverage now 100%.
 
 ## v1.92.53
 
