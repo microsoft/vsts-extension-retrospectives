@@ -461,7 +461,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .subText.li + .subText.li {
-    @apply mt-1;
+    margin-top: 0.3rem;
   }
 
   & .subText:not(.li) + .subText.li {
