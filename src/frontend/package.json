@@ -50,7 +50,7 @@
     "fast-check": "4.7.0",
     "globals": "17.4.0",
     "jest": "30.3.0",
-    "jest-environment-jsdom": "30.3.0",
+    "jest-environment-jsdom": "30.4.1",
     "jest-junit": "17.0.0",
     "markdownlint-cli2": "0.22.0",
     "postcss": "8.5.10",
