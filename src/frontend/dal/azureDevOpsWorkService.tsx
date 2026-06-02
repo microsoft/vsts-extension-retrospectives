@@ -7,6 +7,8 @@ import { appInsights, TelemetryExceptions } from "../utilities/telemetryClient";
 import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
 
 class WorkService {
+  private static readonly requirementCategoryReferenceName = "Microsoft.RequirementCategory";
+
   private _httpWorkClient: WorkRestClient;
 
   constructor() {
@@ -60,6 +62,27 @@ class WorkService {
     }
 
     return teamFieldValues;
+  }
+
+  /**
+   * Gets requirement-backlog work item type names for the given team.
+   */
+  public async getRequirementBacklogWorkItemTypeNames(teamId: string): Promise<string[]> {
+    const projectId = await getProjectId();
+    const teamContext = {
+      project: "",
+      projectId,
+      team: "",
+      teamId,
+    };
+
+    try {
+      const backlogConfiguration = await this._httpWorkClient.getBacklogConfigurations(teamContext);
+      return backlogConfiguration.requirementBacklog?.workItemTypes?.map(type => type.name).filter(Boolean) ?? [];
+    } catch (e) {
+      appInsights.trackException(e, { teamId, categoryReferenceName: WorkService.requirementCategoryReferenceName });
+      return [];
+    }
   }
 }
 

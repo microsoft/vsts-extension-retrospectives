@@ -107,6 +107,7 @@ jest.mock("../../dal/itemDataService");
 jest.mock("../../dal/azureDevOpsWorkService", () => ({
   workService: {
     getIterations: jest.fn(),
+    getRequirementBacklogWorkItemTypeNames: jest.fn(() => Promise.resolve([])),
   },
 }));
 jest.mock("../../utilities/sprintRetrospectiveHelper", () => ({

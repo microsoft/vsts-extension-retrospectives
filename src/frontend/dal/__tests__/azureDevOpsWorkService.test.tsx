@@ -4,6 +4,7 @@ import { WorkRestClient } from "azure-devops-extension-api/Work/WorkClient";
 // Mock azure-devops-extension-api
 const mockGetTeamIterations = jest.fn();
 const mockGetTeamFieldValues = jest.fn();
+const mockGetBacklogConfigurations = jest.fn();
 const mockGetClient = jest.fn();
 
 jest.mock("azure-devops-extension-api/Common", () => ({
@@ -42,6 +43,7 @@ describe("WorkService", () => {
     mockGetClient.mockReturnValue({
       getTeamIterations: mockGetTeamIterations,
       getTeamFieldValues: mockGetTeamFieldValues,
+      getBacklogConfigurations: mockGetBacklogConfigurations,
     });
 
     mockGetProjectId.mockResolvedValue("project-123");
@@ -295,6 +297,47 @@ describe("WorkService", () => {
       await workService.getTeamFieldValues("team-permission-error");
 
       expect(mockTrackException).toHaveBeenCalledWith(error, { teamId: "team-permission-error" });
+    });
+  });
+
+  describe("getRequirementBacklogWorkItemTypeNames", () => {
+    it("should return requirement backlog work item type names", async () => {
+      mockGetBacklogConfigurations.mockResolvedValue({
+        requirementBacklog: {
+          workItemTypes: [{ name: "User Story" }, { name: "Bug" }],
+        },
+      });
+
+      const result = await workService.getRequirementBacklogWorkItemTypeNames("team-123");
+
+      expect(result).toEqual(["User Story", "Bug"]);
+      expect(mockGetBacklogConfigurations).toHaveBeenCalledWith({
+        project: "",
+        projectId: "project-123",
+        team: "",
+        teamId: "team-123",
+      });
+    });
+
+    it("should return empty array when requirement backlog is unavailable", async () => {
+      mockGetBacklogConfigurations.mockResolvedValue({ requirementBacklog: undefined });
+
+      const result = await workService.getRequirementBacklogWorkItemTypeNames("team-456");
+
+      expect(result).toEqual([]);
+    });
+
+    it("should return empty array and track exception when call fails", async () => {
+      const error = new Error("Backlog config unavailable");
+      mockGetBacklogConfigurations.mockRejectedValue(error);
+
+      const result = await workService.getRequirementBacklogWorkItemTypeNames("team-789");
+
+      expect(result).toEqual([]);
+      expect(mockTrackException).toHaveBeenCalledWith(error, {
+        teamId: "team-789",
+        categoryReferenceName: "Microsoft.RequirementCategory",
+      });
     });
   });
 });

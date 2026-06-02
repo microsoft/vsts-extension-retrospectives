@@ -28,11 +28,12 @@ export interface ActionItemDisplayProps {
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   allowAddNewActionItem: boolean;
+  shouldShowAddWorkItemMenuBelow?: boolean;
 
   onUpdateActionItem: (feedbackItemId: IFeedbackItemDocument) => void;
 }
 
-export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackItemId, feedbackItemTitle, team, boardId, boardTitle, defaultIteration, defaultAreaPath, actionItems, nonHiddenWorkItemTypes, allWorkItemTypes, allowAddNewActionItem, onUpdateActionItem }) => {
+export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackItemId, feedbackItemTitle, team, boardId, boardTitle, defaultIteration, defaultAreaPath, actionItems, nonHiddenWorkItemTypes, allWorkItemTypes, allowAddNewActionItem, shouldShowAddWorkItemMenuBelow = true, onUpdateActionItem }) => {
   const trackActivity = useTrackMetric(reactPlugin, "ActionItemDisplay");
 
   const [isLinkedWorkItemLoaded, setIsLinkedWorkItemLoaded] = useState(false);
@@ -211,7 +212,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
             <span>{t("common_add_work_item")}</span>
           </button>
           {isWorkItemTypeListCalloutVisible && (
-            <div ref={addWorkItemMenuRef} className="popout-container" role="menu" aria-label={t("common_add_work_item_menu")}>
+            <div ref={addWorkItemMenuRef} className={`popout-container ${shouldShowAddWorkItemMenuBelow ? "popout-container-below" : ""}`.trim()} role="menu" aria-label={t("common_add_work_item_menu")}>
               {renderLinkExistingWorkItemButton()}
               {visibleWorkItemTypes.length > 0 && <div role="separator" className="separator" />}
               {visibleWorkItemTypes.map(item => {
@@ -236,10 +237,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
         </div>
         <div className="subText">
           <div className="form-group">
-            <input className="search-box" placeholder="Enter the exact work item id" role="searchbox" onChange={handleInputChange}></input>
+            <input className="search-box" placeholder="Enter the exact work item ID" role="searchbox" onChange={handleInputChange}></input>
             <div className="output-container">
               {isLinkedWorkItemLoaded && linkedWorkItem && renderWorkItemCard(linkedWorkItem, true)}
-              {isLinkedWorkItemLoaded && !linkedWorkItem && <div className="work-item-not-found">The work item you are looking for was not found. Please verify the id.</div>}
+              {isLinkedWorkItemLoaded && !linkedWorkItem && <div className="work-item-not-found">The work item you are looking for was not found. Please verify the ID.</div>}
             </div>
           </div>
         </div>
