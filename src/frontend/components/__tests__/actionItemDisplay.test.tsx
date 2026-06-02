@@ -593,7 +593,7 @@ describe("Action Item Display component", () => {
     });
   });
 
-  it("validates work item id input - shows error for non-numeric input", async () => {
+  it("validates work item ID input - shows error for non-numeric input", async () => {
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
@@ -647,7 +647,7 @@ describe("Action Item Display component", () => {
     });
   });
 
-  it("ignores work item id of zero", async () => {
+  it("ignores work item ID of zero", async () => {
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
@@ -668,7 +668,7 @@ describe("Action Item Display component", () => {
     });
   });
 
-  it("loads and displays work item when valid id is entered", async () => {
+  it("loads and displays work item when valid ID is entered", async () => {
     const mockWorkItem = {
       id: 789,
       fields: {

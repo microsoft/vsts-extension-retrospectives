@@ -128,7 +128,7 @@ describe("getBoardUrl", () => {
       expect(result).toBe(encodeURI(expectedUrl));
     });
 
-    it("falls back to extension context id when publisher and extension ids are unavailable", async () => {
+    it("falls back to extension context ID when publisher and extension IDs are unavailable", async () => {
       const teamId = "team123";
       const boardId = "board456";
       const hostBase = "https://dev.azure.com/myorg/";

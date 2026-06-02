@@ -1,7 +1,7 @@
 import { getUserIdentity, obfuscateUserId, deobfuscateUserId } from "../userIdentityHelper";
 
 describe("UserIdentity", () => {
-  it("should have the correct id property", () => {
+  it("should have the correct ID property", () => {
     const user = getUserIdentity();
 
     expect(user).not.toBeNull();

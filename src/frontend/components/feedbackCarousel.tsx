@@ -4,6 +4,7 @@ import { moveFeedbackItem } from "./feedbackColumn";
 import FeedbackItem, { IFeedbackItemProps } from "./feedbackItem";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
+import { itemDataService } from "../dal/itemDataService";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkflowPhase } from "../interfaces/workItem";
@@ -90,12 +91,25 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
     (column: FocusModeColumn) => {
       const sortedItems = column.columnItems
         .sort((a, b) => {
-          if (b.feedbackItem.upvotes !== a.feedbackItem.upvotes) {
-            return b.feedbackItem.upvotes - a.feedbackItem.upvotes;
+          const groupedItemsA = column.columnItems.filter(item => a.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
+          const groupedItemsB = column.columnItems.filter(item => b.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
+
+          const totalVotesA = itemDataService.getVotesForGroupedItems(
+            a.feedbackItem,
+            groupedItemsA.map(item => item.feedbackItem),
+          );
+          const totalVotesB = itemDataService.getVotesForGroupedItems(
+            b.feedbackItem,
+            groupedItemsB.map(item => item.feedbackItem),
+          );
+
+          if (totalVotesB !== totalVotesA) {
+            return totalVotesB - totalVotesA;
           }
+
           const dateA = new Date(a.feedbackItem.createdDate).getTime();
           const dateB = new Date(b.feedbackItem.createdDate).getTime();
-          return dateA - dateB;
+          return dateB - dateA;
         })
         .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId);
 

@@ -655,7 +655,7 @@ describe("FeedbackBoard Component", () => {
   });
 
   describe("Timer Coordination", () => {
-    it("sets the active timer id when a column requests a start", async () => {
+    it("sets the active timer ID when a column requests a start", async () => {
       render(<FeedbackBoard {...mockedProps} />);
 
       const columnId = testColumnProps.columnIds[0];
@@ -3153,7 +3153,7 @@ describe("FeedbackBoard Component", () => {
       jest.useRealTimers();
     });
 
-    it("skips merging for a board column id that does not yet exist in local column state", async () => {
+    it("skips merging for a board column ID that does not yet exist in local column state", async () => {
       const extraColumnId = "new-column-id";
       const boardWithAdditionalColumn: IFeedbackBoardDocument = {
         ...mockedBoard,

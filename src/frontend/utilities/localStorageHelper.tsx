@@ -1,12 +1,12 @@
 /**
- * Gets the drag and drop id value from the browser's local storage
+ * Gets the drag and drop ID value from the browser's local storage
  */
 const getIdValue = (): string => {
   return localStorage.getItem("reflect/dnd/id");
 };
 
 /**
- * Sets the drag and drop id value in the browser's local storage
+ * Sets the drag and drop ID value in the browser's local storage
  */
 const setIdValue = (value: string) => {
   localStorage.setItem("reflect/dnd/id", value);

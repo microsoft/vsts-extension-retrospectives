@@ -359,7 +359,7 @@ describe("handleArchiveToggle", () => {
 
 jest.spyOn(userIdentityHelper, "getUserIdentity").mockReturnValue({
   ...mockedIdentity,
-  id: "user-1", // make sure the id matches your test
+  id: "user-1", // make sure the ID matches your test
 });
 
 jest.spyOn(userIdentityHelper, "obfuscateUserId").mockImplementation(id => `encrypted-${id}`);

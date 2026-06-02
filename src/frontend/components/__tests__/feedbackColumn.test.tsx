@@ -2474,6 +2474,75 @@ describe("Feedback Column ", () => {
       expect(itemDataService.sortItemsByVotesAndDate).toHaveBeenCalled();
     });
 
+    test("keeps newest-to-oldest numbering in Act phase while display order is vote-sorted", () => {
+      const newest = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", title: "newest card", createdDate: new Date("2026-05-04T19:58:00Z"), upvotes: 0 },
+      };
+      const secondNewest = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", title: "2nd newest", createdDate: new Date("2026-05-04T19:54:00Z"), upvotes: 1 },
+      };
+      const secondOldest = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-3", title: "2nd oldest", createdDate: new Date("2026-05-04T19:44:00Z"), upvotes: 0 },
+      };
+      const oldest = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-4", title: "oldest card", createdDate: new Date("2026-05-04T19:41:00Z"), upvotes: 1 },
+      };
+
+      const props = {
+        ...testColumnProps,
+        columnItems: [newest, secondNewest, secondOldest, oldest],
+        columns: {
+          ...testColumnProps.columns,
+          [testColumnProps.columnId]: {
+            ...testColumnProps.columns[testColumnProps.columnId],
+            columnItems: [newest, secondNewest, secondOldest, oldest],
+          },
+        },
+        workflowPhase: WorkflowPhase.Act,
+        isDataLoaded: true,
+      };
+
+      const sortSpy = itemDataService.sortItemsByVotesAndDate as jest.Mock;
+      const defaultSortImpl = (items: any, originalItems?: any[]) => items ?? originalItems ?? [];
+      sortSpy.mockImplementation(() => [secondNewest, oldest, newest, secondOldest]);
+
+      const originalGetVotes = (itemDataService as any).getVotes;
+      const originalGetVotesForGroupedItems = (itemDataService as any).getVotesForGroupedItems;
+      const originalGetVotesForGroupedItemsByUser = (itemDataService as any).getVotesForGroupedItemsByUser;
+
+      (itemDataService as any).getVotes = jest.fn((feedbackItem: any) => feedbackItem.upvotes ?? 0);
+      (itemDataService as any).getVotesForGroupedItems = jest.fn((mainFeedbackItem: any) => mainFeedbackItem.upvotes ?? 0);
+      (itemDataService as any).getVotesForGroupedItemsByUser = jest.fn(() => 0);
+
+      try {
+        const { container } = render(<FeedbackColumn {...props} />);
+        const entries = Array.from(container.querySelectorAll(".feedback-item-list-entry")) as HTMLElement[];
+
+        expect(entries).toHaveLength(4);
+
+        expect(entries[0].textContent).toContain("2nd newest");
+        expect(entries[0].querySelector(".card-id")?.textContent).toBe("#2");
+
+        expect(entries[1].textContent).toContain("oldest card");
+        expect(entries[1].querySelector(".card-id")?.textContent).toBe("#4");
+
+        expect(entries[2].textContent).toContain("newest card");
+        expect(entries[2].querySelector(".card-id")?.textContent).toBe("#1");
+
+        expect(entries[3].textContent).toContain("2nd oldest");
+        expect(entries[3].querySelector(".card-id")?.textContent).toBe("#3");
+      } finally {
+        sortSpy.mockImplementation(defaultSortImpl);
+        (itemDataService as any).getVotes = originalGetVotes;
+        (itemDataService as any).getVotesForGroupedItems = originalGetVotesForGroupedItems;
+        (itemDataService as any).getVotesForGroupedItemsByUser = originalGetVotesForGroupedItemsByUser;
+      }
+    });
+
     test("renders items sorted by date in non-Act phase", () => {
       const item1 = {
         ...testColumnProps.columnItems[0],
@@ -3943,7 +4012,7 @@ describe("Feedback Column ", () => {
       const props = { ...testColumnProps, columnItems: initialItems, isDataLoaded: true };
       const { container, rerender } = render(<FeedbackColumn {...props} />);
 
-      // Create an input with just an id (no data-feedback-item-id parent)
+      // Create an input with just an ID (no data-feedback-item-id parent)
       const mockInput = document.createElement("input");
       mockInput.id = "standalone-test-input";
       mockInput.type = "text";
@@ -4442,7 +4511,7 @@ describe("Feedback Column ", () => {
       consoleWarnSpy.mockRestore();
     });
 
-    test("preserveFocus captures focus on element with only id (no data-feedback-item-id)", async () => {
+    test("preserveFocus captures focus on element with only ID (no data-feedback-item-id)", async () => {
       const initialItems = [...testColumnProps.columnItems];
       const props = { ...testColumnProps, columnItems: initialItems, isDataLoaded: true };
       const { container, rerender } = render(<FeedbackColumn {...props} />);

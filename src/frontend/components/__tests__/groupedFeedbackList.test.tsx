@@ -4,6 +4,7 @@ import "@testing-library/jest-dom";
 import GroupedFeedbackList, { IGroupedFeedbackListProps } from "../groupedFeedbackList";
 import { IColumn, IColumnItem } from "../feedbackBoard";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
+import { WorkflowPhase } from "../../interfaces/workItem";
 
 // Mock the icons module
 jest.mock("../icons", () => {
@@ -63,6 +64,7 @@ describe("GroupedFeedbackList", () => {
     columnItems: [],
     columns: defaultColumns,
     currentColumnId: "column-1",
+    workflowPhase: WorkflowPhase.Collect,
     hideFeedbackItems: false,
     isFocusModalHidden: true,
   };
@@ -336,6 +338,34 @@ describe("GroupedFeedbackList", () => {
 
       // originalColumnId matches currentColumnId, so no "Original Column" should be shown
       expect(screen.queryByText(/Original Column:/)).not.toBeInTheDocument();
+    });
+
+    it("should sort grouped children by votes desc then newest date in Act phase", () => {
+      const lowVotesNewest = createFeedbackItem({
+        id: "child-1",
+        title: "low votes newest",
+        upvotes: 1,
+        createdDate: new Date("2026-05-04T19:58:00Z"),
+      });
+      const highVotesOld = createFeedbackItem({
+        id: "child-2",
+        title: "high votes old",
+        upvotes: 3,
+        createdDate: new Date("2026-05-04T19:41:00Z"),
+      });
+      const highVotesNewer = createFeedbackItem({
+        id: "child-3",
+        title: "high votes newer",
+        upvotes: 3,
+        createdDate: new Date("2026-05-04T19:54:00Z"),
+      });
+
+      const columnItems = [createColumnItem(lowVotesNewest), createColumnItem(highVotesOld), createColumnItem(highVotesNewer)];
+
+      const { container } = render(<GroupedFeedbackList {...defaultProps} workflowPhase={WorkflowPhase.Act} childrenIds={["child-1", "child-2", "child-3"]} columnItems={columnItems} />);
+
+      const titles = Array.from(container.querySelectorAll(".related-feedback-title")).map(node => node.textContent?.trim());
+      expect(titles).toEqual(["high votes newer", "high votes old", "low votes newest"]);
     });
   });
 });

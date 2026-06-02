@@ -133,7 +133,7 @@ describe("toastNotifications", () => {
   });
 
   describe("update functionality", () => {
-    it("ignores update if toast id does not exist", () => {
+    it("ignores update if toast ID does not exist", () => {
       const { container } = render(<ToastContainer />);
 
       let existingId = "";
@@ -251,7 +251,7 @@ describe("toastNotifications", () => {
       expect(container.querySelector(".retro-message-bar--info")).toBeTruthy();
     });
 
-    it("uses custom id when provided", () => {
+    it("uses custom ID when provided", () => {
       render(<ToastContainer />);
 
       let returnedId = "";

@@ -159,7 +159,7 @@ describe("FeedbackItemGroup", () => {
     stopPropagationSpy.mockRestore();
   });
 
-  it("should use dataTransfer id when dropping", () => {
+  it("should use dataTransfer ID when dropping", () => {
     const mockGetIdValue = localStorageHelper.getIdValue as jest.Mock;
     mockGetIdValue.mockReturnValue("fallback-id");
 

@@ -168,7 +168,7 @@ describe("FeedbackItemTimer", () => {
       expect(event.stopPropagation).toHaveBeenCalled();
     });
 
-    it("should call onTimerToggle with correct id when clicked multiple times", () => {
+    it("should call onTimerToggle with correct ID when clicked multiple times", () => {
       const onTimerToggle = jest.fn();
       render(<FeedbackItemTimer {...defaultProps} feedbackItemId="item-123" onTimerToggle={onTimerToggle} />);
 

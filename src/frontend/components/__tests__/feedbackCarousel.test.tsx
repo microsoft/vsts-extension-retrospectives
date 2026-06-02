@@ -120,7 +120,7 @@ describe("Feedback Carousel ", () => {
   });
 
   describe("Item sorting", () => {
-    it("should sort items by upvotes (descending) then by creation date (ascending)", () => {
+    it("should sort items by grouped total votes (descending) then by creation date (newest first)", () => {
       const item1 = {
         ...testColumnProps.columnItems[0],
         feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", upvotes: 5, createdDate: new Date("2023-01-01") },
@@ -143,6 +143,66 @@ describe("Feedback Carousel ", () => {
 
       // Should render without error - sorting logic executed
       expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+
+    it("should order All tab by grouped vote totals instead of parent-only votes", () => {
+      const groupedParent = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "grouped-parent",
+          title: "Grouped Parent",
+          upvotes: 1,
+          createdDate: new Date("2026-01-01"),
+          parentFeedbackItemId: undefined,
+          childFeedbackItemIds: ["grouped-child"],
+        },
+      };
+
+      const groupedChild = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "grouped-child",
+          title: "Grouped Child",
+          upvotes: 5,
+          createdDate: new Date("2026-01-03"),
+          parentFeedbackItemId: "grouped-parent",
+          childFeedbackItemIds: [],
+        },
+      };
+
+      const highParentOnly = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "high-parent-only",
+          title: "High Parent Only",
+          upvotes: 4,
+          createdDate: new Date("2026-01-02"),
+          parentFeedbackItemId: undefined,
+          childFeedbackItemIds: [],
+        },
+      };
+
+      const propsWithGroupedVoting = {
+        ...mockedProps,
+        focusModeModel: buildFocusModeModel([
+          {
+            ...testColumnProps,
+            columnItems: [groupedParent, groupedChild, highParentOnly],
+          },
+        ]),
+      };
+
+      const { container } = render(<FeedbackCarousel {...propsWithGroupedVoting} />);
+
+      const allTrack = container.querySelector("#carousel-all-columns") as HTMLElement;
+      expect(allTrack).toBeTruthy();
+
+      const slideTexts = Array.from(allTrack.querySelectorAll(".carousel-slide")).map(el => el.textContent ?? "");
+      expect(slideTexts[0]).toContain("Grouped Parent");
+      expect(slideTexts[1]).toContain("High Parent Only");
     });
 
     it("should filter out items with parentFeedbackItemId", () => {

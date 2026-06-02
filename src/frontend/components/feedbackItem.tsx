@@ -1148,7 +1148,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
               {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && props.groupedItemProps!.isGroupExpanded) ? <span className="feedback-yourvote-count">[My Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[My Votes: {groupedVotesByUser}]</span>}</div>}
             </div>
           </div>
-          {isGroupedCarouselItem && isMainItem && state.isShowingGroupedChildrenTitles && <GroupedFeedbackList childrenIds={childrenIds} columnItems={columnItems} columns={props.columns} currentColumnId={props.columnId} hideFeedbackItems={props.hideFeedbackItems} isFocusModalHidden={props.isFocusModalHidden} />}
+          {isGroupedCarouselItem && isMainItem && state.isShowingGroupedChildrenTitles && <GroupedFeedbackList childrenIds={childrenIds} columnItems={columnItems} columns={props.columns} currentColumnId={props.columnId} workflowPhase={props.workflowPhase} hideFeedbackItems={props.hideFeedbackItems} isFocusModalHidden={props.isFocusModalHidden} />}
           <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={displayTitle} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} shouldShowAddWorkItemMenuBelow={props.isFocusModalHidden} />}</div>
         </DocumentCard>
       </div>

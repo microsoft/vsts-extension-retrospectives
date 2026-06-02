@@ -1122,7 +1122,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   /**
    * @description Attempts to select a team from the specified teamId. If the teamId is valid,
    * currentTeam is set to the new team and that team's boards are loaded.
-   * @param teamId The id of the team to select.
+   * @param teamId The ID of the team to select.
    */
   const setCurrentTeam = async (teamId: string) => {
     setContainerState(previousState => ({ ...previousState, isTeamDataLoaded: false }));
@@ -1235,7 +1235,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   /**
    * @description Attempts to select a board from the specified boardId. If the boardId is valid,
    * currentBoard is set to the new board. If not, nothing changes.
-   * @param boardId The id of the board to select.
+   * @param boardId The ID of the board to select.
    */
   const setCurrentBoard = (selectedBoard: IFeedbackBoardDocument) => {
     const matchedBoard = state.boards.find(board => board.id === selectedBoard.id);
