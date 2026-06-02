@@ -4,6 +4,13 @@ You can find the changelog of the Retrospective Extension below.
 
 ## Unpublished
 
+* Refactored Add work item selection to ensure the full work item list is visible and preserved alphabetical ordering.
+* Limited Focus mode work item type options to requirement backlog types.
+* Fixed issues with Focus mode sorting and Act tab sorting.
+* Fixed Act tab feedback item numbering to be consistent with other tabs.
+
+From [GitHub PR #1739](https://github.com/microsoft/vsts-extension-retrospectives/pull/1739)
+
 * Added customizable Team Assessment questions so teams can tailor the assessment prompts used on retrospective boards. From [GitHub PR #1646](https://github.com/microsoft/vsts-extension-retrospectives/pull/1646)
 * Added localization support, including Spanish, German, and French translations, plus localized date and number formatting. From [GitHub PR #1657](https://github.com/microsoft/vsts-extension-retrospectives/pull/1657) and [GitHub PR #1658](https://github.com/microsoft/vsts-extension-retrospectives/pull/1658)
 * Added sprint retrospective support from the Azure Boards iteration backlog, including sprint-specific board creation and navigation. From [GitHub PR #1659](https://github.com/microsoft/vsts-extension-retrospectives/pull/1659)
