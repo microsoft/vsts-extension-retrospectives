@@ -170,9 +170,21 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
 
   const renderWorkItemCard = useCallback(
     (item: WorkItem, areActionIconsHidden: boolean) => {
-      return <ActionItem key={item.id} feedbackItemId={feedbackItemId} boardId={boardId} actionItem={item} nonHiddenWorkItemTypes={nonHiddenWorkItemTypes} allWorkItemTypes={allWorkItemTypes} onUpdateActionItem={onUpdateActionItem} areActionIconsHidden={areActionIconsHidden} shouldFocus={!initialRender} />;
+      return (
+        <ActionItem
+          key={item.id}
+          feedbackItemId={feedbackItemId}
+          boardId={boardId}
+          actionItem={item}
+          nonHiddenWorkItemTypes={nonHiddenWorkItemTypes}
+          allWorkItemTypes={allWorkItemTypes}
+          onUpdateActionItem={onUpdateActionItem}
+          areActionIconsHidden={areActionIconsHidden}
+          shouldFocus={!initialRender && shouldShowAddWorkItemMenuBelow}
+        />
+      );
     },
-    [feedbackItemId, boardId, nonHiddenWorkItemTypes, allWorkItemTypes, onUpdateActionItem, initialRender],
+    [feedbackItemId, boardId, nonHiddenWorkItemTypes, allWorkItemTypes, onUpdateActionItem, initialRender, shouldShowAddWorkItemMenuBelow],
   );
 
   const renderAllWorkItemCards = useCallback(() => {

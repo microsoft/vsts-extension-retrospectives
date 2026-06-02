@@ -402,6 +402,32 @@ describe("Action Item Display component", () => {
     expect(container.querySelectorAll(".related-task-sub-card")).toHaveLength(2);
   });
 
+  it("does not auto-focus linked action items in focus mode", async () => {
+    const propsWithActionItemsInFocusMode = {
+      ...defaultTestProps,
+      shouldShowAddWorkItemMenuBelow: false,
+      actionItems: [
+        {
+          id: 1,
+          fields: {
+            "System.Title": "Action Item 1",
+            "System.WorkItemType": "Task",
+            "System.State": "New",
+          },
+          _links: { html: { href: "http://test-url-1" } },
+        } as any,
+      ],
+    };
+
+    const { container } = render(<ActionItemDisplay {...propsWithActionItemsInFocusMode} />);
+    const actionItemLink = container.querySelector(".related-task-sub-card .details") as HTMLElement;
+
+    await waitFor(() => {
+      expect(actionItemLink).toBeTruthy();
+      expect(document.activeElement).not.toBe(actionItemLink);
+    });
+  });
+
   it("renders add action item button when action items can be added", () => {
     const propsWithAdd = {
       ...defaultTestProps,
