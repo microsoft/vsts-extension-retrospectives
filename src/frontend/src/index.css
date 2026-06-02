@@ -835,6 +835,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
+.link-existing-work-item-dialog {
+  @apply w-[50vw] max-w-[50vw] portrait:w-[80vw] portrait:max-w-[80vw];
+}
+
 #feedback-board-summary-table-header {
   @apply flex w-full h-16 items-center px-8 py-0;
 
