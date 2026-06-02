@@ -2285,6 +2285,55 @@ describe("FeedbackBoard Component", () => {
 
       expect(onVoteCasted).toHaveBeenCalled();
     });
+
+    it("uses focus mode non-hidden work item types when provided", async () => {
+      const onFocusModeModelChange = jest.fn();
+      const focusModeNonHiddenWorkItemTypes = [
+        {
+          name: "Task",
+          referenceName: "Microsoft.VSTS.WorkItemTypes.Task",
+          icon: { url: "task-icon.png" },
+          _links: {},
+        } as any,
+      ];
+
+      const propsWithFocusSpecificTypes = {
+        ...mockedProps,
+        onFocusModeModelChange,
+        focusModeNonHiddenWorkItemTypes,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...propsWithFocusSpecificTypes} />);
+
+      await waitFor(() => {
+        expect(onFocusModeModelChange).toHaveBeenCalled();
+      });
+
+      const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
+      expect(focusModeModel?.nonHiddenWorkItemTypes).toEqual(focusModeNonHiddenWorkItemTypes);
+    });
+
+    it("falls back to standard non-hidden work item types when focus mode types are undefined", async () => {
+      const onFocusModeModelChange = jest.fn();
+      const propsWithFallbackTypes: FeedbackBoardProps = {
+        ...mockedProps,
+        onFocusModeModelChange,
+        focusModeNonHiddenWorkItemTypes: undefined,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...propsWithFallbackTypes} />);
+
+      await waitFor(() => {
+        expect(onFocusModeModelChange).toHaveBeenCalled();
+      });
+
+      const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
+      expect(focusModeModel?.nonHiddenWorkItemTypes).toEqual(mockedProps.nonHiddenWorkItemTypes);
+    });
   });
 
   describe("Timer Functions - Edge Cases", () => {

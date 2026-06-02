@@ -4,6 +4,7 @@ import FeedbackCarousel, { type FocusModeModel } from "../../components/feedback
 import { testGroupColumnProps, testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { mockUuid } from "../__mocks__/uuid/v4";
 import * as icons from "../../components/icons";
+import { itemDataService } from "../../dal/itemDataService";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -247,6 +248,50 @@ describe("Feedback Carousel ", () => {
       const { container } = render(<FeedbackCarousel {...propsWithEqual} />);
 
       expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+    });
+
+    it("should pass grouped child feedback items to grouped vote calculation when parent is comparator left operand", () => {
+      const groupedVotesSpy = jest.spyOn(itemDataService, "getVotesForGroupedItems");
+
+      const groupedParent = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "parent-item",
+          title: "Parent Item",
+          createdDate: new Date("2026-01-03"),
+          parentFeedbackItemId: undefined,
+          childFeedbackItemIds: ["child-item"],
+        },
+      };
+
+      const groupedChild = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: {
+          ...testColumnProps.columnItems[0].feedbackItem,
+          id: "child-item",
+          title: "Child Item",
+          createdDate: new Date("2026-01-02"),
+          parentFeedbackItemId: "parent-item",
+          childFeedbackItemIds: [],
+        },
+      };
+
+      const propsWithGroupedItems = {
+        ...mockedProps,
+        focusModeModel: buildFocusModeModel([
+          {
+            ...testColumnProps,
+            // Keep child first so the sort comparator processes the parent as the left operand.
+            columnItems: [groupedChild, groupedParent],
+          },
+        ]),
+      };
+
+      render(<FeedbackCarousel {...propsWithGroupedItems} />);
+
+      expect(groupedVotesSpy).toHaveBeenCalledWith(groupedParent.feedbackItem, expect.arrayContaining([groupedChild.feedbackItem]));
+      groupedVotesSpy.mockRestore();
     });
   });
 

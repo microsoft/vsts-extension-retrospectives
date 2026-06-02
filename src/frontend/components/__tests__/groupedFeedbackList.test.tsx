@@ -367,5 +367,36 @@ describe("GroupedFeedbackList", () => {
       const titles = Array.from(container.querySelectorAll(".related-feedback-title")).map(node => node.textContent?.trim());
       expect(titles).toEqual(["high votes newer", "high votes old", "low votes newest"]);
     });
+
+    it("should handle missing left and right items during Act sort comparator", () => {
+      const existingChild = createFeedbackItem({
+        id: "existing-child",
+        title: "Existing Child",
+      });
+      const columnItems = [createColumnItem(existingChild)];
+
+      const sortSpy = jest.spyOn(Array.prototype, "sort");
+      sortSpy.mockImplementation(function (this: string[], compareFn?: (leftId: string, rightId: string) => number): string[] {
+        if (compareFn) {
+          // Cover branch where left item is missing (line 30)
+          expect(compareFn("missing-left", "existing-child")).toBe(1);
+          // Cover branch where right item is missing (line 33)
+          expect(compareFn("existing-child", "missing-right")).toBe(-1);
+        }
+
+        return this;
+      });
+
+      render(<GroupedFeedbackList {...defaultProps} workflowPhase={WorkflowPhase.Act} childrenIds={["missing-left", "existing-child", "missing-right"]} columnItems={columnItems} />);
+
+      sortSpy.mockRestore();
+    });
+
+    it("should handle Act phase sort when columnItems is undefined", () => {
+      render(<GroupedFeedbackList {...defaultProps} workflowPhase={WorkflowPhase.Act} childrenIds={["left-id", "right-id"]} columnItems={undefined} />);
+
+      const list = screen.getByRole("list");
+      expect(list.children).toHaveLength(0);
+    });
   });
 });
