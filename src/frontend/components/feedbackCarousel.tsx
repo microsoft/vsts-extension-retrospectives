@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { moveFeedbackItem } from "./feedbackColumn";
 import FeedbackItem, { IFeedbackItemProps } from "./feedbackItem";
@@ -80,12 +80,30 @@ const buildFeedbackColumns = (focusModeModel: FocusModeModel): FocusModeColumn[]
 
 export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeModel, isFocusModalHidden }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackCarousel");
+  const hasClearedInitialHashRef = useRef(false);
 
   const [feedbackColumns, setFeedbackColumns] = useState<FocusModeColumn[]>(() => buildFeedbackColumns(focusModeModel));
 
   useEffect(() => {
     setFeedbackColumns(buildFeedbackColumns(focusModeModel));
   }, [focusModeModel]);
+
+  useEffect(() => {
+    if (isFocusModalHidden) {
+      hasClearedInitialHashRef.current = false;
+      return;
+    }
+
+    if (hasClearedInitialHashRef.current) {
+      return;
+    }
+
+    hasClearedInitialHashRef.current = true;
+
+    if (window.location.hash.startsWith("#slide-")) {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    }
+  }, [isFocusModalHidden]);
 
   const renderFeedbackCarouselItems = useCallback(
     (column: FocusModeColumn) => {
