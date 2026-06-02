@@ -120,7 +120,7 @@ describe("dataService", () => {
       expect(mockDataManager.getDocument).toHaveBeenCalledWith("testCollection", "1", { scopeType: "User" });
     });
 
-    it("should return undefined for emptyFeedbackItem id", async () => {
+    it("should return undefined for emptyFeedbackItem ID", async () => {
       const result = await readDocument("testCollection", "emptyFeedbackItem");
 
       expect(result).toBeUndefined();

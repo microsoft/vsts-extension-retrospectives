@@ -12312,7 +12312,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       expect(props.refreshFeedbackItems).not.toHaveBeenCalled();
     });
 
-    test("drop handler ignores self drops and falls back to local storage id", async () => {
+    test("drop handler ignores self drops and falls back to local storage ID", async () => {
       const props = makeProps({ workflowPhase: "Group" });
       const dropSpy = jest.spyOn(FeedbackItemHelper, "handleDropFeedbackItemOnFeedbackItem").mockResolvedValue(undefined as any);
       jest.spyOn(localStorageHelper, "getIdValue").mockReturnValue("fallback-drop-id");

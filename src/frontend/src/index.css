@@ -836,7 +836,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .link-existing-work-item-dialog {
-  @apply w-[50vw] max-w-[50vw] portrait:w-[80vw] portrait:max-w-[80vw];
+  @apply w-[40vw] max-w-[40vw] portrait:w-[60vw] portrait:max-w-[60vw];
 }
 
 #feedback-board-summary-table-header {

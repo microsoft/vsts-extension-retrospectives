@@ -15,9 +15,9 @@ class AzureDevOpsCoreService {
   }
 
   /**
-   * Gets the teams for the current project id.
-   * @param projectId The project id.
-   * @param teamId The team id.
+   * Gets the teams for the current project ID.
+   * @param projectId The project ID.
+   * @param teamId The team ID.
    */
   public async getTeam(projectId: string, teamId: string): Promise<WebApiTeam> {
     try {
@@ -28,9 +28,9 @@ class AzureDevOpsCoreService {
   }
 
   /**
-   * Gets the members of teams for the current project id.
-   * @param projectId The project id.
-   * @param teamId The team id.
+   * Gets the members of teams for the current project ID.
+   * @param projectId The project ID.
+   * @param teamId The team ID.
    */
   public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
     try {
@@ -41,8 +41,8 @@ class AzureDevOpsCoreService {
   }
 
   /**
-   * Gets all the teams for the current project id.
-   * @param projectId The project id.
+   * Gets all the teams for the current project ID.
+   * @param projectId The project ID.
    * @param forCurrentUserOnly If true, return teams the requesting user is a member of. If false, return teams the user can see in this project.
    */
   public async getAllTeams(projectId: string, forCurrentUserOnly: boolean): Promise<WebApiTeam[]> {

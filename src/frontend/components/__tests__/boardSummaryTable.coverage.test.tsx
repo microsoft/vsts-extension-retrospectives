@@ -135,7 +135,7 @@ describe("BoardSummaryTable targeted coverage", () => {
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
   });
 
-  it("executes boardRowSummary null return branch for unknown board id", async () => {
+  it("executes boardRowSummary null return branch for unknown board ID", async () => {
     render(<BoardSummaryTable {...props} />);
 
     await waitFor(() => {

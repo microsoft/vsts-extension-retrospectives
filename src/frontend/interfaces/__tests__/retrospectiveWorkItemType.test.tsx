@@ -24,7 +24,7 @@ describe("retrospectiveWorkItemType", () => {
       expect(feedbackType.type).toBe(1);
     });
 
-    it("should have null id", () => {
+    it("should have null ID", () => {
       expect(feedbackType.id).toBeNull();
     });
 
@@ -50,7 +50,7 @@ describe("retrospectiveWorkItemType", () => {
       expect(upvotes.type).toBe(2); // FieldType.Integer
     });
 
-    it("should have null id", () => {
+    it("should have null ID", () => {
       expect(upvotes.id).toBeNull();
     });
 
@@ -96,7 +96,7 @@ describe("retrospectiveWorkItemType", () => {
       expect(retrospectiveWorkItemTypeModel.isDisabled).toBe(false);
     });
 
-    it("should have null id", () => {
+    it("should have null ID", () => {
       expect(retrospectiveWorkItemTypeModel.id).toBeNull();
     });
 
@@ -126,7 +126,7 @@ describe("retrospectiveWorkItemType", () => {
       expect(feedbackPickList.isSuggested).toBe(false);
     });
 
-    it("should have null id", () => {
+    it("should have null ID", () => {
       expect(feedbackPickList.id).toBeNull();
     });
 

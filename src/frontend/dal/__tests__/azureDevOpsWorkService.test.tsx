@@ -290,7 +290,7 @@ describe("WorkService", () => {
       expect(result.values).toHaveLength(0);
     });
 
-    it("should track exceptions with correct team id", async () => {
+    it("should track exceptions with correct team ID", async () => {
       const error = new Error("Permission denied");
       mockGetTeamFieldValues.mockRejectedValue(error);
 

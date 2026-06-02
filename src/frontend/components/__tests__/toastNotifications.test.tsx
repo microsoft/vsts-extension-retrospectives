@@ -305,7 +305,7 @@ describe("toastNotifications", () => {
   });
 
   describe("dismiss functionality", () => {
-    it("dismisses a specific toast by id", () => {
+    it("dismisses a specific toast by ID", () => {
       const { container } = render(<ToastContainer />);
 
       let firstId = "";
@@ -326,7 +326,7 @@ describe("toastNotifications", () => {
       expect(container.textContent).not.toContain("First");
     });
 
-    it("does nothing when dismissing a non-existent toast id", () => {
+    it("does nothing when dismissing a non-existent toast ID", () => {
       const { container } = render(<ToastContainer />);
 
       act(() => {

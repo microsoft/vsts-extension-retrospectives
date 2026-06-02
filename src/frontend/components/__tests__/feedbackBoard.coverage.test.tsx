@@ -433,7 +433,7 @@ describe("FeedbackBoard targeted coverage", () => {
     );
   });
 
-  it("covers keyboard optional chaining branches with missing imperative methods and unknown column id", async () => {
+  it("covers keyboard optional chaining branches with missing imperative methods and unknown column ID", async () => {
     omitImperativeMethods = true;
     const { container } = renderBoard({ workflowPhase: WorkflowPhase.Vote });
 

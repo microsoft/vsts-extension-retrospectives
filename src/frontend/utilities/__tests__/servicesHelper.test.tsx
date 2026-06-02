@@ -22,7 +22,7 @@ describe("servicesHelper", () => {
   });
 
   describe("getProjectId", () => {
-    it("should return the project id", async () => {
+    it("should return the project ID", async () => {
       const mockProject = { id: "project-123", name: "Test Project" };
       const mockProjectPageService = {
         getProject: jest.fn().mockResolvedValue(mockProject),
