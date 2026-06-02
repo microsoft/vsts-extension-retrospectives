@@ -264,6 +264,24 @@ describe("Action Item Display component", () => {
     expect(menu.classList.contains("popout-container-below")).toBe(false);
   });
 
+  it("renders link existing work item at bottom in focus mode menu", async () => {
+    const propsWithMultipleTypes = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      shouldShowAddWorkItemMenuBelow: false,
+      nonHiddenWorkItemTypes: [
+        { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any,
+        { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any,
+      ],
+    };
+
+    const { container } = render(<ActionItemDisplay {...propsWithMultipleTypes} />);
+    const menu = await openAddWorkItemMenu(container);
+    const buttons = within(menu).getAllByRole("button");
+
+    expect(buttons.map(button => button.textContent?.trim())).toEqual(["Bug", "Task", "Link existing work item"]);
+  });
+
   it("handles empty nonHiddenWorkItemTypes", () => {
     const propsEmpty = {
       ...defaultTestProps,
@@ -278,6 +296,22 @@ describe("Action Item Display component", () => {
     const propsEmpty = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [] as any[],
+    };
+
+    const { container } = render(<ActionItemDisplay {...propsEmpty} />);
+    const menu = await openAddWorkItemMenu(container);
+    const buttons = within(menu).getAllByRole("button");
+
+    expect(buttons.map(button => button.textContent?.trim())).toEqual(["Link existing work item"]);
+    expect(container.querySelector(".separator")).toBeNull();
+  });
+
+  it("shows only link existing work item in focus mode when no available types", async () => {
+    const propsEmpty = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      shouldShowAddWorkItemMenuBelow: false,
       nonHiddenWorkItemTypes: [] as any[],
     };
 

@@ -352,7 +352,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     try {
-      await setSupportedWorkItemTypesForProject();
+      await setSupportedWorkItemTypesForProject(initialCurrentTeam?.id);
     } catch (error) {
       appInsights.trackException(error, {
         action: "setSupportedWorkItemTypesForProject",
@@ -432,6 +432,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     if (prevCurrentTeam !== undefined && prevCurrentTeam !== state.currentTeam && state.currentTeam) {
       reflectBackendService.switchToTeam(state.currentTeam.id);
       appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: state.currentTeam.id } });
+      void setSupportedWorkItemTypesForProject(state.currentTeam.id);
     }
 
     if (prevCurrentBoard !== undefined && prevCurrentBoard !== state.currentBoard) {
@@ -724,15 +725,14 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       });
     }, []);
 
-  const setSupportedWorkItemTypesForProject = React.useCallback(async (): Promise<void> => {
-    const currentTeamId = state.currentTeam?.id;
+  const setSupportedWorkItemTypesForProject = React.useCallback(async (teamId?: string): Promise<void> => {
     const allWorkItemTypes: WorkItemType[] = await workItemService.getWorkItemTypesForCurrentProject();
     const hiddenWorkItemTypes: WorkItemTypeReference[] = await workItemService.getHiddenWorkItemTypes();
 
     const hiddenWorkItemTypeNames = hiddenWorkItemTypes.map(workItemType => workItemType.name);
 
     const nonHiddenWorkItemTypes = allWorkItemTypes.filter(workItemType => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1);
-    const requirementWorkItemTypeNames = currentTeamId ? await workService.getRequirementBacklogWorkItemTypeNames(currentTeamId) : [];
+    const requirementWorkItemTypeNames = teamId ? await workService.getRequirementBacklogWorkItemTypeNames(teamId) : [];
     const focusModeNonHiddenWorkItemTypes = requirementWorkItemTypeNames.length
       ? nonHiddenWorkItemTypes.filter(workItemType => requirementWorkItemTypeNames.includes(workItemType.name))
       : nonHiddenWorkItemTypes;
@@ -743,7 +743,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       focusModeNonHiddenWorkItemTypes,
       allWorkItemTypes: allWorkItemTypes,
     }));
-  }, [state.currentTeam?.id]);
+  }, []);
 
   const replaceBoard = React.useCallback(
     (updatedBoard: IFeedbackBoardDocument) => {

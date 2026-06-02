@@ -213,8 +213,8 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
           </button>
           {isWorkItemTypeListCalloutVisible && (
             <div ref={addWorkItemMenuRef} className={`popout-container ${shouldShowAddWorkItemMenuBelow ? "popout-container-below" : ""}`.trim()} role="menu" aria-label={t("common_add_work_item_menu")}>
-              {renderLinkExistingWorkItemButton()}
-              {visibleWorkItemTypes.length > 0 && <div role="separator" className="separator" />}
+              {shouldShowAddWorkItemMenuBelow && renderLinkExistingWorkItemButton()}
+              {shouldShowAddWorkItemMenuBelow && visibleWorkItemTypes.length > 0 && <div role="separator" className="separator" />}
               {visibleWorkItemTypes.map(item => {
                 return (
                   <button key={item.referenceName} className="list-item" onClick={e => handleClickWorkItemType(e, item)} aria-label={`Add work item type ${item.name}`}>
@@ -223,6 +223,8 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
                   </button>
                 );
               })}
+              {!shouldShowAddWorkItemMenuBelow && visibleWorkItemTypes.length > 0 && <div role="separator" className="separator" />}
+              {!shouldShowAddWorkItemMenuBelow && renderLinkExistingWorkItemButton()}
             </div>
           )}
         </div>
