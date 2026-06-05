@@ -192,6 +192,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   }, [isNewBoardCreation, isDuplicatingBoard]);
 
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.setCustomValidity("");
     setTitle(event.target.value);
     setError("");
   }, []);
@@ -259,12 +260,9 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     setIsBoardAnonymous(event.target.checked);
   }, []);
 
-  const handleMaxVotePerUserChange = useCallback((event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleMaxVotePerUserChange = useCallback((event: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setMaxVotesPerUser(Number((event.target as HTMLInputElement | HTMLTextAreaElement).value));
   }, []);
-
-  const titleValidationErrors = ["Field 'Retrospective Name' cannot be empty.", "Field 'Retrospective Name' must be unique."];
-  const hasTitleValidationError = titleValidationErrors.includes(error);
 
   const retrospectiveNameInput = React.useMemo(
     () => (
@@ -272,22 +270,36 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         ref={retrospectiveNameInputRef}
         aria-label="Please enter new retrospective title"
         aria-required={true}
-        aria-invalid={hasTitleValidationError}
         placeholder={placeholderText}
         aria-describedby="retrospective-name-label"
-        className={`title-input-container${hasTitleValidationError ? " error-border" : ""}`}
+        className="title-input-container"
         id="retrospective-title-input"
         value={title}
         maxLength={100}
         onChange={handleInputChange}
       />
     ),
-    [handleInputChange, hasTitleValidationError, placeholderText, title],
+    [handleInputChange, placeholderText, title],
   );
 
   const maxVotesPerUserInput = React.useMemo(
     () => <input className="title-input-container" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />,
     [handleMaxVotePerUserChange, maxVotesPerUser],
+  );
+
+  const shouldShowFeedbackAfterCollectInput = React.useMemo(
+    () => <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />,
+    [handleShouldShowFeedbackAfterCollectChange, isNewBoardCreation, shouldShowFeedbackAfterCollect],
+  );
+
+  const isBoardAnonymousInput = React.useMemo(
+    () => <input id="feedback-display-names-checkbox" type="checkbox" aria-label="Make participant feedback anonymous. This selection cannot be modified after board creation." checked={isBoardAnonymous} disabled={!isNewBoardCreation} onChange={handleIsAnonymousCheckboxChange} />,
+    [handleIsAnonymousCheckboxChange, isBoardAnonymous, isNewBoardCreation],
+  );
+
+  const isIncludeTeamEffectivenessMeasurementInput = React.useMemo(
+    () => <input id="include-team-assessment-checkbox" type="checkbox" aria-label="Include Team Assessment. This selection cannot be modified after board creation." checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />,
+    [handleIsIncludeTeamEffectivenessMeasurementCheckboxChange, isIncludeTeamEffectivenessMeasurement, isNewBoardCreation],
   );
 
   const customTeamAssessmentQuestionInputs = React.useMemo(
@@ -379,21 +391,21 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation.</div>
               <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
                 <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
-                  <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />
+                  {shouldShowFeedbackAfterCollectInput}
                   <span>Hide feedback during Collect phase</span>
                 </label>
                 <span className="board-metadata-form-option-helper">Feedback displayed in Group, Vote, and Act phases.</span>
               </div>
               <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
                 <label className="flex items-center gap-2" htmlFor="feedback-display-names-checkbox">
-                  <input id="feedback-display-names-checkbox" type="checkbox" aria-label="Make participant feedback anonymous. This selection cannot be modified after board creation." checked={isBoardAnonymous} disabled={!isNewBoardCreation} onChange={handleIsAnonymousCheckboxChange} />
+                  {isBoardAnonymousInput}
                   <span>Make participant feedback anonymous</span>
                 </label>
                 <span className="board-metadata-form-option-helper">Participant names not tracked on board, nor in summary.</span>
               </div>
               <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
                 <label className="flex items-center gap-2" htmlFor="include-team-assessment-checkbox">
-                  <input id="include-team-assessment-checkbox" type="checkbox" aria-label="Include Team Assessment. This selection cannot be modified after board creation." checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />
+                  {isIncludeTeamEffectivenessMeasurementInput}
                   <span>Include Team Assessment</span>
                 </label>
                 <span className="board-metadata-form-option-helper">Team assessment responses always stored anonymously.</span>
@@ -693,9 +705,14 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         <button
           className="metadata-form-save-button"
           onClick={async event => {
+            const titleInput = retrospectiveNameInputRef.current!;
+            titleInput.setCustomValidity("");
+
             if (title.trim().length === 0) {
-              setError("Field 'Retrospective Name' cannot be empty.");
-              retrospectiveNameInputRef.current!.focus();
+              const errorMessage = "Field 'Retrospective Name' cannot be empty.";
+              setError(errorMessage);
+              titleInput.setCustomValidity(errorMessage);
+              titleInput.focus();
               return;
             }
             const activeColumnCards = columnCards.filter(columnCard => !columnCard.markedForDeletion);
@@ -710,8 +727,10 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             const isDuplicateBoardName = await BoardDataService.checkIfBoardNameIsTaken(teamId, title.trim());
             const isExistingBoardNameUnchanged = !isNewBoardCreation && title.trim() === initialTitle.trim();
             if (isDuplicateBoardName && !isExistingBoardNameUnchanged) {
-              setError("Field 'Retrospective Name' must be unique.");
-              retrospectiveNameInputRef.current!.focus();
+              const errorMessage = "Field 'Retrospective Name' must be unique.";
+              setError(errorMessage);
+              titleInput.setCustomValidity(errorMessage);
+              titleInput.focus();
               return;
             }
             setError("");

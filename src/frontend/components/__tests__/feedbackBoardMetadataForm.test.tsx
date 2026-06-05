@@ -461,6 +461,7 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
     expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
+    expect(titleInput).toBeInvalid();
     expect(titleInput).toHaveFocus();
   });
 
@@ -917,6 +918,7 @@ describe("FeedbackBoardMetadataForm - Form Submission Extended", () => {
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
     expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/please enter new retrospective title/i)).toBeInvalid();
   });
 
   it("should show an error when no active columns exist", async () => {
@@ -1547,6 +1549,7 @@ describe("FeedbackBoardMetadataForm - Form Submission Advanced", () => {
     });
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(titleInput).toBeInvalid();
   });
 
   it("should allow submission when board name matches initial title", async () => {
@@ -1853,6 +1856,8 @@ describe("FeedbackBoardMetadataForm - Input Change Handler", () => {
     await waitFor(() => {
       expect(screen.queryByText(/field 'retrospective name' must be unique\./i)).not.toBeInTheDocument();
     });
+
+    expect(titleInput).toBeValid();
   });
 });
 

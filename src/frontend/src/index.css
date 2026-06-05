@@ -1444,10 +1444,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .board-metadata-form-section-subheader {
     @apply font-semibold w-full grid grid-cols-[1fr_1fr] items-center my-1 text-(--text-primary-color);
 
-    & > label:only-child {
-      grid-column: 1 / -1;
-    }
-
     & label {
       @apply flex-1 text-start;
     }
@@ -1455,18 +1451,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .board-metadata-form-option-helper {
     @apply italic text-sm font-thin text-(--text-secondary-color);
-  }
-
-  & .board-metadata-form-option-row {
-    @apply grid-cols-[1fr_1fr] items-start;
-
-    & > label {
-      @apply self-start;
-    }
-
-    & > .board-metadata-form-option-helper {
-      @apply text-left self-start;
-    }
   }
 
   & .board-metadata-board-settings-section {
@@ -1480,10 +1464,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @media (max-width: 768px) {
     & .board-metadata-form-option-row {
       @apply grid-cols-1;
-
-      & > .board-metadata-form-option-helper {
-        @apply pl-7;
-      }
     }
   }
 
@@ -1554,53 +1534,25 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply pt-0 w-auto;
     }
 
-    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button) {
+    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button, .feedback-column-card-undelete-button) {
       @apply bg-(--background-color) border-none my-0 mx-1;
-    }
 
-    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button):hover {
-      @apply bg-gray-light;
-    }
+      &:hover {
+        @apply bg-gray-light;
+      }
 
-    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled {
-      @apply bg-(--text-disabled-color);
-    }
+      &.is-disabled {
+        @apply bg-(--text-disabled-color);
+      }
 
-    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled i {
-      @apply text-(--text-disabled-color);
+      &.is-disabled i {
+        @apply text-(--text-disabled-color);
+      }
     }
   }
 
   & .feedback-column-card.marked-for-deletion {
-    @apply bg-(--text-disabled-color) ml-0.5;
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-icon {
-    @apply text-black/30;
-  }
-
-  & .feedback-column-card.marked-for-deletion .editable-text {
-    @apply text-black/30;
-  }
-
-  & .feedback-column-card.marked-for-deletion i.ms-Button-icon {
-    @apply text-black/30;
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button {
-    @apply bg-white border-none;
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button:hover {
-    @apply bg-gray-light text-(--status-info-foreground);
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button.is-disabled i.ms-Button-icon {
-    @apply text-black/25;
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button i.ms-Button-icon {
-    @apply text-black;
+    @apply bg-(--text-disabled-color);
   }
 
   & .create-feedback-column-card-button {
@@ -1618,16 +1570,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .input-validation-message {
     @apply text-sm text-error;
   }
+
   & .title-input-container {
     @apply text-base font-semibold flex flex-col items-center p-1 flex-1 border border-(--text-primary-color) text-left placeholder:text-left;
 
-    &.error-border {
+    &:invalid {
       @apply border-error;
 
-      &:focus,
-      &:focus-visible {
-        border-color: var(--color-error);
-        outline: 2px solid var(--color-error);
+      &:focus, &:focus-visible {
+        @apply border-error outline-2 outline-error;
       }
     }
   }
@@ -1674,7 +1625,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.retrospectives-choose-column-accent-color-dialog .choose-feedback-column-accent-color-button {
+.choose-feedback-column-accent-color-button {
   @apply text-3xl h-12 m-1;
 }
 
