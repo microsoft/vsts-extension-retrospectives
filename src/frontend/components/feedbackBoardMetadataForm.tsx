@@ -709,7 +709,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             titleInput.setCustomValidity("");
 
             if (title.trim().length === 0) {
-              const errorMessage = "⛔ Field 'Retrospective Name' cannot be empty.";
+              const errorMessage = "Field 'Retrospective Name' cannot be empty.";
               setError(errorMessage);
               titleInput.setCustomValidity(errorMessage);
               titleInput.focus();
@@ -727,7 +727,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             const isDuplicateBoardName = await BoardDataService.checkIfBoardNameIsTaken(teamId, title.trim());
             const isExistingBoardNameUnchanged = !isNewBoardCreation && title.trim() === initialTitle.trim();
             if (isDuplicateBoardName && !isExistingBoardNameUnchanged) {
-              const errorMessage = "🚫 Field 'Retrospective Name' must be unique.";
+              const errorMessage = "Field 'Retrospective Name' must be unique.";
               setError(errorMessage);
               titleInput.setCustomValidity(errorMessage);
               titleInput.focus();
