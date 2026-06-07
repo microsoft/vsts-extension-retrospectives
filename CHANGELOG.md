@@ -9,6 +9,7 @@ You can find the changelog of the Retrospective Extension below.
 * Improves Create and Edit Retrospective dialog name-validation feedback, including consistent validation messaging for missing or duplicate board name.
 * Simplifies board-configuration wording in Board Settings, including the required-name indicator, Max Votes label, and hidden feedback option.
 * Reintroduces borders for user input fields for cleaner visuals.
+* Supports small, medium, large and extra large standard dialog widths.
 
 From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospectives/pull/1696)
 
