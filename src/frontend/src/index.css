@@ -808,7 +808,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-carousel-item .popout-container {
-  @apply max-h-[clamp(13.25rem,calc(100dvh-18rem),22.5rem)];
+  max-height: 13.25rem;
+  overflow-y: auto;
 }
 
 .link-existing-work-item-dialog {
