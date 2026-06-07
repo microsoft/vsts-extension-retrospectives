@@ -1601,11 +1601,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     appearance: auto;
   }
 
-  & #max-vote-counter::-webkit-outer-spin-button,
-  & #max-vote-counter::-webkit-inner-spin-button {
-    opacity: 1;
-  }
-
   & .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
     @apply w-full;
   }
