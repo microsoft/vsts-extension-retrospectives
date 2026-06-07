@@ -808,7 +808,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-carousel-item .popout-container {
-  max-height: 13.25rem;
+  max-height: 15.625rem;
   overflow-y: auto;
 }
 
