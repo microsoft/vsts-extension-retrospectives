@@ -363,7 +363,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .preview-email-dialog,
 .carousel-dialog,
 .sprint-retrospective-dialog {
-  @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) shadow-2xl drop-shadow-2xl;
+  @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
   & table {
     @apply w-full border-collapse text-left;
@@ -406,7 +406,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply block px-5 py-2 text-sm text-(--text-primary-color);
 
     &.li {
-      @apply list-item list-inside list-disc ml-4;
+      @apply list-item list-inside list-disc ml-4 py-0;
     }
 
     & .form-group {
@@ -456,10 +456,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .whats-new-dialog {
-  & .subText.li {
-    @apply py-0;
-  }
-
   & .subText.li + .subText.li {
     margin-top: 0.3rem;
   }
