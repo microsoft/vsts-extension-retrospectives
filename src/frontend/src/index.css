@@ -344,7 +344,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .move-feedback-item-dialog,
 .remove-feedback-item-from-group-dialog,
 .board-metadata-dialog,
-.delete-feedback-item-dialog,
 .team-effectiveness-dialog,
 .choose-column-accent-color-dialog,
 .retro-summary-dialog,
@@ -467,12 +466,26 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
+.team-assessment-history-dialog {
+  @apply w-[75vw] max-w-[75vw] portrait:w-[80vw] portrait:max-w-[80vw];
+}
+
 .prime-directive-dialog,
 .whats-new-dialog,
 .keyboard-shortcuts-dialog,
 .user-guide-dialog,
-.volunteer-dialog {
-  @apply w-[50vw] max-w-[50vw] portrait:w-[80vw] portrait:max-w-[80vw];
+.volunteer-dialog,
+.edit-column-notes-dialog {
+  @apply w-[45vw] max-w-[45vw] portrait:w-[80vw] portrait:max-w-[80vw];
+}
+
+.delete-feedback-item-dialog,
+.remove-feedback-item-from-group-dialog,
+.confirm-changes-dialog,.archive-board-dialog,
+.delete-board-dialog,
+.link-existing-work-item-dialog,
+.unlink-work-item-confirmation-dialog {
+  @apply w-[30vw] max-w-[30vw] portrait:w-[80vw] portrait:max-w-[80vw];
 }
 
 .preview-email-content {
