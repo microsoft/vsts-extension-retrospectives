@@ -16,12 +16,13 @@ export interface IGroupedFeedbackListProps {
 
 const GroupedFeedbackList: React.FC<IGroupedFeedbackListProps> = ({ childrenIds, columnItems, columns, currentColumnId, workflowPhase, hideFeedbackItems, isFocusModalHidden }) => {
   const currentUserId = getUserIdentity().id;
+  const columnItemsById = new Map(columnItems?.map(columnItem => [columnItem.feedbackItem.id, columnItem]) ?? []);
   const sortedChildrenIds = [...childrenIds];
 
   if (workflowPhase === WorkflowPhase.Act) {
     sortedChildrenIds.sort((leftId, rightId) => {
-      const left = columnItems?.find(c => c.feedbackItem.id === leftId)?.feedbackItem;
-      const right = columnItems?.find(c => c.feedbackItem.id === rightId)?.feedbackItem;
+      const left = columnItemsById.get(leftId)?.feedbackItem;
+      const right = columnItemsById.get(rightId)?.feedbackItem;
 
       if (!left && !right) {
         return 0;
@@ -46,7 +47,7 @@ const GroupedFeedbackList: React.FC<IGroupedFeedbackListProps> = ({ childrenIds,
       <div className="grouped-feedback-header">{getIconElement("forum")} Grouped Feedback</div>
       <ul aria-label="List of Grouped Feedback" role="list">
         {sortedChildrenIds.map((id: string) => {
-          const childCard: IColumnItem | undefined = columnItems?.find(c => c.feedbackItem.id === id);
+          const childCard: IColumnItem | undefined = columnItemsById.get(id);
           const originalColumn = childCard ? columns[childCard.feedbackItem.originalColumnId] : null;
           const childItemHidden = !!childCard && hideFeedbackItems && childCard.feedbackItem.userIdRef !== currentUserId;
           const childDisplayTitle = childItemHidden ? "[Hidden Feedback]" : childCard?.feedbackItem.title;

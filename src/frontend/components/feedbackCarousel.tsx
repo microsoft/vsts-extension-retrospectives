@@ -89,19 +89,20 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
 
   const renderFeedbackCarouselItems = useCallback(
     (column: FocusModeColumn) => {
-      const sortedItems = column.columnItems
-        .sort((a, b) => {
-          const groupedItemsA = column.columnItems.filter(item => a.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
-          const groupedItemsB = column.columnItems.filter(item => b.feedbackItem.childFeedbackItemIds?.includes(item.feedbackItem.id));
+      const itemsById = new Map(column.columnItems.map(columnItem => [columnItem.feedbackItem.id, columnItem.feedbackItem]));
+      const groupedVoteTotalsByItemId = new Map(
+        column.columnItems.map(columnItem => {
+          const groupedItems = columnItem.feedbackItem.childFeedbackItemIds?.map(childItemId => itemsById.get(childItemId)).filter((item): item is IFeedbackItemDocument => !!item) ?? [];
 
-          const totalVotesA = itemDataService.getVotesForGroupedItems(
-            a.feedbackItem,
-            groupedItemsA.map(item => item.feedbackItem),
-          );
-          const totalVotesB = itemDataService.getVotesForGroupedItems(
-            b.feedbackItem,
-            groupedItemsB.map(item => item.feedbackItem),
-          );
+          return [columnItem.feedbackItem.id, itemDataService.getVotesForGroupedItems(columnItem.feedbackItem, groupedItems)];
+        }),
+      );
+
+      const sortedItems = column.columnItems
+        .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId)
+        .sort((a, b) => {
+          const totalVotesA = groupedVoteTotalsByItemId.get(a.feedbackItem.id) ?? 0;
+          const totalVotesB = groupedVoteTotalsByItemId.get(b.feedbackItem.id) ?? 0;
 
           if (totalVotesB !== totalVotesA) {
             return totalVotesB - totalVotesA;
@@ -110,8 +111,7 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
           const dateA = new Date(a.feedbackItem.createdDate).getTime();
           const dateB = new Date(b.feedbackItem.createdDate).getTime();
           return dateB - dateA;
-        })
-        .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId);
+        });
 
       return sortedItems.map(columnItem => {
         const itemAccentColor = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.accentColor ?? column.accentColor;
