@@ -120,7 +120,7 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
           {getIconElement("link-off")}
         </button>
       )}
-      <dialog className="unlink-work-item-confirmation-dialog" aria-label="Remove Work Item Link" ref={unlinkWorkItemDialogRef} onClose={() => unlinkWorkItemDialogRef.current!.close()}>
+      <dialog className="unlink-work-item-confirmation-dialog dialog-width-sm" aria-label="Remove Work Item Link" ref={unlinkWorkItemDialogRef} onClose={() => unlinkWorkItemDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">Remove Work Item Link</h2>
           <button onClick={() => unlinkWorkItemDialogRef.current!.close()} aria-label="Close">

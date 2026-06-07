@@ -586,7 +586,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             {currentBoard && !isDeleteColumnConfirmationDialogHidden && (
               <dialog
                 ref={deleteColumnConfirmDialogRef}
-                className="confirm-changes-dialog"
+                className="confirm-changes-dialog dialog-width-sm"
                 aria-label="Confirm Changes"
                 onClose={() => setIsDeleteColumnConfirmationDialogHidden(true)}
               >
@@ -606,7 +606,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               </dialog>
             )}
             {columnCardBeingEdited && isChooseColumnIconDialogOpen && (
-              <dialog className="choose-column-icon-dialog" aria-label="Choose column icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
+              <dialog className="choose-column-icon-dialog dialog-width-md" aria-label="Choose column icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
                 <div className="header">
                   <h2 className="title">Choose column icon</h2>
                   <button type="button" onClick={() => chooseColumnIconDialogRef.current!.close()} aria-label="Close">
@@ -646,7 +646,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             {columnCardBeingEdited && !isChooseColumnAccentColorDialogHidden && (
               <dialog
                 ref={chooseColumnAccentColorDialogRef}
-                className="choose-column-accent-color-dialog"
+                className="choose-column-accent-color-dialog dialog-width-md"
                 aria-label="Choose Column Color"
                 onClose={event => {
                   event.stopPropagation();

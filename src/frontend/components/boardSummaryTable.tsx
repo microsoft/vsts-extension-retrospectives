@@ -517,7 +517,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         <BoardSummaryTableBody columns={columnList} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
       </table>
       <dialog
-        className="delete-board-dialog"
+        className="delete-board-dialog dialog-width-sm"
         aria-label={t("delete_retrospective_board")}
         ref={deleteBoardDialogRef}
         onClose={() => {

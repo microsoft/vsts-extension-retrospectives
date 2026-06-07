@@ -1576,7 +1576,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     return (
-      <dialog className="board-metadata-dialog" ref={dialogRef} role="dialog" aria-label={dialogTitle} onClose={onDialogClose}>
+      <dialog className="board-metadata-dialog dialog-width-lg" ref={dialogRef} role="dialog" aria-label={dialogTitle} onClose={onDialogClose}>
         <div className="header">
           <h2 className="title">{dialogTitle}</h2>
           <button type="button" onClick={onDismiss} aria-label="Close">
@@ -1808,7 +1808,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     <div className="flex flex-col h-screen" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <div className="flex items-center shrink-0 mt-2 ml-4">
         {visibleDialogs.isDiscussAndActDialogVisible && (
-          <dialog ref={discussAndActDialogRef} className="delete-feedback-item-dialog" role="dialog" aria-label="Discuss and Act" onClose={() => setDialogVisible("isDiscussAndActDialogVisible", false)}>
+          <dialog ref={discussAndActDialogRef} className="delete-feedback-item-dialog dialog-width-sm" role="dialog" aria-label="Discuss and Act" onClose={() => setDialogVisible("isDiscussAndActDialogVisible", false)}>
             <div className="header">
               <h2 className="title">Discuss and Act</h2>
               <button type="button" onClick={hideDiscussAndActDialog} aria-label="Close">
@@ -1950,7 +1950,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                         <>
                           {visibleDialogs.isTeamEffectivenessDialogVisible && (
-                            <dialog ref={teamEffectivenessDialogRef} className="team-effectiveness-dialog" role="dialog" aria-label="Team Assessment" onClose={() => setDialogVisible("isTeamEffectivenessDialogVisible", false)}>
+                            <dialog ref={teamEffectivenessDialogRef} className="team-effectiveness-dialog dialog-width-lg" role="dialog" aria-label="Team Assessment" onClose={() => setDialogVisible("isTeamEffectivenessDialogVisible", false)}>
                               <div className="header">
                                 <h2 className="title">Team Assessment</h2>
                                 <button type="button" onClick={hideTeamEffectivenessDialog} aria-label="Close">
@@ -2073,7 +2073,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                             <span>Focus Mode</span>
                           </button>
                           {visibleDialogs.isCarouselDialogVisible && (
-                            <dialog ref={carouselDialogRef} className="carousel-dialog" role="dialog" aria-label="Focus Mode" onClose={() => setDialogVisible("isCarouselDialogVisible", false)}>
+                            <dialog ref={carouselDialogRef} className="carousel-dialog dialog-width-lg" role="dialog" aria-label="Focus Mode" onClose={() => setDialogVisible("isCarouselDialogVisible", false)}>
                               <div className="header">
                                 <h2 className="title">Focus Mode</h2>
                                 <button onClick={hideCarouselDialog} aria-label="Close">
@@ -2193,7 +2193,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         </div>
       </div>
       {state.currentBoard && visibleDialogs.isArchiveBoardDialogVisible && (
-        <dialog className="archive-board-dialog" aria-label={t("feedback_board_archive_title")} role="dialog" ref={archiveBoardDialogRef} onClose={() => setDialogVisible("isArchiveBoardDialogVisible", false)}>
+        <dialog className="archive-board-dialog dialog-width-sm" aria-label={t("feedback_board_archive_title")} role="dialog" ref={archiveBoardDialogRef} onClose={() => setDialogVisible("isArchiveBoardDialogVisible", false)}>
           <div className="header">
             <h2 className="title">{t("feedback_board_archive_title")}</h2>
             <button onClick={() => hideDialog("isArchiveBoardDialogVisible", archiveBoardDialogRef)} aria-label={t("common_close")}>
@@ -2230,7 +2230,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       {state.currentBoard && visibleDialogs.isBoardDuplicateDialogVisible && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog, undefined, () => setDialogVisible("isBoardDuplicateDialogVisible", false))}
       {state.currentBoard && visibleDialogs.isBoardUpdateDialogVisible && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, t("feedback_board_edit"), "", updateBoardMetadata, hideBoardUpdateDialog, undefined, () => setDialogVisible("isBoardUpdateDialogVisible", false))}
       {state.currentBoard && visibleDialogs.isPreviewEmailDialogVisible && (
-        <dialog ref={previewEmailDialogRef} className="preview-email-dialog" aria-label={t("feedback_board_email_summary")} role="dialog" onClose={() => setDialogVisible("isPreviewEmailDialogVisible", false)}>
+        <dialog ref={previewEmailDialogRef} className="preview-email-dialog dialog-width-md" aria-label={t("feedback_board_email_summary")} role="dialog" onClose={() => setDialogVisible("isPreviewEmailDialogVisible", false)}>
           <div className="header">
             <h2 className="title">{t("feedback_board_email_summary")}</h2>
             <button onClick={() => hideDialog("isPreviewEmailDialogVisible", previewEmailDialogRef)} aria-label={t("common_close")}>
@@ -2253,7 +2253,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         </dialog>
       )}
       {state.currentBoard && visibleDialogs.isRetroSummaryDialogVisible && (
-        <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog" aria-label={t("feedback_board_retro_summary")} role="dialog" onClose={() => setDialogVisible("isRetroSummaryDialogVisible", false)}>
+        <dialog ref={retroSummaryDialogRef} className="retro-summary-dialog dialog-width-lg" aria-label={t("feedback_board_retro_summary")} role="dialog" onClose={() => setDialogVisible("isRetroSummaryDialogVisible", false)}>
           <div className="header">
             <h2 className="title">{t("feedback_board_retro_summary")}</h2>
             <button type="button" onClick={hideRetroSummaryDialog} aria-label={t("common_close")}>
@@ -2366,7 +2366,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           </div>
         </dialog>
       )}
-      {visibleDialogs.isTeamAssessmentHistoryDialogVisible && <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog" aria-label={t("feedback_board_team_assessment_history")} role="dialog" onClose={() => setDialogVisible("isTeamAssessmentHistoryDialogVisible", false)}>
+      {visibleDialogs.isTeamAssessmentHistoryDialogVisible && <dialog ref={teamAssessmentHistoryDialogRef} className="team-assessment-history-dialog dialog-width-xl" aria-label={t("feedback_board_team_assessment_history")} role="dialog" onClose={() => setDialogVisible("isTeamAssessmentHistoryDialogVisible", false)}>
         <div className="header">
           <h2>{t("feedback_board_team_assessment_history")}</h2>
           <button type="button" onClick={hideTeamAssessmentHistoryDialog} aria-label={t("common_close")}>

@@ -342,6 +342,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .confirm-changes-dialog,
 .delete-feedback-item-dialog,
 .move-feedback-item-dialog,
+.retrospectives-group-feedback-item-dialog,
 .remove-feedback-item-from-group-dialog,
 .board-metadata-dialog,
 .team-effectiveness-dialog,
@@ -466,24 +467,20 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.team-assessment-history-dialog {
-  @apply w-[75vw] max-w-[75vw] portrait:w-[80vw] portrait:max-w-[80vw];
+.dialog-width-sm {
+  @apply w-[30vw] max-w-[30vw] portrait:w-[80vw] portrait:max-w-[80vw];
 }
 
-.board-metadata-dialog,
-.team-effectiveness-dialog,
-.retro-summary-dialog,
-.carousel-dialog {
+.dialog-width-md {
+  @apply w-[45vw] max-w-[45vw] portrait:w-[80vw] portrait:max-w-[80vw];
+}
+
+.dialog-width-lg {
   @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw];
 }
 
-.delete-feedback-item-dialog,
-.remove-feedback-item-from-group-dialog,
-.confirm-changes-dialog,.archive-board-dialog,
-.delete-board-dialog,
-.link-existing-work-item-dialog,
-.unlink-work-item-confirmation-dialog {
-  @apply w-[30vw] max-w-[30vw] portrait:w-[80vw] portrait:max-w-[80vw];
+.dialog-width-xl {
+  @apply w-[75vw] max-w-[75vw] portrait:w-[80vw] portrait:max-w-[80vw];
 }
 
 .preview-email-content {
@@ -1599,6 +1596,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & #max-vote-counter {
     appearance: auto;
+  }
+
+  & #max-vote-counter::-webkit-outer-spin-button,
+  & #max-vote-counter::-webkit-inner-spin-button {
+    opacity: 1;
   }
 
   & .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
