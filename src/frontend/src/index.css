@@ -409,6 +409,18 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply list-item list-inside list-disc ml-4 py-0;
     }
 
+    &.li + .subText.li {
+      @apply mt-1;
+    }
+
+    &:not(.li) + .subText.li {
+      @apply mt-2;
+    }
+
+    &.li + .subText:not(.li) {
+      @apply mt-2;
+    }
+
     & .form-group {
       @apply flex flex-col gap-2;
 
@@ -455,20 +467,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.whats-new-dialog {
-  & .subText.li + .subText.li {
-    margin-top: 0.3rem;
-  }
-
-  & .subText:not(.li) + .subText.li {
-    @apply mt-2;
-  }
-
-  & .subText.li + .subText:not(.li) {
-    @apply mt-2;
-  }
-}
-
+.prime-directive-dialog,
 .whats-new-dialog,
 .keyboard-shortcuts-dialog,
 .user-guide-dialog,
@@ -1446,7 +1445,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-option-helper {
-    @apply italic text-sm font-thin text-(--text-secondary-color);
+    @apply italic text-sm font text-(--text-secondary-color);
   }
 
   & .board-metadata-board-settings-section {
