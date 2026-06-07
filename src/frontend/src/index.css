@@ -1445,7 +1445,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-option-helper {
-    @apply italic text-sm font text-(--text-secondary-color);
+    @apply italic text-sm text-(--text-secondary-color);
   }
 
   & .board-metadata-board-settings-section {
