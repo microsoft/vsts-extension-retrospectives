@@ -362,7 +362,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .preview-email-dialog,
 .carousel-dialog,
 .sprint-retrospective-dialog {
-  @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
+  @apply w-[45vw] max-w-[45vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
   & table {
     @apply w-full border-collapse text-left;
@@ -470,13 +470,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-[75vw] max-w-[75vw] portrait:w-[80vw] portrait:max-w-[80vw];
 }
 
-.prime-directive-dialog,
-.whats-new-dialog,
-.keyboard-shortcuts-dialog,
-.user-guide-dialog,
-.volunteer-dialog,
-.edit-column-notes-dialog {
-  @apply w-[45vw] max-w-[45vw] portrait:w-[80vw] portrait:max-w-[80vw];
+.board-metadata-dialog,
+.team-effectiveness-dialog,
+.retro-summary-dialog,
+.carousel-dialog {
+  @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw];
 }
 
 .delete-feedback-item-dialog,
