@@ -807,9 +807,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply top-full bottom-auto;
 }
 
-.retrospectives-link-existing-work-item-dialog {
-  @apply w-125 h-62 max-w-md;
-
+.link-existing-work-item-dialog {
   & .error-container {
     @apply h-5;
   }
@@ -833,10 +831,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .work-item-id-input {
     @apply w-full;
   }
-}
-
-.link-existing-work-item-dialog {
-  @apply w-[40vw] max-w-[40vw] portrait:w-[60vw] portrait:max-w-[60vw];
 }
 
 #feedback-board-summary-table-header {
