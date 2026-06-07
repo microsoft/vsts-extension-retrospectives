@@ -807,11 +807,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply top-full bottom-auto;
 }
 
-.link-existing-work-item-dialog {
-  & .error-container {
-    @apply h-5;
-  }
+.feedback-carousel-item .popout-container {
+  @apply max-h-[clamp(22.5rem,calc(100dvh-18rem),60vh)];
+}
 
+.link-existing-work-item-dialog {
   & .output-container {
     @apply h-10;
   }
@@ -821,15 +821,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .work-item-not-found {
-    @apply w-full;
-  }
-
-  & .input-validation-message {
     @apply text-error;
-  }
-
-  & .work-item-id-input {
-    @apply w-full;
   }
 }
 
