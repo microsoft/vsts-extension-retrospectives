@@ -808,7 +808,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-carousel-item .popout-container {
-  @apply max-h-[clamp(22.5rem,calc(100dvh-18rem),60vh)];
+  @apply max-h-[clamp(12rem,calc(100dvh-18rem),22.5rem)];
 }
 
 .link-existing-work-item-dialog {
