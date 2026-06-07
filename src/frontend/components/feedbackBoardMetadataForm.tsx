@@ -408,7 +408,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   {isIncludeTeamEffectivenessMeasurementInput}
                   <span>Include Team Assessment</span>
                 </label>
-                <span className="board-metadata-form-option-helper">Team assessment responses always stored anonymously.</span>
+                <span className="board-metadata-form-option-helper">Team Assessment responses always stored anonymously.</span>
               </div>
             </section>
             {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
