@@ -149,9 +149,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
   const closeLinkExistingWorkItemDialog = useCallback((event?: React.SyntheticEvent) => {
     event?.stopPropagation();
 
-    if (linkExistingWorkItemDialogRef.current?.open) {
-      linkExistingWorkItemDialogRef.current.close();
-    }
+    linkExistingWorkItemDialogRef.current!.close();
   }, []);
 
   const handleLinkExistingWorkItemDialogClose = useCallback((event: React.SyntheticEvent<HTMLDialogElement>) => {

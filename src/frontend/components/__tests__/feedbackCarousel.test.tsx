@@ -309,6 +309,18 @@ describe("Feedback Carousel ", () => {
       expect(container.textContent).toContain("What Needs Improvement");
       expect(container.textContent).toContain("Action Items");
     });
+
+    it("should select a column when its pivot link is clicked", () => {
+      const column1 = { ...testColumnProps, columnId: "col1", columnName: "Column 1" };
+      const column2 = { ...testColumnProps, columnId: "col2", columnName: "Column 2" };
+
+      const { getByRole } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([column1, column2])} isFocusModalHidden={false} />);
+
+      const column2Tab = getByRole("tab", { name: "Column 2" });
+      fireEvent.click(column2Tab);
+
+      expect(column2Tab.getAttribute("aria-selected")).toBe("true");
+    });
   });
 
   describe("componentDidUpdate", () => {
@@ -371,6 +383,155 @@ describe("Feedback Carousel ", () => {
       await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest", inline: "nearest" }));
 
       requestAnimationFrameSpy.mockRestore();
+    });
+
+    it("should keep the focused carousel card in view after focus mode model refreshes", async () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", title: "First Item", upvotes: 1, createdDate: new Date("2023-01-01") },
+      };
+      const item2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item2", title: "Second Item", upvotes: 2, createdDate: new Date("2023-01-02") },
+      };
+      const scrollIntoView = jest.fn();
+      const requestAnimationFrameSpy = jest.spyOn(window, "requestAnimationFrame").mockImplementation(callback => {
+        callback(0);
+        return 0;
+      });
+
+      Object.defineProperty(window.HTMLElement.prototype, "scrollIntoView", {
+        configurable: true,
+        value: scrollIntoView,
+      });
+
+      const { container, rerender } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [item1, item2] }])} isFocusModalHidden={false} />);
+
+      fireEvent.focus(container.querySelector("#slide-all-columns-1") as HTMLElement);
+
+      rerender(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [item1, { ...item2, showAddedAnimation: true }] }])} isFocusModalHidden={false} />);
+
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest", inline: "nearest" }));
+
+      requestAnimationFrameSpy.mockRestore();
+    });
+
+    it("should keep arrow-selected carousel cards in view after focus mode model refreshes", async () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", title: "First Item", upvotes: 3, createdDate: new Date("2023-01-01") },
+      };
+      const item2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item2", title: "Second Item", upvotes: 2, createdDate: new Date("2023-01-02") },
+      };
+      const scrollIntoView = jest.fn();
+      const requestAnimationFrameSpy = jest.spyOn(window, "requestAnimationFrame").mockImplementation(callback => {
+        callback(0);
+        return 0;
+      });
+
+      Object.defineProperty(window.HTMLElement.prototype, "scrollIntoView", {
+        configurable: true,
+        value: scrollIntoView,
+      });
+
+      const { container, rerender } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [item1, item2] }])} isFocusModalHidden={false} />);
+
+      fireEvent.click(container.querySelector("#slide-all-columns-0 .next-button") as HTMLElement);
+      fireEvent.click(container.querySelector("#slide-all-columns-1 .back-button") as HTMLElement);
+
+      rerender(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [{ ...item1, showAddedAnimation: true }, item2] }])} isFocusModalHidden={false} />);
+
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest", inline: "nearest" }));
+
+      requestAnimationFrameSpy.mockRestore();
+    });
+
+    it("should keep dot-selected carousel cards in view after focus mode model refreshes", async () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", title: "First Item", upvotes: 3, createdDate: new Date("2023-01-01") },
+      };
+      const item2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item2", title: "Second Item", upvotes: 2, createdDate: new Date("2023-01-02") },
+      };
+      const scrollIntoView = jest.fn();
+      const requestAnimationFrameSpy = jest.spyOn(window, "requestAnimationFrame").mockImplementation(callback => {
+        callback(0);
+        return 0;
+      });
+
+      Object.defineProperty(window.HTMLElement.prototype, "scrollIntoView", {
+        configurable: true,
+        value: scrollIntoView,
+      });
+
+      const { container, rerender } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [item1, item2] }])} isFocusModalHidden={false} />);
+
+      fireEvent.click(container.querySelector('.carousel-dot[href="#slide-all-columns-1"]') as HTMLElement);
+
+      rerender(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [item1, { ...item2, showAddedAnimation: true }] }])} isFocusModalHidden={false} />);
+
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest", inline: "nearest" }));
+
+      requestAnimationFrameSpy.mockRestore();
+    });
+
+    it("should skip restoring the active card when its column no longer exists", async () => {
+      const requestAnimationFrameSpy = jest.spyOn(window, "requestAnimationFrame");
+
+      const { container, rerender } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([testColumnProps])} isFocusModalHidden={false} />);
+
+      fireEvent.click(container.querySelector("#slide-all-columns-0") as HTMLElement);
+
+      rerender(<FeedbackCarousel focusModeModel={buildFocusModeModel([])} isFocusModalHidden={false} />);
+
+      await waitFor(() => expect(container.textContent).not.toContain("All"));
+      expect(requestAnimationFrameSpy).not.toHaveBeenCalled();
+
+      requestAnimationFrameSpy.mockRestore();
+    });
+
+    it("should skip restoring the active card when it no longer exists", async () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", title: "First Item", upvotes: 1, createdDate: new Date("2023-01-01") },
+      };
+      const requestAnimationFrameSpy = jest.spyOn(window, "requestAnimationFrame");
+
+      const { container, rerender } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [item1] }])} isFocusModalHidden={false} />);
+
+      fireEvent.click(container.querySelector("#slide-all-columns-0") as HTMLElement);
+
+      rerender(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [] }])} isFocusModalHidden={false} />);
+
+      await waitFor(() => expect(container.querySelector("#slide-all-columns-0")).toBeNull());
+      expect(requestAnimationFrameSpy).not.toHaveBeenCalled();
+
+      requestAnimationFrameSpy.mockRestore();
+    });
+
+    it("should not throw when the active slide element is missing after refresh", () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", title: "First Item", upvotes: 1, createdDate: new Date("2023-01-01") },
+      };
+      const getElementByIdSpy = jest.spyOn(document, "getElementById").mockReturnValue(null);
+      const requestAnimationFrameSpy = jest.spyOn(window, "requestAnimationFrame").mockImplementation(callback => {
+        callback(0);
+        return 0;
+      });
+
+      const { container, rerender } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [item1] }])} isFocusModalHidden={false} />);
+
+      fireEvent.click(container.querySelector("#slide-all-columns-0") as HTMLElement);
+
+      expect(() => rerender(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...testColumnProps, columnItems: [{ ...item1, showAddedAnimation: true }] }])} isFocusModalHidden={false} />)).not.toThrow();
+
+      requestAnimationFrameSpy.mockRestore();
+      getElementByIdSpy.mockRestore();
     });
   });
 

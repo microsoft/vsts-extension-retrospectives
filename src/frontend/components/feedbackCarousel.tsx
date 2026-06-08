@@ -96,8 +96,8 @@ const getSortedColumnItems = (column: FocusModeColumn): IColumnItem[] => {
   return column.columnItems
     .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId)
     .sort((a, b) => {
-      const totalVotesA = groupedVoteTotalsByItemId.get(a.feedbackItem.id) ?? 0;
-      const totalVotesB = groupedVoteTotalsByItemId.get(b.feedbackItem.id) ?? 0;
+      const totalVotesA = groupedVoteTotalsByItemId.get(a.feedbackItem.id)!;
+      const totalVotesB = groupedVoteTotalsByItemId.get(b.feedbackItem.id)!;
 
       if (totalVotesB !== totalVotesA) {
         return totalVotesB - totalVotesA;
@@ -217,7 +217,7 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
   );
 
   return (
-    <Pivot className="feedback-carousel-pivot" selectedKey={selectedColumnId ?? feedbackColumns[0]?.columnId} onLinkClick={item => setSelectedColumnId(item?.props.itemKey)} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+    <Pivot className="feedback-carousel-pivot" selectedKey={selectedColumnId ?? feedbackColumns[0]?.columnId} onLinkClick={item => setSelectedColumnId(item!.props.itemKey)} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {feedbackColumns.map(column => {
         const feedbackCarouselItems = renderFeedbackCarouselItems(column);
         const slideIds = feedbackCarouselItems.map((_, index) => `slide-${column.columnId}-${index}`);
