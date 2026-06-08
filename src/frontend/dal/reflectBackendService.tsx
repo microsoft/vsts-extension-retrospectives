@@ -170,8 +170,8 @@ class ReflectBackendService {
   /**
    * Removes the connection from the current board group
    * and, if newBoardId isn't falsy, adds it to the new
-   * board group for the specified board id.
-   * @param newBoardId The id of the board to join.
+   * board group for the specified board ID.
+   * @param newBoardId The ID of the board to join.
    */
   public switchToBoard = (newBoardId: string) => {
     if (this._currentBoardId !== undefined && this._currentBoardId !== null && this._currentBoardId !== newBoardId && this.isConnected()) {
@@ -186,8 +186,8 @@ class ReflectBackendService {
 
   /**
    * Sends a BroadcastNewItem signal for other instances.
-   * @param columnId The column id that the feedback item is a part of.
-   * @param feedbackItemId The id of the new feedback item.
+   * @param columnId The column ID that the feedback item is a part of.
+   * @param feedbackItemId The ID of the new feedback item.
    */
   public broadcastNewItem = (columnId: string, feedbackItemId: string) => {
     if (!this._connectionAvailable) {
@@ -203,8 +203,8 @@ class ReflectBackendService {
 
   /**
    * Sends a BroadcastNewBoard signal for other instances.
-   * @param teamId The id of the parent team.
-   * @param boardId The id of the board.
+   * @param teamId The ID of the parent team.
+   * @param boardId The ID of the board.
    */
   public broadcastNewBoard = (teamId: string, boardId: string) => {
     if (!this._connectionAvailable) {
@@ -220,8 +220,8 @@ class ReflectBackendService {
 
   /**
    * Sends a BroadcastUpdatedBoard signal for other instances.
-   * @param teamId The id of the parent team.
-   * @param boardId The id of the board.
+   * @param teamId The ID of the parent team.
+   * @param boardId The ID of the board.
    */
   public broadcastUpdatedBoard = (teamId: string, boardId: string) => {
     if (!this._connectionAvailable) {
@@ -237,8 +237,8 @@ class ReflectBackendService {
 
   /**
    * Sends a BroadcastDeletedBoard signal for other instances.
-   * @param teamId The id of the parent team.
-   * @param boardId The id of the board.
+   * @param teamId The ID of the parent team.
+   * @param boardId The ID of the board.
    */
   public broadcastDeletedBoard = (teamId: string, boardId: string) => {
     if (!this._connectionAvailable) {
@@ -254,8 +254,8 @@ class ReflectBackendService {
 
   /**
    * Sends a BroadcastUpdatedItem signal for other instances.
-   * @param columnId The column id that the feedback item is a part of.
-   * @param feedbackItemId The id of the feedback item to update.
+   * @param columnId The column ID that the feedback item is a part of.
+   * @param feedbackItemId The ID of the feedback item to update.
    */
   public broadcastUpdatedItem = (columnId: string, feedbackItemId: string) => {
     if (!this._connectionAvailable) {
@@ -271,8 +271,8 @@ class ReflectBackendService {
 
   /**
    * Sends a BroadcastDeletedItem signal for other instances.
-   * @param columnId The column id that the feedback item is a part of.
-   * @param feedbackItemId The id of the feedback item to update.
+   * @param columnId The column ID that the feedback item is a part of.
+   * @param feedbackItemId The ID of the feedback item to update.
    */
   public broadcastDeletedItem = (columnId: string, feedbackItemId: string) => {
     if (!this._connectionAvailable) {
