@@ -33,8 +33,8 @@ namespace ReflectBackend
         /// <summary>
         /// Broadcast receiveDeletedBoard to all connected clients except the sender.
         /// </summary>
-        /// <param name="teamId">The id of the team to which the board belongs.</param>
-        /// <param name="reflectBoardId">The id of the deleted Retrospectives board.</param>
+        /// <param name="teamId">The ID of the team to which the board belongs.</param>
+        /// <param name="reflectBoardId">The ID of the deleted Retrospectives board.</param>
         public Task BroadcastDeletedBoard(string teamId, string reflectBoardId)
         {
             _logger.LogInformation($"BroadcastDeletedBoard connectionID: {Context.ConnectionId}");
@@ -46,9 +46,9 @@ namespace ReflectBackend
         /// <summary>
         /// Broadcast receiveDeletedItem to all other clients viewing the same Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
-        /// <param name="columnId">The id of column this item is associated with.</param>
-        /// <param name="feedbackItemId">The id of the new feedback item.</param>
+        /// <param name="reflectBoardId">The ID of the Retrospectives board.</param>
+        /// <param name="columnId">The ID of column this item is associated with.</param>
+        /// <param name="feedbackItemId">The ID of the new feedback item.</param>
         public Task BroadcastDeletedItem(string reflectBoardId, string columnId, string feedbackItemId)
         {
             _logger.LogInformation($"BroadcastDeletedItem connectionID: {Context.ConnectionId}");
@@ -60,8 +60,8 @@ namespace ReflectBackend
         /// <summary>
         /// Broadcast receiveNewBoard to all connected clients except the sender.
         /// </summary>
-        /// <param name="teamId">The id of the team to which the board belongs.</param>
-        /// <param name="reflectBoardId">The id of the new Retrospectives board.</param>
+        /// <param name="teamId">The ID of the team to which the board belongs.</param>
+        /// <param name="reflectBoardId">The ID of the new Retrospectives board.</param>
         public Task BroadcastNewBoard(string teamId, string reflectBoardId)
         {
             _logger.LogInformation($"BroadcastNewBoard connectionID: {Context.ConnectionId}");
@@ -73,9 +73,9 @@ namespace ReflectBackend
         /// <summary>
         /// Broadcast receiveNewItem to all other clients viewing the same Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
-        /// <param name="columnId">The id of column this item is associated with.</param>
-        /// <param name="feedbackItemId">The id of the new feedback item.</param>
+        /// <param name="reflectBoardId">The ID of the Retrospectives board.</param>
+        /// <param name="columnId">The ID of column this item is associated with.</param>
+        /// <param name="feedbackItemId">The ID of the new feedback item.</param>
         public Task BroadcastNewItem(string reflectBoardId, string columnId, string feedbackItemId)
         {
             _logger.LogInformation($"BroadcastNewItem connectionID: {Context.ConnectionId}");
@@ -87,8 +87,8 @@ namespace ReflectBackend
         /// <summary>
         /// Broadcast receiveUpdatedBoard to all other clients except the sender.
         /// </summary>
-        /// <param name="teamId">The id of the team to which the board belongs.</param>
-        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
+        /// <param name="teamId">The ID of the team to which the board belongs.</param>
+        /// <param name="reflectBoardId">The ID of the Retrospectives board.</param>
         public Task BroadcastUpdatedBoard(string teamId, string reflectBoardId)
         {
             _logger.LogInformation($"BroadcastUpdatedBoard connectionID: {Context.ConnectionId}");
@@ -100,9 +100,9 @@ namespace ReflectBackend
         /// <summary>
         /// Broadcast receiveUpdatedItem to all other clients viewing the same Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
-        /// <param name="columnId">The id of column this item is associated with.</param>
-        /// <param name="feedbackItemId">The id of the new feedback item.</param>
+        /// <param name="reflectBoardId">The ID of the Retrospectives board.</param>
+        /// <param name="columnId">The ID of column this item is associated with.</param>
+        /// <param name="feedbackItemId">The ID of the new feedback item.</param>
         public Task BroadcastUpdatedItem(string reflectBoardId, string columnId, string feedbackItemId)
         {
             _logger.LogInformation($"BroadcastUpdatedItem connectionID: {Context.ConnectionId}");
@@ -114,7 +114,7 @@ namespace ReflectBackend
         /// <summary>
         /// Adds the client to the group for this Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
+        /// <param name="reflectBoardId">The ID of the Retrospectives board.</param>
         public Task JoinReflectBoardGroup(string reflectBoardId)
         {
             _logger.LogInformation($"JoinReflectBoardGroup connectionID: {Context.ConnectionId}");
@@ -126,7 +126,7 @@ namespace ReflectBackend
         /// <summary>
         /// Removes the client from the group for this Retrospectives board.
         /// </summary>
-        /// <param name="reflectBoardId">The id of the Retrospectives board.</param>
+        /// <param name="reflectBoardId">The ID of the Retrospectives board.</param>
         public Task LeaveReflectBoardGroup(string reflectBoardId)
         {
             _logger.LogInformation($"LeaveReflectBoardGroup connectionID: {Context.ConnectionId}");
@@ -163,7 +163,7 @@ namespace ReflectBackend
         /// </summary>
         public override Task OnConnectedAsync()
         {
-            _logger.LogInformation($"Established Connection id {Context.ConnectionId}");
+            _logger.LogInformation($"Established Connection ID {Context.ConnectionId}");
             return base.OnConnectedAsync();
         }
     }
