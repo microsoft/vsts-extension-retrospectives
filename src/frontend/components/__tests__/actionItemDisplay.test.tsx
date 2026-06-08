@@ -223,11 +223,7 @@ describe("Action Item Display component", () => {
     const propsWithMultipleTypes = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
-      nonHiddenWorkItemTypes: [
-        { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any,
-        { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any,
-        { name: "User Story", referenceName: "Microsoft.VSTS.WorkItemTypes.UserStory", icon: { url: "story-icon.png" }, _links: {} } as any,
-      ],
+      nonHiddenWorkItemTypes: [{ name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any, { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any, { name: "User Story", referenceName: "Microsoft.VSTS.WorkItemTypes.UserStory", icon: { url: "story-icon.png" }, _links: {} } as any],
     };
 
     const { container } = render(<ActionItemDisplay {...propsWithMultipleTypes} />);
@@ -269,10 +265,7 @@ describe("Action Item Display component", () => {
       ...defaultTestProps,
       allowAddNewActionItem: true,
       shouldShowAddWorkItemMenuBelow: false,
-      nonHiddenWorkItemTypes: [
-        { name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any,
-        { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any,
-      ],
+      nonHiddenWorkItemTypes: [{ name: "Task", referenceName: "Microsoft.VSTS.WorkItemTypes.Task", icon: { url: "task-icon.png" }, _links: {} } as any, { name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
     };
 
     const { container } = render(<ActionItemDisplay {...propsWithMultipleTypes} />);
@@ -823,6 +816,29 @@ describe("Action Item Display component", () => {
     });
   });
 
+  it("does not close a parent dialog when cancelling link existing work item dialog", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const parentClose = jest.fn();
+    const { container } = render(
+      <dialog open onClose={parentClose}>
+        <ActionItemDisplay {...propsWithAdd} />
+      </dialog>,
+    );
+
+    const dialog = await openLinkExistingDialog(container);
+    const cancelButton = dialog.querySelector(".default.button") as HTMLButtonElement;
+    fireEvent.click(cancelButton);
+
+    await waitFor(() => {
+      expect(dialog.open).toBe(false);
+      expect(parentClose).not.toHaveBeenCalled();
+    });
+  });
+
   it("handles user with undefined name (Former User)", async () => {
     mockGetUser.mockReturnValue({ name: undefined, displayName: "Former User", id: "former-user-id" });
     mockOpenNewWorkItem.mockResolvedValue({ id: 111, fields: { "System.Title": "Test" } });
@@ -1109,6 +1125,29 @@ describe("Action Item Display component", () => {
 
     await waitFor(() => {
       expect(dialog.open).toBe(false);
+    });
+  });
+
+  it("does not close a parent dialog when clicking link existing work item dialog close button", async () => {
+    const propsWithAdd = {
+      ...defaultTestProps,
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+    const parentClose = jest.fn();
+    const { container } = render(
+      <dialog open onClose={parentClose}>
+        <ActionItemDisplay {...propsWithAdd} />
+      </dialog>,
+    );
+
+    const dialog = await openLinkExistingDialog(container);
+    const closeButton = dialog.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+    fireEvent.click(closeButton);
+
+    await waitFor(() => {
+      expect(dialog.open).toBe(false);
+      expect(parentClose).not.toHaveBeenCalled();
     });
   });
 

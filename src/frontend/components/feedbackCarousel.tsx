@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { moveFeedbackItem } from "./feedbackColumn";
 import FeedbackItem, { IFeedbackItemProps } from "./feedbackItem";
@@ -42,6 +42,11 @@ interface FocusModeColumn {
   columnItems: IColumnItem[];
 }
 
+interface ActiveCarouselPosition {
+  columnId: string;
+  feedbackItemId: string;
+}
+
 export interface IFeedbackCarouselProps {
   focusModeModel: FocusModeModel;
   isFocusModalHidden: boolean;
@@ -78,40 +83,77 @@ const buildFeedbackColumns = (focusModeModel: FocusModeModel): FocusModeColumn[]
   return columnsList;
 };
 
+const getSortedColumnItems = (column: FocusModeColumn): IColumnItem[] => {
+  const itemsById = new Map(column.columnItems.map(columnItem => [columnItem.feedbackItem.id, columnItem.feedbackItem]));
+  const groupedVoteTotalsByItemId = new Map(
+    column.columnItems.map(columnItem => {
+      const groupedItems = columnItem.feedbackItem.childFeedbackItemIds?.map(childItemId => itemsById.get(childItemId)).filter((item): item is IFeedbackItemDocument => !!item) ?? [];
+
+      return [columnItem.feedbackItem.id, itemDataService.getVotesForGroupedItems(columnItem.feedbackItem, groupedItems)];
+    }),
+  );
+
+  return column.columnItems
+    .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId)
+    .sort((a, b) => {
+      const totalVotesA = groupedVoteTotalsByItemId.get(a.feedbackItem.id) ?? 0;
+      const totalVotesB = groupedVoteTotalsByItemId.get(b.feedbackItem.id) ?? 0;
+
+      if (totalVotesB !== totalVotesA) {
+        return totalVotesB - totalVotesA;
+      }
+
+      const dateA = new Date(a.feedbackItem.createdDate).getTime();
+      const dateB = new Date(b.feedbackItem.createdDate).getTime();
+      return dateB - dateA;
+    });
+};
+
 export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeModel, isFocusModalHidden }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackCarousel");
 
   const [feedbackColumns, setFeedbackColumns] = useState<FocusModeColumn[]>(() => buildFeedbackColumns(focusModeModel));
+  const [selectedColumnId, setSelectedColumnId] = useState<string | undefined>();
+  const activeCarouselPositionRef = useRef<ActiveCarouselPosition | null>(null);
 
   useEffect(() => {
-    setFeedbackColumns(buildFeedbackColumns(focusModeModel));
+    const newFeedbackColumns = buildFeedbackColumns(focusModeModel);
+    setFeedbackColumns(newFeedbackColumns);
+    setSelectedColumnId(previousColumnId => (previousColumnId && newFeedbackColumns.some(column => column.columnId === previousColumnId) ? previousColumnId : newFeedbackColumns[0]?.columnId));
   }, [focusModeModel]);
+
+  useEffect(() => {
+    const activeCarouselPosition = activeCarouselPositionRef.current;
+    if (!activeCarouselPosition) {
+      return;
+    }
+
+    const activeColumn = feedbackColumns.find(column => column.columnId === activeCarouselPosition.columnId);
+    if (!activeColumn) {
+      return;
+    }
+
+    const activeItemIndex = getSortedColumnItems(activeColumn).findIndex(columnItem => columnItem.feedbackItem.id === activeCarouselPosition.feedbackItemId);
+    if (activeItemIndex === -1) {
+      return;
+    }
+
+    const activeSlideId = `slide-${activeCarouselPosition.columnId}-${activeItemIndex}`;
+    setSelectedColumnId(activeCarouselPosition.columnId);
+
+    requestAnimationFrame(() => {
+      document.getElementById(activeSlideId)?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    });
+  }, [feedbackColumns]);
+
+  const recordActiveCarouselPosition = useCallback((columnId: string, feedbackItemId: string) => {
+    activeCarouselPositionRef.current = { columnId, feedbackItemId };
+    setSelectedColumnId(columnId);
+  }, []);
 
   const renderFeedbackCarouselItems = useCallback(
     (column: FocusModeColumn) => {
-      const itemsById = new Map(column.columnItems.map(columnItem => [columnItem.feedbackItem.id, columnItem.feedbackItem]));
-      const groupedVoteTotalsByItemId = new Map(
-        column.columnItems.map(columnItem => {
-          const groupedItems = columnItem.feedbackItem.childFeedbackItemIds?.map(childItemId => itemsById.get(childItemId)).filter((item): item is IFeedbackItemDocument => !!item) ?? [];
-
-          return [columnItem.feedbackItem.id, itemDataService.getVotesForGroupedItems(columnItem.feedbackItem, groupedItems)];
-        }),
-      );
-
-      const sortedItems = column.columnItems
-        .filter(columnItem => !columnItem.feedbackItem.parentFeedbackItemId)
-        .sort((a, b) => {
-          const totalVotesA = groupedVoteTotalsByItemId.get(a.feedbackItem.id) ?? 0;
-          const totalVotesB = groupedVoteTotalsByItemId.get(b.feedbackItem.id) ?? 0;
-
-          if (totalVotesB !== totalVotesA) {
-            return totalVotesB - totalVotesA;
-          }
-
-          const dateA = new Date(a.feedbackItem.createdDate).getTime();
-          const dateB = new Date(b.feedbackItem.createdDate).getTime();
-          return dateB - dateA;
-        });
+      const sortedItems = getSortedColumnItems(column);
 
       return sortedItems.map(columnItem => {
         const itemAccentColor = focusModeModel.columns[columnItem.feedbackItem.columnId]?.columnProperties?.accentColor ?? column.accentColor;
@@ -175,28 +217,30 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
   );
 
   return (
-    <Pivot className="feedback-carousel-pivot" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+    <Pivot className="feedback-carousel-pivot" selectedKey={selectedColumnId ?? feedbackColumns[0]?.columnId} onLinkClick={item => setSelectedColumnId(item?.props.itemKey)} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {feedbackColumns.map(column => {
         const feedbackCarouselItems = renderFeedbackCarouselItems(column);
         const slideIds = feedbackCarouselItems.map((_, index) => `slide-${column.columnId}-${index}`);
         const activeDotCss = slideIds.map(slideId => `.carousel-container:has(#${slideId}:target) .carousel-dots a[href="#${slideId}"] { opacity: 1; transform: scale(1.05); }`).join("\n");
+        const sortedItems = getSortedColumnItems(column);
 
         return (
-          <PivotItem key={column.columnId} headerText={column.columnName} className="feedback-carousel-pivot-item" {...column}>
+          <PivotItem key={column.columnId} itemKey={column.columnId} headerText={column.columnName} className="feedback-carousel-pivot-item" {...column}>
             <div className="carousel-container">
               {activeDotCss && <style>{activeDotCss}</style>}
               <ol className="carousel-track" id={`carousel-${column.columnId}`}>
                 {feedbackCarouselItems.map((child, index) => {
+                  const feedbackItemId = sortedItems[index].feedbackItem.id;
                   return (
-                    <li className="carousel-slide" id={`slide-${column.columnId}-${index}`} key={child.key}>
+                    <li className="carousel-slide" id={`slide-${column.columnId}-${index}`} key={child.key} onClickCapture={() => recordActiveCarouselPosition(column.columnId, feedbackItemId)} onFocusCapture={() => recordActiveCarouselPosition(column.columnId, feedbackItemId)}>
                       {index > 0 && (
-                        <a href={`#slide-${column.columnId}-${index - 1}`} className="back-button" aria-label="Previous slide">
+                        <a href={`#slide-${column.columnId}-${index - 1}`} className="back-button" aria-label="Previous slide" onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index - 1].feedbackItem.id)}>
                           {getIconElement("chevron-left")}
                         </a>
                       )}
                       <div className="carousel-viewport">{child}</div>
                       {index < feedbackCarouselItems.length - 1 && (
-                        <a href={`#slide-${column.columnId}-${index + 1}`} className="next-button" aria-label="Next slide">
+                        <a href={`#slide-${column.columnId}-${index + 1}`} className="next-button" aria-label="Next slide" onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index + 1].feedbackItem.id)}>
                           {getIconElement("chevron-right")}
                         </a>
                       )}
@@ -207,7 +251,7 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
               <ul className="carousel-dots" aria-label="Focus mode pagination">
                 {slideIds.map((slideId, index) => (
                   <li key={slideId}>
-                    <a href={`#${slideId}`} className="carousel-dot" aria-label={`Go to card ${index + 1} of ${slideIds.length}`} />
+                    <a href={`#${slideId}`} className="carousel-dot" aria-label={`Go to card ${index + 1} of ${slideIds.length}`} onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index].feedbackItem.id)} />
                   </li>
                 ))}
               </ul>

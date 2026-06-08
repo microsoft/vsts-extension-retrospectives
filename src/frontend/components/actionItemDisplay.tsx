@@ -146,14 +146,26 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
     setLinkedWorkItem(workItem[0] ? workItem[0] : null);
   }, []);
 
+  const closeLinkExistingWorkItemDialog = useCallback((event?: React.SyntheticEvent) => {
+    event?.stopPropagation();
+
+    if (linkExistingWorkItemDialogRef.current?.open) {
+      linkExistingWorkItemDialogRef.current.close();
+    }
+  }, []);
+
+  const handleLinkExistingWorkItemDialogClose = useCallback((event: React.SyntheticEvent<HTMLDialogElement>) => {
+    event.stopPropagation();
+  }, []);
+
   const linkExistingWorkItem = useCallback(async () => {
     const updatedFeedbackItem = await itemDataService.addAssociatedActionItem(boardId, feedbackItemId, linkedWorkItem!.id);
 
     appInsights.trackEvent({ name: TelemetryEvents.ExistingWorkItemLinked, properties: { workItemTypeName: linkedWorkItem!.fields["System.WorkItemType"] } });
 
+    closeLinkExistingWorkItemDialog();
     onUpdateActionItem(updatedFeedbackItem);
-    linkExistingWorkItemDialogRef.current!.close();
-  }, [linkedWorkItem, boardId, feedbackItemId, onUpdateActionItem]);
+  }, [linkedWorkItem, boardId, feedbackItemId, closeLinkExistingWorkItemDialog, onUpdateActionItem]);
 
   const handleLinkExistingWorkItemClick = useCallback(
     (mouseEvent: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement> | undefined = undefined) => {
@@ -170,19 +182,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
 
   const renderWorkItemCard = useCallback(
     (item: WorkItem, areActionIconsHidden: boolean) => {
-      return (
-        <ActionItem
-          key={item.id}
-          feedbackItemId={feedbackItemId}
-          boardId={boardId}
-          actionItem={item}
-          nonHiddenWorkItemTypes={nonHiddenWorkItemTypes}
-          allWorkItemTypes={allWorkItemTypes}
-          onUpdateActionItem={onUpdateActionItem}
-          areActionIconsHidden={areActionIconsHidden}
-          shouldFocus={!initialRender && shouldShowAddWorkItemMenuBelow}
-        />
-      );
+      return <ActionItem key={item.id} feedbackItemId={feedbackItemId} boardId={boardId} actionItem={item} nonHiddenWorkItemTypes={nonHiddenWorkItemTypes} allWorkItemTypes={allWorkItemTypes} onUpdateActionItem={onUpdateActionItem} areActionIconsHidden={areActionIconsHidden} shouldFocus={!initialRender && shouldShowAddWorkItemMenuBelow} />;
     },
     [feedbackItemId, boardId, nonHiddenWorkItemTypes, allWorkItemTypes, onUpdateActionItem, initialRender, shouldShowAddWorkItemMenuBelow],
   );
@@ -240,10 +240,10 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
         </div>
       )}
       {renderAllWorkItemCards()}
-      <dialog ref={linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onClose={() => linkExistingWorkItemDialogRef.current!.close()}>
+      <dialog ref={linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onCancel={handleLinkExistingWorkItemDialogClose} onClose={handleLinkExistingWorkItemDialogClose}>
         <div className="header">
           <h2 className="title">{t("common_link_existing_work_item")}</h2>
-          <button onClick={() => linkExistingWorkItemDialogRef.current!.close()} aria-label="Close">
+          <button onClick={closeLinkExistingWorkItemDialog} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
@@ -260,7 +260,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
           <button className="button" disabled={!linkedWorkItem} onClick={linkExistingWorkItem}>
             {t("common_link_work_item")}
           </button>
-          <button className="default button" onClick={() => linkExistingWorkItemDialogRef.current!.close()}>
+          <button className="default button" onClick={closeLinkExistingWorkItemDialog}>
             {t("common_cancel")}
           </button>
         </div>
