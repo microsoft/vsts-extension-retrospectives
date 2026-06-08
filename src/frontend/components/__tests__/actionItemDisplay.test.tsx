@@ -264,7 +264,7 @@ describe("Action Item Display component", () => {
     expect(menu.classList.contains("popout-container-below")).toBe(false);
   });
 
-  it("renders link existing work item at bottom in focus mode menu", async () => {
+  it("renders link existing work item at top in focus mode menu", async () => {
     const propsWithMultipleTypes = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
@@ -279,7 +279,7 @@ describe("Action Item Display component", () => {
     const menu = await openAddWorkItemMenu(container);
     const buttons = within(menu).getAllByRole("button");
 
-    expect(buttons.map(button => button.textContent?.trim())).toEqual(["Bug", "Task", "Link existing work item"]);
+    expect(buttons.map(button => button.textContent?.trim())).toEqual(["Link existing work item", "Bug", "Task"]);
   });
 
   it("handles empty nonHiddenWorkItemTypes", () => {
