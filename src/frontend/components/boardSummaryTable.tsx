@@ -517,7 +517,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
         <BoardSummaryTableBody columns={columnList} data={sortedData} expandedRows={expandedRows} boardRowSummary={boardRowSummary} />
       </table>
       <dialog
-        className="delete-board-dialog"
+        className="delete-board-dialog dialog-width-sm"
         aria-label={t("delete_retrospective_board")}
         ref={deleteBoardDialogRef}
         onClose={() => {
@@ -541,7 +541,7 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
           The retrospective board {selectedBoardForDelete?.boardName} with {selectedBoardForDelete?.feedbackItemsCount} feedback items will be deleted.
         </div>
         <div className="subText">
-          <em>⚠️ Warning: This action is permanent and cannot be undone.</em>
+          ⚠️ <em>Warning: This action is permanent and cannot be undone.</em>
         </div>
         <div className="inner">
           <button className="button" onClick={handleConfirmDelete}>

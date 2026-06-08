@@ -258,7 +258,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </details>
 
-      <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onCancel={() => primeDirectiveDialogRef.current!.close()}>
+      <dialog className="prime-directive-dialog dialog-width-md" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onCancel={() => primeDirectiveDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("the_prime_directive")}</h2>
           <button onClick={() => primeDirectiveDialogRef.current!.close()} aria-label="Close">
@@ -278,23 +278,18 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="whats-new-dialog" aria-label="What is New" ref={whatsNewDialogRef} onCancel={() => whatsNewDialogRef.current!.close()}>
+      <dialog className="whats-new-dialog dialog-width-md" aria-label="What is New" ref={whatsNewDialogRef} onCancel={() => whatsNewDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("whats_new")}</h2>
           <button onClick={() => whatsNewDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
-        <div className="subText">This release focuses on accessibility, simplified stylings, and clearer visuals.</div>
-        <div className="subText li">Added full keyboard navigation across the board along with a dedicated keyboard shortcuts dialog and improved focus handling.</div>
-        <div className="subText li">Introduced a configurable countdown timer with a duration picker, start and stop chimes.</div>
-        <div className="subText li">Added a Team Assessment History dialog with trend charts so teams can review past assessment results.</div>
-        <div className="subText li">Added support for Retrospective Board columns to include notes to clarify what is expected from the user.</div>
-        <div className="subText li">Standardized icons to ensure a consistent look and feel. Icons are included in the package, enabling support for Azure DevOps Enterprise environments.</div>
-        <div className="subText li">Redesigned the voting phase to include the total votes used by the team.</div>
-        <div className="subText li">Refined feedback cards, grouped feedback visuals, and dialog layouts for better readability and consistency.</div>
-        <div className="subText li">Restricted board deletion permissions to the Board Owner and Team Admin.</div>
-        <div className="subText">Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</div>
+        <div className="subText">This release improves retrospective metadata editing reliability and simplifies the create and edit experience.</div>
+        <div className="subText li">Fixed board name update behavior to prevent accidental renames and duplicate name retrieval issues.</div>
+        <div className="subText li">Improved create and edit validation messaging for missing and duplicate retrospective names.</div>
+        <div className="subText li">Simplified board settings options and added helper text for a cleaner, more consistent setup experience.</div>
+        <div className="subText">See the changelog for the full list of changes.</div>
         <div className="inner">
           <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
             Open change log
@@ -305,7 +300,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="user-guide-dialog" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onCancel={() => userGuideDialogRef.current!.close()}>
+      <dialog className="user-guide-dialog dialog-width-md" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onCancel={() => userGuideDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("user_guide")}</h2>
           <button onClick={() => userGuideDialogRef.current!.close()} aria-label="Close">
@@ -324,7 +319,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="volunteer-dialog" aria-label="Volunteer" ref={volunteerDialogRef} onCancel={() => volunteerDialogRef.current!.close()}>
+      <dialog className="volunteer-dialog dialog-width-md" aria-label="Volunteer" ref={volunteerDialogRef} onCancel={() => volunteerDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("volunteer")}</h2>
           <button onClick={() => volunteerDialogRef.current!.close()} aria-label="Close">
@@ -344,7 +339,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="keyboard-shortcuts-dialog" aria-label="Keyboard Shortcuts" ref={keyboardShortcutsDialogRef} onCancel={() => keyboardShortcutsDialogRef.current!.close()}>
+      <dialog className="keyboard-shortcuts-dialog dialog-width-md" aria-label="Keyboard Shortcuts" ref={keyboardShortcutsDialogRef} onCancel={() => keyboardShortcutsDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("keyboard_shortcuts")}</h2>
           <button onClick={() => keyboardShortcutsDialogRef.current!.close()} aria-label="Close">

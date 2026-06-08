@@ -227,7 +227,7 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
         </div>
       )}
       {renderAllWorkItemCards()}
-      <dialog ref={linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog" aria-label="Link existing work item" onClose={() => linkExistingWorkItemDialogRef.current!.close()}>
+      <dialog ref={linkExistingWorkItemDialogRef} className="link-existing-work-item-dialog dialog-width-sm" aria-label="Link existing work item" onClose={() => linkExistingWorkItemDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("common_link_existing_work_item")}</h2>
           <button onClick={() => linkExistingWorkItemDialogRef.current!.close()} aria-label="Close">
