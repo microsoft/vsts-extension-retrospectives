@@ -342,9 +342,9 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .confirm-changes-dialog,
 .delete-feedback-item-dialog,
 .move-feedback-item-dialog,
+.retrospectives-group-feedback-item-dialog,
 .remove-feedback-item-from-group-dialog,
 .board-metadata-dialog,
-.delete-feedback-item-dialog,
 .team-effectiveness-dialog,
 .choose-column-accent-color-dialog,
 .retro-summary-dialog,
@@ -363,7 +363,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .preview-email-dialog,
 .carousel-dialog,
 .sprint-retrospective-dialog {
-  @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:backdrop-blur-xs backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
+  @apply w-[45vw] max-w-[45vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
   & table {
     @apply w-full border-collapse text-left;
@@ -406,7 +406,19 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply block px-5 py-2 text-sm text-(--text-primary-color);
 
     &.li {
-      @apply list-item list-inside list-disc ml-4;
+      @apply list-item list-inside list-disc ml-4 py-0;
+    }
+
+    &.li + .subText.li {
+      @apply mt-1;
+    }
+
+    &:not(.li) + .subText.li {
+      @apply mt-2;
+    }
+
+    &.li + .subText:not(.li) {
+      @apply mt-2;
     }
 
     & .form-group {
@@ -434,7 +446,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
 
     & .input-validation-message {
-      @apply flex items-center gap-1 text-task-yellow text-sm;
+      @apply flex items-center gap-1 text-error text-sm;
 
       & svg {
         @apply w-4 h-4;
@@ -453,6 +465,22 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
     }
   }
+}
+
+.dialog-width-sm {
+  @apply w-[30vw] max-w-[30vw] portrait:w-[80vw] portrait:max-w-[80vw];
+}
+
+.dialog-width-md {
+  @apply w-[45vw] max-w-[45vw] portrait:w-[80vw] portrait:max-w-[80vw];
+}
+
+.dialog-width-lg {
+  @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw];
+}
+
+.dialog-width-xl {
+  @apply w-[75vw] max-w-[75vw] portrait:w-[80vw] portrait:max-w-[80vw];
 }
 
 .preview-email-content {
@@ -1419,6 +1447,24 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
   }
 
+  & .board-metadata-form-option-helper {
+    @apply italic text-sm font-light text-(--text-primary-color);
+  }
+
+  & .board-metadata-board-settings-section {
+    @apply pb-0;
+
+    & .board-metadata-form-option-row:last-child {
+      @apply mb-0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    & .board-metadata-form-option-row {
+      @apply grid-cols-1;
+    }
+  }
+
   & .ms-Checkbox.is-checked .ms-Checkbox-checkbox {
     @apply bg-(--background-color);
   }
@@ -1486,53 +1532,25 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply pt-0 w-auto;
     }
 
-    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button) {
+    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button, .feedback-column-card-undelete-button) {
       @apply bg-(--background-color) border-none my-0 mx-1;
-    }
 
-    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button):hover {
-      @apply bg-gray-light;
-    }
+      &:hover {
+        @apply bg-gray-light;
+      }
 
-    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled {
-      @apply bg-(--text-disabled-color);
-    }
+      &.is-disabled {
+        @apply bg-(--text-disabled-color);
+      }
 
-    & :is(.feedback-column-card-move-up-button, .feedback-column-card-move-down-button, .feedback-column-card-delete-button).is-disabled i {
-      @apply text-(--text-disabled-color);
+      &.is-disabled i {
+        @apply text-(--text-disabled-color);
+      }
     }
   }
 
   & .feedback-column-card.marked-for-deletion {
-    @apply bg-(--text-disabled-color) ml-0.5;
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-icon {
-    @apply text-black/30;
-  }
-
-  & .feedback-column-card.marked-for-deletion .editable-text {
-    @apply text-black/30;
-  }
-
-  & .feedback-column-card.marked-for-deletion i.ms-Button-icon {
-    @apply text-black/30;
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button {
-    @apply bg-white border-none;
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button:hover {
-    @apply bg-gray-light text-(--status-info-foreground);
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button.is-disabled i.ms-Button-icon {
-    @apply text-black/25;
-  }
-
-  & .feedback-column-card.marked-for-deletion .feedback-column-card-undelete-button i.ms-Button-icon {
-    @apply text-black;
+    @apply bg-(--text-disabled-color);
   }
 
   & .create-feedback-column-card-button {
@@ -1550,8 +1568,17 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & .input-validation-message {
     @apply text-sm text-error;
   }
+
   & .title-input-container {
-    @apply text-base font-semibold flex flex-col items-center p-1 flex-1 border border-(--text-primary-color) text-right placeholder:text-right;
+    @apply text-base font-semibold flex flex-col items-center p-1 flex-1 border border-(--text-primary-color) text-left placeholder:text-left;
+
+    &:invalid {
+      @apply border-error;
+
+      &:focus, &:focus-visible {
+        @apply border-error outline-2 outline-error;
+      }
+    }
   }
 
   & select.title-input-container {
@@ -1560,6 +1587,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .title-input-container.column-template-dropdown {
     @apply bg-(--background-color) font-normal;
+  }
+
+  & #max-vote-counter {
+    appearance: auto;
+  }
+
+  & #max-vote-counter::-webkit-outer-spin-button,
+  & #max-vote-counter::-webkit-inner-spin-button {
+    opacity: 1;
   }
 
   & .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
@@ -1587,7 +1623,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.retrospectives-choose-column-accent-color-dialog .choose-feedback-column-accent-color-button {
+.choose-feedback-column-accent-color-button {
   @apply text-3xl h-12 m-1;
 }
 

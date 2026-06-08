@@ -258,7 +258,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </details>
 
-      <dialog className="prime-directive-dialog" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onCancel={() => primeDirectiveDialogRef.current!.close()}>
+      <dialog className="prime-directive-dialog dialog-width-md" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onCancel={() => primeDirectiveDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("the_prime_directive")}</h2>
           <button onClick={() => primeDirectiveDialogRef.current!.close()} aria-label="Close">
@@ -278,7 +278,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="whats-new-dialog" aria-label="What is New" ref={whatsNewDialogRef} onCancel={() => whatsNewDialogRef.current!.close()}>
+      <dialog className="whats-new-dialog dialog-width-md" aria-label="What is New" ref={whatsNewDialogRef} onCancel={() => whatsNewDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("whats_new")}</h2>
           <button onClick={() => whatsNewDialogRef.current!.close()} aria-label="Close">
@@ -298,7 +298,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="user-guide-dialog" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onCancel={() => userGuideDialogRef.current!.close()}>
+      <dialog className="user-guide-dialog dialog-width-md" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onCancel={() => userGuideDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("user_guide")}</h2>
           <button onClick={() => userGuideDialogRef.current!.close()} aria-label="Close">
@@ -317,7 +317,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="volunteer-dialog" aria-label="Volunteer" ref={volunteerDialogRef} onCancel={() => volunteerDialogRef.current!.close()}>
+      <dialog className="volunteer-dialog dialog-width-md" aria-label="Volunteer" ref={volunteerDialogRef} onCancel={() => volunteerDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("volunteer")}</h2>
           <button onClick={() => volunteerDialogRef.current!.close()} aria-label="Close">
@@ -337,7 +337,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="keyboard-shortcuts-dialog" aria-label="Keyboard Shortcuts" ref={keyboardShortcutsDialogRef} onCancel={() => keyboardShortcutsDialogRef.current!.close()}>
+      <dialog className="keyboard-shortcuts-dialog dialog-width-md" aria-label="Keyboard Shortcuts" ref={keyboardShortcutsDialogRef} onCancel={() => keyboardShortcutsDialogRef.current!.close()}>
         <div className="header">
           <h2 className="title">{t("keyboard_shortcuts")}</h2>
           <button onClick={() => keyboardShortcutsDialogRef.current!.close()} aria-label="Close">

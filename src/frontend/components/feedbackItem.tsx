@@ -1152,7 +1152,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={displayTitle} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} shouldShowAddWorkItemMenuBelow={props.isFocusModalHidden} />}</div>
         </DocumentCard>
       </div>
-      <dialog ref={deleteFeedbackDialogRef} className="delete-feedback-item-dialog" aria-label="Delete Feedback" onClose={() => setStateMerge({ isDeleteItemConfirmationDialogHidden: true })}>
+      <dialog ref={deleteFeedbackDialogRef} className="delete-feedback-item-dialog dialog-width-sm" aria-label="Delete Feedback" onClose={() => setStateMerge({ isDeleteItemConfirmationDialogHidden: true })}>
         <div className="header">
           <h2 className="title">Delete Feedback</h2>
           <button onClick={hideDeleteItemConfirmationDialog} aria-label="Close">
@@ -1172,7 +1172,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           </button>
         </div>
       </dialog>
-      <dialog ref={moveFeedbackDialogRef} className="move-feedback-item-dialog" aria-label="Move Feedback to Different Column" onClose={() => setStateMerge({ isMoveFeedbackItemDialogHidden: true })}>
+      <dialog ref={moveFeedbackDialogRef} className="move-feedback-item-dialog dialog-width-md" aria-label="Move Feedback to Different Column" onClose={() => setStateMerge({ isMoveFeedbackItemDialogHidden: true })}>
         <div className="header">
           <h2 className="title">Move Feedback to Different Column</h2>
           <button onClick={hideMoveFeedbackItemDialog} aria-label="Close">
@@ -1202,7 +1202,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           </button>
         </div>
       </dialog>
-      <dialog ref={groupFeedbackDialogRef} className="retrospectives-group-feedback-item-dialog" aria-label="Group Feedback" onClose={() => setStateMerge({ isGroupFeedbackItemDialogHidden: true, searchedFeedbackItems: [], searchTerm: "" })}>
+      <dialog ref={groupFeedbackDialogRef} className="retrospectives-group-feedback-item-dialog dialog-width-md" aria-label="Group Feedback" onClose={() => setStateMerge({ isGroupFeedbackItemDialogHidden: true, searchedFeedbackItems: [], searchTerm: "" })}>
         <div className="header">
           <h2 className="title">Group Feedback</h2>
           <button onClick={hideGroupFeedbackItemDialog} aria-label="Close">
@@ -1270,7 +1270,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           })}
         </div>
       </dialog>
-      <dialog ref={removeFeedbackFromGroupDialogRef} className="remove-feedback-item-from-group-dialog" aria-label="Remove Feedback from Group" onClose={() => setStateMerge({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: true })}>
+      <dialog ref={removeFeedbackFromGroupDialogRef} className="remove-feedback-item-from-group-dialog dialog-width-sm" aria-label="Remove Feedback from Group" onClose={() => setStateMerge({ isRemoveFeedbackItemFromGroupConfirmationDialogHidden: true })}>
         <div className="header">
           <h2 className="title">Remove Feedback from Group</h2>
           <button onClick={hideRemoveFeedbackItemFromGroupConfirmationDialog} aria-label="Close">

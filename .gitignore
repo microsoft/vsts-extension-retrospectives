@@ -184,3 +184,6 @@ dist/
 .playwright-mcp
 
 stats.json
+
+# Dotnet runfile discovery cache artifacts
+dotnet/runfile-discovery/
