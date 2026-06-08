@@ -4,7 +4,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## Unpublished
 
-* Refactored Add work item menu so all work items are selectable and ordered alphabetically.
+* Refactored Add work item menu so all work items visible and ordered alphabetically.
 * Limited Focus mode work item type options to requirement backlog types.
 * Fixed Focus mode and Act tab feedback item sorting.
 * Fixed Act tab feedback item numbering so numbering consistent with other tabs.
