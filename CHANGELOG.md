@@ -2,7 +2,7 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## Unpublished
+## v1.92.55
 
 * Refactored Add work item menu so all work items visible and ordered alphabetically.
 * Limited Focus mode work item type options to requirement backlog types.
@@ -12,23 +12,25 @@ You can find the changelog of the Retrospective Extension below.
 
 From [GitHub PR #1739](https://github.com/microsoft/vsts-extension-retrospectives/pull/1739)
 
-* Ensures editing a retrospective updates the intended board name and prevents accidental renames.
-* Prevents duplicate-name side effects that can impact board retrieval when updating board metadata.
-* Improves Create and Edit Retrospective dialog name-validation feedback, including consistent validation messaging for missing or duplicate board name.
-* Simplifies board-configuration wording in Board Settings, including the required-name indicator, Max Votes label, and hidden feedback option.
-* Reintroduces borders for user input fields for cleaner visuals.
-* Supports small, medium, large and extra large standard dialog widths.
+## v1.92.54
+
+* Ensured editing a retrospective updates the intended board name and prevents accidental renames.
+* Prevented duplicate-name side effects that can impact board retrieval when updating board metadata.
+* Improved Create and Edit Retrospective dialog name-validation feedback, including consistent validation messaging for missing or duplicate board name.
+* Simplified board-configuration wording in Board Settings, including the required-name indicator, Max Votes label, and hidden feedback option.
+* Reintroduced borders for user input fields for cleaner visuals.
+* Added support for small, medium, large and extra large standard dialog widths.
 
 From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospectives/pull/1696)
 
-* Refines Create and Edit Retrospective metadata UX, including helper text, dialog-title consistency, and simplified example board name.
-* Fixes a regression introduced during metadata dialog updates where selecting a column icon could close the parent Create or Edit dialog and discard in-progress changes.
-* Aligns dialog title styling across Create, Copy, Edit, Archive, and Summary experiences for a more consistent visual experience.
-* Reverts dialog backdrop styling from blurred background to shaded background for better context visibility and consistency with ADO.
+* Refined Create and Edit Retrospective metadata UX, including helper text, dialog-title consistency, and simplified example board name.
+* Fixed a regression introduced during metadata dialog updates where selecting a column icon could close the parent Create or Edit dialog and discard in-progress changes.
+* Aligned dialog title styling across Create, Copy, Edit, Archive, and Summary experiences for a more consistent visual experience.
+* Reverted dialog backdrop styling from blurred background to shaded background for better context visibility and consistency with ADO.
 
 From [GitHub PR #1728](https://github.com/microsoft/vsts-extension-retrospectives/pull/1728)
 
-* Test code coverage now 100%.
+* Added tests to achieve 100% code coverage.
 
 ## v1.92.53
 
