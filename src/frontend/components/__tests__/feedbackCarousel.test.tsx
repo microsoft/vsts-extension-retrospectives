@@ -321,6 +321,33 @@ describe("Feedback Carousel ", () => {
 
       expect(column2Tab.getAttribute("aria-selected")).toBe("true");
     });
+
+    it("should keep a manually selected column after carousel navigation and model refresh", async () => {
+      const item1 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", title: "First Item", columnId: "col1", upvotes: 3, createdDate: new Date("2023-01-01") },
+      };
+      const item2 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item2", title: "Second Item", columnId: "col1", upvotes: 2, createdDate: new Date("2023-01-02") },
+      };
+      const item3 = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item3", title: "Third Item", columnId: "col2", upvotes: 1, createdDate: new Date("2023-01-03") },
+      };
+
+      const column1 = { ...testColumnProps, columnId: "col1", columnName: "Column 1", columnItems: [item1, item2] };
+      const column2 = { ...testColumnProps, columnId: "col2", columnName: "Column 2", columnItems: [item3] };
+
+      const { container, getByRole, rerender } = render(<FeedbackCarousel focusModeModel={buildFocusModeModel([column1, column2])} isFocusModalHidden={false} />);
+
+      fireEvent.click(container.querySelector("#slide-all-columns-0 .next-button") as HTMLElement);
+      fireEvent.click(getByRole("tab", { name: "Column 2" }));
+
+      rerender(<FeedbackCarousel focusModeModel={buildFocusModeModel([{ ...column1, columnItems: [{ ...item1, showAddedAnimation: true }, item2] }, column2])} isFocusModalHidden={false} />);
+
+      await waitFor(() => expect(getByRole("tab", { name: "Column 2" }).getAttribute("aria-selected")).toBe("true"));
+    });
   });
 
   describe("componentDidUpdate", () => {

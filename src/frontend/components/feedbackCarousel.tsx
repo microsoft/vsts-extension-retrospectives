@@ -148,6 +148,10 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
 
   const recordActiveCarouselPosition = useCallback((columnId: string, feedbackItemId: string) => {
     activeCarouselPositionRef.current = { columnId, feedbackItemId };
+  }, []);
+
+  const selectColumn = useCallback((columnId: string | undefined) => {
+    activeCarouselPositionRef.current = null;
     setSelectedColumnId(columnId);
   }, []);
 
@@ -217,7 +221,7 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
   );
 
   return (
-    <Pivot className="feedback-carousel-pivot" selectedKey={selectedColumnId ?? feedbackColumns[0]?.columnId} onLinkClick={item => setSelectedColumnId(item!.props.itemKey)} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+    <Pivot className="feedback-carousel-pivot" selectedKey={selectedColumnId ?? feedbackColumns[0]?.columnId} onLinkClick={item => selectColumn(item?.props.itemKey)} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {feedbackColumns.map(column => {
         const feedbackCarouselItems = renderFeedbackCarouselItems(column);
         const slideIds = feedbackCarouselItems.map((_, index) => `slide-${column.columnId}-${index}`);
