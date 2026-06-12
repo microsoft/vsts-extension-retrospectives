@@ -478,7 +478,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
           </ul>
         )}
       </div>
-      <dialog ref={editColumnNotesDialogRef} className="edit-column-notes-dialog" role="dialog" aria-label={t("edit_column_notes")}>
+      <dialog ref={editColumnNotesDialogRef} className="edit-column-notes-dialog dialog-width-md" role="dialog" aria-label={t("edit_column_notes")}>
         <div className="header">
           <h2 className="title">{t("edit_column_notes")}</h2>
           <button type="button" onClick={() => editColumnNotesDialogRef.current!.close()} aria-label="Close">

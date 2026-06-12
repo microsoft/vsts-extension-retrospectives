@@ -3,7 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from "react";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mockUuid } from "../__mocks__/uuid/v4";
@@ -179,7 +179,7 @@ describe("Board Metadata Form", () => {
       const user = userEvent.setup();
       render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
       expect(displayNamesCheckbox).not.toBeChecked();
 
@@ -265,7 +265,7 @@ describe("Board Metadata Form", () => {
       const user = userEvent.setup();
       render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
       expect(displayNamesCheckbox).not.toBeChecked();
 
@@ -354,7 +354,7 @@ describe("Board Metadata Form", () => {
     it("should properly set display names settings", () => {
       render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
       expect(displayNamesCheckbox).toBeInTheDocument();
       expect(displayNamesCheckbox.checked).toBe(testExistingBoard.isAnonymous);
@@ -417,7 +417,7 @@ describe("Board Metadata Form", () => {
     it("should properly set display names settings", () => {
       render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+      const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
       expect(displayNamesCheckbox).toBeInTheDocument();
       expect(displayNamesCheckbox.checked).toBe(testExistingBoard.isAnonymous);
@@ -460,7 +460,8 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
     await user.click(submitButton);
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
+    expect(titleInput).toBeInvalid();
     expect(titleInput).toHaveFocus();
   });
 
@@ -804,7 +805,7 @@ describe("FeedbackBoardMetadataForm - Checkbox Options", () => {
     const user = userEvent.setup();
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-    const checkbox = screen.getByLabelText(/Do not display names in feedback/i);
+    const checkbox = screen.getByLabelText(/Make participant feedback anonymous/i);
     expect(checkbox).toBeInTheDocument();
 
     await user.click(checkbox);
@@ -916,7 +917,8 @@ describe("FeedbackBoardMetadataForm - Form Submission Extended", () => {
     await user.click(saveButton);
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/please enter new retrospective title/i)).toBeInvalid();
   });
 
   it("should show an error when no active columns exist", async () => {
@@ -1316,7 +1318,7 @@ describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
     await user.click(saveButton);
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
   });
 
   it("should handle whitespace-only board names", async () => {
@@ -1330,7 +1332,7 @@ describe("FeedbackBoardMetadataForm - Board Name Taken Validation", () => {
     await user.click(saveButton);
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
-    expect(screen.getByText(/retrospective board name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
   });
 });
 
@@ -1411,7 +1413,7 @@ describe("FeedbackBoardMetadataForm - ComponentDidMount Settings Loading", () =>
 
     const teamAssessmentCheckbox = screen.getByLabelText(/include team assessment/i) as HTMLInputElement;
     const obscureFeedbackCheckbox = screen.getByRole("checkbox", { name: /only show feedback after collect phase/i }) as HTMLInputElement;
-    const displayNamesCheckbox = screen.getByRole("checkbox", { name: /do not display names in feedback/i }) as HTMLInputElement;
+    const displayNamesCheckbox = screen.getByRole("checkbox", { name: /make participant feedback anonymous/i }) as HTMLInputElement;
 
     expect(teamAssessmentCheckbox).not.toBeChecked();
     expect(obscureFeedbackCheckbox).toBeChecked();
@@ -1543,10 +1545,11 @@ describe("FeedbackBoardMetadataForm - Form Submission Advanced", () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/a board with this name already exists/i)).toBeInTheDocument();
+      expect(screen.getByText(/field 'retrospective name' must be unique\./i)).toBeInTheDocument();
     });
 
     expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(titleInput).toBeInvalid();
   });
 
   it("should allow submission when board name matches initial title", async () => {
@@ -1737,6 +1740,51 @@ describe("FeedbackBoardMetadataForm - Dialog Dismissal", () => {
       expect(screen.queryByText(/choose column color/i)).not.toBeInTheDocument();
     });
   });
+
+  it("should not close the parent dialog when an icon is selected", async () => {
+    const user = userEvent.setup();
+    const parentOnClose = jest.fn();
+
+    const { container } = render(
+      <dialog onClose={parentOnClose}>
+        <FeedbackBoardMetadataForm {...mockedProps} />
+      </dialog>,
+    );
+
+    const changeIconButtons = Array.from(container.querySelectorAll('button[aria-label="Change column icon"]')) as HTMLButtonElement[];
+    await user.click(changeIconButtons[0]);
+
+    const iconButtons = Array.from(container.querySelectorAll(".choose-feedback-column-icon-button")) as HTMLButtonElement[];
+    expect(iconButtons.length).toBeGreaterThan(0);
+    await user.click(iconButtons[0]);
+
+    expect(parentOnClose).not.toHaveBeenCalled();
+  });
+
+  it("should handle icon dialog close callback when event is undefined", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const changeIconButtons = screen.getAllByRole("button", { name: /change column icon/i });
+    await user.click(changeIconButtons[0]);
+
+    const iconDialog = container.querySelector("dialog.choose-column-icon-dialog") as HTMLDialogElement | null;
+    expect(iconDialog).toBeTruthy();
+
+    if (!iconDialog) return;
+
+    const reactPropsKey = Object.keys(iconDialog).find(key => key.startsWith("__reactProps$"));
+    expect(reactPropsKey).toBeTruthy();
+
+    if (!reactPropsKey) return;
+
+    const onCloseHandler = (iconDialog as unknown as Record<string, { onClose?: (event?: unknown) => void }>)[reactPropsKey]?.onClose;
+    expect(typeof onCloseHandler).toBe("function");
+
+    await act(async () => {
+      onCloseHandler?.();
+    });
+  });
 });
 
 describe("FeedbackBoardMetadataForm - Save Button Disabled States", () => {
@@ -1799,15 +1847,17 @@ describe("FeedbackBoardMetadataForm - Input Change Handler", () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/a board with this name already exists/i)).toBeInTheDocument();
+      expect(screen.getByText(/field 'retrospective name' must be unique\./i)).toBeInTheDocument();
     });
 
     // Change the title to clear the error
     await user.type(titleInput, " Modified");
 
     await waitFor(() => {
-      expect(screen.queryByText(/a board with this name already exists/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/field 'retrospective name' must be unique\./i)).not.toBeInTheDocument();
     });
+
+    expect(titleInput).toBeValid();
   });
 });
 
