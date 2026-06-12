@@ -12,7 +12,9 @@ You can find the changelog of the Retrospective Extension below.
 From [GitHub PR #1739](https://github.com/microsoft/vsts-extension-retrospectives/pull/1739)
 
 * Refined What's New by moving its dialog into a dedicated component and centralizing release-note copy for easier independent updates.
-* Updated the Changelog to caputre missing updates from prior releases.
+* Updated the Changelog to capture missing updates from prior releases.
+
+From [GitHub PR #1753](https://github.com/microsoft/vsts-extension-retrospectives/pull/1753)
 
 ## v1.92.54
 
