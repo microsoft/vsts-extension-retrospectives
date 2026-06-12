@@ -2,63 +2,85 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## Unpublished
+## v1.92.55
 
-* Added customizable Team Assessment questions so teams can tailor the assessment prompts used on retrospective boards. From [GitHub PR #1646](https://github.com/microsoft/vsts-extension-retrospectives/pull/1646)
-* Added localization support, including Spanish, German, and French translations, plus localized date and number formatting. From [GitHub PR #1657](https://github.com/microsoft/vsts-extension-retrospectives/pull/1657) and [GitHub PR #1658](https://github.com/microsoft/vsts-extension-retrospectives/pull/1658)
-* Added sprint retrospective support from the Azure Boards iteration backlog, including sprint-specific board creation and navigation. From [GitHub PR #1659](https://github.com/microsoft/vsts-extension-retrospectives/pull/1659)
-* Improved retrospective board responsiveness and feedback-item rendering performance to reduce hangs during heavy board activity. From [GitHub PR #1622](https://github.com/microsoft/vsts-extension-retrospectives/pull/1622) and [GitHub PR #1624](https://github.com/microsoft/vsts-extension-retrospectives/pull/1624)
-* Improved live-sync scoping when switching teams or boards so updates follow the currently selected retrospective context. From [GitHub PR #1678](https://github.com/microsoft/vsts-extension-retrospectives/pull/1678)
-* Improved feedback-item accessibility with list semantics, clearer selection and favorability labels, and quieter screen-reader behavior while typing. From [GitHub PR #1589](https://github.com/microsoft/vsts-extension-retrospectives/pull/1589)
-* Improved Create and Edit Retrospective validation by preventing accidental board renames, preserving feedback after board-name updates, and clarifying duplicate-name and required-field messages. From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospectives/pull/1696)
+* Refined Add work item selection to ensure the full work item list is visible on Act tab.
+* Limited Focus mode work item type options to requirement backlog types.
+* Fixed issues with Focus mode sorting and Act tab sorting.
+* Fixed Act tab feedback item numbering to be consistent with other tabs.
+
+From [GitHub PR #1739](https://github.com/microsoft/vsts-extension-retrospectives/pull/1739)
+
+* Refined What's New by moving its dialog into a dedicated component and centralizing release-note copy for easier independent updates.
+* Updated the Changelog to caputre missing updates from prior releases.
+
+## v1.92.54
+
+* Improved live-sync scoping when switching teams or boards so updates followed the currently selected retrospective context. From [GitHub PR #1678](https://github.com/microsoft/vsts-extension-retrospectives/pull/1678)
+
+* Ensured editing a retrospective updates the intended board name and prevents accidental renames.
+* Prevented duplicate-name side effects that can impact board retrieval when updating board metadata.
+* Improved Create and Edit Retrospective dialog name-validation feedback, including consistent validation messaging for missing or duplicate board name.
+* Simplified board-configuration wording in Board Settings, including the required-name indicator, Max Votes label, and hidden feedback option.
+* Reintroduced borders for user input fields for cleaner visuals.
+* Maintained test code coverage at 100%.
+
+From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospectives/pull/1696) and [GitHub PR #1723](https://github.com/microsoft/vsts-extension-retrospectives/pull/1723)
+
+* Refined Create and Edit Retrospective metadata UX, including helper text, dialog-title consistency, error messaging, and simplified example board name.
+* Fixed a regression introduced during metadata dialog updates where selecting a column icon could close the parent Create or Edit dialog and discard in-progress changes.
+* Aligned dialog title styling across Create, Copy, Edit, Archive, and Summary experiences for a more consistent visual experience.
+* Reverted dialog backdrop styling from blurred background to shaded background for better context visibility and consistency with ADO.
+
+From [GitHub PR #1728](https://github.com/microsoft/vsts-extension-retrospectives/pull/1728)
 
 ## v1.92.53
 
-* Ensures editing a retrospective updates the intended board name and prevents accidental renames.
-* Prevents duplicate-name side effects that can impact board retrieval when updating board metadata.
-* Improves Create and Edit Retrospective dialog name-validation feedback, including consistent top and bottom validation messaging.
-* Simplifies board-configuration wording in Board Settings, including the required-name indicator, Max Votes label text, Collect phase helper text, and warning copy.
-* Adjusts board-configuration layout and spacing, including title-input sizing, max-votes input width, and dialog width responsiveness.
-* Validated across create, sprint, copy, and edit flows, including switched boards with General or Permissions edits.
-* Confirms feedback items remain visible after board-name updates.
-
-From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospectives/pull/1696)
+* Added customizable Team Assessment questions so teams can tailor the assessment prompts used on retrospective boards. From [GitHub PR #1646](https://github.com/microsoft/vsts-extension-retrospectives/pull/1646)
+* Added localization support, including Spanish, German, and French translations, plus localized date and number formatting. From [GitHub PR #1657](https://github.com/microsoft/vsts-extension-retrospectives/pull/1657) and [GitHub PR #1658](https://github.com/microsoft/vsts-extension-retrospectives/pull/1658)
+* Added option to define retrospective board using current sprint iteration. From [GitHub PR #1659](https://github.com/microsoft/vsts-extension-retrospectives/pull/1659)
+* Improved retrospective board responsiveness and feedback-item rendering performance to reduce hangs during heavy board activity. From [GitHub PR #1622](https://github.com/microsoft/vsts-extension-retrospectives/pull/1622) and [GitHub PR #1624](https://github.com/microsoft/vsts-extension-retrospectives/pull/1624)
 
 ## v1.92.52
 
-* Fix: improve archived board delete messaging in History and harden loading-state recovery to avoid indefinite spinner states after data-load failures. From [GitHub PR #1578](https://github.com/microsoft/vsts-extension-retrospectives/pull/1578)
-* Fix: improve live-sync reliability with automatic reconnect, manual retry, and connection telemetry for better diagnostics. From [GitHub PR #1580](https://github.com/microsoft/vsts-extension-retrospectives/pull/1580)
-* Fix: order feedback items by votes in retrospective email summary and CSV export, with newest-first tie-breaking for consistent results. From [GitHub PR #1581](https://github.com/microsoft/vsts-extension-retrospectives/pull/1581)
-* Refactor: inline favorability-band helper logic in team assessment score aria-label generation. From [GitHub PR #1582](https://github.com/microsoft/vsts-extension-retrospectives/pull/1582)
-* Refactor: remove remaining Fluent UI dependencies by replacing selector-combo, dialogs, buttons, editable inputs, and board summary list/table implementations with native HTML elements, with associated style and test updates. From [GitHub PR #1583](https://github.com/microsoft/vsts-extension-retrospectives/pull/1583)
-* Fix: improve Team Assessment info button accessibility by providing explicit accessible names and descriptions for screen readers. From [GitHub PR #1584](https://github.com/microsoft/vsts-extension-retrospectives/pull/1584)
-* Feat: improve runtime performance by memoizing heavy frontend computations, optimizing team assessment history chart rendering, and updating TypeScript target settings. From [GitHub PR #1585](https://github.com/microsoft/vsts-extension-retrospectives/pull/1585)
-* Fix: tune SignalR keep-alive configuration to improve websocket connection stability and reduce noisy keep-alive traffic. From [GitHub PR #1586](https://github.com/microsoft/vsts-extension-retrospectives/pull/1586)
+* Improved archived board delete messaging in History and hardened loading-state recovery to avoid indefinite spinner states after data-load failures. From [GitHub PR #1578](https://github.com/microsoft/vsts-extension-retrospectives/pull/1578)
+* Improved live-sync reliability with automatic reconnect, manual retry, and connection telemetry for better diagnostics. From [GitHub PR #1580](https://github.com/microsoft/vsts-extension-retrospectives/pull/1580)
+* Improved feedback-item ordering by votes in retrospective email summary and CSV export, with newest-first tie-breaking for consistent results. From [GitHub PR #1581](https://github.com/microsoft/vsts-extension-retrospectives/pull/1581)
+* Refactored favorability-band helper logic in team assessment score aria-label generation. From [GitHub PR #1582](https://github.com/microsoft/vsts-extension-retrospectives/pull/1582)
+* Refactored remaining Fluent UI dependencies by replacing selector-combo, dialogs, buttons, editable inputs, and board summary list/table implementations with native HTML elements, with associated style and test updates. From [GitHub PR #1583](https://github.com/microsoft/vsts-extension-retrospectives/pull/1583)
+* Improved Team Assessment info button accessibility by providing explicit accessible names and descriptions for screen readers. From [GitHub PR #1584](https://github.com/microsoft/vsts-extension-retrospectives/pull/1584)
+* Improved runtime performance by memoizing heavy frontend computations, optimizing team assessment history chart rendering, and updating TypeScript target settings. From [GitHub PR #1585](https://github.com/microsoft/vsts-extension-retrospectives/pull/1585)
+* Tuned SignalR keep-alive configuration to improve websocket connection stability and reduce noisy keep-alive traffic. From [GitHub PR #1586](https://github.com/microsoft/vsts-extension-retrospectives/pull/1586)
+* Improved feedback-item accessibility with list semantics, clearer selection and favorability labels, and quieter screen-reader behavior while typing. From [GitHub PR #1589](https://github.com/microsoft/vsts-extension-retrospectives/pull/1589)
 
 ## v1.92.51
 
-* Fix: improve readability of retrospective summary percentages by adjusting background styling. From [GitHub PR #1552](https://github.com/microsoft/vsts-extension-retrospectives/pull/1552)
-* Feat: update AdjustIcon SVG for improved design and functionality. From [GitHub PR #1554](https://github.com/microsoft/vsts-extension-retrospectives/pull/1554)
-* Fix: update Retrospective Wiki URL to the correct domain. From [GitHub PR #1556](https://github.com/microsoft/vsts-extension-retrospectives/pull/1556)
+* Fixed readability of retrospective summary percentages by adjusting background styling. From [GitHub PR #1552](https://github.com/microsoft/vsts-extension-retrospectives/pull/1552)
+* Updated AdjustIcon SVG for improved design and functionality. From [GitHub PR #1554](https://github.com/microsoft/vsts-extension-retrospectives/pull/1554)
+* Updated the Retrospective Wiki URL to the correct domain. From [GitHub PR #1556](https://github.com/microsoft/vsts-extension-retrospectives/pull/1556)
 
 ## v1.92.50
 
-* Responsive board layout to view multiple cards per column. From [GitHub PR #1548](https://github.com/microsoft/vsts-extension-retrospectives/pull/1548)
-* Boards do not display team dropdown when default team in list never had retrospective. From [GitHub PR #1550](https://github.com/microsoft/vsts-extension-retrospectives/pull/1550)
+* Refined the board layout to display multiple cards per column responsively. From [GitHub PR #1548](https://github.com/microsoft/vsts-extension-retrospectives/pull/1548)
+* Fixed team dropdown visibility so boards did not display it when the default team in the list never had a retrospective. From [GitHub PR #1550](https://github.com/microsoft/vsts-extension-retrospectives/pull/1550)
 
 ## v1.92.49
 
-* Fixing regression issues. From [GitHub PR #1545](https://github.com/microsoft/vsts-extension-retrospectives/pull/1545)
+* Fixed regression issues. From [GitHub PR #1545](https://github.com/microsoft/vsts-extension-retrospectives/pull/1545)
 
 ## v1.92.48
 
 * Added Team Assessment History dialog with trend charts to review past assessment results. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
 * Enhanced timer with a configurable countdown, duration picker, start/stop chimes, and visibility that adapts by board phase. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392) and [GitHub PR #1405](https://github.com/microsoft/vsts-extension-retrospectives/pull/1405)
+* Refactored User Votes as My Votes and added total votes as Team Votes. From [GitHub PR #1405](https://github.com/microsoft/vsts-extension-retrospectives/pull/1405)
 * Implemented keyboard navigation, focus handling, and a dedicated keyboard shortcuts dialog for improved accessibility. From [GitHub PR #1386](https://github.com/microsoft/vsts-extension-retrospectives/pull/1386)
-* Restricts delete board functionality to the board owner or a team admin. From [GitHub PR #1308](https://github.com/microsoft/vsts-extension-retrospectives/pull/1308)
+* Introduced column notes to provide detailed context for each board column. From [GitHub PR #1372](https://github.com/microsoft/vsts-extension-retrospectives/pull/1372) and [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
+* Replaced icons sourced from Font Awesome and Fluent UI with SVG icons sourced from Material UI. From [GitHub PR #1453](https://github.com/microsoft/vsts-extension-retrospectives/pull/1453)
+* Consolidated and simplified CSS styling rules; simplified styling for grouped feedback; removed mobile view styling and user setting. From [GitHub PR #1392](https://github.com/microsoft/vsts-extension-retrospectives/pull/1392)
+* Restricted delete board functionality to the board owner or a team admin. From [GitHub PR #1308](https://github.com/microsoft/vsts-extension-retrospectives/pull/1308)
 * Updated hyperlinks in CONTRIBUTING markdown file. From [GitHub PR #1305](https://github.com/microsoft/vsts-extension-retrospectives/pull/1305)
 * Added "Ways to Contribute" to the CONTRIBUTING markdown file. From [GitHub PR #1304](https://github.com/microsoft/vsts-extension-retrospectives/pull/1304)
-* Removes groups from Permission table, since setting permission by groups not supported. From [GitHub PR #1294](https://github.com/microsoft/vsts-extension-retrospectives/pull/1294)
+* Removed groups from Permission table, since setting permission by groups not supported. From [GitHub PR #1294](https://github.com/microsoft/vsts-extension-retrospectives/pull/1294)
 * Improved test code coverage. From [GitHub PR #1289](https://github.com/microsoft/vsts-extension-retrospectives/pull/1289)
 
 ## v1.92.46
@@ -85,20 +107,20 @@ From [GitHub PR #1696](https://github.com/microsoft/vsts-extension-retrospective
 
 From [GitHub PR #1234](https://github.com/microsoft/vsts-extension-retrospectives/pull/1234)
 
-* Identifies Team Admin, in addition to Board Owner, in Permission table.
-* Only the Board Owner or a Team Admin can edit permissions to access the retrospective board.
+* Added Team Admin, in addition to Board Owner, identification in Permission table.
+* Restricted edit permissions functionality to the Board Owner or a Team Admin.
 
 From [GitHub PR #1206](https://github.com/microsoft/vsts-extension-retrospectives/pull/1206)
 
-* Moves functionality to delete Retrospectives boards from the Board menu to the History table.
-* Only enables delete functionality for archived boards.
-* More clearly warns that deleting a board is permanent and cannot be undone.
+* Moved functionality to delete Retrospectives boards from the Board menu to the History table.
+* Enabled delete functionality only for archived boards.
+* Clarified warning that deleting a board was permanent and cannot be undone.
 
 From [GitHub PR #1193](https://github.com/microsoft/vsts-extension-retrospectives/pull/1193)
 
-* Implements _sticky_ default settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback.
-* First time board creators will have defaults set to 5 for maximum votes, checked for Team Assessment and Prime Directive, and unchecked for obscure feedback and anonymous feedback.
-* Allows a minimum value of 1 for maximum votes per user.
+* Implemented _sticky_ default settings for maximum votes, Team Assessment, Prime Directive, obscure feedback, and anonymous feedback.
+* Set first-time board creator defaults set to 5 for maximum votes, checked for Team Assessment and Prime Directive, and unchecked for obscure feedback and anonymous feedback.
+* Allowed a minimum value of 1 for maximum votes per user.
 
 From [GitHub PR #1184](https://github.com/microsoft/vsts-extension-retrospectives/pull/1184)
 

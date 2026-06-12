@@ -10,6 +10,7 @@ import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import { getIconElement } from "./icons";
+import WhatsNewDialog from "./whatsNewDialog";
 import { t } from "../utilities/localization";
 
 interface IExportImportDataSchema {
@@ -278,32 +279,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="whats-new-dialog" aria-label="What is New" ref={whatsNewDialogRef} onCancel={() => whatsNewDialogRef.current!.close()}>
-        <div className="header">
-          <h2 className="title">{t("whats_new")}</h2>
-          <button onClick={() => whatsNewDialogRef.current!.close()} aria-label="Close">
-            {getIconElement("close")}
-          </button>
-        </div>
-        <div className="subText">This release focuses on accessibility, simplified stylings, and clearer visuals.</div>
-        <div className="subText li">Added full keyboard navigation across the board along with a dedicated keyboard shortcuts dialog and improved focus handling.</div>
-        <div className="subText li">Introduced a configurable countdown timer with a duration picker, start and stop chimes.</div>
-        <div className="subText li">Added a Team Assessment History dialog with trend charts so teams can review past assessment results.</div>
-        <div className="subText li">Added support for Retrospective Board columns to include notes to clarify what is expected from the user.</div>
-        <div className="subText li">Standardized icons to ensure a consistent look and feel. Icons are included in the package, enabling support for Azure DevOps Enterprise environments.</div>
-        <div className="subText li">Redesigned the voting phase to include the total votes used by the team.</div>
-        <div className="subText li">Refined feedback cards, grouped feedback visuals, and dialog layouts for better readability and consistency.</div>
-        <div className="subText li">Restricted board deletion permissions to the Board Owner and Team Admin.</div>
-        <div className="subText">Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</div>
-        <div className="inner">
-          <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
-            Open change log
-          </button>
-          <button className="default button" onClick={() => whatsNewDialogRef.current!.close()}>
-            {t("common_close")}
-          </button>
-        </div>
-      </dialog>
+      <WhatsNewDialog dialogRef={whatsNewDialogRef} />
 
       <dialog className="user-guide-dialog" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onCancel={() => userGuideDialogRef.current!.close()}>
         <div className="header">
