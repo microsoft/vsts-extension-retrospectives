@@ -12,16 +12,17 @@ import { itemDataService } from "../../dal/itemDataService";
 
 jest.mock("../../dal/itemDataService", () => {
   const actual = jest.requireActual("../../dal/itemDataService");
+  const itemDataServiceMock = Object.assign(Object.create(Object.getPrototypeOf(actual.itemDataService)), actual.itemDataService, {
+    addFeedbackItemAsMainItemToColumn: jest.fn().mockResolvedValue({
+      updatedOldParentFeedbackItem: null,
+      updatedFeedbackItem: { id: "updated", columnId: "column-id" },
+      updatedChildFeedbackItems: [],
+    }),
+    sortItemsByVotesAndDate: jest.fn((items: any, originalItems?: any[]) => items ?? originalItems ?? []),
+  });
+
   return {
-    itemDataService: {
-      ...actual.itemDataService,
-      addFeedbackItemAsMainItemToColumn: jest.fn().mockResolvedValue({
-        updatedOldParentFeedbackItem: null,
-        updatedFeedbackItem: { id: "updated", columnId: "column-id" },
-        updatedChildFeedbackItems: [],
-      }),
-      sortItemsByVotesAndDate: jest.fn((items: any, originalItems?: any[]) => items ?? originalItems ?? []),
-    },
+    itemDataService: itemDataServiceMock,
   };
 });
 
@@ -686,6 +687,7 @@ describe("FeedbackColumn targeted coverage", () => {
       ...testColumnProps,
       workflowPhase: WorkflowPhase.Act,
       isDataLoaded: true,
+      sortMode: "votes" as const,
     };
 
     const { container } = render(<FeedbackColumn {...props} />);

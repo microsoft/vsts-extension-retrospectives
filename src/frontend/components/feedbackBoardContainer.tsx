@@ -9,6 +9,7 @@ import BoardSummaryTable from "./boardSummaryTable";
 import FeedbackBoardMetadataForm from "./feedbackBoardMetadataForm";
 import FeedbackBoard from "../components/feedbackBoard";
 import FeedbackCarousel, { type FocusModeModel } from "./feedbackCarousel";
+import { type FeedbackColumnSortMode } from "./feedbackColumnSorting";
 
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
@@ -74,6 +75,7 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogMessage: string;
   teamBoardDeletedDialogTitle: string;
   focusModeModel: FocusModeModel | null;
+  actColumnSortMode: FeedbackColumnSortMode;
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
   isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
@@ -131,6 +133,7 @@ const initialState: FeedbackBoardContainerState = {
   isBackendServiceConnected: false,
   isBackendServiceReconnecting: false,
   focusModeModel: null,
+  actColumnSortMode: "time",
   isIncludeTeamEffectivenessMeasurementDialogHidden: true,
   isDropIssueInEdgeMessageBarVisible: true,
   isLiveSyncInTfsIssueMessageBarVisible: true,
@@ -1642,6 +1645,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     setDialogVisible("isCarouselDialogVisible", true);
   };
 
+  const toggleActColumnSortMode = () => {
+    setContainerState(previousState => ({ ...previousState, actColumnSortMode: previousState.actColumnSortMode === "time" ? "votes" : "time" }));
+  };
+
+  const currentActSortLabel = state.actColumnSortMode === "time" ? t("sorted_by_time") : t("sorted_by_votes");
+
   const hideCarouselDialog = () => {
     hideDialog("isCarouselDialogVisible", carouselDialogRef);
   };
@@ -2068,6 +2077,16 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       )}
                       {state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
+                          <button
+                            className="sort-mode-button focus-mode-button"
+                            onClick={toggleActColumnSortMode}
+                            title={currentActSortLabel}
+                            aria-label={currentActSortLabel}
+                            type="button"
+                          >
+                            {getIconElement(state.actColumnSortMode === "time" ? "sort-by-time" : "sort-by-votes")}
+                            <span>{currentActSortLabel}</span>
+                          </button>
                           <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
                             {getIconElement("adjust")}
                             <span>Focus Mode</span>
@@ -2180,6 +2199,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     onFocusModeModelChange={focusModeModel => {
                       setContainerState(previousState => ({ ...previousState, focusModeModel }));
                     }}
+                    sortMode={state.actColumnSortMode}
                     isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
                     hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
                     userId={state.currentUserId}

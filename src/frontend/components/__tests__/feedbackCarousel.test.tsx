@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import FeedbackCarousel, { type FocusModeModel } from "../../components/feedbackCarousel";
 import { testGroupColumnProps, testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { mockUuid } from "../__mocks__/uuid/v4";
@@ -120,7 +120,7 @@ describe("Feedback Carousel ", () => {
   });
 
   describe("Item sorting", () => {
-    it("should sort items by upvotes (descending) then by creation date (ascending)", () => {
+    it("should preserve the focus mode model item order", async () => {
       const item1 = {
         ...testColumnProps.columnItems[0],
         feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", upvotes: 5, createdDate: new Date("2023-01-01") },
@@ -141,8 +141,10 @@ describe("Feedback Carousel ", () => {
 
       const { container } = render(<FeedbackCarousel {...propsWithSorting} />);
 
-      // Should render without error - sorting logic executed
-      expect(container.querySelector(".feedback-carousel-pivot")).toBeTruthy();
+      await waitFor(() => {
+        const itemIds = Array.from(container.querySelectorAll("#carousel-all-columns [data-feedback-item-id]")).map(element => element.getAttribute("data-feedback-item-id"));
+        expect(itemIds).toEqual(["item3", "item1", "item2"]);
+      });
     });
 
     it("should filter out items with parentFeedbackItemId", () => {

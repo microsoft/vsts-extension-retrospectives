@@ -14,6 +14,7 @@ import { appInsights, TelemetryEvents } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement } from "./icons";
 import { t } from "../utilities/localization";
+import { type FeedbackColumnSortMode, sortFeedbackColumnItems } from "./feedbackColumnSorting";
 
 export interface FeedbackColumnProps {
   columns: { [id: string]: IColumn };
@@ -41,6 +42,7 @@ export interface FeedbackColumnProps {
   showColumnEditButton: boolean;
   columnNotes: string;
   onColumnNotesChange: (notes: string) => void;
+  sortMode?: FeedbackColumnSortMode;
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
   activeTimerFeedbackItemId: string | null;
   requestTimerStart: (feedbackItemId: string) => void;
@@ -133,12 +135,14 @@ export const createFeedbackItemProps = (columnProps: FeedbackColumnProps, column
 };
 
 const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((props, ref) => {
-  const { columnName, columnId, icon, workflowPhase, isDataLoaded, columnItems, boardId, isBoardAnonymous, showColumnEditButton, columnNotes, onColumnNotesChange, addFeedbackItems, refreshFeedbackItems } = props;
+  const { columnName, columnId, icon, workflowPhase, isDataLoaded, columnItems, boardId, isBoardAnonymous, showColumnEditButton, columnNotes, onColumnNotesChange, sortMode: controlledSortMode, addFeedbackItems, refreshFeedbackItems } = props;
   const currentColumnItems = columnItems ?? [];
 
   const [isCollapsed] = useState(false);
   const [columnNotesDraft, setColumnNotesDraft] = useState("");
   const [, setFocusedItemIndex] = useState(-1);
+
+  const sortMode = controlledSortMode ?? "time";
 
   const columnRef = useRef<HTMLDivElement>(null);
   const editColumnNotesDialogRef = useRef<HTMLDialogElement>(null);
@@ -147,17 +151,10 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
 
   const getNavigableColumnItems = useCallback((): IColumnItem[] => {
     const sourceColumnItems: IColumnItem[] = currentColumnItems;
-
-    let sortedItems: IColumnItem[] = sourceColumnItems;
-
-    if (workflowPhase === WorkflowPhase.Act) {
-      sortedItems = itemDataService.sortItemsByVotesAndDate(sortedItems, sourceColumnItems);
-    } else {
-      sortedItems = sortedItems.sort((item1, item2) => new Date(item2.feedbackItem.createdDate).getTime() - new Date(item1.feedbackItem.createdDate).getTime());
-    }
+    const sortedItems = sortFeedbackColumnItems(sourceColumnItems, workflowPhase, sortMode);
 
     return (sortedItems || []).filter(item => !item.feedbackItem.parentFeedbackItemId);
-  }, [currentColumnItems, workflowPhase]);
+  }, [currentColumnItems, workflowPhase, sortMode]);
 
   const focusFeedbackItemById = useCallback((feedbackItemId: string) => {
     const elementToFocus = columnRef.current?.querySelector(`[data-feedback-item-id="${feedbackItemId}"]`) as HTMLElement | null;

@@ -109,6 +109,33 @@ export const InfoIcon = () => {
   );
 };
 
+export const SortIcon = () => {
+  return (
+    <svg className="icon-sort" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z" />
+    </svg>
+  );
+};
+
+export const SortByVotesIcon = () => {
+  return (
+    <svg className="icon-sort-by-votes" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M6.29,14.29l-.29.3V7A1,1,0,0,0,4,7v7.59l-.29-.3a1,1,0,0,0-1.42,1.42l2,2a1,1,0,0,0,.33.21.94.94,0,0,0,.76,0,1,1,0,0,0,.33-.21l2-2a1,1,0,0,0-1.42-1.42Z" />
+      <path d="M19.78,8.448845 L19.78,17.335 C19.78,18.0142832 19.2272832,18.567 18.548,18.567 L12.392,18.567 C11.7127168,18.567 11.16,18.0142832 11.16,17.335 L11.16,8.448845 C11.16,8.038005 11.366191,7.652888 11.7079328,7.4265068 L14.925799,5.1427304 C15.131548,5.0042015 15.400452,5.0042015 15.606201,5.1427304 L18.8240672,7.4265068 C19.165809,7.652888 19.78,8.038005 19.78,8.448845 Z M15.264,6.393730 L12.392,8.448845 L12.392,17.335 L18.548,17.335 L18.548,8.448845 L15.264,6.393730 Z M14.648,8.76 C14.648,8.4203585 14.9243585,8.144 15.264,8.144 C15.6036415,8.144 15.88,8.4203585 15.88,8.76 C15.88,9.0996415 15.6036415,9.376 15.264,9.376 C14.9243585,9.376 14.648,9.0996415 14.648,8.76 Z" />
+    </svg>
+  );
+};
+
+export const SortByTimeIcon = () => {
+  return (
+    <svg className="icon-sort-by-time" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M6.29,14.29l-.29.3V7A1,1,0,0,0,4,7v7.59l-.29-.3a1,1,0,0,0-1.42,1.42l2,2a1,1,0,0,0,.33.21.94.94,0,0,0,.76,0,1,1,0,0,0,.33-.21l2-2a1,1,0,0,0-1.42-1.42Z" />
+      <path d="M16.3,5.35 C19.9727,5.35 22.95,8.3273 22.95,12 C22.95,15.6727 19.9727,18.65 16.3,18.65 C12.6273,18.65 9.65,15.6727 9.65,12 C9.65,8.3273 12.6273,5.35 16.3,5.35 Z M16.3,6.68 C13.3626,6.68 10.98,9.0626 10.98,12 C10.98,14.9374 13.3626,17.32 16.3,17.32 C19.2374,17.32 21.62,14.9374 21.62,12 C21.62,9.0626 19.2374,6.68 16.3,6.68 Z M16.3,8.01 C16.641035,8.01 16.922113,8.266717 16.960526,8.597447 L16.965,8.675 L16.965,11.7245 L18.100226,12.859726 C18.359613,13.119113 18.359613,13.540887 18.100226,13.800274 C17.8594,14.0411 17.482295,14.05955 17.221421,13.856547 L17.158226,13.800274 L15.828226,12.470274 C15.7243,12.366347 15.658372,12.231517 15.639267,12.087059 L15.6335,12 L15.6335,8.675 C15.6335,8.307731 15.932731,8.01 16.3,8.01 Z" />
+    </svg>
+  );
+};
+
 export const ExclamationIcon = () => {
   return (
     <svg className="icon-exclamation" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -928,6 +955,9 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "link-off", tags: [], name: "Link Off", icon: <LinkOffIcon /> },
   { id: "table-chart", tags: [], name: "Table Chart", icon: <TableChartIcon /> },
   { id: "info", tags: [], name: "Info", icon: <InfoIcon /> },
+  { id: "sort", tags: [], name: "Sort", icon: <SortIcon /> },
+  { id: "sort-by-votes", tags: [], name: "Sort By Votes", icon: <SortByVotesIcon /> },
+  { id: "sort-by-time", tags: [], name: "Sort By Time", icon: <SortByTimeIcon /> },
   { id: "content-copy", tags: [], name: "Content Copy", icon: <ContentCopyIcon /> },
   { id: "sim-card-download", tags: [], name: "Sim Card Download", icon: <SimCardDownloadIcon /> },
   { id: "forward-to-inbox", tags: [], name: "Forward To Inbox", icon: <ForwardToInboxIcon /> },

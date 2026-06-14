@@ -11,6 +11,7 @@ import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from "
 import { ExceptionCode } from "../interfaces/retrospectiveState";
 import { WorkflowPhase } from "../interfaces/workItem";
 import type { FocusModeModel } from "./feedbackCarousel";
+import { type FeedbackColumnSortMode, sortFeedbackColumnItems } from "./feedbackColumnSorting";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
@@ -28,6 +29,7 @@ export interface FeedbackBoardProps {
   isAnonymous: boolean;
   hideFeedbackItems: boolean;
   onFocusModeModelChange?: (model: FocusModeModel) => void;
+  sortMode?: FeedbackColumnSortMode;
   userId: string;
   onVoteCasted?: () => void;
   onColumnNotesChange?: (columnId: string, notes: string) => Promise<void>;
@@ -100,7 +102,7 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   return resetFocusForStateColumns;
 };
 
-export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
+export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, sortMode = "time", userId, onVoteCasted, onColumnNotesChange }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -309,8 +311,22 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   }, []);
 
   const getFocusModeModel = useCallback((): FocusModeModel => {
+    const focusModeColumns = { ...columns };
+
+    columnIds.forEach(columnId => {
+      const column = columns[columnId];
+      if (!column) {
+        return;
+      }
+
+      focusModeColumns[columnId] = {
+        ...column,
+        columnItems: sortFeedbackColumnItems(column.columnItems, workflowPhase, sortMode),
+      };
+    });
+
     return {
-      columns,
+      columns: focusModeColumns,
       columnIds,
       workflowPhase,
       team,
@@ -331,7 +347,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       removeFeedbackItemFromColumn,
       refreshFeedbackItems,
     };
-  }, [columns, columnIds, workflowPhase, team, board.id, board.title, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
+  }, [columns, columnIds, workflowPhase, sortMode, team, board.id, board.title, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
 
   const initColumns = useCallback(() => {
     const columnProperties = board.columns;
@@ -733,6 +749,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         showColumnEditButton: !!canCurrentUserEditBoard,
         columnNotes: getColumnNotesOrEmpty(columnNotes, columnId),
         onColumnNotesChange: (notes: string) => handleColumnNotesChange(columnId, notes),
+        sortMode,
         onVoteCasted: () => {
           if (onVoteCasted) {
             onVoteCasted();
@@ -743,7 +760,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         notifyTimerStopped: handleTimerStopped,
       };
     });
-  }, [board.createdBy?.id, board.id, board.title, userId, columnIds, columns, team, isDataLoaded, workflowPhase, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, columnNotes, handleColumnNotesChange, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped]);
+  }, [board.createdBy?.id, board.id, board.title, userId, columnIds, columns, team, isDataLoaded, workflowPhase, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, columnNotes, handleColumnNotesChange, sortMode, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped]);
 
   if (!displayBoard) {
     return <div> An unexpected exception occurred. </div>;

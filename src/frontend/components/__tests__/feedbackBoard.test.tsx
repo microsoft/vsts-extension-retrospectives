@@ -2,6 +2,7 @@ import React from "react";
 import { render, waitFor, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../../interfaces/feedback";
+import { WorkflowPhase } from "../../interfaces/workItem";
 import { mocked } from "jest-mock";
 import FeedbackBoard, { FeedbackBoardProps } from "../../components/feedbackBoard";
 import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
@@ -39,6 +40,7 @@ jest.mock("../../dal/itemDataService", () => ({
     getFeedbackItem: jest.fn(),
     getBoardItem: jest.fn(),
     flipTimer: jest.fn(),
+    sortItemsByVotesAndDate: jest.fn((items: any[]) => items),
   },
 }));
 
@@ -1105,6 +1107,16 @@ describe("FeedbackBoard Component", () => {
           const columnProps = getLatestColumnProps(column.id);
           expect(columnProps).toBeDefined();
           expect(columnProps.columnId).toBe(column.id);
+        });
+      });
+    });
+
+    it("passes one board sort mode to every column", async () => {
+      render(<FeedbackBoard {...mockedProps} workflowPhase={WorkflowPhase.Act} sortMode="votes" />);
+
+      await waitFor(() => {
+        mockedProps.board.columns.forEach(column => {
+          expect(getLatestColumnProps(column.id)?.sortMode).toBe("votes");
         });
       });
     });
@@ -2284,6 +2296,27 @@ describe("FeedbackBoard Component", () => {
       focusModeModel?.onVoteCasted?.();
 
       expect(onVoteCasted).toHaveBeenCalled();
+    });
+
+    it("uses board sort mode for focus mode columns", async () => {
+      const onFocusModeModelChange = jest.fn();
+      const firstColumnId = testColumnProps.columnIds[0];
+      const itemsInFirstColumn = [
+        { ...mockFeedbackItems[0], id: "first", columnId: firstColumnId, originalColumnId: firstColumnId },
+        { ...mockFeedbackItems[0], id: "second", columnId: firstColumnId, originalColumnId: firstColumnId },
+      ];
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue(itemsInFirstColumn);
+      (itemDataService.sortItemsByVotesAndDate as jest.Mock).mockImplementation((items: any[]) => [...items].reverse());
+
+      render(<FeedbackBoard {...mockedProps} workflowPhase={WorkflowPhase.Act} sortMode="votes" onFocusModeModelChange={onFocusModeModelChange} />);
+
+      await waitFor(() => {
+        const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
+        const focusModeItemIds = focusModeModel?.columns[firstColumnId]?.columnItems.map((item: any) => item.feedbackItem.id);
+        expect(focusModeItemIds).toHaveLength(2);
+        expect(focusModeItemIds).toEqual(["second", "first"]);
+      });
     });
   });
 

@@ -1141,7 +1141,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .focus-mode-button {
-  @apply flex items-center gap-1 bg-transparent border-0 cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none hover:text-primary;
+  @apply flex items-center gap-1 bg-transparent border-0 cursor-pointer text-sm p-2 hover:bg-transparent focus:outline-none hover:text-primary;
 
   & svg {
     @apply w-5 h-5;

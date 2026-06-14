@@ -32,16 +32,17 @@ jest.mock("@microsoft/applicationinsights-react-js", () => ({
 
 jest.mock("../../dal/itemDataService", () => {
   const actual = jest.requireActual("../../dal/itemDataService");
+  const itemDataServiceMock = Object.assign(Object.create(Object.getPrototypeOf(actual.itemDataService)), actual.itemDataService, {
+    addFeedbackItemAsMainItemToColumn: jest.fn().mockResolvedValue({
+      updatedOldParentFeedbackItem: null,
+      updatedFeedbackItem: { id: "updated", columnId: "column-id" },
+      updatedChildFeedbackItems: [],
+    }),
+    sortItemsByVotesAndDate: jest.fn((items: any, originalItems?: any[]) => items ?? originalItems ?? []),
+  });
+
   return {
-    itemDataService: {
-      ...actual.itemDataService,
-      addFeedbackItemAsMainItemToColumn: jest.fn().mockResolvedValue({
-        updatedOldParentFeedbackItem: null,
-        updatedFeedbackItem: { id: "updated", columnId: "column-id" },
-        updatedChildFeedbackItems: [],
-      }),
-      sortItemsByVotesAndDate: jest.fn((items: any, originalItems?: any[]) => items ?? originalItems ?? []),
-    },
+    itemDataService: itemDataServiceMock,
   };
 });
 
@@ -102,6 +103,19 @@ describe("Feedback Column ", () => {
 
       const infoButton = queryByRole("button", { name: /Column notes:/ });
       expect(infoButton).not.toBeInTheDocument();
+    });
+  });
+
+  describe("sort button", () => {
+    it("is not rendered in column headers", () => {
+      (itemDataService.sortItemsByVotesAndDate as jest.Mock).mockClear();
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Act, isDataLoaded: true };
+
+      const { container, queryByRole } = render(<FeedbackColumn {...props} />);
+
+      expect(queryByRole("button", { name: "Sort by votes" })).not.toBeInTheDocument();
+      expect(container.querySelector(".feedback-column-sort-button")).toBeNull();
+      expect(itemDataService.sortItemsByVotesAndDate).not.toHaveBeenCalled();
     });
   });
 
@@ -2326,7 +2340,7 @@ describe("Feedback Column ", () => {
     test("sorts items by votes in Act phase", () => {
       const itemOne = { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-1", upvotes: 1 } };
       const itemTwo = { ...testColumnProps.columnItems[0], feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", upvotes: 5 } };
-      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Act, isDataLoaded: true, columnItems: [itemOne, itemTwo] };
+      const props = { ...testColumnProps, workflowPhase: WorkflowPhase.Act, isDataLoaded: true, columnItems: [itemOne, itemTwo], sortMode: "votes" as const };
 
       const sortSpy = itemDataService.sortItemsByVotesAndDate as jest.Mock;
       sortSpy.mockImplementation(items => items.slice().reverse());
@@ -2467,7 +2481,7 @@ describe("Feedback Column ", () => {
         feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item-2", upvotes: 10 },
       };
 
-      const props = { ...testColumnProps, columnItems: [item1, item2], workflowPhase: WorkflowPhase.Act, isDataLoaded: true };
+      const props = { ...testColumnProps, columnItems: [item1, item2], workflowPhase: WorkflowPhase.Act, isDataLoaded: true, sortMode: "votes" as const };
       const { container } = render(<FeedbackColumn {...props} />);
 
       expect(container.querySelector(".feedback-items-container")).toBeTruthy();
