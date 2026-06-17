@@ -2241,7 +2241,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             </div>
           )}
           {state.activeTab === "Board" && state.currentBoard && (
-            <div className="feedback-board-container">
+            <div className={`feedback-board-container scroll-mode-${state.scrollMode}`}>
               {state.currentTeam && state.currentBoard && (
                 <>
                   {!isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
