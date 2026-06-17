@@ -186,6 +186,7 @@ const mockedProps: FeedbackBoardProps = {
   displayBoard: true,
   board: mockedBoard,
   team: testColumnProps.team,
+  scrollMode: "column",
   workflowPhase: "Vote",
   nonHiddenWorkItemTypes: testColumnProps.nonHiddenWorkItemTypes,
   allWorkItemTypes: testColumnProps.allWorkItemTypes,

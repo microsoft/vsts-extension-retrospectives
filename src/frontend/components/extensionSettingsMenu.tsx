@@ -117,7 +117,10 @@ const importData = async () => {
   return false;
 };
 
-export const ExtensionSettingsMenu: React.FC = () => {
+export const ExtensionSettingsMenu: React.FC<{
+  scrollMode: "column" | "board";
+  onScrollModeChange: (mode: "column" | "board") => void;
+}> = ({ scrollMode, onScrollModeChange }) => {
   const trackActivity = useTrackMetric(reactPlugin, "ExtensionSettingsMenu");
 
   const menuRootRef = useRef<HTMLDivElement>(null);
@@ -255,6 +258,25 @@ export const ExtensionSettingsMenu: React.FC = () => {
           >
             {getIconElement("contact-phone")}
             {t("contact_us")}
+          </button>
+        </div>
+      </details>
+
+      <details className="flex items-center relative">
+        <summary aria-label={t("common_settings")} title={t("common_settings")} className="extension-settings-button">
+          {getIconElement("settings")}
+          <span className="hidden lg:inline">{t("common_settings")}</span>
+        </summary>
+
+        <div className="callout-menu right">
+          <button
+            onClick={() => {
+              const newMode = scrollMode === "column" ? "board" : "column";
+              onScrollModeChange(newMode);
+            }}
+          >
+            {getIconElement("settings")}
+            {scrollMode === "column" ? t("scroll_by_board") : t("scroll_by_column")}
           </button>
         </div>
       </details>

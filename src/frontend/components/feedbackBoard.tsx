@@ -31,6 +31,7 @@ export interface FeedbackBoardProps {
   userId: string;
   onVoteCasted?: () => void;
   onColumnNotesChange?: (columnId: string, notes: string) => Promise<void>;
+  scrollMode: "column" | "board";
 }
 
 export interface IColumn {
@@ -100,7 +101,7 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   return resetFocusForStateColumns;
 };
 
-export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
+export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange, scrollMode }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -754,7 +755,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   const feedbackColumnPropsList = getFeedbackColumnPropsList();
 
   return (
-    <div className="feedback-board" role="main" aria-label="Feedback board with columns" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+    <div className={`feedback-board scroll-mode-${scrollMode}`} role="main" aria-label="Feedback board with columns" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       {isDataLoaded &&
         feedbackColumnPropsList.map(columnProps => {
           return <FeedbackColumn key={columnProps.columnId} ref={columnRefsRef.current[columnIds.indexOf(columnProps.columnId)]} {...columnProps} />;
