@@ -35,6 +35,13 @@ describe("icons", () => {
       expect(container.querySelector(".icon-table-chart")).toBeTruthy();
     });
 
+    it("returns MiscellaneousServicesIcon for miscellaneous-services id", () => {
+      const icon = getIconElement("miscellaneous-services");
+      const { container } = render(icon);
+
+      expect(container.querySelector(".icon-miscellaneous-services")).toBeTruthy();
+    });
+
     it("returns icons by legacy tag", () => {
       const icon = getIconElement("fas fa-coffee");
       const { container } = render(icon);
