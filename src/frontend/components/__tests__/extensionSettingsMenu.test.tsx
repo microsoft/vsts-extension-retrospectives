@@ -92,6 +92,10 @@ describe("ExtensionSettingsMenu", () => {
 
   const getHelpMenuButton = (name: string): HTMLElement => within(getHelpMenuDetails()).getByRole("button", { name });
 
+  const renderMenu = (props: Partial<React.ComponentProps<typeof ExtensionSettingsMenu>> = {}) => {
+    return render(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={jest.fn()} {...props} />);
+  };
+
   beforeEach(() => {
     windowOpenSpy = jest.spyOn(window, "open").mockImplementation(() => null);
 
@@ -128,12 +132,12 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("renders component", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     expect(container.querySelector(".extension-settings-menu")).toBeInTheDocument();
   });
 
   it("renders all buttons", () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     expect(screen.getByTitle("Prime Directive")).toBeInTheDocument();
     expect(screen.getByTitle("Data Import/Export")).toBeInTheDocument();
     expect(screen.getByTitle("Retrospective Help")).toBeInTheDocument();
@@ -141,7 +145,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("shows labels when wide", () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     expect(screen.getByText("Directive")).toBeInTheDocument();
     expect(screen.getByText("Data")).toBeInTheDocument();
     expect(screen.getByText("Help")).toBeInTheDocument();
@@ -151,20 +155,20 @@ describe("ExtensionSettingsMenu", () => {
     Object.defineProperty(window, "outerWidth", { value: 800, writable: true, configurable: true });
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
 
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     // Labels are in DOM but hidden with Tailwind classes
     const label = screen.getByText("Directive");
     expect(label).toHaveClass("hidden", "lg:inline");
   });
 
   it("opens Prime Directive dialog", () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Prime Directive"));
     expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
   });
 
   it("opens keyboard shortcuts dialog with '?' hotkey", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
 
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
     expect(dialog).toBeInTheDocument();
@@ -175,14 +179,14 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens retrospective wiki", () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Prime Directive"));
     fireEvent.click(screen.getByRole("button", { name: "Open retrospective wiki" }));
     expect(windowOpenSpy).toHaveBeenCalledWith("https://retrospectivewiki.org", "_blank");
   });
 
   it("opens What's New dialog", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("What's new"));
@@ -193,7 +197,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens User Guide dialog", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("User guide"));
@@ -204,7 +208,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens Volunteer dialog", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
@@ -215,7 +219,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens Keyboard Shortcuts dialog", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
@@ -226,7 +230,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes Keyboard Shortcuts dialog", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
@@ -243,7 +247,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens GitHub issues", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("Contact us"));
@@ -252,7 +256,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes open menu details on outside pointerdown", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
 
     const details = Array.from(container.querySelectorAll("details"));
     expect(details.length).toBeGreaterThanOrEqual(2);
@@ -267,7 +271,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("handles pointerdown events gracefully", () => {
     // Test that a basic pointerdown on body doesn't cause errors
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
 
     // Open a details menu
     const details = Array.from(container.querySelectorAll("details"));
@@ -288,7 +292,7 @@ describe("ExtensionSettingsMenu", () => {
 
     const anchorClickSpy = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
 
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByText("Export Data"));
 
     await waitFor(() => {
@@ -300,7 +304,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes the What's New dialog with the header close button", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("What's new"));
@@ -316,7 +320,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes the User Guide dialog with the header close button", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("User guide"));
@@ -332,7 +336,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes the Volunteer dialog with the header close button", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
@@ -348,7 +352,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes the Keyboard Shortcuts dialog with the header close button", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
@@ -364,7 +368,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("handles dialog cancel events for all help dialogs", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
 
     fireEvent.click(screen.getByTitle("Prime Directive"));
     const primeDirectiveDialog = screen.getByRole("dialog", { name: "The Prime Directive" });
@@ -402,7 +406,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("handles keyboard shortcuts", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Prime Directive"));
     expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
     const dialog = screen.getByRole("dialog", { name: "The Prime Directive" });
@@ -413,7 +417,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes What's New dialog", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("What's new"));
@@ -429,7 +433,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens changelog from What's New", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("What's new"));
@@ -441,7 +445,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens readme from User Guide", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("User guide"));
@@ -453,7 +457,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes User Guide dialog", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("User guide"));
@@ -469,7 +473,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens contributing from Volunteer", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
@@ -481,7 +485,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes Volunteer dialog", async () => {
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     fireEvent.click(screen.getByTitle("Retrospective Help"));
     await waitFor(() => {
       fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
@@ -501,14 +505,14 @@ describe("ExtensionSettingsMenu", () => {
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
     Object.defineProperty(window, "innerHeight", { value: 1200, writable: true, configurable: true });
 
-    render(<ExtensionSettingsMenu />);
+    renderMenu();
     // Labels are in DOM with Tailwind responsive classes
     const label = screen.getByText("Directive");
     expect(label).toHaveClass("hidden", "lg:inline");
   });
 
   it("uses Tailwind responsive classes for label visibility", async () => {
-    const { rerender } = render(<ExtensionSettingsMenu />);
+    const { rerender } = renderMenu();
     const label = screen.getByText("Directive");
     expect(label).toBeInTheDocument();
     expect(label).toHaveClass("hidden", "lg:inline");
@@ -519,7 +523,7 @@ describe("ExtensionSettingsMenu", () => {
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
 
     fireEvent(window, new Event("resize"));
-    rerender(<ExtensionSettingsMenu />);
+    rerender(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={jest.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByText("Directive")).toHaveClass("hidden", "lg:inline");
@@ -534,7 +538,7 @@ describe("ExtensionSettingsMenu", () => {
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([{ id: "item-1", boardId: "board-1" }]);
 
     try {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Data menu
       const dataButton = screen.getByTitle("Data Import/Export");
@@ -557,7 +561,7 @@ describe("ExtensionSettingsMenu", () => {
 
     // The processImportedData function is now internal to the component
     // We can only test the UI interaction of importing data
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
 
     // Open the Data menu
     const dataButton = screen.getByTitle("Data Import/Export");
@@ -572,7 +576,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("wires up file input for data import", async () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
 
     // Open the Data menu
     const dataButton = screen.getByTitle("Data Import/Export");
@@ -615,7 +619,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("ignores '?' shortcut when focus is on an input", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
 
     const input = document.createElement("input");
@@ -630,7 +634,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("does not open shortcuts dialog when a different dialog is already open", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
 
     const blockingDialog = document.createElement("dialog");
@@ -646,7 +650,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("ignores keyboard shortcut when modifier keys are pressed", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
 
     fireEvent.keyDown(document, { key: "?", code: "Slash", ctrlKey: true });
@@ -655,7 +659,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("closes open data details when clicking outside the menu", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const details = container.querySelector("details");
 
     details?.setAttribute("open", "");
@@ -675,7 +679,7 @@ describe("ExtensionSettingsMenu", () => {
 
     // The processImportedData function is now internal to the component
     // We test that the import UI elements are rendered correctly
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
 
     // Open the Data menu
     const dataButton = screen.getByTitle("Data Import/Export");
@@ -691,7 +695,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("does not reopen keyboard shortcuts dialog when already open", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
 
     // Open the dialog first
@@ -705,7 +709,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens keyboard shortcuts with '/' and shiftKey", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
     expect(dialog).not.toHaveAttribute("open");
 
@@ -715,7 +719,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("opens keyboard shortcuts with code 'Slash' and shiftKey", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
     expect(dialog).not.toHaveAttribute("open");
 
@@ -725,7 +729,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("ignores keyboard shortcut when metaKey is pressed", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
 
     fireEvent.keyDown(document, { key: "?", code: "Slash", metaKey: true });
@@ -734,7 +738,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("ignores keyboard shortcut when altKey is pressed", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
 
     fireEvent.keyDown(document, { key: "?", code: "Slash", altKey: true });
@@ -743,7 +747,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("ignores non-question-mark keys", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     const dialog = container.querySelector(".keyboard-shortcuts-dialog") as HTMLDialogElement;
 
     fireEvent.keyDown(document, { key: "a" });
@@ -759,7 +763,7 @@ describe("ExtensionSettingsMenu", () => {
 
     // The processImportedData function is now internal to the component
     // We test that the component renders and the data menu works
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
 
     // Open the Data menu
     const dataButton = screen.getByTitle("Data Import/Export");
@@ -774,7 +778,7 @@ describe("ExtensionSettingsMenu", () => {
   });
 
   it("handles keydown when no dialog is open", () => {
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
     // Press a key when no dialog is open - should not throw
     const event = new KeyboardEvent("keydown", { key: "?", bubbles: true });
     document.dispatchEvent(event);
@@ -799,7 +803,7 @@ describe("ExtensionSettingsMenu", () => {
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
 
     try {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Data menu
       const dataButton = screen.getByTitle("Data Import/Export");
@@ -816,7 +820,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("calls importData when Import Data button is clicked", async () => {
     // Render the component FIRST before mocking document methods
-    const { container } = render(<ExtensionSettingsMenu />);
+    const { container } = renderMenu();
 
     // Verify component rendered
     const menuComponent = container.querySelector(".extension-settings-menu");
@@ -861,7 +865,7 @@ describe("ExtensionSettingsMenu", () => {
   describe("handleDocumentPointerDown", () => {
     it("handles pointerdown events without crashing", () => {
       // Render component and test that pointerdown events are handled gracefully
-      render(<ExtensionSettingsMenu />);
+      renderMenu();
 
       // Should not throw when simulating pointerdown
       expect(() => {
@@ -870,7 +874,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("returns early when event.target is null", () => {
-      render(<ExtensionSettingsMenu />);
+      renderMenu();
 
       // Should not throw when simulating pointerdown
       expect(() => {
@@ -879,7 +883,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("closes open details elements when clicking outside", () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open a details menu
       const dataButton = screen.getByTitle("Data Import/Export");
@@ -897,7 +901,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("does not close details when clicking inside", () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open a details menu
       const dataButton = screen.getByTitle("Data Import/Export");
@@ -921,7 +925,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("opens Prime Directive dialog when clicking Prime Directive button", () => {
-      render(<ExtensionSettingsMenu />);
+      renderMenu();
       const primeDirectiveButton = screen.getByTitle("Prime Directive");
 
       fireEvent.click(primeDirectiveButton);
@@ -930,7 +934,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("closes Prime Directive dialog when clicking close button", () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
       const primeDirectiveButton = screen.getByTitle("Prime Directive");
 
       fireEvent.click(primeDirectiveButton);
@@ -945,7 +949,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("opens What's New dialog from help menu", () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Help menu
       const helpButton = screen.getByTitle("Retrospective Help");
@@ -962,7 +966,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("opens Keyboard shortcuts dialog from help menu", () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Help menu
       const helpButton = screen.getByTitle("Retrospective Help");
@@ -980,7 +984,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("opens User guide dialog from help menu", () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Help menu
       const helpButton = screen.getByTitle("Retrospective Help");
@@ -998,7 +1002,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("opens Volunteer dialog from help menu", () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Help menu
       const helpButton = screen.getByTitle("Retrospective Help");
@@ -1018,7 +1022,7 @@ describe("ExtensionSettingsMenu", () => {
     it("opens Contact us link in new window", () => {
       const windowOpenSpy = jest.spyOn(window, "open").mockImplementation(() => null);
 
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Help menu
       const helpButton = screen.getByTitle("Retrospective Help");
@@ -1037,7 +1041,7 @@ describe("ExtensionSettingsMenu", () => {
     });
 
     it("closes dialogs using the Close button", () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open Prime Directive dialog
       const primeDirectiveButton = screen.getByTitle("Prime Directive");
@@ -1059,7 +1063,7 @@ describe("ExtensionSettingsMenu", () => {
 
   describe("Data Import/Export functionality", () => {
     it("triggers file reader when import file is selected", async () => {
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Mock file reader
       const mockFileReader: Partial<FileReader> = {
@@ -1150,7 +1154,7 @@ describe("ExtensionSettingsMenu", () => {
       const createBoardSpy = jest.spyOn(boardDataService, "createBoardForTeam").mockResolvedValue({ id: "new-board", title: "Board One" } as any);
       const appendSpy = jest.spyOn(itemDataService, "appendItemToBoard").mockResolvedValue({} as any);
 
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Data menu and click Import
       const dataButton = screen.getByTitle("Data Import/Export");
@@ -1211,7 +1215,7 @@ describe("ExtensionSettingsMenu", () => {
       const createBoardSpy = jest.spyOn(boardDataService, "createBoardForTeam").mockResolvedValue({ id: "new-board", title: "Imported Board" } as any);
       const appendSpy = jest.spyOn(itemDataService, "appendItemToBoard").mockResolvedValue({} as any);
 
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Data menu
       const dataButton = screen.getByTitle("Data Import/Export");
@@ -1234,7 +1238,7 @@ describe("ExtensionSettingsMenu", () => {
       (azureDevOpsCoreService.getAllTeams as jest.Mock).mockResolvedValue([{ id: "team-1", name: "Existing Team" }]);
       (azureDevOpsCoreService.getDefaultTeam as jest.Mock).mockResolvedValue({ id: "default-team", name: "Default Team" });
 
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Data menu
       const dataButton = screen.getByTitle("Data Import/Export");
@@ -1266,7 +1270,7 @@ describe("ExtensionSettingsMenu", () => {
 
       const anchorClickSpy = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
 
-      const { container } = render(<ExtensionSettingsMenu />);
+      const { container } = renderMenu();
 
       // Open the Data menu and click Export
       const dataButton = screen.getByTitle("Data Import/Export");

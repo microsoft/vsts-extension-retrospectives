@@ -167,6 +167,7 @@ const renderBoard = (overrides?: Partial<FeedbackBoardProps>) => {
     userId: "owner-1",
     onColumnNotesChange: jest.fn().mockResolvedValue(undefined),
     ...overrides,
+    scrollMode: overrides?.scrollMode ?? "column",
   };
 
   return render(<FeedbackBoard {...props} />);
@@ -418,7 +419,7 @@ describe("FeedbackBoard targeted coverage", () => {
     });
 
     const oldColumnProps = getLatestColumnPropsById("old-col");
-    rerender(<FeedbackBoard displayBoard={true} board={nextBoard} team={baseTeam} workflowPhase={WorkflowPhase.Vote} nonHiddenWorkItemTypes={[]} allWorkItemTypes={[]} isAnonymous={false} hideFeedbackItems={false} userId="owner-1" onColumnNotesChange={onColumnNotesChange} />);
+    rerender(<FeedbackBoard displayBoard={true} board={nextBoard} team={baseTeam} workflowPhase={WorkflowPhase.Vote} nonHiddenWorkItemTypes={[]} allWorkItemTypes={[]} isAnonymous={false} hideFeedbackItems={false} userId="owner-1" onColumnNotesChange={onColumnNotesChange} scrollMode="column" />);
 
     await act(async () => {
       await oldColumnProps.onColumnNotesChange("temp");
@@ -481,7 +482,7 @@ describe("FeedbackBoard targeted coverage", () => {
       oldColumnProps.requestTimerStart("timer-a");
     });
 
-    rerender(<FeedbackBoard displayBoard={true} board={secondBoard} team={baseTeam} workflowPhase={WorkflowPhase.Vote} nonHiddenWorkItemTypes={[]} allWorkItemTypes={[]} isAnonymous={false} hideFeedbackItems={false} userId="owner-1" onColumnNotesChange={jest.fn().mockResolvedValue(undefined)} />);
+    rerender(<FeedbackBoard displayBoard={true} board={secondBoard} team={baseTeam} workflowPhase={WorkflowPhase.Vote} nonHiddenWorkItemTypes={[]} allWorkItemTypes={[]} isAnonymous={false} hideFeedbackItems={false} userId="owner-1" onColumnNotesChange={jest.fn().mockResolvedValue(undefined)} scrollMode="column" />);
 
     await act(async () => {
       oldColumnProps.requestTimerStart("timer-b");
