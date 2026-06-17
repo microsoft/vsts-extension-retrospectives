@@ -165,7 +165,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
-      - if: steps.changes.outputs.src == 'true'
+      - if: steps.changes.outputs.src == 'true' && github.event_name == 'workflow_dispatch'
         name: "Prepare package"
         working-directory: 'src/frontend'
         run: |
@@ -190,7 +190,7 @@ jobs:
 
           cp ../../LICENSE ./assets/LICENSE.md
 
-      - if: steps.changes.outputs.src == 'true'
+      - if: steps.changes.outputs.src == 'true' && github.event_name == 'workflow_dispatch'
         name: "Publish extension to dev environment"
         working-directory: 'src/frontend'
         env:
