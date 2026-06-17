@@ -24,7 +24,7 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
-import { questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { normalizeTeamAssessmentQuestions, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
@@ -1344,7 +1344,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const showRetroSummaryDialog = async () => {
     const measurements: { id: number; selected: number }[] = [];
     const board = await BoardDataService.getBoardForTeamById(state.currentTeam.id, state.currentBoard.id);
-    const boardQuestions = board.teamAssessmentQuestions?.length ? board.teamAssessmentQuestions : questions;
+    const boardQuestions = normalizeTeamAssessmentQuestions(board.teamAssessmentQuestions);
     const voteCollection = board.teamEffectivenessMeasurementVoteCollection || [];
 
     voteCollection.forEach(vote => {
@@ -1740,7 +1740,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       return;
     }
 
-    const boardQuestions = currentBoard.teamAssessmentQuestions?.length ? currentBoard.teamAssessmentQuestions : questions;
+    const boardQuestions = normalizeTeamAssessmentQuestions(currentBoard.teamAssessmentQuestions);
     const teamEffectivenessMeasurementVoteCollection = currentBoard.teamEffectivenessMeasurementVoteCollection || [];
     const currentUserId = obfuscateUserId(state.currentUserId);
     const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
@@ -2022,7 +2022,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      {(state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions).map(question => {
+                                      {normalizeTeamAssessmentQuestions(state.currentBoard.teamAssessmentQuestions).map(question => {
                                         return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={question.iconClassName} title={question.shortTitle} subtitle={question.title} tooltip={question.tooltip} />;
                                       })}
                                     </tbody>

@@ -42,6 +42,13 @@ describe("icons", () => {
       expect(container.querySelector(".icon-miscellaneous-services")).toBeTruthy();
     });
 
+    it("returns ViewColumnIcon for view-column id", () => {
+      const icon = getIconElement("view-column");
+      const { container } = render(icon);
+
+      expect(container.querySelector(".icon-view-column")).toBeTruthy();
+    });
+
     it("returns icons by legacy tag", () => {
       const icon = getIconElement("fas fa-coffee");
       const { container } = render(icon);

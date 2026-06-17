@@ -1,4 +1,4 @@
-import { questions, getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName } from "../effectivenessMeasurementQuestionHelper";
+import { questions, getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName, normalizeTeamAssessmentQuestions } from "../effectivenessMeasurementQuestionHelper";
 
 describe("effectivenessMeasurementQuestionHelper", () => {
   it("should have the correct number of questions", () => {
@@ -93,5 +93,33 @@ describe("getQuestionFontAwesomeClass", () => {
     const result = getQuestionIconClassName(questionId);
 
     expect(result).toBe("");
+  });
+});
+
+describe("normalizeTeamAssessmentQuestions", () => {
+  it("uses the current built-in icon for stored Efficiency questions", () => {
+    const result = normalizeTeamAssessmentQuestions([
+      {
+        ...questions[5],
+        iconClassName: "fa-solid fa-gears",
+      },
+    ]);
+
+    expect(result[0].iconClassName).toBe("miscellaneous-services");
+  });
+
+  it("preserves custom question icons", () => {
+    const result = normalizeTeamAssessmentQuestions([
+      {
+        id: 7,
+        shortTitle: "Custom",
+        title: "Custom question",
+        iconClassName: "assessment",
+        tooltip: "",
+        isCustom: true,
+      },
+    ]);
+
+    expect(result[0].iconClassName).toBe("assessment");
   });
 });

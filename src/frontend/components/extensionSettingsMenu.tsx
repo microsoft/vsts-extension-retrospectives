@@ -274,7 +274,7 @@ export const ExtensionSettingsMenu: React.FC<{
               onScrollModeChange(newMode);
             }}
           >
-            {getIconElement("settings")}
+            {getIconElement("view-column")}
             {scrollMode === "column" ? t("scroll_by_board") : t("scroll_by_column")}
           </button>
         </div>
