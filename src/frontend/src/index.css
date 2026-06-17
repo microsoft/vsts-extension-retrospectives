@@ -553,7 +553,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-board {
   @apply w-full h-[calc(100vh-92px)] grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
@@ -1267,7 +1267,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-items-container {
   @apply pt-2.5 w-full box-border overflow-visible grid gap-3 list-none m-0 p-0;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 
   & > li {
     @apply min-w-0;

@@ -101,6 +101,7 @@ export interface FeedbackBoardContainerState {
     createdDate: Date;
     questionAverages: { questionId: number; average: number }[];
   }[];
+  scrollMode: "column" | "board";
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -163,6 +164,7 @@ const initialState: FeedbackBoardContainerState = {
   countdownDurationMinutes: 5,
   hasPlayedStopChime: false,
   teamAssessmentHistoryData: [],
+  scrollMode: "column",
 };
 
 type DialogVisibilityState = {
@@ -1865,7 +1867,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
           {renderWorkflowTimerControls()}
-          <ExtensionSettingsMenu />
+          <ExtensionSettingsMenu scrollMode={state.scrollMode} onScrollModeChange={(mode) => {
+            setContainerState(previousState => ({ ...previousState, scrollMode: mode }));
+          }} />
         </div>
       </div>
       <div className="flex items-center justify-start shrink-0">
@@ -2185,6 +2189,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     userId={state.currentUserId}
                     onVoteCasted={updateCurrentVoteCount}
                     onColumnNotesChange={persistColumnNotes}
+                    scrollMode={state.scrollMode}
                   />
                 </>
               )}
