@@ -561,6 +561,19 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
+.scroll-mode-board .feedback-board {
+  @apply flex flex-nowrap w-max min-w-full h-auto;
+}
+
+.scroll-mode-board .feedback-column {
+  @apply overflow-visible flex-none;
+  width: clamp(300px, 25vw, 320px);
+}
+
+.scroll-mode-board .feedback-board-container {
+  @apply overflow-auto;
+}
+
 .board-metadata-form-permissions .board-metadata-form-board-settings {
   & .board-metadata-form-section-information {
     @apply m-2.5;
