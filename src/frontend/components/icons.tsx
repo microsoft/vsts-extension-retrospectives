@@ -876,6 +876,15 @@ export const SettingsIcon = () => {
   );
 };
 
+export const ViewColumnIcon = () => {
+  return (
+    <svg className="icon-view-column" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M14.67 5v14H9.33V5h5.34m1-2H8.33c-.55 0-1 .45-1 1v16c0 .55.45 1 1 1h7.34c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM5 5v14H3V5h2m1-2H2c-.55 0-1 .45-1 1v16c0 .55.45 1 1 1h4c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zm16 2v14h-2V5h2m1-2h-4c-.55 0-1 .45-1 1v16c0 .55.45 1 1 1h4c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1z" />
+    </svg>
+  );
+};
+
 export const availableIcons: { id: string; tags: string[]; name: string; icon: React.ReactElement }[] = [
   { id: "happy-face", tags: ["fas fa-cart-plus", "far fa-smile"], name: "Smile", icon: <HappyFaceIcon /> },
   { id: "sad-face", tags: ["far fa-frown"], name: "Frown", icon: <SadFaceIcon /> },
@@ -960,6 +969,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "undo", tags: [], name: "Undo", icon: <UndoIcon /> },
   { id: "logout", tags: [], name: "Logout", icon: <LogoutIcon /> },
   { id: "settings", tags: [], name: "Settings", icon: <SettingsIcon /> },
+  { id: "view-column", tags: [], name: "View Column", icon: <ViewColumnIcon /> },
 ];
 
 export function getIconElement(iconId: string | undefined | null): React.ReactElement {

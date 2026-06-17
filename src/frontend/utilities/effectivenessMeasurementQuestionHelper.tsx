@@ -51,6 +51,19 @@ export const questions: ITeamAssessmentQuestion[] = [
   },
 ];
 
+export const normalizeTeamAssessmentQuestions = (teamAssessmentQuestions?: ITeamAssessmentQuestion[]): ITeamAssessmentQuestion[] => {
+  const sourceQuestions = teamAssessmentQuestions?.length ? teamAssessmentQuestions : questions;
+
+  return sourceQuestions.map(question => {
+    if (question.isCustom) {
+      return question;
+    }
+
+    const defaultQuestion = questions.find(defaultAssessmentQuestion => defaultAssessmentQuestion.id === question.id);
+    return defaultQuestion ? { ...question, iconClassName: defaultQuestion.iconClassName } : question;
+  });
+};
+
 /**
  * @param questionId Id of the question
  *
