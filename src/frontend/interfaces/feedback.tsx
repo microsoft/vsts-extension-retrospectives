@@ -46,7 +46,7 @@ export class FeedbackBoardDocumentHelper {
    * Filter out boards that the user does not have access to
    * @param board - Current board being evaluated
    * @param teamIds - List of team ids the user has access to
-   * @param userId - Id of the current user
+   * @param userId - ID of the current user
    * @returns
    */
   static filter(board: IFeedbackBoardDocument, teamIds: string[], userId: string): boolean {

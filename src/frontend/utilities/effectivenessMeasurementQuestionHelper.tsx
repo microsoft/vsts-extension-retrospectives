@@ -65,7 +65,7 @@ export const normalizeTeamAssessmentQuestions = (teamAssessmentQuestions?: ITeam
 };
 
 /**
- * @param questionId Id of the question
+ * @param questionId ID of the question
  *
  * @returns name of the question
  */
@@ -78,7 +78,7 @@ export const getQuestionName = (questionId: number): string => {
 };
 
 /**
- * @param questionId Id of the question
+ * @param questionId ID of the question
  *
  * @returns short name of the question
  */
@@ -91,7 +91,7 @@ export const getQuestionShortName = (questionId: number): string => {
 };
 
 /**
- * @param questionId Id of the question
+ * @param questionId ID of the question
  *
  * @returns tooltip of the question
  */
@@ -104,7 +104,7 @@ export const getQuestionTooltip = (questionId: number): string => {
 };
 
 /**
- * @param questionId Id of the question
+ * @param questionId ID of the question
  *
  * @returns associated fontaswesome icon of the question
  */
