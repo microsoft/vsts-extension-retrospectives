@@ -69,6 +69,7 @@ export interface FeedbackBoardContainerState {
    * All teams within the current organization.
    */
   projectTeams: WebApiTeam[];
+  allProjectTeams: WebApiTeam[];
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   isMobileBoardActionsDialogHidden: boolean;
@@ -147,6 +148,7 @@ const initialState: FeedbackBoardContainerState = {
   isTeamSelectorCalloutVisible: false,
   nonHiddenWorkItemTypes: [],
   projectTeams: [],
+  allProjectTeams: [],
   teamBoardDeletedDialogMessage: "",
   teamBoardDeletedDialogTitle: "",
   userTeams: [],
@@ -1080,9 +1082,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
 
-    const projectTeams = allTeams?.length > 0 ? allTeams : state.projectTeams;
+    const projectTeams = allTeams?.length > 0 ? allTeams : state.allProjectTeams;
     setContainerState(previousState => ({
       ...previousState,
+      allProjectTeams: projectTeams,
       projectTeams,
       filteredProjectTeams: projectTeams,
       isAllTeamsLoaded: true,
@@ -1862,7 +1865,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const handleTeamSelectionChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTeamId = event.target.value;
-    const displayedTeams = state.teamDisplayMode === "allTeams" ? state.projectTeams : state.userTeams;
+    const displayedTeams = state.teamDisplayMode === "allTeams" ? state.allProjectTeams : state.userTeams;
     const selectedTeam = displayedTeams.find(team => team.id === selectedTeamId);
     if (selectedTeam) {
       await changeSelectedTeam(selectedTeam);
@@ -1912,7 +1915,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         }
       }
 
-      setContainerState(previousState => ({ ...previousState, teamDisplayMode: "allTeams" }));
+      setContainerState(previousState => ({
+        ...previousState,
+        projectTeams: previousState.allProjectTeams,
+        filteredProjectTeams: previousState.allProjectTeams,
+        teamDisplayMode: "allTeams",
+      }));
       return;
     }
 
@@ -1921,7 +1929,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       await changeSelectedTeam(state.userTeams[0]);
     }
 
-    setContainerState(previousState => ({ ...previousState, teamDisplayMode: "myTeams" }));
+    setContainerState(previousState => ({
+      ...previousState,
+      projectTeams: previousState.userTeams,
+      filteredProjectTeams: previousState.userTeams,
+      teamDisplayMode: "myTeams",
+    }));
   };
 
   const showTeamEffectivenessDialog = () => {
@@ -1967,7 +1980,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   };
 
   const teamEffectivenessResponseCount = state.currentBoard?.teamEffectivenessMeasurementVoteCollection?.length;
-  const displayedTeams = state.teamDisplayMode === "allTeams" ? state.projectTeams : state.userTeams;
+  const displayedTeams = state.teamDisplayMode === "allTeams" ? state.allProjectTeams : state.userTeams;
 
   return (
     <div className="flex flex-col h-screen" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
