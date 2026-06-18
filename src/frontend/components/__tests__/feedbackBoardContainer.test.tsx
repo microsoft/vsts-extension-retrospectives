@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
@@ -372,6 +372,7 @@ describe("FeedbackBoardContainer integration", () => {
 
   beforeEach(() => {
     props = { isHostedAzureDevOps: false, projectId: "1" };
+    jest.clearAllMocks();
   });
 
   it("renders main UI after loading", () => {
@@ -479,6 +480,37 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.getByText("Fix release risk")).toBeInTheDocument();
     expect(screen.getByText("Board 2 - Risks - Jan 1, 2024")).toBeInTheDocument();
     expect(screen.queryByText("Keep the release calm")).not.toBeInTheDocument();
+  });
+
+  it("loads and saves the last scroll mode setting", async () => {
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(undefined);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([mockBoard]);
+    mocked(BoardDataService.getSetting).mockResolvedValue("board");
+    mocked(BoardDataService.saveSetting).mockResolvedValue(undefined);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(mockBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    await waitFor(() => {
+      expect(screen.getByTitle("Settings")).toBeInTheDocument();
+    });
+
+    expect(BoardDataService.getSetting).toHaveBeenCalledWith("lastScrollMode");
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Scroll by Column" }));
+
+    await waitFor(() => {
+      expect(BoardDataService.saveSetting).toHaveBeenCalledWith("lastScrollMode", "column");
+    });
   });
 });
 
@@ -851,4 +883,3 @@ describe("FeedbackBoardContainer - Real-time collaboration", () => {
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
-
