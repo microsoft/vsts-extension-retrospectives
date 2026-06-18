@@ -290,6 +290,18 @@ describe("ExtensionSettingsMenu", () => {
     expect(settingsMenuDetails).not.toHaveAttribute("open");
   });
 
+  it("changes board scroll mode back to column scroll mode", () => {
+    const onScrollModeChange = jest.fn();
+
+    renderMenu({ scrollMode: "board", onScrollModeChange });
+    const settingsMenuDetails = getSettingsMenuDetails();
+
+    fireEvent.click(within(settingsMenuDetails).getByRole("button", { name: "Scroll by Column" }));
+
+    expect(onScrollModeChange).toHaveBeenCalledWith("column");
+    expect(settingsMenuDetails).not.toHaveAttribute("open");
+  });
+
   it("handles pointerdown events gracefully", () => {
     // Test that a basic pointerdown on body doesn't cause errors
     const { container } = renderMenu();

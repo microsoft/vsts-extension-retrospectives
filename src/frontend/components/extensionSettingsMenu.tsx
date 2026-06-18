@@ -179,7 +179,7 @@ export const ExtensionSettingsMenu: React.FC<{
   }, [handleDocumentPointerDown, handleDocumentKeyDown]);
 
   const closeContainingMenu = (event: React.MouseEvent<HTMLElement>) => {
-    event.currentTarget.closest("details")?.removeAttribute("open");
+    event.currentTarget.closest("details")!.removeAttribute("open");
   };
 
   return (
