@@ -558,7 +558,9 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-board {
   @apply w-full grid flex-1 min-h-0;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(290px, 1fr);
 }
 
 .feedback-board.scroll-mode-board {
@@ -1669,7 +1671,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board-container {
-  @apply flex flex-col flex-1 h-[calc(100vh-88px)] min-h-0 border-t-4 border-(--nav-header-active-item-background) overflow-y-auto overflow-x-hidden;
+  @apply flex flex-col flex-1 h-[calc(100vh-88px)] min-h-0 border-t-4 border-(--nav-header-active-item-background) overflow-y-auto overflow-x-auto;
 }
 
 .feedback-board-container-header-spacer {
