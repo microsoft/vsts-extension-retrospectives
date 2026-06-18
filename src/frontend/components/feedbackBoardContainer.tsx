@@ -43,6 +43,9 @@ import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
 
+type ScrollMode = "column" | "board";
+const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
+
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
   currentUserId: string;
@@ -101,7 +104,7 @@ export interface FeedbackBoardContainerState {
     createdDate: Date;
     questionAverages: { questionId: number; average: number }[];
   }[];
-  scrollMode: "column" | "board";
+  scrollMode: ScrollMode;
 }
 
 export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember[] {
@@ -332,6 +335,17 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
     } else {
       setContainerState(previousState => ({ ...previousState, isBackendServiceConnected: false, isBackendServiceReconnecting: false }));
+    }
+
+    try {
+      const savedScrollMode = await BoardDataService.getSetting<ScrollMode>(SCROLL_MODE_SETTING_KEY);
+      if (savedScrollMode === "column" || savedScrollMode === "board") {
+        setContainerState(previousState => ({ ...previousState, scrollMode: savedScrollMode }));
+      }
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "loadScrollModeSetting",
+      });
     }
 
     try {
@@ -1869,6 +1883,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           {renderWorkflowTimerControls()}
           <ExtensionSettingsMenu scrollMode={state.scrollMode} onScrollModeChange={(mode) => {
             setContainerState(previousState => ({ ...previousState, scrollMode: mode }));
+            void BoardDataService.saveSetting(SCROLL_MODE_SETTING_KEY, mode).catch(error => {
+              appInsights.trackException(error, {
+                action: "saveScrollModeSetting",
+              });
+            });
           }} />
         </div>
       </div>
