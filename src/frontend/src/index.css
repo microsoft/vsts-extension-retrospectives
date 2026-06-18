@@ -562,12 +562,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board.scroll-mode-board {
-  @apply flex flex-nowrap w-max min-w-full h-auto;
+  @apply h-auto;
+  min-height: calc(100vh - 92px);
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(300px, 1fr);
 }
 
 .feedback-board.scroll-mode-board .feedback-column {
-  @apply overflow-y-visible flex-none;
-  width: clamp(300px, 25vw, 320px);
+  @apply overflow-y-visible;
 }
 
 .feedback-board-container.scroll-mode-board {
