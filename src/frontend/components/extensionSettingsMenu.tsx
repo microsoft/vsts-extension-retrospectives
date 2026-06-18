@@ -276,16 +276,6 @@ export const ExtensionSettingsMenu: React.FC<{
         <div className="callout-menu right">
           <button
             onClick={event => {
-              const newMode = scrollMode === "column" ? "board" : "column";
-              onScrollModeChange(newMode);
-              closeContainingMenu(event);
-            }}
-          >
-            {getIconElement("view-column")}
-            {scrollMode === "column" ? t("scroll_by_board") : t("scroll_by_column")}
-          </button>
-          <button
-            onClick={event => {
               const newMode = teamDisplayMode === "myTeams" ? "allTeams" : "myTeams";
               void onTeamDisplayModeChange(newMode);
               closeContainingMenu(event);
@@ -293,6 +283,16 @@ export const ExtensionSettingsMenu: React.FC<{
           >
             {getIconElement("people")}
             {teamDisplayMode === "myTeams" ? t("show_all_teams") : t("show_my_teams")}
+          </button>
+          <button
+            onClick={event => {
+              const newMode = scrollMode === "column" ? "board" : "column";
+              onScrollModeChange(newMode);
+              closeContainingMenu(event);
+            }}
+          >
+            {getIconElement("view-column")}
+            {scrollMode === "column" ? t("scroll_by_board") : t("scroll_by_column")}
           </button>
         </div>
       </details>

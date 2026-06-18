@@ -302,6 +302,13 @@ describe("ExtensionSettingsMenu", () => {
     expect(settingsMenuDetails).not.toHaveAttribute("open");
   });
 
+  it("shows the team display option first in the settings menu", () => {
+    renderMenu();
+    const settingsMenuDetails = getSettingsMenuDetails();
+
+    expect(within(settingsMenuDetails).getAllByRole("button")[0]).toHaveTextContent("Show All Teams");
+  });
+
   it("closes the settings menu after changing to show all teams", () => {
     const onTeamDisplayModeChange = jest.fn();
 

@@ -217,7 +217,7 @@ const getTeamFieldValuesMock = () => {
   ];
 };
 
-jest.mock("../feedbackBoardMetadataForm", () => () => <div data-testid="metadata-form" />);
+jest.mock("../feedbackBoardMetadataForm", () => (props: { availablePermissionOptions: { name: string }[] }) => <div data-testid="metadata-form">{props.availablePermissionOptions.map(option => option.name).join(",")}</div>);
 jest.mock("azure-devops-extension-api/Work/WorkClient", () => {
   return {
     getTeamIterations: getTeamIterationsMock,
@@ -476,12 +476,27 @@ describe("FeedbackBoardContainer integration", () => {
     expect(teamSelector).not.toHaveTextContent("Team 2");
     expect(azureDevOpsCoreService.getAllTeams).not.toHaveBeenCalledWith("1", false);
 
+    fireEvent.click(screen.getByTitle("Board Actions"));
+    fireEvent.click(screen.getByRole("button", { name: "Create new retrospective" }));
+    const metadataForm = await screen.findByTestId("metadata-form");
+    expect(metadataForm).toHaveTextContent("Team 1");
+    expect(metadataForm).not.toHaveTextContent("Team 2");
+
     fireEvent.click(screen.getByTitle("Settings"));
     fireEvent.click(screen.getByRole("button", { name: "Show All Teams" }));
 
     await waitFor(() => {
       expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
       expect(teamSelector).toHaveTextContent("Team 2");
+      expect(metadataForm).toHaveTextContent("Team 2");
+    });
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Show My Teams" }));
+
+    await waitFor(() => {
+      expect(teamSelector).not.toHaveTextContent("Team 2");
+      expect(metadataForm).not.toHaveTextContent("Team 2");
     });
   });
 });
