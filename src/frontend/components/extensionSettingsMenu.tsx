@@ -119,7 +119,9 @@ const importData = async () => {
 export const ExtensionSettingsMenu: React.FC<{
   scrollMode: "column" | "board";
   onScrollModeChange: (mode: "column" | "board") => void;
-}> = ({ scrollMode, onScrollModeChange }) => {
+  teamDisplayMode: "myTeams" | "allTeams";
+  onTeamDisplayModeChange: (mode: "myTeams" | "allTeams") => void | Promise<void>;
+}> = ({ scrollMode, onScrollModeChange, teamDisplayMode, onTeamDisplayModeChange }) => {
   const trackActivity = useTrackMetric(reactPlugin, "ExtensionSettingsMenu");
 
   const menuRootRef = useRef<HTMLDivElement>(null);
@@ -281,6 +283,16 @@ export const ExtensionSettingsMenu: React.FC<{
           >
             {getIconElement("view-column")}
             {scrollMode === "column" ? t("scroll_by_board") : t("scroll_by_column")}
+          </button>
+          <button
+            onClick={event => {
+              const newMode = teamDisplayMode === "myTeams" ? "allTeams" : "myTeams";
+              void onTeamDisplayModeChange(newMode);
+              closeContainingMenu(event);
+            }}
+          >
+            {getIconElement("people")}
+            {teamDisplayMode === "myTeams" ? t("show_all_teams") : t("show_my_teams")}
           </button>
         </div>
       </details>

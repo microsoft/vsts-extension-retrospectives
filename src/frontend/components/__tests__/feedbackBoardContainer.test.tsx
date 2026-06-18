@@ -447,6 +447,43 @@ describe("FeedbackBoardContainer integration", () => {
       expect(BoardDataService.saveSetting).toHaveBeenCalledWith("lastScrollMode", "column");
     });
   });
+
+  it("loads all project teams only after selecting show all teams", async () => {
+    const otherTeam = { id: "t2", name: "Team 2", projectName: "P", description: "", url: "" };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams)
+      .mockResolvedValueOnce([mockTeam as WebApiTeam])
+      .mockResolvedValueOnce([mockTeam as WebApiTeam])
+      .mockResolvedValueOnce([mockTeam as WebApiTeam, otherTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([mockBoard]);
+    mocked(BoardDataService.getSetting).mockResolvedValue(undefined);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(mockBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    await waitFor(() => {
+      expect(screen.getByTitle("Settings")).toBeInTheDocument();
+    });
+
+    const teamSelector = screen.getByRole("combobox", { name: "Team" });
+    expect(teamSelector).toHaveTextContent("Team 1");
+    expect(teamSelector).not.toHaveTextContent("Team 2");
+    expect(azureDevOpsCoreService.getAllTeams).not.toHaveBeenCalledWith("1", false);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Show All Teams" }));
+
+    await waitFor(() => {
+      expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
+      expect(teamSelector).toHaveTextContent("Team 2");
+    });
+  });
 });
 
 describe("FeedbackBoardContainer instance methods", () => {
@@ -818,4 +855,3 @@ describe("FeedbackBoardContainer - Real-time collaboration", () => {
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
-

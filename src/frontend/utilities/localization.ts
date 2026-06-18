@@ -21,6 +21,8 @@ const translations = {
     common_settings: "Settings",
     scroll_by_column: "Scroll by Column",
     scroll_by_board: "Scroll by Board",
+    show_all_teams: "Show All Teams",
+    show_my_teams: "Show My Teams",
     column_notes: "Column notes",
     edit_column_notes: "Edit column notes",
     add_new_feedback: "Add new feedback",
@@ -54,7 +56,7 @@ const translations = {
     app_init_failed_step_refresh: "Refresh the page",
     feedback_board_team_list_error: "We are unable to retrieve the list of teams for this project. Try reloading the page.",
     feedback_board_link_copied: "The link to retrospective {{title}} ({{phase}} phase) has been copied to your clipboard.",
-    feedback_board_email_copied: "The email summary for \"{{title}}\" has been copied to your clipboard.",
+    feedback_board_email_copied: 'The email summary for "{{title}}" has been copied to your clipboard.',
     feedback_board_answer_all_questions: "Please answer all questions before saving",
     feedback_board_archive_title: "Archive retrospective",
     feedback_board_archive_message: "The retrospective board {{title}} with its feedback will be archived.",
@@ -134,6 +136,8 @@ const translations = {
     common_settings: "Configuración",
     scroll_by_column: "Desplazarse por Columna",
     scroll_by_board: "Desplazarse por Tablero",
+    show_all_teams: "Mostrar todos los equipos",
+    show_my_teams: "Mostrar mis equipos",
     column_notes: "Notas de columna",
     edit_column_notes: "Editar notas de columna",
     add_new_feedback: "Agregar nuevo feedback",
@@ -167,7 +171,7 @@ const translations = {
     app_init_failed_step_refresh: "Recarga la pagina",
     feedback_board_team_list_error: "No podemos recuperar la lista de equipos de este proyecto. Intenta recargar la pagina.",
     feedback_board_link_copied: "El enlace a la retrospectiva {{title}} (fase {{phase}}) se copio a tu portapapeles.",
-    feedback_board_email_copied: "El resumen por correo de \"{{title}}\" se copio a tu portapapeles.",
+    feedback_board_email_copied: 'El resumen por correo de "{{title}}" se copio a tu portapapeles.',
     feedback_board_answer_all_questions: "Responde todas las preguntas antes de guardar",
     feedback_board_archive_title: "Archivar la retrospectiva",
     feedback_board_archive_message: "Se archivara el tablero de retrospectiva {{title}} con sus comentarios.",
@@ -247,6 +251,8 @@ const translations = {
     common_settings: "Einstellungen",
     scroll_by_column: "Nach Spalte scrollen",
     scroll_by_board: "Nach Board scrollen",
+    show_all_teams: "Alle Teams anzeigen",
+    show_my_teams: "Meine Teams anzeigen",
     column_notes: "Spaltennotizen",
     edit_column_notes: "Spaltennotizen bearbeiten",
     add_new_feedback: "Neues Feedback hinzufuegen",
@@ -280,7 +286,7 @@ const translations = {
     app_init_failed_step_refresh: "Aktualisieren Sie die Seite",
     feedback_board_team_list_error: "Die Teamliste fuer dieses Projekt konnte nicht abgerufen werden. Versuchen Sie, die Seite neu zu laden.",
     feedback_board_link_copied: "Der Link zur Retrospektive {{title}} (Phase {{phase}}) wurde in Ihre Zwischenablage kopiert.",
-    feedback_board_email_copied: "Die E-Mail-Zusammenfassung fuer \"{{title}}\" wurde in Ihre Zwischenablage kopiert.",
+    feedback_board_email_copied: 'Die E-Mail-Zusammenfassung fuer "{{title}}" wurde in Ihre Zwischenablage kopiert.',
     feedback_board_answer_all_questions: "Bitte beantworten Sie alle Fragen, bevor Sie speichern",
     feedback_board_archive_title: "Retrospektive archivieren",
     feedback_board_archive_message: "Das Retrospektiven-Board {{title}} wird zusammen mit seinem Feedback archiviert.",
@@ -360,6 +366,8 @@ const translations = {
     common_settings: "Paramètres",
     scroll_by_column: "Faire défiler par colonne",
     scroll_by_board: "Faire défiler par tableau",
+    show_all_teams: "Afficher toutes les equipes",
+    show_my_teams: "Afficher mes equipes",
     column_notes: "Notes de colonne",
     edit_column_notes: "Modifier les notes de colonne",
     add_new_feedback: "Ajouter un nouveau feedback",
@@ -393,7 +401,7 @@ const translations = {
     app_init_failed_step_refresh: "Actualisez la page",
     feedback_board_team_list_error: "Impossible de recuperer la liste des equipes pour ce projet. Essayez d'actualiser la page.",
     feedback_board_link_copied: "Le lien vers la retrospective {{title}} (phase {{phase}}) a ete copie dans votre presse-papiers.",
-    feedback_board_email_copied: "Le resume par e-mail de \"{{title}}\" a ete copie dans votre presse-papiers.",
+    feedback_board_email_copied: 'Le resume par e-mail de "{{title}}" a ete copie dans votre presse-papiers.',
     feedback_board_answer_all_questions: "Veuillez repondre a toutes les questions avant d'enregistrer",
     feedback_board_archive_title: "Archiver la retrospective",
     feedback_board_archive_message: "Le tableau de retrospective {{title}} sera archive avec ses commentaires.",
@@ -464,7 +472,7 @@ let activeLanguage: SupportedLanguage = "en";
 
 function detectPreferredLocale(): string {
   const documentLocale = typeof document !== "undefined" ? document.documentElement.lang : "";
-  const browserLocale = typeof navigator !== "undefined" ? navigator.languages?.[0] ?? navigator.language : "";
+  const browserLocale = typeof navigator !== "undefined" ? (navigator.languages?.[0] ?? navigator.language) : "";
 
   return documentLocale || browserLocale || DEFAULT_LOCALE;
 }
