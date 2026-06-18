@@ -97,6 +97,12 @@ describe("getQuestionFontAwesomeClass", () => {
 });
 
 describe("normalizeTeamAssessmentQuestions", () => {
+  it("uses the default questions when no team assessment questions are provided", () => {
+    const result = normalizeTeamAssessmentQuestions();
+
+    expect(result).toEqual(questions);
+  });
+
   it("uses the current built-in icon for stored Efficiency questions", () => {
     const result = normalizeTeamAssessmentQuestions([
       {
@@ -106,6 +112,20 @@ describe("normalizeTeamAssessmentQuestions", () => {
     ]);
 
     expect(result[0].iconClassName).toBe("miscellaneous-services");
+  });
+
+  it("preserves non-custom questions that do not match a built-in question", () => {
+    const unknownQuestion = {
+      id: 999,
+      shortTitle: "Unknown",
+      title: "Unknown question",
+      iconClassName: "unknown-icon",
+      tooltip: "",
+    };
+
+    const result = normalizeTeamAssessmentQuestions([unknownQuestion]);
+
+    expect(result[0]).toBe(unknownQuestion);
   });
 
   it("preserves custom question icons", () => {
