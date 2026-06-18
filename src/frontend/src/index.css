@@ -242,7 +242,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .carousel-track {
-  @apply flex overflow-x-auto w-full relative snap-x snap-mandatory scroll-smooth [-webkit-overflow-scrolling:touch] scrollbar-none [-ms-overflow-style:none];
+  @apply flex overflow-x-auto w-full relative snap-x snap-mandatory scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none];
 
   &::-webkit-scrollbar {
     @apply hidden; /* Chrome/Safari */
@@ -566,6 +566,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   grid-template-columns: none;
   grid-auto-flow: column;
   grid-auto-columns: minmax(300px, 1fr);
+}
+
+.feedback-board.scroll-mode-board .feedback-column {
+  @apply overflow-y-visible;
 }
 
 .feedback-board-container.scroll-mode-board {
@@ -1217,7 +1221,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column {
-  @apply border-r-2 border-l-2 border-(--nav-header-active-item-background) min-w-0 min-h-0 overflow-hidden flex flex-col;
+  @apply border-r-2 border-l-2 border-(--nav-header-active-item-background) min-w-0 overflow-y-auto;
 
   &:focus {
     @apply outline-none;
@@ -1274,7 +1278,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column-content {
-  @apply p-2.5 w-full box-border overflow-y-auto overflow-x-visible flex-1 min-h-0;
+  @apply p-2.5 w-full box-border overflow-visible;
 }
 
 .feedback-column-info-dialog-text {
