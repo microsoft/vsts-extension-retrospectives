@@ -1236,7 +1236,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-column-header {
-  @apply px-4 py-2 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2 h-14;
+  @apply px-4 py-2 border-b-3 border-(--nav-header-active-item-background) flex items-center justify-between gap-2 h-14 sticky top-0 z-1 bg-(--background-color);
 
   & .feedback-column-title {
     @apply flex items-center;
