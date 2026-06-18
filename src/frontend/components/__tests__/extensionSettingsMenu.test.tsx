@@ -101,7 +101,7 @@ describe("ExtensionSettingsMenu", () => {
   };
 
   const renderMenu = (props: Partial<React.ComponentProps<typeof ExtensionSettingsMenu>> = {}) => {
-    return render(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={jest.fn()} {...props} />);
+    return render(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={jest.fn()} teamDisplayMode="myTeams" onTeamDisplayModeChange={jest.fn()} {...props} />);
   };
 
   beforeEach(() => {
@@ -299,6 +299,30 @@ describe("ExtensionSettingsMenu", () => {
     fireEvent.click(within(settingsMenuDetails).getByRole("button", { name: "Scroll by Column" }));
 
     expect(onScrollModeChange).toHaveBeenCalledWith("column");
+    expect(settingsMenuDetails).not.toHaveAttribute("open");
+  });
+
+  it("closes the settings menu after changing to show all teams", () => {
+    const onTeamDisplayModeChange = jest.fn();
+
+    renderMenu({ onTeamDisplayModeChange });
+    const settingsMenuDetails = getSettingsMenuDetails();
+
+    fireEvent.click(within(settingsMenuDetails).getByRole("button", { name: "Show All Teams" }));
+
+    expect(onTeamDisplayModeChange).toHaveBeenCalledWith("allTeams");
+    expect(settingsMenuDetails).not.toHaveAttribute("open");
+  });
+
+  it("closes the settings menu after changing to show my teams", () => {
+    const onTeamDisplayModeChange = jest.fn();
+
+    renderMenu({ teamDisplayMode: "allTeams", onTeamDisplayModeChange });
+    const settingsMenuDetails = getSettingsMenuDetails();
+
+    fireEvent.click(within(settingsMenuDetails).getByRole("button", { name: "Show My Teams" }));
+
+    expect(onTeamDisplayModeChange).toHaveBeenCalledWith("myTeams");
     expect(settingsMenuDetails).not.toHaveAttribute("open");
   });
 
@@ -556,7 +580,7 @@ describe("ExtensionSettingsMenu", () => {
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });
 
     fireEvent(window, new Event("resize"));
-    rerender(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={jest.fn()} />);
+    rerender(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={jest.fn()} teamDisplayMode="myTeams" onTeamDisplayModeChange={jest.fn()} />);
 
     await waitFor(() => {
       expect(screen.getByText("Directive")).toHaveClass("hidden", "lg:inline");
