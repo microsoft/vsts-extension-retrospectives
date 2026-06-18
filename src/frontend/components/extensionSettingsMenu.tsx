@@ -178,6 +178,10 @@ export const ExtensionSettingsMenu: React.FC<{
     };
   }, [handleDocumentPointerDown, handleDocumentKeyDown]);
 
+  const closeContainingMenu = (event: React.MouseEvent<HTMLElement>) => {
+    event.currentTarget.closest("details")?.removeAttribute("open");
+  };
+
   return (
     <div className="extension-settings-menu" ref={menuRootRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <button onClick={() => primeDirectiveDialogRef.current!.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
@@ -269,9 +273,10 @@ export const ExtensionSettingsMenu: React.FC<{
 
         <div className="callout-menu right">
           <button
-            onClick={() => {
+            onClick={event => {
               const newMode = scrollMode === "column" ? "board" : "column";
               onScrollModeChange(newMode);
+              closeContainingMenu(event);
             }}
           >
             {getIconElement("view-column")}

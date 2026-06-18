@@ -92,6 +92,14 @@ describe("ExtensionSettingsMenu", () => {
 
   const getHelpMenuButton = (name: string): HTMLElement => within(getHelpMenuDetails()).getByRole("button", { name });
 
+  const getSettingsMenuDetails = (): HTMLElement => {
+    const settingsMenuDetails = screen.getByTitle("Settings").closest("details") as HTMLElement;
+    if (!settingsMenuDetails.hasAttribute("open")) {
+      fireEvent.click(screen.getByTitle("Settings"));
+    }
+    return settingsMenuDetails;
+  };
+
   const renderMenu = (props: Partial<React.ComponentProps<typeof ExtensionSettingsMenu>> = {}) => {
     return render(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={jest.fn()} {...props} />);
   };
@@ -267,6 +275,19 @@ describe("ExtensionSettingsMenu", () => {
 
     expect(details[0]).not.toHaveAttribute("open");
     expect(details[1]).not.toHaveAttribute("open");
+  });
+
+  it("closes the settings menu after changing scroll mode", () => {
+    const onScrollModeChange = jest.fn();
+
+    renderMenu({ onScrollModeChange });
+    const settingsMenuDetails = getSettingsMenuDetails();
+
+    expect(settingsMenuDetails).toHaveAttribute("open");
+    fireEvent.click(within(settingsMenuDetails).getByRole("button", { name: "Scroll by Board" }));
+
+    expect(onScrollModeChange).toHaveBeenCalledWith("board");
+    expect(settingsMenuDetails).not.toHaveAttribute("open");
   });
 
   it("handles pointerdown events gracefully", () => {
