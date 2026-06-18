@@ -562,8 +562,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board.scroll-mode-board {
-  @apply h-auto;
-  min-height: calc(100vh - 92px);
+  @apply h-auto flex-1;
   grid-template-columns: none;
   grid-auto-flow: column;
   grid-auto-columns: minmax(300px, 1fr);
