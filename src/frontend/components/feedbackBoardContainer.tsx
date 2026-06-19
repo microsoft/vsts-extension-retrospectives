@@ -1585,8 +1585,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const renderBoardUpdateMetadataFormDialog = (dialogRef: React.RefObject<HTMLDialogElement>, isNewBoardCreation: boolean, isDuplicatingBoard: boolean, onDismiss: () => void, dialogTitle: string, placeholderText: string, onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void, onCancel: () => void, initialTitleOverride?: string, onDialogClose?: () => void) => {
     const permissionOptions: FeedbackBoardPermissionOption[] = [];
+    const permissionTeams: WebApiTeam[] = state.userTeams.length > 0
+      ? state.userTeams
+      : [state.currentTeam].filter((team): team is WebApiTeam => Boolean(team));
 
-    for (const team of state.projectTeams) {
+    for (const team of permissionTeams) {
       permissionOptions.push({
         id: team.id,
         name: team.name,
