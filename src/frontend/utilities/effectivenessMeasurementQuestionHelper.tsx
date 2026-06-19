@@ -46,7 +46,7 @@ export const questions: ITeamAssessmentQuestion[] = [
     shortTitle: "Efficiency",
     discussActTemplate: "efficiency",
     title: "Our processes and tools help me work efficiently and effectively",
-    iconClassName: "miscellaneous-services",
+    iconClassName: "gears",
     tooltip: "Effective tools and processes reduce friction and improve delivery. This helps teams respond faster and meet customer needs more consistently. Without efficiency, delays, frustration, and rework increase. https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#efficiency (Learn more) about the supporting research and best practices.",
   },
 ];

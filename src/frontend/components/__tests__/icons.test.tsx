@@ -35,11 +35,11 @@ describe("icons", () => {
       expect(container.querySelector(".icon-table-chart")).toBeTruthy();
     });
 
-    it("returns MiscellaneousServicesIcon for miscellaneous-services ID", () => {
-      const icon = getIconElement("miscellaneous-services");
+    it("returns GearsIcon for gears ID", () => {
+      const icon = getIconElement("gears");
       const { container } = render(icon);
 
-      expect(container.querySelector(".icon-miscellaneous-services")).toBeTruthy();
+      expect(container.querySelector(".icon-gears")).toBeTruthy();
     });
 
     it("returns ViewColumnIcon for view-column ID", () => {

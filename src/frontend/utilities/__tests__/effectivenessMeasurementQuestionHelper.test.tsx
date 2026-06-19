@@ -111,7 +111,7 @@ describe("normalizeTeamAssessmentQuestions", () => {
       },
     ]);
 
-    expect(result[0].iconClassName).toBe("miscellaneous-services");
+    expect(result[0].iconClassName).toBe("gears");
   });
 
   it("preserves non-custom questions that do not match a built-in question", () => {
