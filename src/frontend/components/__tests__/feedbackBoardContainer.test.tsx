@@ -564,6 +564,46 @@ describe("FeedbackBoardContainer integration", () => {
       expect(metadataForm).not.toHaveTextContent("Team 2");
     });
   });
+
+  it("falls back to default user team when most recent visit team is not in my teams", async () => {
+    const nonMemberTeam = { id: "t2", name: "Team 2", projectName: "P", description: "", url: "" };
+    const boardForMyTeam: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "b-my-team",
+      teamId: "t1",
+      title: "Board For Team 1",
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getTeam).mockResolvedValue(nonMemberTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "t2", boardId: "b-non-member" } as any);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => {
+      if (teamId === "t1") {
+        return [boardForMyTeam];
+      }
+
+      throw new Error(`Unexpected team lookup: ${teamId}`);
+    });
+    mocked(BoardDataService.getSetting).mockResolvedValue(undefined);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(boardForMyTeam);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    await waitFor(() => {
+      expect(screen.getByTitle("Settings")).toBeInTheDocument();
+    });
+
+    const teamSelector = screen.getByRole("combobox", { name: "Team" });
+    expect(teamSelector).toHaveTextContent("Team 1");
+
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("t1");
+    expect(BoardDataService.getBoardsForTeam).not.toHaveBeenCalledWith("t2");
+  });
 });
 
 describe("FeedbackBoardContainer instance methods", () => {
