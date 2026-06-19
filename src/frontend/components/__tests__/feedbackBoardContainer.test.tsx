@@ -217,7 +217,7 @@ const getTeamFieldValuesMock = () => {
   ];
 };
 
-jest.mock("../feedbackBoardMetadataForm", () => (props: { availablePermissionOptions: { name: string }[] }) => <div data-testid="metadata-form">{props.availablePermissionOptions.map(option => option.name).join(",")}</div>);
+ jest.mock("../feedbackBoardMetadataForm", () => (props: { availablePermissionOptions: { name: string }[] }) => <div data-testid="metadata-form">{props.availablePermissionOptions.map(option => option.name).join(",")}</div>);
 jest.mock("azure-devops-extension-api/Work/WorkClient", () => {
   return {
     getTeamIterations: getTeamIterationsMock,
@@ -513,7 +513,7 @@ describe("FeedbackBoardContainer integration", () => {
     });
   });
 
-  it("loads all project teams only after selecting show all teams", async () => {
+  it("loads all project teams only after selecting show all teams without changing permission options", async () => {
     const otherTeam = { id: "t2", name: "Team 2", projectName: "P", description: "", url: "" };
 
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
@@ -553,7 +553,7 @@ describe("FeedbackBoardContainer integration", () => {
     await waitFor(() => {
       expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
       expect(teamSelector).toHaveTextContent("Team 2");
-      expect(metadataForm).toHaveTextContent("Team 2");
+      expect(metadataForm).not.toHaveTextContent("Team 2");
     });
 
     fireEvent.click(screen.getByTitle("Settings"));
