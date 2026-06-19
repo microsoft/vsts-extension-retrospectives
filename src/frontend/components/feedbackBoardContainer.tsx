@@ -1103,7 +1103,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     if (mostRecentUserVisit) {
       const mostRecentTeam = await azureDevOpsCoreService.getTeam(projectId, mostRecentUserVisit.teamId);
 
-      if (mostRecentTeam) {
+      const isRecentTeamInUserTeams = Boolean(mostRecentTeam) && userTeams.some(team => team.id === mostRecentTeam.id);
+
+      if (mostRecentTeam && isRecentTeamInUserTeams) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
         if (boardsForTeam?.length > 0) {
           boardsForTeam = boardsForTeam
