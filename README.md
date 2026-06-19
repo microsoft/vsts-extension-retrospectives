@@ -52,20 +52,9 @@ Navigate to the Azure 'Boards' tab in your account on the left hand navigation. 
 
 You are now on the Retrospectives page. Select your Azure DevOps team from the dropdown in the header. By default, the dropdown displays **My Teams** — only teams where you are a member.
 
-If you need to access retrospectives from teams where you're not a member, you can toggle to **Show All Teams** in the Settings menu (see section 2a). This displays all teams in the project and allows you to view their retrospective boards. Note that this approach relies on board-level permissions to control access to sensitive feedback. 
+If you need to access retrospectives from teams where you're not a member, you can toggle to **Show All Teams** in the Settings menu (see section 7). This displays all teams in the project and allows you to view their retrospective boards. Note that this approach relies on board-level permissions to control access to sensitive feedback. 
 
 ![Screenshot of the Retrospective tool's Team dropdown. In the example the user belongs to only one team, the "Backend Team". The selected team is darkened as though the mouse is hovering over the selection.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-dropdown-My-Teams.png)
-
-### 2a. Header Settings
-
-Use the **Settings** menu in the header to adjust how teams and boards are displayed:
-
-- **Show My Teams**: Restricts the team selector to teams where you are a member.
-- **Show All Teams**: Displays every team in the current project.
-- **Scroll by Column**: Supports vertical scrolling within each column to view all feedback.
-- **Scroll by Board**: Supports vertical scrolling for the full board to view all feedback.
-
-**Caution**: Selecting **Show All Teams** can degrade performance in projects with a large number of teams, because the extension must load and filter a much larger team list.
 
 ### 3. Create New Retrospective
 
@@ -114,7 +103,18 @@ Once you create a new retrospective, you can share a link to it to all participa
 
 ![A screenshot of the dropdown from the Board Actions Menu. The option for 'Copy retrospective link' is highlighted as the fourth menu option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/menu-dropdown-copy-retrospective-link.png)
 
-### 7. Phases of the Standard Retrospective
+### 7. Adjust User Settings
+
+Use the **Settings** menu in the header to adjust how teams and boards are displayed:
+
+- **Show My Teams**: Restricts the team selector to teams where you are a member.
+- **Show All Teams**: Displays every team in the current project.
+- **Scroll by Column**: Supports vertical scrolling within each column to view all feedback.
+- **Scroll by Board**: Supports vertical scrolling for the full board to view all feedback.
+
+**Caution**: Selecting **Show All Teams** can degrade performance in projects with a large number of teams, because the extension must load and filter a much larger team list.
+
+### 8. Phases of the Standard Retrospective
 
 The number of columns in each retrospective is determined by the selection made when making the new board. Regardless of the template, they still follow the same sequence of phases.
 
@@ -176,7 +176,7 @@ This will open up the standard Azure DevOps work item creation form. Enter the w
 
 ![A screenshot that shows a feedback item in the 'Act Phase'. On the example feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed to reveal a selection of options. The user has the option to create a number of different Azure Dev Ops items, like adding a bug, a user story, and others. In this case, the item that is darkened as though hovered by a mouse is the 'User Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
-### 8. Optional: The Team Assessment
+### 9. The Team Assessment
 
 You can optionally include a "Team Assessment" that anonymously collects feedback from participants.
 To get the feedback form, you can click on the "Team Assessment" link at the top of the board.
@@ -287,7 +287,7 @@ least voted upon.
 
 Follow the steps above to assign actions as work items in Azure DevOps. Note: We recommend only selecting 1-2 actions per sprint to ensure completion prior to the next sprint.
 
-### 9. Retrospective Summary
+### 10. Retrospective Summary
 
 The Retrospective Summary dialog is accessible from the "Board Actions" menu in the top navigation.
 
@@ -306,7 +306,7 @@ Once there, there is a summary of the Retrospective. This includes:
 
 If there is a team assessment, then a charted summary will show the vote breakdown by favorability, along with an average score.
 
-### 10. Board History
+### 11. Board History
 
 The **History** tab appears in the top-left navigation header, next to the **Board** tab. This view lists past retrospectives, showing the count of feedback items and action items, and supports archiving or restoring archived retrospectives, as well as permanently deleting archived retrospectives.
 

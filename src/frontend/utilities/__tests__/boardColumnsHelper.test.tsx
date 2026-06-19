@@ -403,7 +403,7 @@ describe("boardColumnsHelper", () => {
             accentColor: "#cc293d",
             iconClass: "sad-face",
             id: "uuid-2",
-            title: "What undermines pyschological safety?",
+            title: "What undermines psychological safety?",
             notes: "",
           });
           expect(result[2]).toEqual({
