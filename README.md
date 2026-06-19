@@ -50,13 +50,22 @@ Navigate to the Azure 'Boards' tab in your account on the left hand navigation. 
 
 ### 2. Pick the Team
 
-You are now on the Retrospectives page. Select your Azure DevOps team from the dropdown in the header. You will only be able to select from My Teams.
+You are now on the Retrospectives page. Select your Azure DevOps team from the dropdown in the header. By default, the dropdown displays **My Teams** — only teams where you are a member.
 
-Retrospectives should be a safe space for team members to share feedback. Therefore, you should not have access to other teams' retrospective boards. All Teams would provide access to see feedback from any team in the project.
-
-If you need to access another team's retrospective board in the project, you will need to be added as a member of that team.
+If you need to access retrospectives from teams where you're not a member, you can toggle to **Show All Teams** in the Settings menu (see section 2a). This displays all teams in the project and allows you to view their retrospective boards. Note that this approach relies on board-level permissions to control access to sensitive feedback. 
 
 ![Screenshot of the Retrospective tool's Team dropdown. In the example the user belongs to only one team, the "Backend Team". The selected team is darkened as though the mouse is hovering over the selection.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/team-dropdown-My-Teams.png)
+
+### 2a. Header Settings
+
+Use the **Settings** menu in the header to adjust how teams and boards are displayed:
+
+- **Show My Teams**: Restricts the team selector to teams where you are a member.
+- **Show All Teams**: Displays every team in the current project.
+- **Scroll by Column**: Supports vertical scrolling within each column to view all feedback.
+- **Scroll by Board**: Supports vertical scrolling for the full board to view all feedback.
+
+**Caution**: Selecting **Show All Teams** can degrade performance in projects with a large number of teams, because the extension must load and filter a much larger team list.
 
 ### 3. Create New Retrospective
 
