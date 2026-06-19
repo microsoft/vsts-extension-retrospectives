@@ -23,26 +23,26 @@ describe("icons", () => {
   });
 
   describe("getIconElement", () => {
-    it("returns PlumbingIcon for plumbing id", () => {
+    it("returns PlumbingIcon for plumbing ID", () => {
       const icon = getIconElement("plumbing");
       const { container } = render(icon);
       expect(container.querySelector(".icon-plumbing")).toBeTruthy();
     });
 
-    it("returns TableChartIcon for table-chart id", () => {
+    it("returns TableChartIcon for table-chart ID", () => {
       const icon = getIconElement("table-chart");
       const { container } = render(icon);
       expect(container.querySelector(".icon-table-chart")).toBeTruthy();
     });
 
-    it("returns MiscellaneousServicesIcon for miscellaneous-services id", () => {
+    it("returns MiscellaneousServicesIcon for miscellaneous-services ID", () => {
       const icon = getIconElement("miscellaneous-services");
       const { container } = render(icon);
 
       expect(container.querySelector(".icon-miscellaneous-services")).toBeTruthy();
     });
 
-    it("returns ViewColumnIcon for view-column id", () => {
+    it("returns ViewColumnIcon for view-column ID", () => {
       const icon = getIconElement("view-column");
       const { container } = render(icon);
 
@@ -56,7 +56,7 @@ describe("icons", () => {
       expect(container.querySelector(".icon-coffee")).toBeTruthy();
     });
 
-    it("falls back to PlayCircleIcon for an unknown id", () => {
+    it("falls back to PlayCircleIcon for an unknown ID", () => {
       const icon = getIconElement("unknown-icon");
       const { container } = render(icon);
 
