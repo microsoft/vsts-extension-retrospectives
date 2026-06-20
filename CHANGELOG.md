@@ -2,7 +2,11 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## Unpublished
+## v1.92.55
+
+* Resolved race conditions on initial load which could result in missing teams or boards. From [GitHub PR #1766](https://github.com/microsoft/vsts-extension-retrospectives/pull/1766)
+
+## v1.92.54
 
 * Ensures editing a retrospective updates the intended board name and prevents accidental renames.
 * Prevents duplicate-name side effects that can impact board retrieval when updating board metadata.
