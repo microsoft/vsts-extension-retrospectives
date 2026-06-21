@@ -308,7 +308,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ cu
                 workItemTypesDialogRef.current!.showModal();
               }}
             >
-              <span aria-hidden="true">{getIconElement("fact-check")}</span>
+              <span aria-hidden="true">{getIconElement("list-all")}</span>
               Add work item types
             </button>
           </div>

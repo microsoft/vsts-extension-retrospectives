@@ -797,11 +797,11 @@ export const AdminPanelSettingsIcon = () => {
   );
 };
 
-export const FactCheckIcon = () => {
+export const ListAllIcon = () => {
   return (
-    <svg className="icon-fact-check" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-list-all" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M0 0h24v24H0z" fill="none" />
-      <path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H4V5h16v14zM8 17H5v-2h3v2zm0-4H5v-2h3v2zm0-4H5V7h3v2zm5.5 7.5L10 13l1.41-1.41 2.09 2.08 4.59-4.59L19.5 10.5l-6 6z" />
+      <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0-10v2h14V7H7z" />
     </svg>
   );
 };
@@ -913,7 +913,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
   { id: "gears", tags: ["gears", "fa-solid fa-gears"], name: "Gears", icon: <GearsIcon /> },
   { id: "admin-panel-settings", tags: [], name: "Admin Panel Settings", icon: <AdminPanelSettingsIcon /> },
-  { id: "fact-check", tags: [], name: "Fact Check", icon: <FactCheckIcon /> },
+  { id: "list-all", tags: [], name: "List All", icon: <ListAllIcon /> },
   { id: "eye", tags: ["eye", "far fa-eye"], name: "Eye", icon: <EyeIcon /> },
   { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
   { id: "add", tags: [], name: "Add", icon: <AddIcon /> },
