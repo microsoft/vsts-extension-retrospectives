@@ -27,6 +27,7 @@ interface KeyboardShortcut {
 
 const emptyWorkItemTypes: WorkItemType[] = [];
 const emptyWorkItemTypeNames: string[] = [];
+const getWorkItemTypeInputId = (workItemType: WorkItemType): string => `work-item-type-${encodeURIComponent(workItemType.referenceName ?? workItemType.name)}`;
 
 export interface ExtensionSettingsMenuProps {
   currentUserIsTeamAdmin?: boolean;
@@ -131,7 +132,6 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ cu
   const trackActivity = useTrackMetric(reactPlugin, "ExtensionSettingsMenu");
 
   const menuRootRef = useRef<HTMLDivElement>(null);
-  const adminSettingsDialogRef = useRef<HTMLDialogElement>(null);
   const workItemTypesDialogRef = useRef<HTMLDialogElement>(null);
   const primeDirectiveDialogRef = useRef<HTMLDialogElement>(null);
   const whatsNewDialogRef = useRef<HTMLDialogElement>(null);
@@ -213,26 +213,6 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ cu
 
   return (
     <div className="extension-settings-menu" ref={menuRootRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
-      {currentUserIsTeamAdmin && (
-        <details className="flex items-center relative">
-          <summary aria-label="Admin Settings" title="Admin Settings" className="extension-settings-button">
-            {getIconElement("admin-panel-settings")}
-            <span className="hidden lg:inline">Admin</span>
-          </summary>
-
-          <div className="callout-menu right">
-            <button
-              onClick={() => {
-                adminSettingsDialogRef.current!.showModal();
-              }}
-            >
-              {getIconElement("fact-check")}
-              Allowable Work Item Types
-            </button>
-          </div>
-        </details>
-      )}
-
       <button onClick={() => primeDirectiveDialogRef.current!.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
         {getIconElement("privacy-tip")}
         <span className="hidden lg:inline">{t("prime_directive")}</span>
@@ -314,48 +294,59 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ cu
         </div>
       </details>
 
-      <dialog className="admin-settings-dialog dialog-width-md" aria-label="Admin Settings" ref={adminSettingsDialogRef} onCancel={() => adminSettingsDialogRef.current!.close()}>
-        <div className="header">
-          <h2 className="title">Admin Settings</h2>
-          <button onClick={() => adminSettingsDialogRef.current!.close()} aria-label="Close">
-            {getIconElement("close")}
-          </button>
-        </div>
-        <div className="subText">
-          <button
-            className="list-item"
-            onClick={() => {
-              adminSettingsDialogRef.current!.close();
-              workItemTypesDialogRef.current!.showModal();
-            }}
-          >
-            {getIconElement("fact-check")}
-            <span>Allowable Work Item Types</span>
-          </button>
-        </div>
-        <div className="inner">
-          <button className="default button" onClick={() => adminSettingsDialogRef.current!.close()}>
-            {t("common_close")}
-          </button>
-        </div>
-      </dialog>
+      {currentUserIsTeamAdmin && (
+        <details className="flex items-center relative">
+          <summary aria-label="Admin Settings" title="Admin Settings" className="extension-settings-button">
+            {getIconElement("admin-panel-settings")}
+            <span className="hidden lg:inline">Admin</span>
+          </summary>
 
-      <dialog className="work-item-types-settings-dialog dialog-width-md" aria-label="Allowable Work Item Types" ref={workItemTypesDialogRef} onCancel={closeWorkItemTypesDialog}>
+          <div className="callout-menu right">
+            <button
+              className="admin-settings-menu-item"
+              onClick={() => {
+                workItemTypesDialogRef.current!.showModal();
+              }}
+            >
+              {getIconElement("fact-check")}
+              Add Work Item Types
+            </button>
+          </div>
+        </details>
+      )}
+
+      <dialog className="work-item-types-settings-dialog dialog-width-md" role="dialog" aria-label="Add Work Item Types" ref={workItemTypesDialogRef} onCancel={closeWorkItemTypesDialog}>
         <div className="header">
-          <h2 className="title">Allowable Work Item Types</h2>
+          <h2 className="title">Add Work Item Types</h2>
           <button onClick={closeWorkItemTypesDialog} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
         <div className="subText">Select the work item types users can create from Add Work Item. If nothing is selected, Add Work Item uses the team's Requirements Backlog work item types.</div>
-        <div className="subText max-h-96 overflow-y-auto pr-2">
-          {sortedWorkItemTypes.map(workItemType => (
-            <label key={workItemType.referenceName ?? workItemType.name} className="flex items-center gap-2 py-1">
-              <input type="checkbox" checked={draftAllowedWorkItemTypeNames.includes(workItemType.name)} onChange={() => toggleDraftWorkItemType(workItemType.name)} />
-              {workItemType.icon?.url && <img className="work-item-type-icon" alt={`icon for work item type ${workItemType.name}`} src={workItemType.icon.url} />}
-              <span>{workItemType.name}</span>
-            </label>
-          ))}
+        <div className="subText work-item-types-settings-list">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Show</th>
+                <th scope="col">Work item type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedWorkItemTypes.map(workItemType => (
+                <tr key={workItemType.referenceName ?? workItemType.name}>
+                  <td>
+                    <input id={getWorkItemTypeInputId(workItemType)} type="checkbox" checked={draftAllowedWorkItemTypeNames.includes(workItemType.name)} onChange={() => toggleDraftWorkItemType(workItemType.name)} />
+                  </td>
+                  <td>
+                    <label htmlFor={getWorkItemTypeInputId(workItemType)}>
+                      {workItemType.icon?.url && <img className="work-item-type-icon" alt="" src={workItemType.icon.url} width="16" height="16" />}
+                      <span>{workItemType.name}</span>
+                    </label>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <div className="inner">
           <button className="button" onClick={saveWorkItemTypesDialog}>

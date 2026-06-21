@@ -2,7 +2,7 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## v1.92.55
+An## v1.92.55
 
 * Refactored Add work item menu so all work items visible and ordered alphabetically.
 * Limited Focus mode work item type options to requirement backlog types.

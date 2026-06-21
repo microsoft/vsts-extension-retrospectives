@@ -161,7 +161,7 @@ Once everyone is done voting, move on to the next phase of **Act**.
 
 In this phase, the team will go through each feedback item.  You will notice that the items with the most votes will appear at the top of the column. It is recommended that each time you do this exercise, you only select one or two of the feedback items to take action against. Click on the 'Add action item' button on a feedback card, and select the type of work item that needs to be created in Azure DevOps.
 
-By default, Add Work Item shows the selected team's Requirements Backlog work item types. Team Admins can change the team default from **Admin Settings** by selecting **Allowable Work Item Types**. If no work item types are selected in that dialog, the team returns to the Requirements Backlog default. If one or more work item types are selected, only those selected types are shown in Add Work Item in the Act tab and Focus mode.
+By default, Add Work Item shows the selected team's Requirements Backlog work item types. Team Admins can change the team default from **Admin Settings** by selecting **Add Work Item Types**. If no work item types are selected in that dialog, the team returns to the Requirements Backlog default. If one or more work item types are selected, only those selected types are shown in Add Work Item in the Act tab and Focus mode.
 
 This will open up the standard Azure DevOps work item creation form. Enter the work item details and save. This will create the work item in your Azure DevOps account and also associate it to the feedback item.
 

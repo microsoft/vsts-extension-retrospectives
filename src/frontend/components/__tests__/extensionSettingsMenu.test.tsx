@@ -94,10 +94,8 @@ describe("ExtensionSettingsMenu", () => {
 
   const openAllowableWorkItemTypesDialog = () => {
     fireEvent.click(screen.getByTitle("Admin Settings"));
-    fireEvent.click(screen.getByRole("button", { name: "Allowable Work Item Types" }));
-    const adminDialog = screen.getByRole("dialog", { name: "Admin Settings" });
-    fireEvent.click(within(adminDialog).getByRole("button", { name: "Allowable Work Item Types" }));
-    return screen.getByRole("dialog", { name: "Allowable Work Item Types" });
+    fireEvent.click(screen.getByRole("button", { name: "Add Work Item Types" }));
+    return screen.getByRole("dialog", { name: "Add Work Item Types" });
   };
 
   beforeEach(() => {
@@ -169,6 +167,8 @@ describe("ExtensionSettingsMenu", () => {
 
     const dialog = openAllowableWorkItemTypesDialog();
     expect(dialog).toHaveAttribute("open");
+    expect(within(dialog).getByRole("columnheader", { name: "Show" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("columnheader", { name: "Work item type" })).toBeInTheDocument();
     expect(within(dialog).getByRole("checkbox", { name: /Bug/ })).toBeInTheDocument();
     expect(within(dialog).getByRole("checkbox", { name: /User Story/ })).toBeInTheDocument();
     expect(within(dialog).getByText(/uses the team's Requirements Backlog work item types/i)).toBeInTheDocument();
@@ -231,7 +231,7 @@ describe("ExtensionSettingsMenu", () => {
 
     const dialog = openAllowableWorkItemTypesDialog();
     expect(within(dialog).getAllByRole("checkbox")).toHaveLength(60);
-    expect(dialog.querySelector(".overflow-y-auto")).toBeInTheDocument();
+    expect(dialog.querySelector(".work-item-types-settings-list")).toBeInTheDocument();
   });
 
   it("shows labels when wide", () => {
