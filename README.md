@@ -159,13 +159,13 @@ Once everyone is done voting, move on to the next phase of **Act**.
 
 #### Act
 
-In this phase, the team will go through each feedback item.  You will notice that the items with the most votes will appear at the top of the column. It is recommended that each time you do this exercise, you only select one or two of the feedback items to take action against. Click on the 'Add action item' button on a feedback card, and select the type of work item that needs to be created in Azure DevOps.
+In this phase, the team will go through each feedback item.  You will notice that the items with the most votes will appear at the top of the column. It is recommended that each time you do this exercise, you only select one or two of the feedback items to take action against. Click on the 'Add work item' button on a feedback card, and select the type of work item that needs to be created in Azure DevOps.
 
-By default, Add Work Item shows the selected team's Requirement Backlog work item types. Team Admins can change the team default from **Admin Settings** by selecting **Add work item types**. If no work item types are selected in that dialog, the team returns to the Requirement Backlog default. If one or more work item types are selected, only those selected types are shown in Add Work Item in the Act tab and Focus mode.
+By default, 'Add work item' shows the selected team's Requirement Backlog work item types. Team Admins can change the team default from **Admin Settings** by selecting **Add work item types**. If no work item types are selected in that dialog, the team returns to the Requirement Backlog default. If one or more work item types are selected, only those selected types are shown in 'Add work item' for the Act tab and Focus mode.
 
 This will open up the standard Azure DevOps work item creation form. Enter the work item details and save. This will create the work item in your Azure DevOps account and also associate it to the feedback item.
 
-![A screenshot that shows a feedback item in the 'Act Phase'. On the example feedback items, the button for 'Add Action Item,' an ellipsis, has been pressed to reveal a selection of options. The user has the option to create a number of different Azure Dev Ops items, like adding a bug, a user story, and others. In this case, the item that is darkened as though hovered by a mouse is the 'User Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
+![A screenshot that shows a feedback item in the 'Act Phase'. On the example feedback items, the button for 'Add work item,' an ellipsis, has been pressed to reveal a selection of options. The user has the option to create a number of different Azure Dev Ops items, depending on the team's configuration. In this case, the item that is darkened as though hovered by a mouse is the 'User Story' option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/add-action-item-dropdown.png)
 
 ### 8. Optional: The Team Assessment
 
