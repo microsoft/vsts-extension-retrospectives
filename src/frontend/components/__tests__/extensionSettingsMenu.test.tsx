@@ -92,6 +92,14 @@ describe("ExtensionSettingsMenu", () => {
 
   const getHelpMenuButton = (name: string): HTMLElement => within(getHelpMenuDetails()).getByRole("button", { name });
 
+  const openAllowableWorkItemTypesDialog = () => {
+    fireEvent.click(screen.getByTitle("Admin Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Allowable Work Item Types" }));
+    const adminDialog = screen.getByRole("dialog", { name: "Admin Settings" });
+    fireEvent.click(within(adminDialog).getByRole("button", { name: "Allowable Work Item Types" }));
+    return screen.getByRole("dialog", { name: "Allowable Work Item Types" });
+  };
+
   beforeEach(() => {
     windowOpenSpy = jest.spyOn(window, "open").mockImplementation(() => null);
 
@@ -138,6 +146,92 @@ describe("ExtensionSettingsMenu", () => {
     expect(screen.getByTitle("Data Import/Export")).toBeInTheDocument();
     expect(screen.getByTitle("Retrospective Help")).toBeInTheDocument();
     expect(screen.queryByTitle("User Settings")).not.toBeInTheDocument();
+    expect(screen.queryByTitle("Admin Settings")).not.toBeInTheDocument();
+  });
+
+  it("shows Admin Settings for team admins", () => {
+    render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} />);
+
+    expect(screen.getByTitle("Admin Settings")).toBeInTheDocument();
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+  });
+
+  it("opens allowable work item types dialog from Admin Settings", async () => {
+    render(
+      <ExtensionSettingsMenu
+        currentUserIsTeamAdmin={true}
+        allWorkItemTypes={[
+          { name: "Bug", referenceName: "Bug", icon: { url: "bug.png" } } as any,
+          { name: "User Story", referenceName: "UserStory", icon: { url: "story.png" } } as any,
+        ]}
+      />,
+    );
+
+    const dialog = openAllowableWorkItemTypesDialog();
+    expect(dialog).toHaveAttribute("open");
+    expect(within(dialog).getByRole("checkbox", { name: /Bug/ })).toBeInTheDocument();
+    expect(within(dialog).getByRole("checkbox", { name: /User Story/ })).toBeInTheDocument();
+    expect(within(dialog).getByText(/uses the team's Requirements Backlog work item types/i)).toBeInTheDocument();
+  });
+
+  it("saves selected allowable work item types", async () => {
+    const onSave = jest.fn().mockResolvedValue(undefined);
+    render(
+      <ExtensionSettingsMenu
+        currentUserIsTeamAdmin={true}
+        allWorkItemTypes={[
+          { name: "Bug", referenceName: "Bug", icon: { url: "bug.png" } } as any,
+          { name: "Task", referenceName: "Task", icon: { url: "task.png" } } as any,
+        ]}
+        onSaveAllowedActionItemWorkItemTypes={onSave}
+      />,
+    );
+
+    const dialog = openAllowableWorkItemTypesDialog();
+    fireEvent.click(within(dialog).getByRole("checkbox", { name: /Task/ }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith(["Task"]);
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
+  it("cancels allowable work item type changes", async () => {
+    const onSave = jest.fn().mockResolvedValue(undefined);
+    render(
+      <ExtensionSettingsMenu
+        currentUserIsTeamAdmin={true}
+        allWorkItemTypes={[
+          { name: "Bug", referenceName: "Bug", icon: { url: "bug.png" } } as any,
+          { name: "Task", referenceName: "Task", icon: { url: "task.png" } } as any,
+        ]}
+        allowedActionItemWorkItemTypeNames={["Bug"]}
+        onSaveAllowedActionItemWorkItemTypes={onSave}
+      />,
+    );
+
+    const dialog = openAllowableWorkItemTypesDialog();
+    const bugCheckbox = within(dialog).getByRole("checkbox", { name: /Bug/ }) as HTMLInputElement;
+    expect(bugCheckbox).toBeChecked();
+
+    fireEvent.click(bugCheckbox);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+
+    await waitFor(() => {
+      expect(onSave).not.toHaveBeenCalled();
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
+  it("renders large allowable work item type lists", () => {
+    const allWorkItemTypes = Array.from({ length: 60 }, (_, index) => ({ name: `Custom Type ${index}`, referenceName: `Custom.Type.${index}`, icon: { url: `type-${index}.png` } })) as any[];
+
+    render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} allWorkItemTypes={allWorkItemTypes} />);
+
+    const dialog = openAllowableWorkItemTypesDialog();
+    expect(within(dialog).getAllByRole("checkbox")).toHaveLength(60);
+    expect(dialog.querySelector(".overflow-y-auto")).toBeInTheDocument();
   });
 
   it("shows labels when wide", () => {

@@ -788,6 +788,24 @@ export const GearsIcon = () => {
   );
 };
 
+export const AdminPanelSettingsIcon = () => {
+  return (
+    <svg className="icon-admin-panel-settings" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <path d="M17 11c.34 0 .67.04 1 .09V6.27L10.5 3 3 6.27v4.91c0 4.54 3.2 8.79 7.5 9.82.55-.13 1.08-.32 1.6-.55A6.98 6.98 0 0 1 10 15c0-2.21 1.79-4 4-4h3zm0 2c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm2.5 4.5H18v1.5h-2v-1.5h-1.5v-2H16V14h2v1.5h1.5v2z" />
+    </svg>
+  );
+};
+
+export const FactCheckIcon = () => {
+  return (
+    <svg className="icon-fact-check" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H5v-2h4v2zm0-4H5v-2h4v2zm0-4H5V7h4v2zm4.5 7.5L10 13l1.41-1.41 2.09 2.08 4.59-4.59L19.5 10.5l-6 6z" />
+    </svg>
+  );
+};
+
 export const LinkOffIcon = () => {
   return (
     <svg className="icon-link-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -894,6 +912,8 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "psychological-safety", tags: ["psychological-safety", "fa-regular fa-handshake"], name: "Psychological Safety", icon: <PsychologicalSafetyIcon /> },
   { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
   { id: "gears", tags: ["gears", "fa-solid fa-gears"], name: "Gears", icon: <GearsIcon /> },
+  { id: "admin-panel-settings", tags: [], name: "Admin Panel Settings", icon: <AdminPanelSettingsIcon /> },
+  { id: "fact-check", tags: [], name: "Fact Check", icon: <FactCheckIcon /> },
   { id: "eye", tags: ["eye", "far fa-eye"], name: "Eye", icon: <EyeIcon /> },
   { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
   { id: "add", tags: [], name: "Add", icon: <AddIcon /> },

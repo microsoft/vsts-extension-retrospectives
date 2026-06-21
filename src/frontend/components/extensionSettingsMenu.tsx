@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useCallback } from "react";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
+import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { reactPlugin } from "../utilities/telemetryClient";
 import boardDataService from "../dal/boardDataService";
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
@@ -22,6 +23,16 @@ interface KeyboardShortcut {
   keys: string[];
   description: string;
   category: string;
+}
+
+const emptyWorkItemTypes: WorkItemType[] = [];
+const emptyWorkItemTypeNames: string[] = [];
+
+export interface ExtensionSettingsMenuProps {
+  currentUserIsTeamAdmin?: boolean;
+  allWorkItemTypes?: WorkItemType[];
+  allowedActionItemWorkItemTypeNames?: string[];
+  onSaveAllowedActionItemWorkItemTypes?: (workItemTypeNames: string[]) => Promise<void> | void;
 }
 
 const keyboardShortcuts: KeyboardShortcut[] = [
@@ -116,15 +127,22 @@ const importData = async () => {
   return false;
 };
 
-export const ExtensionSettingsMenu: React.FC = () => {
+export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ currentUserIsTeamAdmin = false, allWorkItemTypes = emptyWorkItemTypes, allowedActionItemWorkItemTypeNames = emptyWorkItemTypeNames, onSaveAllowedActionItemWorkItemTypes }) => {
   const trackActivity = useTrackMetric(reactPlugin, "ExtensionSettingsMenu");
 
   const menuRootRef = useRef<HTMLDivElement>(null);
+  const adminSettingsDialogRef = useRef<HTMLDialogElement>(null);
+  const workItemTypesDialogRef = useRef<HTMLDialogElement>(null);
   const primeDirectiveDialogRef = useRef<HTMLDialogElement>(null);
   const whatsNewDialogRef = useRef<HTMLDialogElement>(null);
   const userGuideDialogRef = useRef<HTMLDialogElement>(null);
   const volunteerDialogRef = useRef<HTMLDialogElement>(null);
   const keyboardShortcutsDialogRef = useRef<HTMLDialogElement>(null);
+  const [draftAllowedWorkItemTypeNames, setDraftAllowedWorkItemTypeNames] = React.useState<string[]>(allowedActionItemWorkItemTypeNames);
+
+  useEffect(() => {
+    setDraftAllowedWorkItemTypeNames(allowedActionItemWorkItemTypeNames);
+  }, [allowedActionItemWorkItemTypeNames]);
 
   const handleDocumentKeyDown = useCallback((event: KeyboardEvent) => {
     const target = event.target as HTMLElement | null;
@@ -165,6 +183,24 @@ export const ExtensionSettingsMenu: React.FC = () => {
     }
   }, []);
 
+  const sortedWorkItemTypes = React.useMemo(() => {
+    return [...allWorkItemTypes].sort((left, right) => left.name.localeCompare(right.name));
+  }, [allWorkItemTypes]);
+
+  const closeWorkItemTypesDialog = useCallback(() => {
+    setDraftAllowedWorkItemTypeNames(allowedActionItemWorkItemTypeNames);
+    workItemTypesDialogRef.current!.close();
+  }, [allowedActionItemWorkItemTypeNames]);
+
+  const saveWorkItemTypesDialog = useCallback(async () => {
+    await onSaveAllowedActionItemWorkItemTypes?.(draftAllowedWorkItemTypeNames);
+    workItemTypesDialogRef.current!.close();
+  }, [draftAllowedWorkItemTypeNames, onSaveAllowedActionItemWorkItemTypes]);
+
+  const toggleDraftWorkItemType = useCallback((workItemTypeName: string) => {
+    setDraftAllowedWorkItemTypeNames(previousNames => (previousNames.includes(workItemTypeName) ? previousNames.filter(name => name !== workItemTypeName) : [...previousNames, workItemTypeName]));
+  }, []);
+
   useEffect(() => {
     document.addEventListener("pointerdown", handleDocumentPointerDown);
     document.addEventListener("keydown", handleDocumentKeyDown);
@@ -177,6 +213,26 @@ export const ExtensionSettingsMenu: React.FC = () => {
 
   return (
     <div className="extension-settings-menu" ref={menuRootRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+      {currentUserIsTeamAdmin && (
+        <details className="flex items-center relative">
+          <summary aria-label="Admin Settings" title="Admin Settings" className="extension-settings-button">
+            {getIconElement("admin-panel-settings")}
+            <span className="hidden lg:inline">Admin</span>
+          </summary>
+
+          <div className="callout-menu right">
+            <button
+              onClick={() => {
+                adminSettingsDialogRef.current!.showModal();
+              }}
+            >
+              {getIconElement("fact-check")}
+              Allowable Work Item Types
+            </button>
+          </div>
+        </details>
+      )}
+
       <button onClick={() => primeDirectiveDialogRef.current!.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
         {getIconElement("privacy-tip")}
         <span className="hidden lg:inline">{t("prime_directive")}</span>
@@ -257,6 +313,59 @@ export const ExtensionSettingsMenu: React.FC = () => {
           </button>
         </div>
       </details>
+
+      <dialog className="admin-settings-dialog dialog-width-md" aria-label="Admin Settings" ref={adminSettingsDialogRef} onCancel={() => adminSettingsDialogRef.current!.close()}>
+        <div className="header">
+          <h2 className="title">Admin Settings</h2>
+          <button onClick={() => adminSettingsDialogRef.current!.close()} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">
+          <button
+            className="list-item"
+            onClick={() => {
+              adminSettingsDialogRef.current!.close();
+              workItemTypesDialogRef.current!.showModal();
+            }}
+          >
+            {getIconElement("fact-check")}
+            <span>Allowable Work Item Types</span>
+          </button>
+        </div>
+        <div className="inner">
+          <button className="default button" onClick={() => adminSettingsDialogRef.current!.close()}>
+            {t("common_close")}
+          </button>
+        </div>
+      </dialog>
+
+      <dialog className="work-item-types-settings-dialog dialog-width-md" aria-label="Allowable Work Item Types" ref={workItemTypesDialogRef} onCancel={closeWorkItemTypesDialog}>
+        <div className="header">
+          <h2 className="title">Allowable Work Item Types</h2>
+          <button onClick={closeWorkItemTypesDialog} aria-label="Close">
+            {getIconElement("close")}
+          </button>
+        </div>
+        <div className="subText">Select the work item types users can create from Add Work Item. If nothing is selected, Add Work Item uses the team's Requirements Backlog work item types.</div>
+        <div className="subText max-h-96 overflow-y-auto pr-2">
+          {sortedWorkItemTypes.map(workItemType => (
+            <label key={workItemType.referenceName ?? workItemType.name} className="flex items-center gap-2 py-1">
+              <input type="checkbox" checked={draftAllowedWorkItemTypeNames.includes(workItemType.name)} onChange={() => toggleDraftWorkItemType(workItemType.name)} />
+              {workItemType.icon?.url && <img className="work-item-type-icon" alt={`icon for work item type ${workItemType.name}`} src={workItemType.icon.url} />}
+              <span>{workItemType.name}</span>
+            </label>
+          ))}
+        </div>
+        <div className="inner">
+          <button className="button" onClick={saveWorkItemTypesDialog}>
+            {t("common_save")}
+          </button>
+          <button className="default button" onClick={closeWorkItemTypesDialog}>
+            {t("common_cancel")}
+          </button>
+        </div>
+      </dialog>
 
       <dialog className="prime-directive-dialog dialog-width-md" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onCancel={() => primeDirectiveDialogRef.current!.close()}>
         <div className="header">
