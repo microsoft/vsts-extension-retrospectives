@@ -171,7 +171,7 @@ describe("ExtensionSettingsMenu", () => {
     expect(within(dialog).getByRole("columnheader", { name: "Work item type" })).toBeInTheDocument();
     expect(within(dialog).getByRole("checkbox", { name: /Bug/ })).toBeInTheDocument();
     expect(within(dialog).getByRole("checkbox", { name: /User Story/ })).toBeInTheDocument();
-    expect(within(dialog).getByText(/uses the team's Requirements Backlog work item types/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/uses the team's Requirement Backlog work item types/i)).toBeInTheDocument();
   });
 
   it("saves selected allowable work item types", async () => {
