@@ -94,8 +94,8 @@ describe("ExtensionSettingsMenu", () => {
 
   const openAllowableWorkItemTypesDialog = () => {
     fireEvent.click(screen.getByTitle("Admin Settings"));
-    fireEvent.click(screen.getByRole("button", { name: "Add Work Item Types" }));
-    return screen.getByRole("dialog", { name: "Add Work Item Types" });
+    fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
+    return screen.getByRole("dialog", { name: "Add work item types" });
   };
 
   beforeEach(() => {
@@ -383,7 +383,7 @@ describe("ExtensionSettingsMenu", () => {
     const anchorClickSpy = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
 
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByText("Export Data"));
+    fireEvent.click(screen.getByText("Export data"));
 
     await waitFor(() => {
       expect(window.URL.createObjectURL).toHaveBeenCalled();
@@ -634,7 +634,7 @@ describe("ExtensionSettingsMenu", () => {
       const dataButton = screen.getByTitle("Data Import/Export");
       fireEvent.click(dataButton);
 
-      // Click Export Data button
+      // Click Export data button
       const calloutMenu = container.querySelector("details[open] .callout-menu");
       const exportButton = calloutMenu?.querySelector("button");
       expect(exportButton).toBeTruthy();
@@ -672,10 +672,10 @@ describe("ExtensionSettingsMenu", () => {
     const dataButton = screen.getByTitle("Data Import/Export");
     fireEvent.click(dataButton);
 
-    // Click Import Data button (first button - Import is before Export in the menu)
+    // Click Import data button (first button - Import is before Export in the menu)
     const calloutMenu = container.querySelector("details[open] .callout-menu");
     const buttons = calloutMenu?.querySelectorAll("button");
-    const importButton = buttons?.[0]; // First button is Import Data
+    const importButton = buttons?.[0]; // First button is Import data
     expect(importButton).toBeTruthy();
 
     // Just verify the button can be clicked without error
@@ -899,7 +899,7 @@ describe("ExtensionSettingsMenu", () => {
       const dataButton = screen.getByTitle("Data Import/Export");
       fireEvent.click(dataButton);
 
-      // Click Export Data button
+      // Click Export data button
       const calloutMenu = container.querySelector("details[open] .callout-menu");
       const exportButton = calloutMenu?.querySelector("button");
       expect(exportButton).toBeTruthy();
@@ -908,7 +908,7 @@ describe("ExtensionSettingsMenu", () => {
     }
   });
 
-  it("calls importData when Import Data button is clicked", async () => {
+  it("calls importData when Import data button is clicked", async () => {
     // Render the component FIRST before mocking document methods
     const { container } = render(<ExtensionSettingsMenu />);
 
@@ -920,8 +920,8 @@ describe("ExtensionSettingsMenu", () => {
     const dataButton = screen.getByTitle("Data Import/Export");
     fireEvent.click(dataButton);
 
-    // Find Import Data button
-    const importButton = screen.getByText("Import Data");
+    // Find Import data button
+    const importButton = screen.getByText("Import data");
     expect(importButton).toBeInTheDocument();
 
     // NOW mock file input handling after render is complete

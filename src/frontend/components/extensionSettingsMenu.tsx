@@ -309,15 +309,15 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ cu
               }}
             >
               {getIconElement("fact-check")}
-              Add Work Item Types
+              Add work item types
             </button>
           </div>
         </details>
       )}
 
-      <dialog className="work-item-types-settings-dialog dialog-width-md" role="dialog" aria-label="Add Work Item Types" ref={workItemTypesDialogRef} onCancel={closeWorkItemTypesDialog}>
+      <dialog className="work-item-types-settings-dialog dialog-width-sm" role="dialog" aria-label="Add work item types" ref={workItemTypesDialogRef} onCancel={closeWorkItemTypesDialog}>
         <div className="header">
-          <h2 className="title">Add Work Item Types</h2>
+          <h2 className="title">Add work item types</h2>
           <button onClick={closeWorkItemTypesDialog} aria-label="Close">
             {getIconElement("close")}
           </button>
