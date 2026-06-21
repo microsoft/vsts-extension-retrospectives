@@ -171,7 +171,7 @@ describe("ExtensionSettingsMenu", () => {
     expect(within(dialog).getByRole("columnheader", { name: "Work item type" })).toBeInTheDocument();
     expect(within(dialog).getByRole("checkbox", { name: /Bug/ })).toBeInTheDocument();
     expect(within(dialog).getByRole("checkbox", { name: /User Story/ })).toBeInTheDocument();
-    expect(within(dialog).getByText(/uses the team's Requirement Backlog work item types/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/defaults to the team's Requirement Backlog work item types/i)).toBeInTheDocument();
   });
 
   it("saves selected allowable work item types", async () => {
@@ -220,6 +220,74 @@ describe("ExtensionSettingsMenu", () => {
 
     await waitFor(() => {
       expect(onSave).not.toHaveBeenCalled();
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
+  it("closes add work item types dialog with the header close button", async () => {
+    const onSave = jest.fn().mockResolvedValue(undefined);
+    render(
+      <ExtensionSettingsMenu
+        currentUserIsTeamAdmin={true}
+        allWorkItemTypes={[{ name: "Bug", referenceName: "Bug", icon: { url: "bug.png" } } as any]}
+        allowedActionItemWorkItemTypeNames={["Bug"]}
+        onSaveAllowedActionItemWorkItemTypes={onSave}
+      />,
+    );
+
+    const dialog = openAllowableWorkItemTypesDialog();
+    const bugCheckbox = within(dialog).getByRole("checkbox", { name: /Bug/ }) as HTMLInputElement;
+    expect(bugCheckbox).toBeChecked();
+
+    fireEvent.click(bugCheckbox);
+    fireEvent.click(getIconCloseButton(dialog));
+
+    await waitFor(() => {
+      expect(onSave).not.toHaveBeenCalled();
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
+  it("renders work item types without icons", () => {
+    render(
+      <ExtensionSettingsMenu
+        currentUserIsTeamAdmin={true}
+        allWorkItemTypes={[{ name: "Task", referenceName: "Task" } as any]}
+      />,
+    );
+
+    const dialog = openAllowableWorkItemTypesDialog();
+
+    expect(within(dialog).getByRole("checkbox", { name: /Task/ })).toBeInTheDocument();
+    expect(within(dialog).queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("renders work item types without reference names", () => {
+    render(
+      <ExtensionSettingsMenu
+        currentUserIsTeamAdmin={true}
+        allWorkItemTypes={[{ name: "Custom Type", icon: { url: "custom.png" } } as any]}
+      />,
+    );
+
+    const dialog = openAllowableWorkItemTypesDialog();
+
+    expect(within(dialog).getByRole("checkbox", { name: /Custom Type/ })).toBeInTheDocument();
+  });
+
+  it("saves add work item type selections when no save handler is provided", async () => {
+    render(
+      <ExtensionSettingsMenu
+        currentUserIsTeamAdmin={true}
+        allWorkItemTypes={[{ name: "Bug", referenceName: "Bug", icon: { url: "bug.png" } } as any]}
+      />,
+    );
+
+    const dialog = openAllowableWorkItemTypesDialog();
+    fireEvent.click(within(dialog).getByRole("checkbox", { name: /Bug/ }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    await waitFor(() => {
       expect(dialog).not.toHaveAttribute("open");
     });
   });

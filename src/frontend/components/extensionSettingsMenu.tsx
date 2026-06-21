@@ -297,7 +297,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ cu
       {currentUserIsTeamAdmin && (
         <details className="flex items-center relative">
           <summary aria-label="Admin Settings" title="Admin Settings" className="extension-settings-button">
-            {getIconElement("admin-panel-settings")}
+            <span aria-hidden="true">{getIconElement("admin-panel-settings")}</span>
             <span className="hidden lg:inline">Admin</span>
           </summary>
 
@@ -308,21 +308,21 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ cu
                 workItemTypesDialogRef.current!.showModal();
               }}
             >
-              {getIconElement("fact-check")}
+              <span aria-hidden="true">{getIconElement("fact-check")}</span>
               Add work item types
             </button>
           </div>
         </details>
       )}
 
-      <dialog className="work-item-types-settings-dialog dialog-width-sm" role="dialog" aria-label="Add work item types" ref={workItemTypesDialogRef} onCancel={closeWorkItemTypesDialog}>
+      <dialog className="work-item-types-settings-dialog dialog-width-sm" role="dialog" aria-labelledby="add-work-item-types-title" aria-describedby="add-work-item-types-description" ref={workItemTypesDialogRef} onCancel={closeWorkItemTypesDialog}>
         <div className="header">
-          <h2 className="title">Add work item types</h2>
+          <h2 className="title" id="add-work-item-types-title">Add work item types</h2>
           <button onClick={closeWorkItemTypesDialog} aria-label="Close">
             {getIconElement("close")}
           </button>
         </div>
-        <div className="subText">Select the work item types users can create from Add Work Item. If nothing is selected, Add Work Item uses the team's Requirement Backlog work item types.</div>
+        <div className="subText" id="add-work-item-types-description">Select the work item types users can create from Add Work Item. If nothing is selected, Add Work Item defaults to the team's Requirement Backlog work item types.</div>
         <div className="subText work-item-types-settings-list">
           <table>
             <thead>

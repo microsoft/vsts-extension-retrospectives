@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import FeedbackCarousel, { type FocusModeModel } from "../../components/feedbackCarousel";
+import FeedbackCarousel, { getPivotItemKey, getSelectedCarouselColumnKey, type FocusModeModel } from "../../components/feedbackCarousel";
 import { testGroupColumnProps, testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { mockUuid } from "../__mocks__/uuid/v4";
 import * as icons from "../../components/icons";
@@ -70,6 +70,38 @@ const mockedGroupProps = {
 jest.mock("uuid", () => ({ v4: () => mockUuid }));
 
 describe("Feedback Carousel ", () => {
+  describe("carousel key helpers", () => {
+    it("uses the selected column id when one exists", () => {
+      const result = getSelectedCarouselColumnKey("selected-column", [{ columnId: "first-column" }]);
+
+      expect(result).toBe("selected-column");
+    });
+
+    it("falls back to the first feedback column id", () => {
+      const result = getSelectedCarouselColumnKey(undefined, [{ columnId: "first-column" }]);
+
+      expect(result).toBe("first-column");
+    });
+
+    it("returns undefined when there is no selected column or feedback column", () => {
+      const result = getSelectedCarouselColumnKey(undefined, []);
+
+      expect(result).toBeUndefined();
+    });
+
+    it("gets the item key from a pivot item", () => {
+      const result = getPivotItemKey({ props: { itemKey: "column-1" } });
+
+      expect(result).toBe("column-1");
+    });
+
+    it("returns undefined when the pivot item is missing", () => {
+      const result = getPivotItemKey(undefined);
+
+      expect(result).toBeUndefined();
+    });
+  });
+
   it("can be rendered", () => {
     const { container } = render(<FeedbackCarousel {...mockedProps} />);
     const carouselPivot = container.querySelector(".feedback-carousel-pivot");
