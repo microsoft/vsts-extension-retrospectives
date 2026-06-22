@@ -4,6 +4,8 @@ You can find the changelog of the Retrospective Extension below.
 
 ## Unpublished
 
+* Restricts editing and deleting a feedback card to the user who created it or the board owner, so participants can no longer modify or remove other people's cards. From [GitHub PR #1772](https://github.com/microsoft/vsts-extension-retrospectives/pull/1772)
+
 * Ensures editing a retrospective updates the intended board name and prevents accidental renames.
 * Prevents duplicate-name side effects that can impact board retrieval when updating board metadata.
 * Improves Create and Edit Retrospective dialog name-validation feedback, including consistent validation messaging for missing or duplicate board name.

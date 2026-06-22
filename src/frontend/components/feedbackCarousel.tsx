@@ -23,6 +23,7 @@ export interface FocusModeModel {
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   hideFeedbackItems: boolean;
+  isBoardOwner?: boolean;
   activeTimerFeedbackItemId: string | null;
   onVoteCasted: () => void;
   requestTimerStart: (feedbackItemId: string) => void;
@@ -139,6 +140,7 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
           shouldHaveFocus: columnItem.shouldHaveFocus,
           hideFeedbackItems: focusModeModel.hideFeedbackItems,
           userIdRef: columnItem.feedbackItem.userIdRef,
+          isBoardOwner: focusModeModel.isBoardOwner,
           onVoteCasted: focusModeModel.onVoteCasted,
           groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
           groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],
