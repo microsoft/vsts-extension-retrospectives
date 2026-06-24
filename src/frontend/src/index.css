@@ -388,7 +388,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .feedback-search-input {
-    @apply @apply w-[calc(100%-var(--spacing)*8)] m-4 p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
+    @apply w-[calc(100%-var(--spacing)*8)] m-4 p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
   }
 
   & .header {
