@@ -474,7 +474,9 @@ describe("FeedbackBoardContainer integration", () => {
     fireEvent.click(screen.getByText("Search all boards"));
     fireEvent.change(screen.getByPlaceholderText("Enter words to search"), { target: { value: "risk" } });
 
-    expect(await screen.findByText("Fix release risk")).toBeInTheDocument();
+    const searchResultLink = await screen.findByRole("link", { name: /Fix release risk/ });
+    expect(searchResultLink).toHaveAttribute("href", "#teamId=t1&boardId=b2&phase=Collect");
+    expect(screen.getByText("Fix release risk")).toBeInTheDocument();
     expect(screen.getByText("Board 2 - Risks - Jan 1, 2024")).toBeInTheDocument();
     expect(screen.queryByText("Keep the release calm")).not.toBeInTheDocument();
   });

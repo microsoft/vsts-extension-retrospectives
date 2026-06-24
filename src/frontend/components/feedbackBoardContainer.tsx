@@ -1303,7 +1303,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     hideDialog("isSearchAllBoardsDialogVisible", searchAllBoardsDialogRef);
   };
 
-  const handleAllBoardFeedbackSearchInputChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+  const handleAllBoardFeedbackSearchInputChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const trimmedSearchTerm = event.currentTarget.value.trim();
     const requestId = allBoardFeedbackSearchRequestIdRef.current + 1;
     allBoardFeedbackSearchRequestIdRef.current = requestId;
@@ -1355,11 +1355,24 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         setIsSearchingAllBoardFeedback(false);
       }
     }
-  };
+  }, [state.boards, state.currentUserId]);
 
   const openAllBoardFeedbackSearchResult = async (board: IFeedbackBoardDocument): Promise<void> => {
     await changeSelectedBoard(board);
     hideAllBoardFeedbackSearchDialog();
+  };
+
+  const getAllBoardFeedbackSearchResultHref = (board: IFeedbackBoardDocument): string => {
+    return `#teamId=${encodeURIComponent(state.currentTeam.id)}&boardId=${encodeURIComponent(board.id)}&phase=${encodeURIComponent(board.activePhase)}`;
+  };
+
+  const handleAllBoardFeedbackSearchResultClick = async (event: React.MouseEvent<HTMLAnchorElement>, board: IFeedbackBoardDocument): Promise<void> => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    await openAllBoardFeedbackSearchResult(board);
   };
 
   const clickWorkflowStateCallback = (_: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
@@ -1792,6 +1805,20 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
     };
   }, [isHostedAzureDevOps, state.isBackendServiceConnected, state.isBackendServiceReconnecting, attemptBackendReconnect]);
+
+  const allBoardFeedbackSearchInput = React.useMemo(
+    () => (
+      <input
+        id="all-board-feedback-search-input"
+        className="feedback-search-input"
+        type="search"
+        placeholder="Enter words to search"
+        aria-label="Enter words to search"
+        onChange={handleAllBoardFeedbackSearchInputChange}
+      />
+    ),
+    [handleAllBoardFeedbackSearchInputChange],
+  );
 
   if (!state.isAppInitialized || !state.isTeamDataLoaded) {
     return (
@@ -2366,7 +2393,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           <label className="subText" htmlFor="all-board-feedback-search-input">
             Search feedback in all boards for this team.
           </label>
-          <input id="all-board-feedback-search-input" className="feedback-search-input" type="search" placeholder="Enter words to search" aria-label="Enter words to search" onChange={handleAllBoardFeedbackSearchInputChange} />
+          {allBoardFeedbackSearchInput}
           <div className="output-container" aria-live="polite">
             {isSearchingAllBoardFeedback && <p className="search-feedback-message">Searching...</p>}
             {!isSearchingAllBoardFeedback && !allBoardFeedbackSearchResults.length && allBoardFeedbackSearchTerm && <p className="search-feedback-message">No feedback found.</p>}
@@ -2376,10 +2403,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               const detailsText = [board.title, columnTitle, createdDateText].filter(Boolean).join(" - ");
 
               return (
-                <button key={`${board.id}-${feedbackItem.id}`} type="button" className="feedback-search-result-item" onClick={() => void openAllBoardFeedbackSearchResult(board)}>
+                <a key={`${board.id}-${feedbackItem.id}`} href={getAllBoardFeedbackSearchResultHref(board)} className="feedback-search-result-item" onClick={event => void handleAllBoardFeedbackSearchResultClick(event, board)}>
                   <span className="feedback-search-result-title">{feedbackItem.title}</span>
                   <span className="feedback-search-result-details">{detailsText}</span>
-                </button>
+                </a>
               );
             })}
           </div>

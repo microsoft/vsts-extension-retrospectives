@@ -2229,7 +2229,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .retrospectives-all-board-feedback-search-dialog .output-container .feedback-search-result-item {
-  @apply flex flex-col gap-1 cursor-pointer text-start w-full p-3 border border-(--border-subtle-color) bg-(--background-color) text-(--text-primary-color);
+  @apply flex flex-col gap-1 cursor-pointer text-start w-full p-3 border border-(--border-subtle-color) bg-(--background-color) text-(--text-primary-color) no-underline;
 
   &:focus,
   &:active,
