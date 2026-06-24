@@ -4,6 +4,13 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.55
 
+* Restricts editing and deleting a feedback card to the user who created it or the board owner, so participants can no longer modify or remove other people's cards. From [GitHub PR #1772](https://github.com/microsoft/vsts-extension-retrospectives/pull/1772)
+* Ensures editing a retrospective updates the intended board name and prevents accidental renames.
+* Prevents duplicate-name side effects that can impact board retrieval when updating board metadata.
+* Improves Create and Edit Retrospective dialog name-validation feedback, including consistent validation messaging for missing or duplicate board name.
+* Simplifies board-configuration wording in Board Settings, including the required-name indicator, Max Votes label, and hidden feedback option.
+* Reintroduces borders for user input fields for cleaner visuals.
+* Supports small, medium, large and extra large standard dialog widths.
 * Resolved race conditions on initial load which could result in missing teams or boards. From [GitHub PR #1766](https://github.com/microsoft/vsts-extension-retrospectives/pull/1766)
 
 * Refined Add work item selection to ensure the full work item list is visible on Act tab.

@@ -2285,6 +2285,48 @@ describe("FeedbackBoard Component", () => {
 
       expect(onVoteCasted).toHaveBeenCalled();
     });
+
+    it("sets isBoardOwner to true when the current user created the board", async () => {
+      const onFocusModeModelChange = jest.fn();
+      // mockedProps.userId and mockedBoard.createdBy.id are both "", so the current user is the owner.
+      const ownerProps = {
+        ...mockedProps,
+        onFocusModeModelChange,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...ownerProps} />);
+
+      await waitFor(() => {
+        expect(onFocusModeModelChange).toHaveBeenCalled();
+      });
+
+      const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
+      expect(focusModeModel?.isBoardOwner).toBe(true);
+    });
+
+    it("sets isBoardOwner to false when the board has no creator", async () => {
+      const onFocusModeModelChange = jest.fn();
+      const boardWithoutCreator: IFeedbackBoardDocument = { ...mockedBoard, createdBy: undefined };
+      const nonOwnerProps = {
+        ...mockedProps,
+        board: boardWithoutCreator,
+        userId: "some-other-user",
+        onFocusModeModelChange,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...nonOwnerProps} />);
+
+      await waitFor(() => {
+        expect(onFocusModeModelChange).toHaveBeenCalled();
+      });
+
+      const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
+      expect(focusModeModel?.isBoardOwner).toBe(false);
+    });
   });
 
   describe("Timer Functions - Edge Cases", () => {
@@ -2968,9 +3010,7 @@ describe("FeedbackBoard Component", () => {
 
   describe("Branch coverage regressions", () => {
     it("falls back to non-current iterations when current iterations are empty", async () => {
-      (workService.getIterations as jest.Mock)
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([{ path: "Iteration\\Fallback", id: "iter-fallback" }]);
+      (workService.getIterations as jest.Mock).mockResolvedValueOnce([]).mockResolvedValueOnce([{ path: "Iteration\\Fallback", id: "iter-fallback" }]);
 
       render(<FeedbackBoard {...mockedProps} />);
 
@@ -3213,9 +3253,7 @@ describe("FeedbackBoard Component", () => {
         originalColumnId: columnId,
       };
 
-      (itemDataService.getFeedbackItemsForBoard as jest.Mock)
-        .mockResolvedValueOnce([])
-        .mockResolvedValue([serverItem]);
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([]).mockResolvedValue([serverItem]);
 
       render(<FeedbackBoard {...collectProps} />);
 
@@ -3248,11 +3286,7 @@ describe("FeedbackBoard Component", () => {
       (useStateSpy as unknown as jest.Mock).mockImplementation((initialState: unknown) => {
         const [state, setState] = (realUseState as unknown as (value: unknown) => [unknown, React.Dispatch<React.SetStateAction<unknown>>])(initialState);
 
-        const isColumnsState =
-          !!state &&
-          typeof state === "object" &&
-          !Array.isArray(state) &&
-          Object.values(state as Record<string, unknown>).some(value => !!value && typeof value === "object" && "columnItems" in (value as object) && "columnProperties" in (value as object));
+        const isColumnsState = !!state && typeof state === "object" && !Array.isArray(state) && Object.values(state as Record<string, unknown>).some(value => !!value && typeof value === "object" && "columnItems" in (value as object) && "columnProperties" in (value as object));
 
         if (!isColumnsState) {
           return [state, setState] as [unknown, React.Dispatch<React.SetStateAction<unknown>>];
@@ -3265,10 +3299,13 @@ describe("FeedbackBoard Component", () => {
 
             if (keys.length > 1) {
               const [, ...remainingKeys] = keys;
-              const columnsMissingFirstKey = remainingKeys.reduce((acc, key) => {
-                acc[key] = currentColumns[key];
-                return acc;
-              }, {} as Record<string, unknown>);
+              const columnsMissingFirstKey = remainingKeys.reduce(
+                (acc, key) => {
+                  acc[key] = currentColumns[key];
+                  return acc;
+                },
+                {} as Record<string, unknown>,
+              );
 
               (update as (prevState: unknown) => unknown)(columnsMissingFirstKey);
               return;
@@ -3292,6 +3329,5 @@ describe("FeedbackBoard Component", () => {
 
       useStateSpy.mockRestore();
     });
-
   });
 });
