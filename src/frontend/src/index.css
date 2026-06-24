@@ -242,7 +242,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .carousel-track {
-  @apply flex overflow-x-auto w-full relative snap-x snap-mandatory scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none];
+  @apply flex overflow-x-auto w-full relative snap-x snap-mandatory scrollbar-none scroll-smooth [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none];
 
   &::-webkit-scrollbar {
     @apply hidden; /* Chrome/Safari */
