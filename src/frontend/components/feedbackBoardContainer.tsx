@@ -174,8 +174,14 @@ type DialogVisibilityState = {
   isDiscussAndActDialogVisible: boolean;
   isPreviewEmailDialogVisible: boolean;
   isRetroSummaryDialogVisible: boolean;
+  isSearchAllBoardsDialogVisible: boolean;
   isTeamAssessmentHistoryDialogVisible: boolean;
   isTeamEffectivenessDialogVisible: boolean;
+};
+
+type AllBoardFeedbackSearchResult = {
+  board: IFeedbackBoardDocument;
+  feedbackItem: IFeedbackItemDocument;
 };
 
 const initialDialogVisibilityState: DialogVisibilityState = {
@@ -187,6 +193,7 @@ const initialDialogVisibilityState: DialogVisibilityState = {
   isDiscussAndActDialogVisible: false,
   isPreviewEmailDialogVisible: false,
   isRetroSummaryDialogVisible: false,
+  isSearchAllBoardsDialogVisible: false,
   isTeamAssessmentHistoryDialogVisible: false,
   isTeamEffectivenessDialogVisible: false,
 };
@@ -207,9 +214,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const [state, setContainerState] = React.useState<FeedbackBoardContainerState>(() => ({ ...initialState }));
   const [visibleDialogs, setVisibleDialogs] = React.useState<DialogVisibilityState>(initialDialogVisibilityState);
+  const [allBoardFeedbackSearchTerm, setAllBoardFeedbackSearchTerm] = React.useState("");
+  const [allBoardFeedbackSearchResults, setAllBoardFeedbackSearchResults] = React.useState<AllBoardFeedbackSearchResult[]>([]);
+  const [isSearchingAllBoardFeedback, setIsSearchingAllBoardFeedback] = React.useState(false);
 
   const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
   const connectionWatchdogIntervalIdRef = React.useRef<number | undefined>(undefined);
+  const allBoardFeedbackSearchRequestIdRef = React.useRef(0);
 
   const prevCurrentTeamRef = React.useRef<WebApiTeam | undefined>(undefined);
   const prevCurrentBoardRef = React.useRef<IFeedbackBoardDocument | undefined>(undefined);
@@ -219,6 +230,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const searchAllBoardsDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const archiveBoardDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const boardCreationDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const boardDuplicateDialogRef = React.useRef<HTMLDialogElement | null>(null);
@@ -271,6 +283,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   useShowModalWhenVisible(visibleDialogs.isDiscussAndActDialogVisible, discussAndActDialogRef);
   useShowModalWhenVisible(visibleDialogs.isPreviewEmailDialogVisible, previewEmailDialogRef);
   useShowModalWhenVisible(visibleDialogs.isRetroSummaryDialogVisible, retroSummaryDialogRef);
+  useShowModalWhenVisible(visibleDialogs.isSearchAllBoardsDialogVisible, searchAllBoardsDialogRef);
   useShowModalWhenVisible(visibleDialogs.isTeamAssessmentHistoryDialogVisible, teamAssessmentHistoryDialogRef);
   useShowModalWhenVisible(visibleDialogs.isTeamEffectivenessDialogVisible, teamEffectivenessDialogRef);
 
@@ -1273,6 +1286,95 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   };
 
+  const resetAllBoardFeedbackSearch = React.useCallback(() => {
+    allBoardFeedbackSearchRequestIdRef.current += 1;
+    setAllBoardFeedbackSearchTerm("");
+    setAllBoardFeedbackSearchResults([]);
+    setIsSearchingAllBoardFeedback(false);
+  }, []);
+
+  const showAllBoardFeedbackSearchDialog = (): void => {
+    resetAllBoardFeedbackSearch();
+    setDialogVisible("isSearchAllBoardsDialogVisible", true);
+  };
+
+  const hideAllBoardFeedbackSearchDialog = (): void => {
+    resetAllBoardFeedbackSearch();
+    hideDialog("isSearchAllBoardsDialogVisible", searchAllBoardsDialogRef);
+  };
+
+  const handleAllBoardFeedbackSearchInputChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const trimmedSearchTerm = event.currentTarget.value.trim();
+    const requestId = allBoardFeedbackSearchRequestIdRef.current + 1;
+    allBoardFeedbackSearchRequestIdRef.current = requestId;
+
+    setAllBoardFeedbackSearchTerm(trimmedSearchTerm);
+
+    if (!trimmedSearchTerm) {
+      setAllBoardFeedbackSearchResults([]);
+      setIsSearchingAllBoardFeedback(false);
+      return;
+    }
+
+    setIsSearchingAllBoardFeedback(true);
+
+    try {
+      const normalizedSearchTerm = trimmedSearchTerm.toLowerCase();
+      const boardFeedbackItems = await Promise.all(
+        state.boards.map(async board => ({
+          board,
+          feedbackItems: await itemDataService.getFeedbackItemsForBoard(board.id),
+        })),
+      );
+
+      if (allBoardFeedbackSearchRequestIdRef.current !== requestId) {
+        return;
+      }
+
+      const searchResults = boardFeedbackItems.flatMap(({ board, feedbackItems }) => {
+        return feedbackItems
+          .filter(feedbackItem => {
+            const isHiddenCollectFeedback = board.activePhase === WorkflowPhase.Collect && board.shouldShowFeedbackAfterCollect && feedbackItem.userIdRef !== state.currentUserId;
+            if (isHiddenCollectFeedback) {
+              return false;
+            }
+
+            return feedbackItem.title.toLowerCase().includes(normalizedSearchTerm) || board.title.toLowerCase().includes(normalizedSearchTerm);
+          })
+          .map(feedbackItem => ({ board, feedbackItem }));
+      });
+
+      setAllBoardFeedbackSearchResults(searchResults);
+    } catch (error) {
+      appInsights.trackException(error, { action: "searchAllBoardFeedback" });
+      if (allBoardFeedbackSearchRequestIdRef.current === requestId) {
+        setAllBoardFeedbackSearchResults([]);
+      }
+    } finally {
+      if (allBoardFeedbackSearchRequestIdRef.current === requestId) {
+        setIsSearchingAllBoardFeedback(false);
+      }
+    }
+  }, [state.boards, state.currentUserId]);
+
+  const openAllBoardFeedbackSearchResult = async (board: IFeedbackBoardDocument): Promise<void> => {
+    await changeSelectedBoard(board);
+    hideAllBoardFeedbackSearchDialog();
+  };
+
+  const getAllBoardFeedbackSearchResultHref = (board: IFeedbackBoardDocument): string => {
+    return `#teamId=${encodeURIComponent(state.currentTeam.id)}&boardId=${encodeURIComponent(board.id)}&phase=${encodeURIComponent(board.activePhase)}`;
+  };
+
+  const handleAllBoardFeedbackSearchResultClick = async (event: React.MouseEvent<HTMLAnchorElement>, board: IFeedbackBoardDocument): Promise<void> => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    await openAllBoardFeedbackSearchResult(board);
+  };
+
   const clickWorkflowStateCallback = (_: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLDivElement>, newPhase: WorkflowPhase) => {
     appInsights.trackEvent({ name: TelemetryEvents.WorkflowPhaseChanged, properties: { oldWorkflowPhase: state.currentBoard.activePhase, newWorkflowPhase: newPhase } });
 
@@ -1704,6 +1806,20 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     };
   }, [isHostedAzureDevOps, state.isBackendServiceConnected, state.isBackendServiceReconnecting, attemptBackendReconnect]);
 
+  const allBoardFeedbackSearchInput = React.useMemo(
+    () => (
+      <input
+        id="all-board-feedback-search-input"
+        className="feedback-search-input"
+        type="search"
+        placeholder="Enter words to search"
+        aria-label="Enter words to search"
+        onChange={handleAllBoardFeedbackSearchInputChange}
+      />
+    ),
+    [handleAllBoardFeedbackSearchInputChange],
+  );
+
   if (!state.isAppInitialized || !state.isTeamDataLoaded) {
     return (
       <div className="spinner" aria-live="assertive">
@@ -1917,6 +2033,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                           <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
                             {getIconElement("edit")}
                             Edit retrospective
+                          </button>
+                          <button key="searchAllBoards" type="button" title="Search all boards" onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
+                            {getIconElement("search")}
+                            Search all boards
                           </button>
                           <div key="seperator" className="divider" role="separator" />
                           <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
@@ -2249,6 +2369,50 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             <button title={t("common_download_pdf")} aria-label={t("common_download_pdf")} onClick={downloadEmailSummaryPdf} className="default button">
               {getIconElement("sim-card-download")}
               {t("common_download_pdf")}
+            </button>
+          </div>
+        </dialog>
+      )}
+      {visibleDialogs.isSearchAllBoardsDialogVisible && (
+        <dialog
+          ref={searchAllBoardsDialogRef}
+          className="retrospectives-all-board-feedback-search-dialog dialog-width-md"
+          aria-label="Search All Boards"
+          role="dialog"
+          onClose={() => {
+            resetAllBoardFeedbackSearch();
+            setDialogVisible("isSearchAllBoardsDialogVisible", false);
+          }}
+        >
+          <div className="header">
+            <h2 className="title">Search All Boards</h2>
+            <button type="button" onClick={hideAllBoardFeedbackSearchDialog} aria-label="Close">
+              {getIconElement("close")}
+            </button>
+          </div>
+          <label className="subText" htmlFor="all-board-feedback-search-input">
+            Search feedback in all boards for this team.
+          </label>
+          {allBoardFeedbackSearchInput}
+          <div className="output-container" aria-live="polite">
+            {isSearchingAllBoardFeedback && <p className="search-feedback-message">Searching...</p>}
+            {!isSearchingAllBoardFeedback && !allBoardFeedbackSearchResults.length && allBoardFeedbackSearchTerm && <p className="search-feedback-message">No feedback found.</p>}
+            {allBoardFeedbackSearchResults.map(({ board, feedbackItem }) => {
+              const columnTitle = board.columns.find(column => column.id === feedbackItem.columnId)?.title;
+              const createdDateText = feedbackItem.createdDate ? formatDate(new Date(feedbackItem.createdDate), { year: "numeric", month: "short", day: "numeric" }) : "";
+              const detailsText = [board.title, columnTitle, createdDateText].filter(Boolean).join(" - ");
+
+              return (
+                <a key={`${board.id}-${feedbackItem.id}`} href={getAllBoardFeedbackSearchResultHref(board)} className="feedback-search-result-item" onClick={event => void handleAllBoardFeedbackSearchResultClick(event, board)}>
+                  <span className="feedback-search-result-title">{feedbackItem.title}</span>
+                  <span className="feedback-search-result-details">{detailsText}</span>
+                </a>
+              );
+            })}
+          </div>
+          <div className="inner">
+            <button type="button" className="default button" onClick={hideAllBoardFeedbackSearchDialog}>
+              Close
             </button>
           </div>
         </dialog>

@@ -1,12 +1,12 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { FeedbackBoardContainer, deduplicateTeamMembers } from "../feedbackBoardContainer";
-import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
+import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import { TelemetryEvents } from "../../utilities/telemetryClient";
@@ -416,6 +416,69 @@ describe("FeedbackBoardContainer integration", () => {
     render(<FeedbackBoardContainer {...props} />);
     const spinner = screen.getByText("Loading...");
     expect(spinner).toBeInTheDocument();
+  });
+
+  it("searches feedback in all boards from the Board Actions menu", async () => {
+    const firstBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      columns: [{ id: "good", title: "Good", accentColor: "#107c10" }],
+    };
+    const secondBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "b2",
+      title: "Board 2",
+      columns: [{ id: "risk", title: "Risks", accentColor: "#d83b01" }],
+    };
+    const firstBoardFeedback: IFeedbackItemDocument = {
+      id: "f1",
+      boardId: "b1",
+      title: "Keep the release calm",
+      columnId: "good",
+      originalColumnId: "good",
+      upvotes: 0,
+      voteCollection: {},
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+      userIdRef: mockUserId,
+      timerSecs: 0,
+      timerState: false,
+      timerId: null,
+      groupIds: [],
+      isGroupedCarouselItem: false,
+    };
+    const secondBoardFeedback: IFeedbackItemDocument = {
+      ...firstBoardFeedback,
+      id: "f2",
+      boardId: "b2",
+      title: "Fix release risk",
+      columnId: "risk",
+      originalColumnId: "risk",
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([firstBoard, secondBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(firstBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockImplementation(async boardId => (boardId === "b2" ? [secondBoardFeedback] : [firstBoardFeedback]));
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Board Actions Menu"));
+    fireEvent.click(screen.getByText("Search all boards"));
+    fireEvent.change(screen.getByPlaceholderText("Enter words to search"), { target: { value: "risk" } });
+
+    const searchResultLink = await screen.findByRole("link", { name: /Fix release risk/ });
+    expect(searchResultLink).toHaveAttribute("href", "#teamId=t1&boardId=b2&phase=Collect");
+    expect(screen.getByText("Fix release risk")).toBeInTheDocument();
+    expect(screen.getByText("Board 2 - Risks - Jan 1, 2024")).toBeInTheDocument();
+    expect(screen.queryByText("Keep the release calm")).not.toBeInTheDocument();
   });
 });
 

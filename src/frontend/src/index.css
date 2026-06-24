@@ -242,7 +242,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .carousel-track {
-  @apply flex overflow-x-auto w-full relative snap-x snap-mandatory scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none];
+  @apply flex overflow-x-auto w-full relative snap-x snap-mandatory scrollbar-none scroll-smooth [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none];
 
   &::-webkit-scrollbar {
     @apply hidden; /* Chrome/Safari */
@@ -343,6 +343,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .delete-feedback-item-dialog,
 .move-feedback-item-dialog,
 .retrospectives-group-feedback-item-dialog,
+.retrospectives-all-board-feedback-search-dialog,
 .remove-feedback-item-from-group-dialog,
 .board-metadata-dialog,
 .team-effectiveness-dialog,
@@ -363,7 +364,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .preview-email-dialog,
 .carousel-dialog,
 .sprint-retrospective-dialog {
-  @apply w-[45vw] max-w-[45vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
+  @apply w-[45vw] max-w-[45vw] portrait:w-[80vw] portrait:max-w-[80vw] max-h-[80vh] bg-(--background-color) text-(--text-primary-color) fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 z-1 border border-(--border-subtle-color) backdrop:bg-black/50 shadow-2xl drop-shadow-2xl;
 
   & table {
     @apply w-full border-collapse text-left;
@@ -384,6 +385,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .keyboard-shortcuts-key-separator {
     @apply mx-1 text-(--text-secondary-color);
+  }
+
+  & .feedback-search-input {
+    @apply @apply w-[calc(100%-var(--spacing)*8)] m-4 p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
   }
 
   & .header {
@@ -2217,25 +2222,32 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply mr-2.5;
 }
 
-.retrospectives-group-feedback-item-dialog {
-  @apply bg-(--background-color);
-}
-
-.retrospectives-group-feedback-item-dialog .ms-SearchBox {
-  @apply my-4;
-}
-
-.retrospectives-group-feedback-item-dialog .title,
-.retrospectives-group-feedback-item-dialog .subText {
-  @apply text-(--text-primary-color);
-}
-
-.retrospectives-group-feedback-item-dialog .output-container {
+.retrospectives-group-feedback-item-dialog .output-container,
+.retrospectives-all-board-feedback-search-dialog .output-container {
   @apply overflow-y-auto h-75 flex flex-col gap-3;
 }
 
-.retrospectives-group-feedback-item-dialog .output-container .no-matching-feedback-message {
+.retrospectives-group-feedback-item-dialog .output-container .no-matching-feedback-message,
+.retrospectives-all-board-feedback-search-dialog .output-container .search-feedback-message {
   @apply text-[15px] italic text-(--text-primary-color);
+}
+
+.retrospectives-all-board-feedback-search-dialog .output-container .feedback-search-result-item {
+  @apply flex flex-col gap-1 cursor-pointer text-start w-full p-3 border border-(--border-subtle-color) bg-(--background-color) text-(--text-primary-color) no-underline;
+
+  &:focus,
+  &:active,
+  &:hover {
+    @apply border-2 border-solid border-primary;
+  }
+
+  & .feedback-search-result-title {
+    @apply text-base font-semibold wrap-break-word;
+  }
+
+  & .feedback-search-result-details {
+    @apply text-xs text-(--text-secondary-color) wrap-break-word;
+  }
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .feedback-item-search-result-item {
