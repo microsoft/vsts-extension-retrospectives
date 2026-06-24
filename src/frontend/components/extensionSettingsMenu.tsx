@@ -10,6 +10,7 @@ import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import { getIconElement } from "./icons";
+import WhatsNewDialog from "./whatsNewDialog";
 import { t } from "../utilities/localization";
 
 interface IExportImportDataSchema {
@@ -278,27 +279,7 @@ export const ExtensionSettingsMenu: React.FC = () => {
         </div>
       </dialog>
 
-      <dialog className="whats-new-dialog dialog-width-md" aria-label="What is New" ref={whatsNewDialogRef} onCancel={() => whatsNewDialogRef.current!.close()}>
-        <div className="header">
-          <h2 className="title">{t("whats_new")}</h2>
-          <button onClick={() => whatsNewDialogRef.current!.close()} aria-label="Close">
-            {getIconElement("close")}
-          </button>
-        </div>
-        <div className="subText">This release improves retrospective metadata editing reliability and simplifies the create and edit experience.</div>
-        <div className="subText li">Fixed board name update behavior to prevent accidental renames and duplicate name retrieval issues.</div>
-        <div className="subText li">Improved create and edit validation messaging for missing and duplicate retrospective names.</div>
-        <div className="subText li">Simplified board settings options and added helper text for a cleaner, more consistent setup experience.</div>
-        <div className="subText">See the changelog for the full list of changes.</div>
-        <div className="inner">
-          <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
-            Open change log
-          </button>
-          <button className="default button" onClick={() => whatsNewDialogRef.current!.close()}>
-            {t("common_close")}
-          </button>
-        </div>
-      </dialog>
+      <WhatsNewDialog dialogRef={whatsNewDialogRef} />
 
       <dialog className="user-guide-dialog dialog-width-md" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onCancel={() => userGuideDialogRef.current!.close()}>
         <div className="header">
