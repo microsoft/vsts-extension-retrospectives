@@ -4,6 +4,8 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.55
 
+* Resolved race conditions on initial load which could result in missing teams or boards. From [GitHub PR #1766](https://github.com/microsoft/vsts-extension-retrospectives/pull/1766)
+
 * Refined Add work item selection to ensure the full work item list is visible on Act tab.
 * Limited Focus mode work item type options to requirement backlog types.
 * Fixed issues with Focus mode sorting and Act tab sorting.

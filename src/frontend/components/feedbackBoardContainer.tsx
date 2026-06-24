@@ -333,7 +333,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     try {
-      const initializedTeamAndBoardState = await initializeFeedbackBoard();
+      const initializedTeamAndBoardState = await initializeFeedbackBoard(currentUserId);
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
@@ -843,7 +843,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
    * the current user is a part of and most recently created board.
    * @returns An object to update the state with initialized team and board data.
    */
-  const initializeFeedbackBoard = async (): Promise<{
+  const initializeFeedbackBoard = async (currentUserId: string): Promise<{
     userTeams: WebApiTeam[];
     filteredUserTeams: WebApiTeam[];
     currentTeam: WebApiTeam;
@@ -921,7 +921,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     if (!info?.teamId) {
       // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
       // visited user records.
-      const recentVisitState = await loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
+      const recentVisitState = await loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams, currentUserId);
 
       return {
         ...baseTeamState,
@@ -936,7 +936,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     if (!matchedTeam) {
       // If the teamId query param wasn't valid attempt to pre-select a team and board by last
       // visited user records.
-      const recentVisitState = await loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams);
+      const recentVisitState = await loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams, currentUserId);
       const recentVisitWithDialogState = {
         ...recentVisitState,
         isTeamBoardDeletedInfoDialogHidden: false,
@@ -956,8 +956,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         .filter((board: IFeedbackBoardDocument) =>
           FeedbackBoardDocumentHelper.filter(
             board,
-            state.userTeams.map(t => t.id),
-            state.currentUserId,
+            userTeams.map(t => t.id),
+            currentUserId,
           ),
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -1051,6 +1051,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const loadRecentlyVisitedOrDefaultTeamAndBoardState = async (
     defaultTeam: WebApiTeam,
     userTeams: WebApiTeam[],
+    currentUserId: string,
   ): Promise<{
     boards: IFeedbackBoardDocument[];
     currentBoard: IFeedbackBoardDocument;
@@ -1069,7 +1070,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               FeedbackBoardDocumentHelper.filter(
                 board,
                 userTeams.map(t => t.id),
-                state.currentUserId,
+                currentUserId,
               ),
             )
             .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
