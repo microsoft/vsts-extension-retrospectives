@@ -34,6 +34,7 @@ export interface FeedbackColumnProps {
   nonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   isBoardAnonymous: boolean;
+  isBoardOwner?: boolean;
   shouldFocusOnCreateFeedback: boolean;
   hideFeedbackItems: boolean;
   groupIds: string[];
@@ -120,6 +121,7 @@ export const createFeedbackItemProps = (columnProps: FeedbackColumnProps, column
     shouldHaveFocus: columnItem.shouldHaveFocus,
     hideFeedbackItems: columnProps.hideFeedbackItems,
     userIdRef: columnItem.feedbackItem.userIdRef,
+    isBoardOwner: columnProps.isBoardOwner,
     onVoteCasted: columnProps.onVoteCasted,
     groupCount: columnItem.feedbackItem.childFeedbackItemIds ? columnItem.feedbackItem.childFeedbackItemIds.length : 0,
     groupIds: columnItem.feedbackItem.childFeedbackItemIds ?? [],

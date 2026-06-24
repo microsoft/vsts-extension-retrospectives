@@ -5,6 +5,7 @@ import { parseMarkdown, hasMarkdownFormatting } from "../utilities/markdownUtils
 
 export interface EditableTextProps {
   isDisabled?: boolean;
+  isReadOnly?: boolean;
   isMultiline?: boolean;
   maxLength?: number;
   text: string;
@@ -12,8 +13,12 @@ export interface EditableTextProps {
   onSave: (newText: string) => void;
 }
 
-export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultiline, maxLength, text, isChangeEventRequired, onSave }) => {
+export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isReadOnly, isMultiline, maxLength, text, isChangeEventRequired, onSave }) => {
   const trackActivity = useTrackMetric(reactPlugin, "EditableText");
+
+  // Editing is blocked either because the feedback is obscured during the Collect phase (isDisabled)
+  // or because the current user is neither the creator nor the board owner (isReadOnly).
+  const isEditingBlocked = isDisabled || isReadOnly;
 
   const [isEditing, setIsEditing] = useState(!text.trim());
   const [newText, setNewText] = useState(text);
@@ -168,7 +173,7 @@ export const EditableText: React.FC<EditableTextProps> = ({ isDisabled, isMultil
 
   return (
     <div className="editable-text-container" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
-      <p className="editable-text" tabIndex={0} onKeyDown={isDisabled ? () => {} : handleEditKeyDown} onClick={isDisabled ? () => {} : handleEdit} role="textbox" title="Click to edit" aria-required={true} aria-label={`Feedback title is ${isDisabled ? "obscured during collection." : text + ". Click to edit."}`}>
+      <p className="editable-text" tabIndex={0} onKeyDown={isEditingBlocked ? () => {} : handleEditKeyDown} onClick={isEditingBlocked ? () => {} : handleEdit} role="textbox" title="Click to edit" aria-required={true} aria-label={`Feedback title is ${isDisabled ? "obscured during collection." : isReadOnly ? "read only. You can only edit feedback that you created." : text + ". Click to edit."}`}>
         {hasMarkdownFormatting(text) ? parseMarkdown(text) : text}
       </p>
     </div>

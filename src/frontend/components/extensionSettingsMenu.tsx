@@ -11,6 +11,7 @@ import { toast } from "./toastNotifications";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 
 import { getIconElement } from "./icons";
+import WhatsNewDialog from "./whatsNewDialog";
 import { t } from "../utilities/localization";
 
 interface IExportImportDataSchema {
@@ -378,25 +379,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ cu
         </div>
       </dialog>
 
-      <dialog className="whats-new-dialog dialog-width-md" aria-label="What is New" ref={whatsNewDialogRef} onCancel={() => whatsNewDialogRef.current!.close()}>
-        <div className="header">
-          <h2 className="title">{t("whats_new")}</h2>
-          <button onClick={() => whatsNewDialogRef.current!.close()} aria-label="Close">
-            {getIconElement("close")}
-          </button>
-        </div>
-        <div className="subText">This release improves 'Add work item' support for organizations with custom work item types.</div>
-        <div className="subText li">Team Admins can now use Admin Settings with Add work item types option to choose which work item types appear in Add Work Item menu for Act tab and Focus mode. If no types are selected, Add Work Item defaults to the team Requirement Backlog work item types.</div>
-        <div className="subText">Refer to the Changelog for a comprehensive listing of the updates included in this release and past releases.</div>
-        <div className="inner">
-          <button className="button" onClick={() => window.open("https://github.com/microsoft/vsts-extension-retrospectives/blob/main/CHANGELOG.md", "_blank")}>
-            Open change log
-          </button>
-          <button className="default button" onClick={() => whatsNewDialogRef.current!.close()}>
-            {t("common_close")}
-          </button>
-        </div>
-      </dialog>
+      <WhatsNewDialog dialogRef={whatsNewDialogRef} />
 
       <dialog className="user-guide-dialog dialog-width-md" aria-label="Retrospectives User Guide" ref={userGuideDialogRef} onCancel={() => userGuideDialogRef.current!.close()}>
         <div className="header">

@@ -5669,7 +5669,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         voteCollection: {},
         createdDate: new Date(),
-        userIdRef: "user-1",
+        userIdRef: "test-user-id",
         timerSecs: 0,
         timerState: false,
         timerId: null,
@@ -5699,7 +5699,7 @@ describe("Feedback Item", () => {
         createdDate: new Date(),
         upvotes: 0,
         groupIds: [],
-        userIdRef: "user-1",
+        userIdRef: "test-user-id",
         actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
@@ -6316,7 +6316,7 @@ describe("Feedback Item", () => {
         upvotes: 0,
         voteCollection: {},
         createdDate: new Date(),
-        userIdRef: "user-1",
+        userIdRef: "test-user-id",
         timerSecs: 0,
         timerState: false,
         timerId: null,
@@ -6346,7 +6346,7 @@ describe("Feedback Item", () => {
         createdDate: new Date(),
         upvotes: 0,
         groupIds: [],
-        userIdRef: "user-1",
+        userIdRef: "test-user-id",
         actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
@@ -7660,7 +7660,7 @@ describe("Feedback Item", () => {
         createdDate: new Date(),
         upvotes: 0,
         groupIds: [],
-        userIdRef: "user-1",
+        userIdRef: "test-user-id",
         actionItems: [] as any[],
         newlyCreated: false,
         showAddedAnimation: false,
@@ -8137,6 +8137,121 @@ describe("FeedbackItem additional coverage (merged)", () => {
     jest.useRealTimers();
     jest.restoreAllMocks();
     document.body.innerHTML = "";
+  });
+
+  describe("Delete permission (creator or board owner only)", () => {
+    const openActionsMenu = async () => {
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Feedback options menu" }));
+      });
+    };
+
+    test("shows the delete option to the feedback creator", async () => {
+      // The mocked current user id is "test-user-id".
+      const props = makeProps({ userIdRef: "test-user-id", isBoardOwner: false });
+      render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await openActionsMenu();
+
+      expect(screen.queryByRole("menuitem", { name: "Delete feedback" })).toBeInTheDocument();
+    });
+
+    test("shows the delete option to the board owner for another user's feedback", async () => {
+      const props = makeProps({ userIdRef: "another-user", isBoardOwner: true });
+      render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await openActionsMenu();
+
+      expect(screen.queryByRole("menuitem", { name: "Delete feedback" })).toBeInTheDocument();
+    });
+
+    test("hides the delete option from users who neither created the feedback nor own the board", async () => {
+      const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
+      render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await openActionsMenu();
+
+      expect(screen.queryByRole("menuitem", { name: "Delete feedback" })).not.toBeInTheDocument();
+      // Non-destructive actions remain available to everyone.
+      expect(screen.queryByRole("menuitem", { name: "Move feedback to different column" })).toBeInTheDocument();
+    });
+
+    test("does not open the delete dialog when a non-owner presses the Delete key", async () => {
+      const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      const deleteDialog = container.querySelector(".delete-feedback-item-dialog") as HTMLDialogElement;
+      const showModalSpy = jest.spyOn(deleteDialog, "showModal");
+
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "Delete" });
+      });
+
+      expect(showModalSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Edit permission (creator or board owner only)", () => {
+    test("lets the creator edit their own feedback title", async () => {
+      const props = makeProps({ userIdRef: "test-user-id", isBoardOwner: false });
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const title = container.querySelector(".editable-text") as HTMLElement;
+      await act(async () => {
+        fireEvent.click(title);
+      });
+
+      expect(container.querySelector(".editable-text-input")).toBeTruthy();
+    });
+
+    test("lets the board owner edit another user's feedback title", async () => {
+      const props = makeProps({ userIdRef: "another-user", isBoardOwner: true });
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const title = container.querySelector(".editable-text") as HTMLElement;
+      await act(async () => {
+        fireEvent.click(title);
+      });
+
+      expect(container.querySelector(".editable-text-input")).toBeTruthy();
+    });
+
+    test("marks another user's feedback title as read-only for non-owners", async () => {
+      const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const title = container.querySelector(".editable-text") as HTMLElement;
+      expect(title.getAttribute("aria-label")).toContain("read only");
+
+      await act(async () => {
+        fireEvent.click(title);
+      });
+
+      // Clicking does not open the editor for users who cannot modify the card.
+      expect(container.querySelector(".editable-text-input")).toBeFalsy();
+    });
+
+    test("does not enter edit mode when a non-owner presses Enter on the card", async () => {
+      const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      card.focus();
+      await act(async () => {
+        fireEvent.keyDown(card, { key: "Enter" });
+      });
+
+      expect(container.querySelector(".editable-text-input")).toBeFalsy();
+    });
   });
 
   describe("Keyboard shortcuts when deletion is disabled", () => {

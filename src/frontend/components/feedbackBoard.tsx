@@ -322,6 +322,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       nonHiddenWorkItemTypes: focusModeNonHiddenWorkItemTypes ?? nonHiddenWorkItemTypes,
       allWorkItemTypes,
       hideFeedbackItems,
+      isBoardOwner: board.createdBy?.id === userId,
       onVoteCasted: () => {
         onVoteCasted?.();
       },
@@ -332,7 +333,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       removeFeedbackItemFromColumn,
       refreshFeedbackItems,
     };
-  }, [columns, columnIds, workflowPhase, team, board.id, board.title, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
+  }, [columns, columnIds, workflowPhase, team, board.id, board.title, board.createdBy?.id, userId, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
 
   const initColumns = useCallback(() => {
     const columnProperties = board.columns;
@@ -727,6 +728,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         nonHiddenWorkItemTypes: nonHiddenWorkItemTypes,
         allWorkItemTypes: allWorkItemTypes,
         isBoardAnonymous: isAnonymous,
+        isBoardOwner: !!canCurrentUserEditBoard,
         shouldFocusOnCreateFeedback: !!columns[columnId].shouldFocusOnCreateFeedback,
         hideFeedbackItems: hideFeedbackItems,
         isFocusModalHidden: true,

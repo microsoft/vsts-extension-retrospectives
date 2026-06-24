@@ -56,6 +56,7 @@ export interface IFeedbackItemProps {
   shouldHaveFocus: boolean;
   hideFeedbackItems: boolean;
   userIdRef: string;
+  isBoardOwner?: boolean;
   timerSecs: number;
   timerState: boolean;
   timerId: ReturnType<typeof setInterval> | null;
@@ -557,8 +558,13 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   }, [props.createdBy, props.createdByProfileImage, props.createdDate]);
 
   const deleteFeedbackItem = useCallback(() => {
+    // Only the feedback item's creator or the board owner may delete it.
+    const canDelete = props.isBoardOwner || props.userIdRef === getUserIdentity().id;
+    if (!canDelete) {
+      return;
+    }
     showDeleteItemConfirmationDialog();
-  }, [showDeleteItemConfirmationDialog]);
+  }, [showDeleteItemConfirmationDialog, props.isBoardOwner, props.userIdRef]);
 
   const dragFeedbackItemOverFeedbackItem = useCallback(
     (
@@ -739,7 +745,10 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           break;
         case "enter":
           if (target.tagName !== "BUTTON" && target.tagName !== "A") {
-            if (props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id) {
+            const isOwnFeedbackItem = props.userIdRef === getUserIdentity().id;
+            // Block entering edit mode when the card is obscured during collection, or when the
+            // current user is neither the creator nor the board owner.
+            if ((props.hideFeedbackItems && !isOwnFeedbackItem) || (!isOwnFeedbackItem && !props.isBoardOwner)) {
               e.preventDefault();
               return;
             }
@@ -967,6 +976,8 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const totalItemsInColumn = numberedColumnItems.length;
 
   const hideFeedbackItems = props.workflowPhase === "Collect" && props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id;
+  // A feedback card may only be edited or deleted by the user who created it or by the board owner.
+  const canModifyFeedbackItem = props.isBoardOwner || props.userIdRef === getUserIdentity().id;
   const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : props.title;
   const creationDateFormatter = useMemo(() => new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric" }), []);
   const creationDateLabel = useMemo(() => {
@@ -1112,6 +1123,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                     <div ref={mobileActionsMenuRef} id={`feedback-item-actions-${props.id}`} className="callout-menu right" role="menu" aria-label="Feedback actions">
                       {feedbackItemEllipsisMenuItems
                         .filter(menuItem => !(isMainItem && menuItem.hideMainItem))
+                        .filter(menuItem => menuItem.key !== "deleteFeedback" || canModifyFeedbackItem)
                         .map(menuItem => {
                           const disabled = menuItem.key === "deleteFeedback" && state.isDeletionDisabled;
                           return (
@@ -1139,7 +1151,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             </div>
             <div className="card-content">
               {workflowState.isActPhase && isMainItem && <FeedbackItemTimer feedbackItemId={props.id} timerSecs={props.timerSecs} timerState={curTimerState} onTimerToggle={timerSwitch} />}
-              <EditableDocumentCardTitle isDisabled={hideFeedbackItems} isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={onDocumentCardTitleSave} />
+              <EditableDocumentCardTitle isDisabled={hideFeedbackItems} isReadOnly={!canModifyFeedbackItem} isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={onDocumentCardTitleSave} />
               {props.isFocusModalHidden && !workflowState.isCollectPhase && props.columnId !== props.originalColumnId && <div className="original-column-info">Original Column: {props.columns[props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
             </div>
             {feedbackCreationInformationContent()}
@@ -1244,6 +1256,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
               shouldHaveFocus: props.shouldHaveFocus,
               hideFeedbackItems: props.hideFeedbackItems,
               userIdRef: searchItem.userIdRef,
+              isBoardOwner: props.isBoardOwner,
               timerSecs: searchItem.timerSecs,
               timerState: searchItem.timerState,
               timerId: searchItem.timerId,
