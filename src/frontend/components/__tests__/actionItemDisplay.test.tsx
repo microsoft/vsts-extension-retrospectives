@@ -427,7 +427,7 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
+      expect(getByPlaceholderText("Enter the exact work item ID")).toBeTruthy();
     });
   });
 
@@ -444,7 +444,7 @@ describe("Action Item Display component", () => {
     fireEvent.keyDown(linkButton, { key: "Enter", code: "Enter" });
 
     await waitFor(() => {
-      expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
+      expect(getByPlaceholderText("Enter the exact work item ID")).toBeTruthy();
     });
   });
 
@@ -496,17 +496,17 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
+      expect(getByPlaceholderText("Enter the exact work item ID")).toBeTruthy();
     });
 
     // Enter invalid input
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "abc" } });
 
     await waitFor(() => {
       const linkButton = container.querySelector(".link-existing-work-item-dialog .button") as HTMLButtonElement;
       expect(linkButton?.disabled).toBe(true);
-      expect(queryByText("The work item you are looking for was not found. Please verify the id.")).toBeNull();
+      expect(queryByText("The work item you are looking for was not found. Please verify the ID.")).toBeNull();
     });
   });
 
@@ -521,14 +521,14 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      const searchBox = getByPlaceholderText("Enter the exact work item id");
+      const searchBox = getByPlaceholderText("Enter the exact work item ID");
 
       // Enter invalid input
       fireEvent.change(searchBox, { target: { value: "abc" } });
     });
 
     // Clear input
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "" } });
 
     await waitFor(() => {
@@ -549,7 +549,7 @@ describe("Action Item Display component", () => {
 
     await openLinkExistingDialog(container);
 
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "0" } });
 
     await waitFor(() => {
@@ -584,7 +584,7 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      const searchBox = getByPlaceholderText("Enter the exact work item id");
+      const searchBox = getByPlaceholderText("Enter the exact work item ID");
       fireEvent.change(searchBox, { target: { value: "789" } });
     });
 
@@ -607,12 +607,12 @@ describe("Action Item Display component", () => {
     await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      const searchBox = getByPlaceholderText("Enter the exact work item id");
+      const searchBox = getByPlaceholderText("Enter the exact work item ID");
       fireEvent.change(searchBox, { target: { value: "999" } });
     });
 
     await waitFor(() => {
-      expect(getByText("The work item you are looking for was not found. Please verify the id.")).toBeTruthy();
+      expect(getByText("The work item you are looking for was not found. Please verify the ID.")).toBeTruthy();
     });
   });
 
@@ -643,7 +643,7 @@ describe("Action Item Display component", () => {
 
     // Enter work item id
     await waitFor(() => {
-      const searchBox = getByPlaceholderText("Enter the exact work item id");
+      const searchBox = getByPlaceholderText("Enter the exact work item ID");
       fireEvent.change(searchBox, { target: { value: "789" } });
     });
 
@@ -677,7 +677,7 @@ describe("Action Item Display component", () => {
     const dialog = await openLinkExistingDialog(container);
 
     await waitFor(() => {
-      expect(getByPlaceholderText("Enter the exact work item id")).toBeTruthy();
+      expect(getByPlaceholderText("Enter the exact work item ID")).toBeTruthy();
     });
 
     const cancelButton = dialog.querySelector(".default.button") as HTMLButtonElement;
@@ -877,7 +877,7 @@ describe("Action Item Display component", () => {
 
     await openLinkExistingDialog(container);
 
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "12345" } });
 
     await waitFor(() => {
@@ -949,7 +949,7 @@ describe("Action Item Display component", () => {
 
     await openLinkExistingDialog(container);
 
-    const searchBox = getByPlaceholderText("Enter the exact work item id");
+    const searchBox = getByPlaceholderText("Enter the exact work item ID");
     fireEvent.change(searchBox, { target: { value: "   " } });
 
     await waitFor(() => {
