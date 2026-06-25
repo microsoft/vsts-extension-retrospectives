@@ -102,6 +102,9 @@
       "text"
     ]
   },
+  "overrides": {
+    "@babel/core": "7.29.6"
+  },
   "jest-junit": {
     "outputDirectory": "reports",
     "outputName": "jest-junit.xml",
