@@ -6,7 +6,7 @@ export const questions: ITeamAssessmentQuestion[] = [
     shortTitle: "Clarity",
     discussActTemplate: "clarity",
     title: "I clearly understand what is expected of me in my role on this team",
-    iconClassName: "fa-solid fa-magnifying-glass",
+    iconClassName: "search",
     tooltip: "Clear expectations improve focus, performance, and accountability. This helps reveal whether roles, goals, and priorities are well understood. Without clarity, teams experience confusion, rework, and missed expectations. https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#clarity (Learn more) about the supporting research and best practices.",
   },
   {
@@ -14,7 +14,7 @@ export const questions: ITeamAssessmentQuestion[] = [
     shortTitle: "Energy",
     discussActTemplate: "energy",
     title: "My day-to-day work keeps me engaged, motivated, and energized",
-    iconClassName: "fa-solid fa-bolt",
+    iconClassName: "electric-bolt",
     tooltip: "People do their best work when the work energizes them. This helps reveal alignment with strengths, motivation, and engagement. Low energy often signals burnout, disengagement, or poor fit. https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#energy (Learn more) about the supporting research and best practices.",
   },
   {
@@ -22,7 +22,7 @@ export const questions: ITeamAssessmentQuestion[] = [
     shortTitle: "Psychological Safety",
     discussActTemplate: "psy-safety",
     title: "I feel safe speaking up, raising issues, taking risks, and asking for help",
-    iconClassName: "fa-regular fa-handshake",
+    iconClassName: "psychological-safety",
     tooltip: "Teams perform better when people feel safe speaking up and taking risks. This helps surface issues early and supports learning and collaboration. Without safety, problems stay hidden and improvement slows. https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#psychological-safety (Learn more) about the supporting research and best practices.",
   },
   {
@@ -30,7 +30,7 @@ export const questions: ITeamAssessmentQuestion[] = [
     shortTitle: "Work-life Balance",
     discussActTemplate: "wlb",
     title: "My workload is sustainable and supports a healthy work-life balance",
-    iconClassName: "fa-solid fa-scale-balanced",
+    iconClassName: "balance",
     tooltip: "Sustainable workload supports consistent performance and well-being. This helps maintain quality, morale, and long-term productivity. Without balance, burnout increases and results begin to decline. https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#work-life-balance (Learn more) about the supporting research and best practices.",
   },
   {
@@ -38,7 +38,7 @@ export const questions: ITeamAssessmentQuestion[] = [
     shortTitle: "Confidence",
     discussActTemplate: "confidence",
     title: "I am confident our team will be successful and achieve our goals",
-    iconClassName: "fa-solid fa-square-poll-vertical",
+    iconClassName: "speed",
     tooltip: "Shared confidence reflects belief in the team's ability to succeed. This helps signal alignment, momentum, and commitment to outcomes. Low confidence often leads to hesitation and weaker execution. https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#confidence (Learn more) about the supporting research and best practices.",
   },
   {
@@ -46,7 +46,7 @@ export const questions: ITeamAssessmentQuestion[] = [
     shortTitle: "Efficiency",
     discussActTemplate: "efficiency",
     title: "Our processes and tools help me work efficiently and effectively",
-    iconClassName: "fa-solid fa-gears",
+    iconClassName: "gear-with-stars",
     tooltip: "Effective tools and processes reduce friction and improve delivery. This helps teams respond faster and meet customer needs more consistently. Without efficiency, delays, frustration, and rework increase. https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#efficiency (Learn more) about the supporting research and best practices.",
   },
 ];
