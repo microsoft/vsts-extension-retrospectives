@@ -609,6 +609,20 @@ export const GearWithStarsIcon = () => {
   );
 };
 
+export const ListAllIcon = () => {
+  return (
+    <svg className="icon-list-all" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" />
+      <path d="M7 8h2v2H7V8z" />
+      <path d="M7 12h2v2H7V12z" />
+      <path d="M7 16h2v2H7V16z" />
+      <path d="M11 8h6v2h-6V8z" />
+      <path d="M11 12h6v2h-6V12z" />
+      <path d="M11 16h6v2h-6V16z" />
+    </svg>
+  );
+};
+
 export const LinkOffIcon = () => {
   return (
     <svg className="icon-link-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -704,6 +718,7 @@ export const availableIcons: { id: string; tags: string[]; name: string; icon: R
   { id: "balance", tags: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"], name: "Balance", icon: <BalanceIcon /> },
   { id: "gear", tags: ["gear"], name: "Gear With Stars", icon: <GearIcon /> },
   { id: "gear-with-stars", tags: ["gears", "gear-with-stars", "fa-solid fa-gears"], name: "Gear With Stars", icon: <GearWithStarsIcon /> },
+  { id: "list-all", tags: [], name: "List All", icon: <ListAllIcon /> },
   { id: "eye", tags: ["eye", "far fa-eye"], name: "Eye", icon: <EyeIcon /> },
   { id: "speed", tags: ["fa-solid fa-square-poll-vertical"], name: "Speed", icon: <SpeedIcon /> },
   { id: "add", tags: [], name: "Add", icon: <AddIcon /> },

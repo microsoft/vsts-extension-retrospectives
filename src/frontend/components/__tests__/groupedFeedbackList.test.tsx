@@ -4,6 +4,7 @@ import "@testing-library/jest-dom";
 import GroupedFeedbackList, { IGroupedFeedbackListProps } from "../groupedFeedbackList";
 import { IColumn, IColumnItem } from "../feedbackBoard";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
+import { WorkflowPhase } from "../../interfaces/workItem";
 
 // Mock the icons module
 jest.mock("../icons", () => {
@@ -63,6 +64,7 @@ describe("GroupedFeedbackList", () => {
     columnItems: [],
     columns: defaultColumns,
     currentColumnId: "column-1",
+    workflowPhase: WorkflowPhase.Collect,
     hideFeedbackItems: false,
     isFocusModalHidden: true,
   };

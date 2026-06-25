@@ -1,6 +1,7 @@
 import { TeamFieldValues, TeamSettingsIteration } from "azure-devops-extension-api/Work";
 import { WorkRestClient } from "azure-devops-extension-api/Work/WorkClient";
 import { getClient } from "azure-devops-extension-api/Common";
+import { TeamContext } from "azure-devops-extension-api/Core";
 
 import { getProjectId } from "../utilities/servicesHelper";
 import { appInsights, TelemetryExceptions } from "../utilities/telemetryClient";
@@ -13,17 +14,22 @@ class WorkService {
     this._httpWorkClient = getClient(WorkRestClient);
   }
 
-  /**
-   * Gets the iterations for the current project and a given team
-   */
-  public async getIterations(teamId: string, timeframe?: string): Promise<TeamSettingsIteration[]> {
+  private async getTeamContext(teamId: string): Promise<TeamContext> {
     const projectId = await getProjectId();
-    const teamContext = {
+
+    return {
       project: "",
       projectId,
       team: "",
       teamId,
     };
+  }
+
+  /**
+   * Gets the iterations for the current project and a given team
+   */
+  public async getIterations(teamId: string, timeframe?: string): Promise<TeamSettingsIteration[]> {
+    const teamContext = await this.getTeamContext(teamId);
 
     let teamIterations: TeamSettingsIteration[] = [];
 
@@ -43,13 +49,7 @@ class WorkService {
    * Gets the team field values (default being area paths) for project and team
    */
   public async getTeamFieldValues(teamId: string): Promise<TeamFieldValues> {
-    const projectId = await getProjectId();
-    const teamContext = {
-      project: "",
-      projectId,
-      team: "",
-      teamId,
-    };
+    const teamContext = await this.getTeamContext(teamId);
 
     let teamFieldValues: TeamFieldValues = undefined;
 
@@ -60,6 +60,21 @@ class WorkService {
     }
 
     return teamFieldValues;
+  }
+
+  /**
+   * Gets requirement backlog work item type names for the given team.
+   */
+  public async getRequirementBacklogWorkItemTypeNames(teamId: string): Promise<string[]> {
+    const teamContext = await this.getTeamContext(teamId);
+
+    try {
+      const backlogConfiguration = await this._httpWorkClient.getBacklogConfigurations(teamContext);
+      return backlogConfiguration.requirementBacklog?.workItemTypes?.map(type => type.name).filter(Boolean) ?? [];
+    } catch (e) {
+      appInsights.trackException(e, { teamId, categoryReferenceName: "Microsoft.RequirementCategory" });
+      return [];
+    }
   }
 }
 

@@ -24,6 +24,7 @@ export interface FeedbackBoardProps {
   team: WebApiTeam;
   workflowPhase: WorkflowPhase;
   nonHiddenWorkItemTypes: WorkItemType[];
+  focusModeNonHiddenWorkItemTypes?: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
   isAnonymous: boolean;
   hideFeedbackItems: boolean;
@@ -100,7 +101,7 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   return resetFocusForStateColumns;
 };
 
-export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
+export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -318,7 +319,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       boardTitle: board.title,
       defaultActionItemAreaPath,
       defaultActionItemIteration,
-      nonHiddenWorkItemTypes,
+      nonHiddenWorkItemTypes: focusModeNonHiddenWorkItemTypes ?? nonHiddenWorkItemTypes,
       allWorkItemTypes,
       hideFeedbackItems,
       isBoardOwner: board.createdBy?.id === userId,
@@ -332,7 +333,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       removeFeedbackItemFromColumn,
       refreshFeedbackItems,
     };
-  }, [columns, columnIds, workflowPhase, team, board.id, board.title, board.createdBy?.id, userId, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
+  }, [columns, columnIds, workflowPhase, team, board.id, board.title, board.createdBy?.id, userId, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
 
   const initColumns = useCallback(() => {
     const columnProperties = board.columns;

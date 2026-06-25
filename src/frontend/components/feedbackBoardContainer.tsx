@@ -15,6 +15,7 @@ import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { getBoardUrl } from "../utilities/boardUrlHelper";
 import { userDataService } from "../dal/userDataService";
+import { teamSettingsService } from "../dal/teamSettingsService";
 import ExtensionSettingsMenu from "./extensionSettingsMenu";
 import { ToastContainer, toast } from "./toastNotifications";
 import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
@@ -66,7 +67,10 @@ export interface FeedbackBoardContainerState {
    */
   projectTeams: WebApiTeam[];
   nonHiddenWorkItemTypes: WorkItemType[];
+  focusModeNonHiddenWorkItemTypes: WorkItemType[];
   allWorkItemTypes: WorkItemType[];
+  availableActionItemWorkItemTypes: WorkItemType[];
+  allowedActionItemWorkItemTypeNames: string[];
   isMobileBoardActionsDialogHidden: boolean;
   isMobileTeamSelectorDialogHidden: boolean;
   isTeamBoardDeletedInfoDialogHidden: boolean;
@@ -118,6 +122,7 @@ export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember
 
 const initialState: FeedbackBoardContainerState = {
   allWorkItemTypes: [],
+  availableActionItemWorkItemTypes: [],
   allowCrossColumnGroups: false,
   boards: [],
   currentUserId: "",
@@ -140,6 +145,8 @@ const initialState: FeedbackBoardContainerState = {
   isTeamDataLoaded: false,
   isTeamSelectorCalloutVisible: false,
   nonHiddenWorkItemTypes: [],
+  focusModeNonHiddenWorkItemTypes: [],
+  allowedActionItemWorkItemTypeNames: [],
   projectTeams: [],
   teamBoardDeletedDialogMessage: "",
   teamBoardDeletedDialogTitle: "",
@@ -364,7 +371,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     try {
-      await setSupportedWorkItemTypesForProject();
+      await setSupportedWorkItemTypesForProject(initialCurrentTeam?.id);
     } catch (error) {
       appInsights.trackException(error, {
         action: "setSupportedWorkItemTypesForProject",
@@ -444,6 +451,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     if (prevCurrentTeam !== undefined && prevCurrentTeam !== state.currentTeam && state.currentTeam) {
       reflectBackendService.switchToTeam(state.currentTeam.id);
       appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: state.currentTeam.id } });
+      void setSupportedWorkItemTypesForProject(state.currentTeam.id);
     }
 
     if (prevCurrentBoard !== undefined && prevCurrentBoard !== state.currentBoard) {
@@ -736,20 +744,48 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       });
     }, []);
 
-  const setSupportedWorkItemTypesForProject = React.useCallback(async (): Promise<void> => {
+    const getActionItemWorkItemTypes = (availableWorkItemTypes: WorkItemType[], requirementWorkItemTypeNames: string[], allowedWorkItemTypeNames: string[]): WorkItemType[] => {
+      const allowedNames = allowedWorkItemTypeNames.length ? allowedWorkItemTypeNames : requirementWorkItemTypeNames;
+
+      if (!allowedNames.length) {
+        return availableWorkItemTypes;
+      }
+
+      return availableWorkItemTypes.filter(workItemType => allowedNames.includes(workItemType.name));
+    };
+
+  const setSupportedWorkItemTypesForProject = React.useCallback(async (teamId?: string): Promise<void> => {
     const allWorkItemTypes: WorkItemType[] = await workItemService.getWorkItemTypesForCurrentProject();
     const hiddenWorkItemTypes: WorkItemTypeReference[] = await workItemService.getHiddenWorkItemTypes();
 
     const hiddenWorkItemTypeNames = hiddenWorkItemTypes.map(workItemType => workItemType.name);
 
     const nonHiddenWorkItemTypes = allWorkItemTypes.filter(workItemType => hiddenWorkItemTypeNames.indexOf(workItemType.name) === -1);
+    const requirementWorkItemTypeNames = teamId ? await workService.getRequirementBacklogWorkItemTypeNames(teamId) : [];
+    const allowedActionItemWorkItemTypeNames = teamId ? await teamSettingsService.getAllowedActionItemWorkItemTypeNames(teamId) : [];
+    const actionItemWorkItemTypes = getActionItemWorkItemTypes(nonHiddenWorkItemTypes, requirementWorkItemTypeNames, allowedActionItemWorkItemTypeNames);
 
     setContainerState(previousState => ({
       ...previousState,
-      nonHiddenWorkItemTypes: nonHiddenWorkItemTypes,
+      nonHiddenWorkItemTypes: actionItemWorkItemTypes,
+      focusModeNonHiddenWorkItemTypes: actionItemWorkItemTypes,
       allWorkItemTypes: allWorkItemTypes,
+      availableActionItemWorkItemTypes: nonHiddenWorkItemTypes,
+      allowedActionItemWorkItemTypeNames,
     }));
   }, []);
+
+  const saveAllowedActionItemWorkItemTypes = React.useCallback(
+    async (workItemTypeNames: string[]): Promise<void> => {
+      if (!state.currentTeam?.id) {
+        return;
+      }
+
+      await teamSettingsService.saveAllowedActionItemWorkItemTypeNames(state.currentTeam.id, workItemTypeNames);
+      await setSupportedWorkItemTypesForProject(state.currentTeam.id);
+    },
+    [state.currentTeam?.id, setSupportedWorkItemTypesForProject],
+  );
 
   const replaceBoard = React.useCallback(
     (updatedBoard: IFeedbackBoardDocument) => {
@@ -2012,7 +2048,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
           {renderWorkflowTimerControls()}
-          <ExtensionSettingsMenu showAllTeams={showAllTeams} onShowAllTeamsChange={handleShowAllTeamsChange} />
+          <ExtensionSettingsMenu showAllTeams={showAllTeams} onShowAllTeamsChange={handleShowAllTeamsChange} currentUserIsTeamAdmin={isCurrentUserTeamAdmin()} allWorkItemTypes={state.availableActionItemWorkItemTypes} allowedActionItemWorkItemTypeNames={state.allowedActionItemWorkItemTypeNames} onSaveAllowedActionItemWorkItemTypes={saveAllowedActionItemWorkItemTypes} />
         </div>
       </div>
       <div className="flex items-center justify-start shrink-0">
@@ -2327,6 +2363,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     displayBoard={true}
                     workflowPhase={state.currentBoard.activePhase}
                     nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
+                    focusModeNonHiddenWorkItemTypes={state.focusModeNonHiddenWorkItemTypes}
                     allWorkItemTypes={state.allWorkItemTypes}
                     onFocusModeModelChange={focusModeModel => {
                       setContainerState(previousState => ({ ...previousState, focusModeModel }));
