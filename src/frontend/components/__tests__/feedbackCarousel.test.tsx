@@ -1,6 +1,6 @@
 import React from "react";
-import { render } from "@testing-library/react";
-import FeedbackCarousel, { type FocusModeModel } from "../../components/feedbackCarousel";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import FeedbackCarousel, { getPivotItemKey, getSelectedCarouselColumnKey, type FocusModeModel } from "../../components/feedbackCarousel";
 import { testGroupColumnProps, testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { mockUuid } from "../__mocks__/uuid/v4";
 import * as icons from "../../components/icons";
@@ -69,6 +69,16 @@ const mockedGroupProps = {
 jest.mock("uuid", () => ({ v4: () => mockUuid }));
 
 describe("Feedback Carousel ", () => {
+  describe("carousel helpers", () => {
+    it("selects fallback carousel keys safely", () => {
+      expect(getSelectedCarouselColumnKey("selected", [{ columnId: "first" }])).toBe("selected");
+      expect(getSelectedCarouselColumnKey(undefined, [{ columnId: "first" }])).toBe("first");
+      expect(getSelectedCarouselColumnKey(undefined, [])).toBeUndefined();
+      expect(getPivotItemKey({ props: { itemKey: "pivot-key" } })).toBe("pivot-key");
+      expect(getPivotItemKey(null)).toBeUndefined();
+    });
+  });
+
   it("can be rendered", () => {
     const { container } = render(<FeedbackCarousel {...mockedProps} />);
     const carouselPivot = container.querySelector(".feedback-carousel-pivot");
@@ -123,15 +133,15 @@ describe("Feedback Carousel ", () => {
     it("should sort items by upvotes (descending) then by creation date (ascending)", () => {
       const item1 = {
         ...testColumnProps.columnItems[0],
-        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", upvotes: 5, createdDate: new Date("2023-01-01") },
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item1", voteCollection: { user1: 5 }, createdDate: new Date("2023-01-01") },
       };
       const item2 = {
         ...testColumnProps.columnItems[0],
-        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item2", upvotes: 10, createdDate: new Date("2023-01-02") },
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item2", voteCollection: { user1: 10 }, createdDate: new Date("2023-01-02") },
       };
       const item3 = {
         ...testColumnProps.columnItems[0],
-        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item3", upvotes: 5, createdDate: new Date("2023-01-03") },
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "item3", voteCollection: { user1: 5 }, createdDate: new Date("2023-01-03") },
       };
 
       const propsWithSorting = {
@@ -227,6 +237,123 @@ describe("Feedback Carousel ", () => {
       rerender(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={true} />);
 
       expect(container.textContent).toContain("Test Column");
+    });
+  });
+
+  describe("carousel interactions", () => {
+    it("selects a pivot tab", () => {
+      render(<FeedbackCarousel {...mockedProps} />);
+
+      fireEvent.click(screen.getByRole("tab", { name: testColumnProps.columnName }));
+
+      expect(screen.getByRole("tab", { name: testColumnProps.columnName }).getAttribute("aria-selected")).toBe("true");
+    });
+
+    it("records active slide interactions and restores position after the model changes", async () => {
+      const originalRequestAnimationFrame = window.requestAnimationFrame;
+      const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
+      const scrollIntoView = jest.fn();
+      window.requestAnimationFrame = jest.fn(callback => {
+        callback(0);
+        return 0;
+      });
+      HTMLElement.prototype.scrollIntoView = scrollIntoView;
+
+      const firstItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "first-item", upvotes: 2, createdDate: new Date("2024-01-01") },
+      };
+      const secondItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "second-item", upvotes: 1, createdDate: new Date("2024-01-02") },
+      };
+      const model = buildFocusModeModel([{ ...testColumnProps, columnItems: [firstItem, secondItem] }]);
+      const updatedModel = buildFocusModeModel([{ ...testColumnProps, columnName: "Updated Column", columnItems: [firstItem, secondItem] }]);
+
+      try {
+        const { container, rerender } = render(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={false} />);
+
+        const firstColumnSlide = container.querySelector("#slide-all-columns-0") as HTMLElement;
+        const secondColumnSlide = container.querySelector("#slide-all-columns-1") as HTMLElement;
+        expect(firstColumnSlide).toBeTruthy();
+        expect(secondColumnSlide).toBeTruthy();
+
+        fireEvent.focus(secondColumnSlide);
+        fireEvent.click(secondColumnSlide.querySelector(".back-button")!);
+        fireEvent.click(firstColumnSlide.querySelector(".next-button")!);
+        fireEvent.click(container.querySelector('.carousel-dots a[href="#slide-all-columns-1"]')!);
+
+        rerender(<FeedbackCarousel focusModeModel={updatedModel} isFocusModalHidden={false} />);
+
+        await waitFor(() => {
+          expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest", inline: "nearest" });
+        });
+      } finally {
+        window.requestAnimationFrame = originalRequestAnimationFrame;
+        HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
+      }
+    });
+
+    it("ignores recorded active position when its column is removed", () => {
+      const originalRequestAnimationFrame = window.requestAnimationFrame;
+      window.requestAnimationFrame = jest.fn();
+      const emptyModel = buildFocusModeModel([] as unknown as Array<typeof testColumnProps>);
+      emptyModel.columnIds = [];
+      emptyModel.columns = {} as any;
+
+      try {
+        const { container, rerender } = render(<FeedbackCarousel {...mockedProps} />);
+
+        fireEvent.click(container.querySelector("#slide-all-columns-0")!);
+        rerender(<FeedbackCarousel focusModeModel={emptyModel} isFocusModalHidden={false} />);
+
+        expect(window.requestAnimationFrame).not.toHaveBeenCalled();
+      } finally {
+        window.requestAnimationFrame = originalRequestAnimationFrame;
+      }
+    });
+
+    it("ignores recorded active position when its item is removed", () => {
+      const originalRequestAnimationFrame = window.requestAnimationFrame;
+      window.requestAnimationFrame = jest.fn();
+      const replacementItem = {
+        ...testColumnProps.columnItems[0],
+        feedbackItem: { ...testColumnProps.columnItems[0].feedbackItem, id: "replacement-item" },
+      };
+      const updatedModel = buildFocusModeModel([{ ...testColumnProps, columnItems: [replacementItem] }]);
+
+      try {
+        const { container, rerender } = render(<FeedbackCarousel {...mockedProps} />);
+
+        fireEvent.click(container.querySelector("#slide-all-columns-0")!);
+        rerender(<FeedbackCarousel focusModeModel={updatedModel} isFocusModalHidden={false} />);
+
+        expect(window.requestAnimationFrame).not.toHaveBeenCalled();
+      } finally {
+        window.requestAnimationFrame = originalRequestAnimationFrame;
+      }
+    });
+
+    it("does not scroll when the recorded active slide element is missing", () => {
+      const originalRequestAnimationFrame = window.requestAnimationFrame;
+      const getElementByIdSpy = jest.spyOn(document, "getElementById").mockReturnValue(null);
+      window.requestAnimationFrame = jest.fn(callback => {
+        callback(0);
+        return 0;
+      });
+      const updatedModel = buildFocusModeModel([{ ...testColumnProps, columnName: "Updated Column" }]);
+
+      try {
+        const { container, rerender } = render(<FeedbackCarousel {...mockedProps} />);
+
+        fireEvent.click(container.querySelector("#slide-all-columns-0")!);
+        rerender(<FeedbackCarousel focusModeModel={updatedModel} isFocusModalHidden={false} />);
+
+        expect(getElementByIdSpy).toHaveBeenCalledWith("slide-all-columns-0");
+      } finally {
+        window.requestAnimationFrame = originalRequestAnimationFrame;
+        getElementByIdSpy.mockRestore();
+      }
     });
   });
 

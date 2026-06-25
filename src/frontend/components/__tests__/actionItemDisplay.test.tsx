@@ -978,7 +978,7 @@ describe("Action Item Display component", () => {
     });
   });
 
-  it("triggers dialog onClose handler when dialog is closed", async () => {
+  it("stops propagation for link existing work item dialog close events", async () => {
     const propsWithAdd = {
       ...defaultTestProps,
       allowAddNewActionItem: true,
@@ -989,11 +989,16 @@ describe("Action Item Display component", () => {
     const dialog = await openLinkExistingDialog(container);
     expect(dialog.open).toBe(true);
 
-    // Trigger the close event on the dialog
-    dialog.dispatchEvent(new Event("close"));
+    const cancelEvent = new Event("cancel", { cancelable: true });
+    const closeEvent = new Event("close");
+    const cancelStopPropagationSpy = jest.spyOn(cancelEvent, "stopPropagation");
+    const closeStopPropagationSpy = jest.spyOn(closeEvent, "stopPropagation");
 
-    // Dialog should handle the close event
-    expect(dialog).toBeTruthy();
+    fireEvent(dialog, cancelEvent);
+    fireEvent(dialog, closeEvent);
+
+    expect(cancelStopPropagationSpy).toHaveBeenCalled();
+    expect(closeStopPropagationSpy).toHaveBeenCalled();
   });
 
   it("handleClickOutside returns early when target is inside the menu", async () => {

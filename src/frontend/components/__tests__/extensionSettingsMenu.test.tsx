@@ -158,6 +158,84 @@ describe("ExtensionSettingsMenu", () => {
     expect(onShowAllTeamsChange).toHaveBeenCalledWith(true);
   });
 
+  it("handles show all teams when no change callback is provided", () => {
+    render(<ExtensionSettingsMenu showAllTeams={true} />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+
+    expect(() => fireEvent.click(screen.getByLabelText("Show all teams"))).not.toThrow();
+  });
+
+  it("saves admin add work item type settings", async () => {
+    const onSaveAllowedActionItemWorkItemTypes = jest.fn().mockResolvedValue(undefined);
+    const allWorkItemTypes = [
+      { name: "Task", referenceName: "System.Task", icon: { url: "task-icon.png" } },
+      { name: "Bug", icon: undefined },
+    ] as any;
+
+    render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} allWorkItemTypes={allWorkItemTypes} allowedActionItemWorkItemTypeNames={["Task"]} onSaveAllowedActionItemWorkItemTypes={onSaveAllowedActionItemWorkItemTypes} />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Add work item types" });
+    const bugCheckbox = within(dialog).getByLabelText("Bug") as HTMLInputElement;
+    const taskCheckbox = within(dialog).getByLabelText("Task") as HTMLInputElement;
+
+    expect(within(dialog).getAllByRole("row").map(row => row.textContent)).toEqual(["ShowWork item type", "Bug", "Task"]);
+    expect(bugCheckbox.id).toBe("work-item-type-Bug");
+    expect(taskCheckbox.id).toBe("work-item-type-System.Task");
+    expect(dialog.querySelector('img[src="task-icon.png"]')).toBeInTheDocument();
+    expect(taskCheckbox.checked).toBe(true);
+    expect(bugCheckbox.checked).toBe(false);
+
+    fireEvent.click(bugCheckbox);
+    fireEvent.click(taskCheckbox);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    await waitFor(() => {
+      expect(onSaveAllowedActionItemWorkItemTypes).toHaveBeenCalledWith(["Bug"]);
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
+  it("resets draft admin add work item type settings when canceled", () => {
+    const allWorkItemTypes = [
+      { name: "Task", referenceName: "System.Task", icon: { url: "task-icon.png" } },
+      { name: "Bug" },
+    ] as any;
+
+    render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} allWorkItemTypes={allWorkItemTypes} allowedActionItemWorkItemTypeNames={["Task"]} />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Add work item types" });
+    fireEvent.click(within(dialog).getByLabelText("Bug"));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+
+    expect(dialog).not.toHaveAttribute("open");
+
+    fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
+
+    expect((within(dialog).getByLabelText("Bug") as HTMLInputElement).checked).toBe(false);
+    expect((within(dialog).getByLabelText("Task") as HTMLInputElement).checked).toBe(true);
+  });
+
+  it("closes admin add work item type settings after save without a callback", async () => {
+    render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Add work item types" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    await waitFor(() => {
+      expect(dialog).not.toHaveAttribute("open");
+    });
+  });
+
   it("renders labels with responsive visibility classes", () => {
     Object.defineProperty(window, "outerWidth", { value: 800, writable: true, configurable: true });
     Object.defineProperty(window, "innerWidth", { value: 800, writable: true, configurable: true });

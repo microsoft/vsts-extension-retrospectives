@@ -2327,6 +2327,22 @@ describe("FeedbackBoard Component", () => {
       const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
       expect(focusModeModel?.isBoardOwner).toBe(false);
     });
+
+    it("uses focus mode work item types when they are provided", async () => {
+      const onFocusModeModelChange = jest.fn();
+      const focusModeNonHiddenWorkItemTypes = [{ name: "Focus Task" }] as any;
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...mockedProps} focusModeNonHiddenWorkItemTypes={focusModeNonHiddenWorkItemTypes} onFocusModeModelChange={onFocusModeModelChange} />);
+
+      await waitFor(() => {
+        expect(onFocusModeModelChange).toHaveBeenCalled();
+      });
+
+      const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
+      expect(focusModeModel?.nonHiddenWorkItemTypes).toBe(focusModeNonHiddenWorkItemTypes);
+    });
   });
 
   describe("Timer Functions - Edge Cases", () => {

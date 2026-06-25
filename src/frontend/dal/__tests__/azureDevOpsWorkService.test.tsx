@@ -4,6 +4,7 @@ import { WorkRestClient } from "azure-devops-extension-api/Work/WorkClient";
 // Mock azure-devops-extension-api
 const mockGetTeamIterations = jest.fn();
 const mockGetTeamFieldValues = jest.fn();
+const mockGetBacklogConfigurations = jest.fn();
 const mockGetClient = jest.fn();
 
 jest.mock("azure-devops-extension-api/Common", () => ({
@@ -42,6 +43,7 @@ describe("WorkService", () => {
     mockGetClient.mockReturnValue({
       getTeamIterations: mockGetTeamIterations,
       getTeamFieldValues: mockGetTeamFieldValues,
+      getBacklogConfigurations: mockGetBacklogConfigurations,
     });
 
     mockGetProjectId.mockResolvedValue("project-123");
@@ -295,6 +297,49 @@ describe("WorkService", () => {
       await workService.getTeamFieldValues("team-permission-error");
 
       expect(mockTrackException).toHaveBeenCalledWith(error, { teamId: "team-permission-error" });
+    });
+  });
+
+  describe("getRequirementBacklogWorkItemTypeNames", () => {
+    it("returns requirement backlog work item type names and filters empty names", async () => {
+      mockGetBacklogConfigurations.mockResolvedValue({
+        requirementBacklog: {
+          workItemTypes: [{ name: "User Story" }, { name: "" }, { name: "Bug" }, {}],
+        },
+      });
+
+      const result = await workService.getRequirementBacklogWorkItemTypeNames("team-requirements");
+
+      expect(result).toEqual(["User Story", "Bug"]);
+      expect(mockGetBacklogConfigurations).toHaveBeenCalledWith({
+        project: "",
+        projectId: "project-123",
+        team: "",
+        teamId: "team-requirements",
+      });
+    });
+
+    it("returns an empty list when requirement backlog work item types are missing", async () => {
+      mockGetBacklogConfigurations.mockResolvedValue({ requirementBacklog: {} });
+
+      await expect(workService.getRequirementBacklogWorkItemTypeNames("team-empty-requirements")).resolves.toEqual([]);
+
+      mockGetBacklogConfigurations.mockResolvedValue({});
+
+      await expect(workService.getRequirementBacklogWorkItemTypeNames("team-no-requirement-backlog")).resolves.toEqual([]);
+    });
+
+    it("returns an empty list and tracks exceptions when requirement backlog loading fails", async () => {
+      const error = new Error("Backlog failure");
+      mockGetBacklogConfigurations.mockRejectedValue(error);
+
+      const result = await workService.getRequirementBacklogWorkItemTypeNames("team-backlog-error");
+
+      expect(result).toEqual([]);
+      expect(mockTrackException).toHaveBeenCalledWith(error, {
+        teamId: "team-backlog-error",
+        categoryReferenceName: "Microsoft.RequirementCategory",
+      });
     });
   });
 });
