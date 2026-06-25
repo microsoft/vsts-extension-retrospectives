@@ -190,6 +190,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply w-4 h-4;
       }
     }
+
+    & .admin-settings-menu-item {
+      @apply min-w-max whitespace-nowrap;
+    }
   }
 }
 
@@ -355,6 +359,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .user-guide-dialog,
 .volunteer-dialog,
 .keyboard-shortcuts-dialog,
+.work-item-types-settings-dialog,
 .archive-board-dialog,
 .edit-column-notes-dialog,
 .delete-board-dialog,
@@ -482,6 +487,37 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .dialog-width-lg {
   @apply w-[60vw] max-w-[60vw] portrait:w-[80vw] portrait:max-w-[80vw];
+}
+
+.work-item-types-settings-dialog {
+  & .work-item-types-settings-list {
+    @apply max-h-96 overflow-y-auto pr-2;
+  }
+
+  & table {
+    @apply w-full border-collapse;
+  }
+
+  & th {
+    @apply sticky top-0 z-1 bg-(--background-color) border-b border-(--border-subtle-color) text-left p-2;
+  }
+
+  & td {
+    @apply border-b border-(--border-subtle-color) p-2 align-middle;
+  }
+
+  & th:first-child,
+  & td:first-child {
+    @apply w-16 text-center;
+  }
+
+  & td label {
+    @apply flex items-center gap-2 cursor-pointer;
+  }
+
+  & .work-item-type-icon {
+    @apply w-4 h-4;
+  }
 }
 
 .dialog-width-xl {
@@ -816,7 +852,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .popout-container {
-  @apply absolute right-0 bottom-full bg-[rgb(var(--palette-neutral-6))] text-sm shadow-[rgb(var(--palette-neutral-0))] shadow-lg min-w-60 max-h-[60vh] z-10 overflow-y-auto;
+  @apply absolute right-0 top-full bottom-auto bg-[rgb(var(--palette-neutral-6))] text-sm shadow-[rgb(var(--palette-neutral-0))] shadow-lg min-w-60 max-h-[60vh] z-10 overflow-y-auto;
 
   & .list-item {
     @apply flex items-center gap-2 cursor-pointer p-2 bg-inherit w-full border-0 overflow-hidden text-(--text-primary-color);
@@ -836,13 +872,13 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.retrospectives-link-existing-work-item-dialog {
-  @apply w-125 h-62 max-w-md;
+.feedback-carousel-item .popout-container {
+  @apply top-auto bottom-full;
+  max-height: 15.625rem;
+  overflow-y: auto;
+}
 
-  & .error-container {
-    @apply h-5;
-  }
-
+.link-existing-work-item-dialog {
   & .output-container {
     @apply h-10;
   }
@@ -852,15 +888,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .work-item-not-found {
-    @apply w-full;
-  }
-
-  & .input-validation-message {
     @apply text-error;
-  }
-
-  & .work-item-id-input {
-    @apply w-full;
   }
 }
 

@@ -4,6 +4,7 @@ import "@testing-library/jest-dom";
 import GroupedFeedbackList, { IGroupedFeedbackListProps } from "../groupedFeedbackList";
 import { IColumn, IColumnItem } from "../feedbackBoard";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
+import { WorkflowPhase } from "../../interfaces/workItem";
 
 // Mock the icons module
 jest.mock("../icons", () => {
@@ -63,6 +64,7 @@ describe("GroupedFeedbackList", () => {
     columnItems: [],
     columns: defaultColumns,
     currentColumnId: "column-1",
+    workflowPhase: WorkflowPhase.Collect,
     hideFeedbackItems: false,
     isFocusModalHidden: true,
   };
@@ -336,6 +338,32 @@ describe("GroupedFeedbackList", () => {
 
       // originalColumnId matches currentColumnId, so no "Original Column" should be shown
       expect(screen.queryByText(/Original Column:/)).not.toBeInTheDocument();
+    });
+
+    it("should sort act phase child items by votes and created date while ignoring missing items", () => {
+      const newestTieItem = createFeedbackItem({
+        id: "newest-tie",
+        title: "Newest Tie",
+        upvotes: 3,
+        createdDate: new Date("2024-02-01T00:00:00Z"),
+      });
+      const oldestTieItem = createFeedbackItem({
+        id: "oldest-tie",
+        title: "Oldest Tie",
+        upvotes: 3,
+        createdDate: new Date("2024-01-01T00:00:00Z"),
+      });
+      const mostVotesItem = createFeedbackItem({
+        id: "most-votes",
+        title: "Most Votes",
+        upvotes: 5,
+        createdDate: new Date("2023-01-01T00:00:00Z"),
+      });
+      const columnItems = [createColumnItem(oldestTieItem), createColumnItem(mostVotesItem), createColumnItem(newestTieItem)];
+
+      render(<GroupedFeedbackList {...defaultProps} workflowPhase={WorkflowPhase.Act} childrenIds={["missing-a", "oldest-tie", "newest-tie", "missing-b", "most-votes"]} columnItems={columnItems} />);
+
+      expect(screen.getAllByRole("listitem").map(item => item.textContent)).toEqual(["Most Votes", "Newest Tie", "Oldest Tie"]);
     });
   });
 });

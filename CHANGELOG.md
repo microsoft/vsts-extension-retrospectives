@@ -2,6 +2,14 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.56
+
+* Introduced Admin Settings with an option to configure available work item types for Add work item.
+* Set available work item types to default to Requirement Backlog types for both Act tab and Focus mode.
+* Fixed Link existing work item in Focus mode so it stays in Focus mode instead of returning to Act tab.
+
+From [GitHub PR #1777](https://github.com/microsoft/vsts-extension-retrospectives/pull/1777)
+
 ## v1.92.55
 
 * Restricts editing and deleting a feedback card to the user who created it or the board owner, so participants can no longer modify or remove other people's cards. From [GitHub PR #1772](https://github.com/microsoft/vsts-extension-retrospectives/pull/1772)
