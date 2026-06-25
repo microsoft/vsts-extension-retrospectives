@@ -103,7 +103,8 @@
     ]
   },
   "overrides": {
-    "@babel/core": "7.29.6"
+    "@babel/core": "7.29.6",
+    "undici": "6.27.0"
   },
   "jest-junit": {
     "outputDirectory": "reports",
