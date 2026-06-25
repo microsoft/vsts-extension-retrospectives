@@ -25,6 +25,11 @@ interface KeyboardShortcut {
   category: string;
 }
 
+interface ExtensionSettingsMenuProps {
+  showAllTeams?: boolean;
+  onShowAllTeamsChange?: (showAllTeams: boolean) => void;
+}
+
 const keyboardShortcuts: KeyboardShortcut[] = [
   // Global shortcuts
   { keys: ["?"], description: "Show keyboard shortcuts", category: "Global" },
@@ -117,7 +122,7 @@ const importData = async () => {
   return false;
 };
 
-export const ExtensionSettingsMenu: React.FC = () => {
+export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ showAllTeams = false, onShowAllTeamsChange }) => {
   const trackActivity = useTrackMetric(reactPlugin, "ExtensionSettingsMenu");
 
   const menuRootRef = useRef<HTMLDivElement>(null);
@@ -278,6 +283,20 @@ export const ExtensionSettingsMenu: React.FC = () => {
           </button>
         </div>
       </dialog>
+
+      <details className="flex items-center relative">
+        <summary aria-label="Settings" title="Settings" className="extension-settings-button">
+          {getIconElement("gear")}
+          <span className="hidden lg:inline">Settings</span>
+        </summary>
+
+        <div className="callout-menu right">
+          <label className="flex items-center gap-2 w-full px-4 py-2 cursor-pointer text-(--text-primary-color)">
+            <input type="checkbox" checked={showAllTeams} onChange={event => onShowAllTeamsChange?.(event.currentTarget.checked)} />
+            Show all teams
+          </label>
+        </div>
+      </details>
 
       <WhatsNewDialog dialogRef={whatsNewDialogRef} />
 

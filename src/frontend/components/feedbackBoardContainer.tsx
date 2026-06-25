@@ -217,6 +217,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const [allBoardFeedbackSearchTerm, setAllBoardFeedbackSearchTerm] = React.useState("");
   const [allBoardFeedbackSearchResults, setAllBoardFeedbackSearchResults] = React.useState<AllBoardFeedbackSearchResult[]>([]);
   const [isSearchingAllBoardFeedback, setIsSearchingAllBoardFeedback] = React.useState(false);
+  const [showAllTeams, setShowAllTeams] = React.useState(false);
 
   const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
   const connectionWatchdogIntervalIdRef = React.useRef<number | undefined>(undefined);
@@ -350,7 +351,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       initialCurrentTeam = initializedTeamAndBoardState.currentTeam;
       initialCurrentBoard = initializedTeamAndBoardState.currentBoard;
 
-      await initializeProjectTeams(initialCurrentTeam);
+      initializeProjectTeams(initialCurrentTeam, initializedTeamAndBoardState.userTeams);
 
       setContainerState(previousState => ({ ...previousState, ...initializedTeamAndBoardState, isTeamDataLoaded: true }));
       reflectBackendService.switchToTeam(initialCurrentTeam ? initialCurrentTeam.id : undefined);
@@ -1021,36 +1022,44 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   };
 
-  const initializeProjectTeams = async (defaultTeam: WebApiTeam) => {
-    // true returns all teams that user is a member in the project
-    // false returns all teams that are in project
-    // intentionally restricting to teams the user is a member
-    const allTeams = await azureDevOpsCoreService.getAllTeams(projectId, true);
-    allTeams.sort((t1, t2) => {
+  const loadMembersForTeams = async (teams: WebApiTeam[]): Promise<TeamMember[]> => {
+    const memberLists = await Promise.all(teams.map(team => azureDevOpsCoreService.getMembers(projectId, team.id)));
+    return deduplicateTeamMembers(memberLists.flat());
+  };
+
+  const sortTeamsByName = (teams: WebApiTeam[]): WebApiTeam[] => {
+    return teams.sort((t1, t2) => {
       return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
     });
+  };
 
-    const promises = [];
-    for (const team of allTeams) {
-      promises.push(azureDevOpsCoreService.getMembers(projectId, team.id));
-    }
-    // if user is member of more than one team, then will return duplicates
-    Promise.all(promises).then(values => {
-      const allTeamMembers: TeamMember[] = [];
-      for (const members of values) {
-        allTeamMembers.push(...members);
-      }
-      // Use the helper function
-      const uniqueTeamMembers = deduplicateTeamMembers(allTeamMembers);
+  const initializeProjectTeams = (defaultTeam: WebApiTeam, userTeams: WebApiTeam[]) => {
+    const projectTeams = userTeams?.length > 0 ? userTeams : defaultTeam ? [defaultTeam] : [];
 
-      setContainerState(previousState => ({
-        ...previousState,
-        allMembers: uniqueTeamMembers,
-        projectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-        filteredProjectTeams: allTeams?.length > 0 ? allTeams : [defaultTeam],
-        isAllTeamsLoaded: true,
-      }));
-    });
+    setContainerState(previousState => ({
+      ...previousState,
+      projectTeams,
+      filteredProjectTeams: projectTeams,
+      isAllTeamsLoaded: false,
+    }));
+
+    loadMembersForTeams(projectTeams)
+      .then(allMembers => setContainerState(previousState => ({ ...previousState, allMembers })))
+      .catch(error => appInsights.trackException(error, { action: "initializeProjectTeamMembers" }));
+  };
+
+  const loadAllProjectTeams = async (): Promise<void> => {
+    const allTeams = sortTeamsByName(await azureDevOpsCoreService.getAllTeams(projectId, false));
+    const projectTeams = allTeams.length ? allTeams : state.userTeams.length ? state.userTeams : state.currentTeam ? [state.currentTeam] : [];
+    const allMembers = await loadMembersForTeams(projectTeams);
+
+    setContainerState(previousState => ({
+      ...previousState,
+      allMembers,
+      projectTeams,
+      filteredProjectTeams: projectTeams,
+      isAllTeamsLoaded: true,
+    }));
   };
 
   const isCurrentUserTeamAdmin = (): boolean => {
@@ -1833,9 +1842,30 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     return <div>{t("feedback_board_team_list_error")}</div>;
   }
 
+  const selectableTeams = showAllTeams && state.projectTeams.length ? state.projectTeams : state.userTeams;
+
+  const handleShowAllTeamsChange = async (shouldShowAllTeams: boolean): Promise<void> => {
+    if (!shouldShowAllTeams) {
+      setShowAllTeams(false);
+      return;
+    }
+
+    setShowAllTeams(true);
+    if (state.isAllTeamsLoaded) {
+      return;
+    }
+
+    try {
+      await loadAllProjectTeams();
+    } catch (error) {
+      appInsights.trackException(error, { action: "loadAllProjectTeams" });
+      setShowAllTeams(false);
+    }
+  };
+
   const handleTeamSelectionChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTeamId = event.target.value;
-    const selectedTeam = state.userTeams.find(team => team.id === selectedTeamId);
+    const selectedTeam = selectableTeams.find(team => team.id === selectedTeamId);
     if (selectedTeam) {
       await changeSelectedTeam(selectedTeam);
     }
@@ -1972,7 +2002,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             Team
           </label>
           <select id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} aria-label="Team">
-            {state.userTeams.map(team => (
+            {selectableTeams.map(team => (
               <option key={team.id} value={team.id}>
                 {team.name}
               </option>
@@ -1982,7 +2012,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
           {renderWorkflowTimerControls()}
-          <ExtensionSettingsMenu />
+          <ExtensionSettingsMenu showAllTeams={showAllTeams} onShowAllTeamsChange={handleShowAllTeamsChange} />
         </div>
       </div>
       <div className="flex items-center justify-start shrink-0">

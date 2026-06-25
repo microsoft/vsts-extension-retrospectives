@@ -480,6 +480,38 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.getByText("Board 2 - Risks - Jan 1, 2024")).toBeInTheDocument();
     expect(screen.queryByText("Keep the release calm")).not.toBeInTheDocument();
   });
+
+  it("shows all project teams in the team selector when enabled from settings", async () => {
+    const otherTeam = { ...mockTeam, id: "t2", name: "Other Team" };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
+      forCurrentUserOnly ? [mockTeam as WebApiTeam] : [mockTeam as WebApiTeam, otherTeam as WebApiTeam],
+    );
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(mockBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", true);
+    expect(azureDevOpsCoreService.getAllTeams).not.toHaveBeenCalledWith("1", false);
+    expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Other Team" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByLabelText("Show all teams"));
+
+    expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
+    expect(await screen.findByRole("option", { name: "Other Team" })).toBeInTheDocument();
+  });
 });
 
 describe("FeedbackBoardContainer instance methods", () => {

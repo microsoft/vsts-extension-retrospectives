@@ -80,7 +80,7 @@ describe("getQuestionTooltip", () => {
 describe("getQuestionFontAwesomeClass", () => {
   it("should return the font awesome class for a valid question id", () => {
     const questionId = 1;
-    const expectedClass = "fa-solid fa-magnifying-glass";
+    const expectedClass = "search";
 
     const result = getQuestionIconClassName(questionId);
 

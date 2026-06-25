@@ -2224,7 +2224,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .retrospectives-group-feedback-item-dialog .output-container,
 .retrospectives-all-board-feedback-search-dialog .output-container {
-  @apply overflow-y-auto h-75 flex flex-col gap-3;
+  @apply overflow-y-auto h-75 mx-4 flex flex-col gap-3;
 }
 
 .retrospectives-group-feedback-item-dialog .output-container .no-matching-feedback-message,

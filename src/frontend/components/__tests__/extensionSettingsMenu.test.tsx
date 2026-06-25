@@ -135,16 +135,27 @@ describe("ExtensionSettingsMenu", () => {
   it("renders all buttons", () => {
     render(<ExtensionSettingsMenu />);
     expect(screen.getByTitle("Prime Directive")).toBeInTheDocument();
+    expect(screen.getByTitle("Settings")).toBeInTheDocument();
     expect(screen.getByTitle("Data Import/Export")).toBeInTheDocument();
     expect(screen.getByTitle("Retrospective Help")).toBeInTheDocument();
-    expect(screen.queryByTitle("User Settings")).not.toBeInTheDocument();
   });
 
   it("shows labels when wide", () => {
     render(<ExtensionSettingsMenu />);
     expect(screen.getByText("Directive")).toBeInTheDocument();
+    expect(screen.getByText("Settings")).toBeInTheDocument();
     expect(screen.getByText("Data")).toBeInTheDocument();
     expect(screen.getByText("Help")).toBeInTheDocument();
+  });
+
+  it("toggles showing all teams", () => {
+    const onShowAllTeamsChange = jest.fn();
+    render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByLabelText("Show all teams"));
+
+    expect(onShowAllTeamsChange).toHaveBeenCalledWith(true);
   });
 
   it("renders labels with responsive visibility classes", () => {
