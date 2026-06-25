@@ -1,4 +1,4 @@
-import { questions, getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName } from "../effectivenessMeasurementQuestionHelper";
+import { questions, normalizeTeamAssessmentQuestions, getQuestionName, getQuestionShortName, getQuestionTooltip, getQuestionIconClassName } from "../effectivenessMeasurementQuestionHelper";
 
 describe("effectivenessMeasurementQuestionHelper", () => {
   it("should have the correct number of questions", () => {
@@ -93,5 +93,33 @@ describe("getQuestionFontAwesomeClass", () => {
     const result = getQuestionIconClassName(questionId);
 
     expect(result).toBe("");
+  });
+});
+
+describe("normalizeTeamAssessmentQuestions", () => {
+  it("returns default questions when board questions are missing", () => {
+    expect(normalizeTeamAssessmentQuestions()).toEqual(questions);
+  });
+
+  it("returns default questions when board questions are empty", () => {
+    expect(normalizeTeamAssessmentQuestions([])).toEqual(questions);
+  });
+
+  it("uses the current default icon for saved default questions", () => {
+    const savedQuestion = { ...questions[5], iconClassName: "legacy-gear" };
+
+    expect(normalizeTeamAssessmentQuestions([savedQuestion])).toEqual([{ ...savedQuestion, iconClassName: "gear-with-stars" }]);
+  });
+
+  it("preserves custom questions", () => {
+    const customQuestion = { ...questions[0], id: 99, isCustom: true, iconClassName: "custom-icon" };
+
+    expect(normalizeTeamAssessmentQuestions([customQuestion])).toEqual([customQuestion]);
+  });
+
+  it("leaves unknown default questions unchanged", () => {
+    const unknownQuestion = { ...questions[0], id: 99, iconClassName: "unknown-icon" };
+
+    expect(normalizeTeamAssessmentQuestions([unknownQuestion])).toEqual([unknownQuestion]);
   });
 });

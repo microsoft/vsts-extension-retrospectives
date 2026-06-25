@@ -153,7 +153,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
 
     fireEvent.click(screen.getByTitle("Settings"));
-    fireEvent.click(screen.getByLabelText("Show all teams"));
+    fireEvent.click(screen.getByRole("button", { name: "Show All Teams" }));
 
     expect(onShowAllTeamsChange).toHaveBeenCalledWith(true);
   });
@@ -163,7 +163,51 @@ describe("ExtensionSettingsMenu", () => {
 
     fireEvent.click(screen.getByTitle("Settings"));
 
-    expect(() => fireEvent.click(screen.getByLabelText("Show all teams"))).not.toThrow();
+    expect(() => fireEvent.click(screen.getByRole("button", { name: "Show My Teams" }))).not.toThrow();
+  });
+
+  it("toggles from column scroll mode to board scroll mode", () => {
+    const onScrollModeChange = jest.fn();
+    render(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={onScrollModeChange} />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Scroll by Board" }));
+
+    expect(onScrollModeChange).toHaveBeenCalledWith("board");
+  });
+
+  it("toggles from board scroll mode to column scroll mode", () => {
+    const onScrollModeChange = jest.fn();
+    render(<ExtensionSettingsMenu scrollMode="board" onScrollModeChange={onScrollModeChange} />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "Scroll by Column" }));
+
+    expect(onScrollModeChange).toHaveBeenCalledWith("column");
+  });
+
+  it("handles scroll mode toggle when no change callback is provided", () => {
+    render(<ExtensionSettingsMenu scrollMode="column" />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+
+    expect(() => fireEvent.click(screen.getByRole("button", { name: "Scroll by Board" }))).not.toThrow();
+  });
+
+  it("handles settings action when the containing menu cannot be found", () => {
+    const onShowAllTeamsChange = jest.fn();
+    render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
+
+    fireEvent.click(screen.getByTitle("Settings"));
+    const showAllTeamsButton = screen.getByRole("button", { name: "Show All Teams" });
+    const closestSpy = jest.spyOn(Element.prototype, "closest").mockReturnValue(null);
+
+    try {
+      expect(() => fireEvent.click(showAllTeamsButton)).not.toThrow();
+      expect(onShowAllTeamsChange).toHaveBeenCalledWith(true);
+    } finally {
+      closestSpy.mockRestore();
+    }
   });
 
   it("saves admin add work item type settings", async () => {
