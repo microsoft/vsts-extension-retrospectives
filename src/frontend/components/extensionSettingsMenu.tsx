@@ -315,7 +315,6 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
         <div className="subText" id="add-work-item-types-description">
           Select the work item types users can create from Add work item. If nothing is selected, Add work item defaults to the team's Requirement Backlog work item types.
         </div>
-        {!currentUserIsTeamAdmin && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only a Team Admin can edit "Add work item types".</div>}
         <div className="subText work-item-types-settings-list">
           <table>
             <thead>
@@ -341,16 +340,19 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
             </tbody>
           </table>
         </div>
-        {currentUserIsTeamAdmin && (
+        {!currentUserIsTeamAdmin && (
           <div className="inner">
-            <button className="button" onClick={saveWorkItemTypesDialog}>
-              {t("common_save")}
-            </button>
-            <button className="default button" onClick={closeWorkItemTypesDialog}>
-              {t("common_cancel")}
-            </button>
+            <div className="board-metadata-form-section-information work-item-types-warning">{getIconElement("exclamation")} Only a Team Admin can edit work item types.</div>
           </div>
         )}
+        <div className="inner">
+          <button className="button" onClick={saveWorkItemTypesDialog} disabled={!currentUserIsTeamAdmin} aria-disabled={!currentUserIsTeamAdmin}>
+            {t("common_save")}
+          </button>
+          <button className="default button" onClick={closeWorkItemTypesDialog}>
+            {t("common_cancel")}
+          </button>
+        </div>
       </dialog>
 
       <dialog className="prime-directive-dialog dialog-width-md" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onCancel={() => primeDirectiveDialogRef.current!.close()}>

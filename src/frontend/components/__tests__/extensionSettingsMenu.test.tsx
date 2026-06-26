@@ -297,9 +297,9 @@ describe("ExtensionSettingsMenu", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
 
     const dialog = screen.getByRole("dialog", { name: "Add work item types" });
-    expect(within(dialog).getByText('Only a Team Admin can edit "Add work item types".')).toBeInTheDocument();
-    expect(within(dialog).queryByRole("button", { name: "Save" })).not.toBeInTheDocument();
-    expect(within(dialog).queryByRole("button", { name: "Cancel" })).not.toBeInTheDocument();
+    expect(within(dialog).getByText("Only a Team Admin can edit work item types.")).toBeInTheDocument();
+    expect((within(dialog).getByRole("button", { name: "Save" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(within(dialog).getByRole("button", { name: "Cancel" })).toBeInTheDocument();
     expect((within(dialog).getByLabelText("Task") as HTMLInputElement).disabled).toBe(true);
     expect((within(dialog).getByLabelText("Bug") as HTMLInputElement).disabled).toBe(true);
   });

@@ -494,6 +494,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply max-h-96 overflow-y-auto pr-2;
   }
 
+  & .work-item-types-warning {
+    @apply w-full grid grid-cols-[auto_1fr] items-center gap-1 border-3 border-gray-medium bg-gray-medium p-1 text-sm;
+
+    & svg {
+      @apply w-5 h-5;
+    }
+  }
+
   & table {
     @apply w-full border-collapse;
   }
