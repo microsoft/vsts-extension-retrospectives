@@ -506,11 +506,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply border-b border-(--border-subtle-color) p-2 align-middle;
   }
 
-  & th:first-child,
-  & td:first-child {
-    @apply w-16 text-center;
-  }
-
   & td label {
     @apply flex items-center gap-2 cursor-pointer;
   }
