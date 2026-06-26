@@ -4,6 +4,8 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.56
 
+* Introduced User Settings with an options to toggle between showing all teams and my teams and scrolling by board or by column. From [GitHub PR #1777](https://github.com/microsoft/vsts-extension-retrospectives/pull/1777)
+
 * Introduced Admin Settings with an option to configure available work item types for Add work item.
 * Set available work item types to default to Requirement Backlog types for both Act tab and Focus mode.
 * Fixed Link existing work item in Focus mode so it stays in Focus mode instead of returning to Act tab.
@@ -19,7 +21,9 @@ From [GitHub PR #1777](https://github.com/microsoft/vsts-extension-retrospective
 * Simplifies board-configuration wording in Board Settings, including the required-name indicator, Max Votes label, and hidden feedback option.
 * Reintroduces borders for user input fields for cleaner visuals.
 * Supports small, medium, large and extra large standard dialog widths.
-* Resolved race conditions on initial load which could result in missing teams or boards. From [GitHub PR #1766](https://github.com/microsoft/vsts-extension-retrospectives/pull/1766)
+* Resolved race conditions on initial load which could result in missing teams or boards. 
+
+From [GitHub PR #1766](https://github.com/microsoft/vsts-extension-retrospectives/pull/1766)
 
 * Refined Add work item selection to ensure the full work item list is visible on Act tab.
 * Limited Focus mode work item type options to requirement backlog types.
