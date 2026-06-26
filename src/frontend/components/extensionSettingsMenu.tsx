@@ -374,7 +374,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
       </dialog>
 
       <details className="flex items-center relative">
-        <summary aria-label={t("common_settings")} title={t("common_settings")} className="extension-settings-button">
+        <summary aria-label={t("retrospective_settings")} title={t("retrospective_settings")} className="extension-settings-button">
           {getIconElement("gear")}
           <span className="hidden lg:inline">{t("common_settings")}</span>
         </summary>

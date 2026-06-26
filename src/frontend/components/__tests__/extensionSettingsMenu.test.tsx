@@ -143,7 +143,7 @@ describe("ExtensionSettingsMenu", () => {
   it("shows labels when wide", () => {
     render(<ExtensionSettingsMenu />);
     expect(screen.getByText("Directive")).toBeInTheDocument();
-    expect(screen.getByText("User/Admin Settings")).toBeInTheDocument();
+    expect(screen.getByText("Settings")).toBeInTheDocument();
     expect(screen.getByText("Data")).toBeInTheDocument();
     expect(screen.getByText("Help")).toBeInTheDocument();
   });
