@@ -72,7 +72,10 @@
   "overrides": {
     "@babel/core": "7.29.7",
     "undici": "6.27.0",
-    "ws": "7.5.11"
+    "ws": "7.5.11",
+    "tfx-cli": {
+      "uuid": "13.0.1"
+    }
   },
   "jest": {
     "testPathIgnorePatterns": [
