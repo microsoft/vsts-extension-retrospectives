@@ -107,7 +107,7 @@ Once you create a new retrospective, you can share a link to it to all participa
 
 Use the **Settings** menu in the header to adjust how teams and boards are displayed:
 
-- **Show my teams**: Restricts the team selector to teams where you are a member.
+.- **Show my teams**: Restricts the team selector to teams where you are a member.
 - **Show all teams**: Displays every team in the current project.
 - **Scroll by column**: Supports vertical scrolling within each column to view all feedback.
 - **Scroll by board**: Supports vertical scrolling for the full board to view all feedback.

@@ -135,7 +135,7 @@ describe("ExtensionSettingsMenu", () => {
   it("renders all buttons", () => {
     render(<ExtensionSettingsMenu />);
     expect(screen.getByTitle("Prime Directive")).toBeInTheDocument();
-    expect(screen.getByTitle("Settings")).toBeInTheDocument();
+    expect(screen.getByTitle("User/Admin Settings")).toBeInTheDocument();
     expect(screen.getByTitle("Data Import/Export")).toBeInTheDocument();
     expect(screen.getByTitle("Retrospective Help")).toBeInTheDocument();
   });
@@ -143,7 +143,7 @@ describe("ExtensionSettingsMenu", () => {
   it("shows labels when wide", () => {
     render(<ExtensionSettingsMenu />);
     expect(screen.getByText("Directive")).toBeInTheDocument();
-    expect(screen.getByText("Settings")).toBeInTheDocument();
+    expect(screen.getByText("User/Admin Settings")).toBeInTheDocument();
     expect(screen.getByText("Data")).toBeInTheDocument();
     expect(screen.getByText("Help")).toBeInTheDocument();
   });
@@ -152,7 +152,7 @@ describe("ExtensionSettingsMenu", () => {
     const onShowAllTeamsChange = jest.fn();
     render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
     fireEvent.click(screen.getByRole("button", { name: "Show all teams" }));
 
     expect(onShowAllTeamsChange).toHaveBeenCalledWith(true);
@@ -161,7 +161,7 @@ describe("ExtensionSettingsMenu", () => {
   it("handles show all teams when no change callback is provided", () => {
     render(<ExtensionSettingsMenu showAllTeams={true} />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
 
     expect(() => fireEvent.click(screen.getByRole("button", { name: "Show my teams" }))).not.toThrow();
   });
@@ -170,7 +170,7 @@ describe("ExtensionSettingsMenu", () => {
     const onScrollModeChange = jest.fn();
     render(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={onScrollModeChange} />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
     fireEvent.click(screen.getByRole("button", { name: "Scroll by board" }));
 
     expect(onScrollModeChange).toHaveBeenCalledWith("board");
@@ -180,7 +180,7 @@ describe("ExtensionSettingsMenu", () => {
     const onScrollModeChange = jest.fn();
     render(<ExtensionSettingsMenu scrollMode="board" onScrollModeChange={onScrollModeChange} />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
     fireEvent.click(screen.getByRole("button", { name: "Scroll by column" }));
 
     expect(onScrollModeChange).toHaveBeenCalledWith("column");
@@ -189,7 +189,7 @@ describe("ExtensionSettingsMenu", () => {
   it("handles scroll mode toggle when no change callback is provided", () => {
     render(<ExtensionSettingsMenu scrollMode="column" />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
 
     expect(() => fireEvent.click(screen.getByRole("button", { name: "Scroll by board" }))).not.toThrow();
   });
@@ -198,7 +198,7 @@ describe("ExtensionSettingsMenu", () => {
     const onShowAllTeamsChange = jest.fn();
     render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
     const showAllTeamsButton = screen.getByRole("button", { name: "Show all teams" });
     const closestSpy = jest.spyOn(Element.prototype, "closest").mockReturnValue(null);
 
@@ -219,7 +219,7 @@ describe("ExtensionSettingsMenu", () => {
 
     render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} allWorkItemTypes={allWorkItemTypes} allowedActionItemWorkItemTypeNames={["Task"]} onSaveAllowedActionItemWorkItemTypes={onSaveAllowedActionItemWorkItemTypes} />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
     fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
 
     const dialog = screen.getByRole("dialog", { name: "Add work item types" });
@@ -251,7 +251,7 @@ describe("ExtensionSettingsMenu", () => {
 
     render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} allWorkItemTypes={allWorkItemTypes} allowedActionItemWorkItemTypeNames={["Task"]} />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
     fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
 
     const dialog = screen.getByRole("dialog", { name: "Add work item types" });
@@ -269,7 +269,7 @@ describe("ExtensionSettingsMenu", () => {
   it("closes admin add work item type settings after save without a callback", async () => {
     render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} />);
 
-    fireEvent.click(screen.getByTitle("Settings"));
+    fireEvent.click(screen.getByTitle("User/Admin Settings"));
     fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
 
     const dialog = screen.getByRole("dialog", { name: "Add work item types" });
@@ -446,7 +446,7 @@ describe("ExtensionSettingsMenu", () => {
     const anchorClickSpy = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
 
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByText("Export Data"));
+    fireEvent.click(screen.getByText("Export data"));
 
     await waitFor(() => {
       expect(window.URL.createObjectURL).toHaveBeenCalled();
@@ -971,7 +971,7 @@ describe("ExtensionSettingsMenu", () => {
     }
   });
 
-  it("calls importData when Import Data button is clicked", async () => {
+  it("calls importData when Import data button is clicked", async () => {
     // Render the component FIRST before mocking document methods
     const { container } = render(<ExtensionSettingsMenu />);
 
@@ -984,7 +984,7 @@ describe("ExtensionSettingsMenu", () => {
     fireEvent.click(dataButton);
 
     // Find Import Data button
-    const importButton = screen.getByText("Import Data");
+    const importButton = screen.getByText("Import data");
     expect(importButton).toBeInTheDocument();
 
     // NOW mock file input handling after render is complete
