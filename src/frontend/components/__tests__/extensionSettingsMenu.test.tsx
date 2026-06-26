@@ -153,7 +153,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
 
     fireEvent.click(screen.getByTitle("Settings"));
-    fireEvent.click(screen.getByRole("button", { name: "Show All Teams" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show all teams" }));
 
     expect(onShowAllTeamsChange).toHaveBeenCalledWith(true);
   });
@@ -163,7 +163,7 @@ describe("ExtensionSettingsMenu", () => {
 
     fireEvent.click(screen.getByTitle("Settings"));
 
-    expect(() => fireEvent.click(screen.getByRole("button", { name: "Show My Teams" }))).not.toThrow();
+    expect(() => fireEvent.click(screen.getByRole("button", { name: "Show my teams" }))).not.toThrow();
   });
 
   it("toggles from column scroll mode to board scroll mode", () => {
@@ -171,7 +171,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={onScrollModeChange} />);
 
     fireEvent.click(screen.getByTitle("Settings"));
-    fireEvent.click(screen.getByRole("button", { name: "Scroll by Board" }));
+    fireEvent.click(screen.getByRole("button", { name: "Scroll by board" }));
 
     expect(onScrollModeChange).toHaveBeenCalledWith("board");
   });
@@ -181,7 +181,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu scrollMode="board" onScrollModeChange={onScrollModeChange} />);
 
     fireEvent.click(screen.getByTitle("Settings"));
-    fireEvent.click(screen.getByRole("button", { name: "Scroll by Column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Scroll by column" }));
 
     expect(onScrollModeChange).toHaveBeenCalledWith("column");
   });
@@ -191,7 +191,7 @@ describe("ExtensionSettingsMenu", () => {
 
     fireEvent.click(screen.getByTitle("Settings"));
 
-    expect(() => fireEvent.click(screen.getByRole("button", { name: "Scroll by Board" }))).not.toThrow();
+    expect(() => fireEvent.click(screen.getByRole("button", { name: "Scroll by board" }))).not.toThrow();
   });
 
   it("handles settings action when the containing menu cannot be found", () => {
@@ -199,7 +199,7 @@ describe("ExtensionSettingsMenu", () => {
     render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
 
     fireEvent.click(screen.getByTitle("Settings"));
-    const showAllTeamsButton = screen.getByRole("button", { name: "Show All Teams" });
+    const showAllTeamsButton = screen.getByRole("button", { name: "Show all teams" });
     const closestSpy = jest.spyOn(Element.prototype, "closest").mockReturnValue(null);
 
     try {
@@ -278,6 +278,30 @@ describe("ExtensionSettingsMenu", () => {
     await waitFor(() => {
       expect(dialog).not.toHaveAttribute("open");
     });
+  });
+
+  it("shows add work item types option for non-admin users", () => {
+    render(<ExtensionSettingsMenu currentUserIsTeamAdmin={false} />);
+
+    fireEvent.click(screen.getByTitle(/settings/i));
+
+    expect(screen.getByRole("button", { name: "Add work item types" })).toBeInTheDocument();
+  });
+
+  it("shows read-only add work item types settings for non-admin users", () => {
+    const allWorkItemTypes = [{ name: "Task", referenceName: "System.Task" }, { name: "Bug" }] as any;
+
+    render(<ExtensionSettingsMenu currentUserIsTeamAdmin={false} allWorkItemTypes={allWorkItemTypes} allowedActionItemWorkItemTypeNames={["Task"]} />);
+
+    fireEvent.click(screen.getByTitle(/settings/i));
+    fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Add work item types" });
+    expect(within(dialog).getByText('Only a Team Admin can edit "Add work item types".')).toBeInTheDocument();
+    expect(within(dialog).queryByRole("button", { name: "Save" })).not.toBeInTheDocument();
+    expect(within(dialog).queryByRole("button", { name: "Cancel" })).not.toBeInTheDocument();
+    expect((within(dialog).getByLabelText("Task") as HTMLInputElement).disabled).toBe(true);
+    expect((within(dialog).getByLabelText("Bug") as HTMLInputElement).disabled).toBe(true);
   });
 
   it("renders labels with responsive visibility classes", () => {

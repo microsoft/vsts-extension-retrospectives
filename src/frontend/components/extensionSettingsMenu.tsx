@@ -315,6 +315,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
         <div className="subText" id="add-work-item-types-description">
           Select the work item types users can create from Add work item. If nothing is selected, Add work item defaults to the team's Requirement Backlog work item types.
         </div>
+        {!currentUserIsTeamAdmin && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only a Team Admin can edit "Add work item types".</div>}
         <div className="subText work-item-types-settings-list">
           <table>
             <thead>
@@ -327,7 +328,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
               {sortedWorkItemTypes.map(workItemType => (
                 <tr key={workItemType.referenceName ?? workItemType.name}>
                   <td>
-                    <input id={getWorkItemTypeInputId(workItemType)} type="checkbox" checked={draftAllowedWorkItemTypeNames.includes(workItemType.name)} onChange={() => toggleDraftWorkItemType(workItemType.name)} />
+                    <input id={getWorkItemTypeInputId(workItemType)} type="checkbox" checked={draftAllowedWorkItemTypeNames.includes(workItemType.name)} disabled={!currentUserIsTeamAdmin} onChange={() => toggleDraftWorkItemType(workItemType.name)} />
                   </td>
                   <td>
                     <label htmlFor={getWorkItemTypeInputId(workItemType)}>
@@ -340,14 +341,16 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
             </tbody>
           </table>
         </div>
-        <div className="inner">
-          <button className="button" onClick={saveWorkItemTypesDialog}>
-            {t("common_save")}
-          </button>
-          <button className="default button" onClick={closeWorkItemTypesDialog}>
-            {t("common_cancel")}
-          </button>
-        </div>
+        {currentUserIsTeamAdmin && (
+          <div className="inner">
+            <button className="button" onClick={saveWorkItemTypesDialog}>
+              {t("common_save")}
+            </button>
+            <button className="default button" onClick={closeWorkItemTypesDialog}>
+              {t("common_cancel")}
+            </button>
+          </div>
+        )}
       </dialog>
 
       <dialog className="prime-directive-dialog dialog-width-md" aria-label="The Prime Directive" ref={primeDirectiveDialogRef} onCancel={() => primeDirectiveDialogRef.current!.close()}>
@@ -396,17 +399,15 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
             {getIconElement("view-column")}
             {scrollMode === "column" ? t("scroll_by_board") : t("scroll_by_column")}
           </button>
-          {currentUserIsTeamAdmin && (
-            <button
-              className="admin-settings-menu-item"
-              onClick={() => {
-                workItemTypesDialogRef.current!.showModal();
-              }}
-            >
-              <span aria-hidden="true">{getIconElement("list-all")}</span>
-              Add work item types
-            </button>
-          )}
+          <button
+            className="admin-settings-menu-item"
+            onClick={() => {
+              workItemTypesDialogRef.current!.showModal();
+            }}
+          >
+            <span aria-hidden="true">{getIconElement("list-all")}</span>
+            Add work item types
+          </button>
         </div>
       </details>
 
