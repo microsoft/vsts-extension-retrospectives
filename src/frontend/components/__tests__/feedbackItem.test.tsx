@@ -8167,6 +8167,16 @@ describe("FeedbackItem additional coverage (merged)", () => {
       expect(screen.queryByRole("menuitem", { name: "Delete feedback" })).toBeInTheDocument();
     });
 
+    test("shows the delete option to the board owner for their own feedback", async () => {
+      const props = makeProps({ userIdRef: "test-user-id", isBoardOwner: true });
+      render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      await openActionsMenu();
+
+      expect(screen.queryByRole("menuitem", { name: "Delete feedback" })).toBeInTheDocument();
+    });
+
     test("hides the delete option from users who neither created the feedback nor own the board", async () => {
       const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
       render(<FeedbackItem {...props} />);
@@ -8212,6 +8222,19 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     test("lets the board owner edit another user's feedback title", async () => {
       const props = makeProps({ userIdRef: "another-user", isBoardOwner: true });
+      const { container } = render(<FeedbackItem {...props} />);
+      await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
+
+      const title = container.querySelector(".editable-text") as HTMLElement;
+      await act(async () => {
+        fireEvent.click(title);
+      });
+
+      expect(container.querySelector(".editable-text-input")).toBeTruthy();
+    });
+
+    test("lets the board owner edit their own feedback title", async () => {
+      const props = makeProps({ userIdRef: "test-user-id", isBoardOwner: true });
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 

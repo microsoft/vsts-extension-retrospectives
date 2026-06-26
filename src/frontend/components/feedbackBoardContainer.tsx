@@ -25,7 +25,7 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 import EffectivenessMeasurementRow from "./effectivenessMeasurementRow";
 
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
-import { questions } from "../utilities/effectivenessMeasurementQuestionHelper";
+import { normalizeTeamAssessmentQuestions, questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
@@ -43,6 +43,9 @@ import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../util
 import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
+
+type ScrollMode = "column" | "board";
+const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
 
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
@@ -99,6 +102,7 @@ export interface FeedbackBoardContainerState {
   isBoardTimerRunning: boolean;
   countdownDurationMinutes: number;
   hasPlayedStopChime: boolean;
+  scrollMode: ScrollMode;
   teamAssessmentHistoryData: {
     boardTitle: string;
     boardId: string;
@@ -169,6 +173,7 @@ const initialState: FeedbackBoardContainerState = {
   isBoardTimerRunning: false,
   countdownDurationMinutes: 5,
   hasPlayedStopChime: false,
+  scrollMode: "column",
   teamAssessmentHistoryData: [],
 };
 
@@ -351,6 +356,15 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
     } else {
       setContainerState(previousState => ({ ...previousState, isBackendServiceConnected: false, isBackendServiceReconnecting: false }));
+    }
+
+    try {
+      const savedScrollMode = await BoardDataService.getSetting<ScrollMode>(SCROLL_MODE_SETTING_KEY);
+      if (savedScrollMode === "column" || savedScrollMode === "board") {
+        setContainerState(previousState => ({ ...previousState, scrollMode: savedScrollMode }));
+      }
+    } catch (error) {
+      appInsights.trackException(error, { action: "loadScrollModeSetting" });
     }
 
     try {
@@ -1490,7 +1504,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const showRetroSummaryDialog = async () => {
     const measurements: { id: number; selected: number }[] = [];
     const board = await BoardDataService.getBoardForTeamById(state.currentTeam.id, state.currentBoard.id);
-    const boardQuestions = board.teamAssessmentQuestions?.length ? board.teamAssessmentQuestions : questions;
+    const boardQuestions = normalizeTeamAssessmentQuestions(board.teamAssessmentQuestions);
     const voteCollection = board.teamEffectivenessMeasurementVoteCollection || [];
 
     voteCollection.forEach(vote => {
@@ -1883,6 +1897,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const handleShowAllTeamsChange = async (shouldShowAllTeams: boolean): Promise<void> => {
     if (!shouldShowAllTeams) {
       setShowAllTeams(false);
+      if (!state.userTeams.some(team => team.id === state.currentTeam?.id) && state.userTeams.length) {
+        await changeSelectedTeam(state.userTeams[0]);
+      }
       return;
     }
 
@@ -1921,7 +1938,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       return;
     }
 
-    const boardQuestions = currentBoard.teamAssessmentQuestions?.length ? currentBoard.teamAssessmentQuestions : questions;
+    const boardQuestions = normalizeTeamAssessmentQuestions(currentBoard.teamAssessmentQuestions);
     const teamEffectivenessMeasurementVoteCollection = currentBoard.teamEffectivenessMeasurementVoteCollection || [];
     const currentUserId = obfuscateUserId(state.currentUserId);
     const currentUserVote = teamEffectivenessMeasurementVoteCollection.find(vote => vote.userId === currentUserId);
@@ -2048,7 +2065,19 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
           {renderWorkflowTimerControls()}
-          <ExtensionSettingsMenu showAllTeams={showAllTeams} onShowAllTeamsChange={handleShowAllTeamsChange} currentUserIsTeamAdmin={isCurrentUserTeamAdmin()} allWorkItemTypes={state.availableActionItemWorkItemTypes} allowedActionItemWorkItemTypeNames={state.allowedActionItemWorkItemTypeNames} onSaveAllowedActionItemWorkItemTypes={saveAllowedActionItemWorkItemTypes} />
+          <ExtensionSettingsMenu
+            showAllTeams={showAllTeams}
+            onShowAllTeamsChange={handleShowAllTeamsChange}
+            scrollMode={state.scrollMode}
+            onScrollModeChange={scrollMode => {
+              setContainerState(previousState => ({ ...previousState, scrollMode }));
+              void BoardDataService.saveSetting(SCROLL_MODE_SETTING_KEY, scrollMode).catch(error => appInsights.trackException(error, { action: "saveScrollModeSetting" }));
+            }}
+            currentUserIsTeamAdmin={isCurrentUserTeamAdmin()}
+            allWorkItemTypes={state.availableActionItemWorkItemTypes}
+            allowedActionItemWorkItemTypeNames={state.allowedActionItemWorkItemTypeNames}
+            onSaveAllowedActionItemWorkItemTypes={saveAllowedActionItemWorkItemTypes}
+          />
         </div>
       </div>
       <div className="flex items-center justify-start shrink-0">
@@ -2205,7 +2234,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      {(state.currentBoard.teamAssessmentQuestions?.length ? state.currentBoard.teamAssessmentQuestions : questions).map(question => {
+                                      {normalizeTeamAssessmentQuestions(state.currentBoard.teamAssessmentQuestions).map(question => {
                                         return <EffectivenessMeasurementRow key={question.id} questionId={question.id} votes={state.currentBoard.teamEffectivenessMeasurementVoteCollection} onSelectedChange={selected => effectivenessMeasurementSelectionChanged(question.id, selected)} iconClassName={question.iconClassName} title={question.shortTitle} subtitle={question.title} tooltip={question.tooltip} />;
                                       })}
                                     </tbody>
@@ -2303,7 +2332,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             </div>
           )}
           {state.activeTab === "Board" && state.currentBoard && (
-            <div className="feedback-board-container">
+            <div className={`feedback-board-container scroll-mode-${state.scrollMode}`}>
               {state.currentTeam && state.currentBoard && (
                 <>
                   {!isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
@@ -2373,6 +2402,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     userId={state.currentUserId}
                     onVoteCasted={updateCurrentVoteCount}
                     onColumnNotesChange={persistColumnNotes}
+                    scrollMode={state.scrollMode}
                   />
                 </>
               )}

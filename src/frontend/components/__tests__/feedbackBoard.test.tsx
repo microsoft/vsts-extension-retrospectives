@@ -285,6 +285,13 @@ describe("FeedbackBoard Component", () => {
       const { container } = render(<FeedbackBoard {...mockedProps} />);
       const feedbackBoard = container.querySelector(".feedback-board");
       expect(feedbackBoard).toBeTruthy();
+      expect(feedbackBoard).toHaveClass("scroll-mode-column");
+    });
+
+    it("applies board scroll mode class", () => {
+      const { container } = render(<FeedbackBoard {...mockedProps} scrollMode="board" />);
+      const feedbackBoard = container.querySelector(".feedback-board");
+      expect(feedbackBoard).toHaveClass("scroll-mode-board");
     });
 
     it("renders error message when displayBoard is false", () => {

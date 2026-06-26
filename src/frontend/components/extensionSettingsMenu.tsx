@@ -32,7 +32,9 @@ const getWorkItemTypeInputId = (workItemType: WorkItemType): string => `work-ite
 
 export interface ExtensionSettingsMenuProps {
   showAllTeams?: boolean;
-  onShowAllTeamsChange?: (showAllTeams: boolean) => void;
+  onShowAllTeamsChange?: (showAllTeams: boolean) => Promise<void> | void;
+  scrollMode?: "column" | "board";
+  onScrollModeChange?: (scrollMode: "column" | "board") => Promise<void> | void;
   currentUserIsTeamAdmin?: boolean;
   allWorkItemTypes?: WorkItemType[];
   allowedActionItemWorkItemTypeNames?: string[];
@@ -131,7 +133,7 @@ const importData = async () => {
   return false;
 };
 
-export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ showAllTeams = false, onShowAllTeamsChange, currentUserIsTeamAdmin = false, allWorkItemTypes = emptyWorkItemTypes, allowedActionItemWorkItemTypeNames = emptyWorkItemTypeNames, onSaveAllowedActionItemWorkItemTypes }) => {
+export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ showAllTeams = false, onShowAllTeamsChange, scrollMode = "column", onScrollModeChange, currentUserIsTeamAdmin = false, allWorkItemTypes = emptyWorkItemTypes, allowedActionItemWorkItemTypeNames = emptyWorkItemTypeNames, onSaveAllowedActionItemWorkItemTypes }) => {
   const trackActivity = useTrackMetric(reactPlugin, "ExtensionSettingsMenu");
 
   const menuRootRef = useRef<HTMLDivElement>(null);
@@ -213,6 +215,10 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
       document.removeEventListener("keydown", handleDocumentKeyDown);
     };
   }, [handleDocumentPointerDown, handleDocumentKeyDown]);
+
+  const closeContainingMenu = (event: React.MouseEvent<HTMLElement>) => {
+    event.currentTarget.closest("details")?.removeAttribute("open");
+  };
 
   return (
     <div className="extension-settings-menu" ref={menuRootRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
@@ -365,18 +371,38 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
       </dialog>
 
       <details className="flex items-center relative">
-        <summary aria-label="Settings" title="Settings" className="extension-settings-button">
+        <summary aria-label={t("common_settings")} title={t("common_settings")} className="extension-settings-button">
           {getIconElement("gear")}
-          <span className="hidden lg:inline">Settings</span>
+          <span className="hidden lg:inline">{t("common_settings")}</span>
         </summary>
 
         <div className="callout-menu right">
-          <label className="flex items-center gap-2 w-full px-4 py-2 cursor-pointer text-(--text-primary-color)">
-            <input type="checkbox" checked={showAllTeams} onChange={event => onShowAllTeamsChange?.(event.currentTarget.checked)} />
-            Show all teams
-          </label>
+          <button
+            onClick={event => {
+              void onShowAllTeamsChange?.(!showAllTeams);
+              closeContainingMenu(event);
+            }}
+          >
+            {getIconElement("people")}
+            {showAllTeams ? t("show_my_teams") : t("show_all_teams")}
+          </button>
+          <button
+            onClick={event => {
+              const newScrollMode = scrollMode === "column" ? "board" : "column";
+              void onScrollModeChange?.(newScrollMode);
+              closeContainingMenu(event);
+            }}
+          >
+            {getIconElement("view-column")}
+            {scrollMode === "column" ? t("scroll_by_board") : t("scroll_by_column")}
+          </button>
           {currentUserIsTeamAdmin && (
-            <button className="admin-settings-menu-item" onClick={() => { workItemTypesDialogRef.current!.showModal(); }}>
+            <button
+              className="admin-settings-menu-item"
+              onClick={() => {
+                workItemTypesDialogRef.current!.showModal();
+              }}
+            >
               <span aria-hidden="true">{getIconElement("list-all")}</span>
               Add work item types
             </button>
