@@ -6,15 +6,16 @@ interface IWhatsNewDialogProps {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
 }
 
-const WHATS_NEW_HEADER_TEXT = "The two most recent releases addressed issues with create & edit board setup and add work item functionality.";
+const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.56 and v1.92.55 include:";
 
 const WHATS_NEW_ITEMS = [
-  "Fixed board name update behavior to prevent accidental renames resulting in duplicate board names.",
-  "Added create and edit validation messaging for missing and duplicate retrospective names.",
-  "Simplified wording for board settings and added notes for each option.",
-  "Adjusted \'Add work item\' selection to ensure the full work item list is visible on Act tab.",
-  "Limited Focus mode work item type options to requirement backlog types.",
-  "Fixed issues with Act tab and Focus mode sorting and numbering.",
+  "Added user settings to toggle between show all teams or my teams and to toggle between scrolling by board or by column.",
+  "Added team admin setting for configuring available work item types in Add work item.",
+  "Defaulted Add work item type options to Requirement Backlog types for Act tab and Focus mode.",
+  "Adjusted \'Add work item\' selection to ensure the full list of work item types is visible for Act tab and Focus mode even with long list of custom types.",
+  "Added function to search for feedback across all boards in the current team.",
+  "Restricted editing and deleting feedback cards to the card creator or board owner.",
+  "Resolved initial-load race conditions that could result in missing teams or boards.",
 ];
 
 const WHATS_NEW_FOOTER_TEXT = "Refer to the Changelog for a complete history of updates.";
