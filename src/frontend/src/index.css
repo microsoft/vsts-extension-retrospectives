@@ -470,6 +470,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply bg-primary text-white border-primary;
       }
 
+      &:disabled,
+      &[aria-disabled="true"] {
+        @apply bg-(--border-subtle-color) text-(--text-disabled-color) border-(--border-subtle-color) cursor-not-allowed;
+      }
+
       & svg {
         @apply w-4 h-4;
       }
