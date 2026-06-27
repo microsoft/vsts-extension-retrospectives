@@ -7,10 +7,10 @@ You can find the changelog of the Retrospective Extension below.
 * Updated changelog and what's new to reflect current version updates and untangled changelog for prior two versions. From [GitHub PR #1783](https://github.com/microsoft/vsts-extension-retrospectives/pull/1783)
 * Introduced user setting with an option to toggle between scrolling by board or by column. From [GitHub PR #1780](https://github.com/microsoft/vsts-extension-retrospectives/pull/1780)
 
-* Introduced Admin Settings with an option to configure available work item types for Add work item.
-* Set available work item types to default to Requirement Backlog types for both Act tab and Focus mode.
+* Introduced Admin Settings with an option to configure available work item types for "Add work item".
+* Set available work item types to default to Requirement Backlog types for both the Act tab and Focus mode.
 * Fixed Link existing work item in Focus mode so it stays in Focus mode instead of returning to Act tab.
-* Refined Add work item selection to ensure the full work item list is visible on Act tab and Focus mode.
+* Refined the "Add work item" selection to ensure the full work item list is visible on the Act tab and Focus mode.
 * Fixed issues with Focus mode sorting and Act tab sorting.
 * Fixed Act tab feedback item numbering to be consistent with other tabs.
 

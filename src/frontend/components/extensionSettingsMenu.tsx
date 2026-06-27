@@ -313,7 +313,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
           </button>
         </div>
         <div className="subText" id="add-work-item-types-description">
-          Select the work item types users can create from Add work item. If nothing is selected, Add work item defaults to the team's Requirement Backlog work item types.
+          Select the work item types users can create from "Add work item". If nothing is selected, "Add work item" defaults to the team's Requirement Backlog work item types.
         </div>
         <div className="subText work-item-types-settings-list">
           <table>
