@@ -470,6 +470,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply bg-primary text-white border-primary;
       }
 
+      &:disabled,
+      &[aria-disabled="true"] {
+        @apply bg-(--border-subtle-color) text-(--text-disabled-color) border-(--border-subtle-color) cursor-not-allowed;
+      }
+
       & svg {
         @apply w-4 h-4;
       }
@@ -492,6 +497,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .work-item-types-settings-dialog {
   & .work-item-types-settings-list {
     @apply max-h-96 overflow-y-auto pr-2;
+  }
+
+  & .work-item-types-warning {
+    @apply w-full grid grid-cols-[auto_1fr] items-center gap-1 border-3 border-gray-medium bg-gray-medium p-1 text-sm;
+
+    & svg {
+      @apply w-5 h-5;
+    }
   }
 
   & table {

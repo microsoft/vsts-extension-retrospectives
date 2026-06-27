@@ -107,12 +107,12 @@ Once you create a new retrospective, you can share a link to it to all participa
 
 Use the **Settings** menu in the header to adjust how teams and boards are displayed:
 
-- **Show My Teams**: Restricts the team selector to teams where you are a member.
-- **Show All Teams**: Displays every team in the current project.
-- **Scroll by Column**: Supports vertical scrolling within each column to view all feedback.
-- **Scroll by Board**: Supports vertical scrolling for the full board to view all feedback.
+- **Show my teams**: Restricts the team selector to teams where you are a member.
+- **Show all teams**: Displays every team in the current project.
+- **Scroll by column**: Supports vertical scrolling within each column to view all feedback.
+- **Scroll by board**: Supports vertical scrolling for the full board to view all feedback.
 
-**Caution**: Selecting **Show All Teams** can degrade performance in projects with a large number of teams, because the extension must load and filter a much larger team list.
+**Caution**: Selecting **Show all teams** can degrade performance in projects with a large number of teams, because the extension must load and filter a much larger team list.
 
 ### 8. Phases of the Standard Retrospective
 
@@ -172,7 +172,7 @@ Once everyone is done voting, move on to the next phase of **Act**.
 
 In this phase, the team will go through each feedback item.  You will notice that the items with the most votes will appear at the top of the column. It is recommended that each time you do this exercise, you only select one or two of the feedback items to take action against. Click on the 'Add work item' button on a feedback card, and select the type of work item that needs to be created in Azure DevOps.
 
-By default, 'Add work item' shows the selected team's Requirement Backlog work item types. Team Admins can change the team default from **Admin Settings** by selecting **Add work item types**. If no work item types are selected in that dialog, the team returns to the Requirement Backlog default. If one or more work item types are selected, only those selected types are shown in 'Add work item' for the Act tab and Focus mode.
+By default, 'Add work item' shows the selected team's Requirement Backlog work item types. Team Admins can change the team default from **Settings** by selecting **Add work item types**. If no work item types are selected in that dialog, the team returns to the Requirement Backlog default. If one or more work item types are selected, only those selected types are shown in 'Add work item' for the Act tab and Focus mode.
 
 This will open up the standard Azure DevOps work item creation form. Enter the work item details and save. This will create the work item in your Azure DevOps account and also associate it to the feedback item.
 

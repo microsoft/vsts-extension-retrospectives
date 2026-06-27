@@ -2474,7 +2474,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         <dialog
           ref={searchAllBoardsDialogRef}
           className="retrospectives-all-board-feedback-search-dialog dialog-width-md"
-          aria-label="Search All Boards"
+          aria-label="Search all boards"
           role="dialog"
           onClose={() => {
             resetAllBoardFeedbackSearch();
@@ -2482,7 +2482,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           }}
         >
           <div className="header">
-            <h2 className="title">Search All Boards</h2>
+            <h2 className="title">Search all boards</h2>
             <button type="button" onClick={hideAllBoardFeedbackSearchDialog} aria-label="Close">
               {getIconElement("close")}
             </button>

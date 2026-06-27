@@ -313,7 +313,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
           </button>
         </div>
         <div className="subText" id="add-work-item-types-description">
-          Select the work item types users can create from Add work item. If nothing is selected, Add work item defaults to the team's Requirement Backlog work item types.
+          Select the work item types users can create from "Add work item". If nothing is selected, "Add work item" defaults to the team's Requirement Backlog work item types.
         </div>
         <div className="subText work-item-types-settings-list">
           <table>
@@ -327,7 +327,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
               {sortedWorkItemTypes.map(workItemType => (
                 <tr key={workItemType.referenceName ?? workItemType.name}>
                   <td>
-                    <input id={getWorkItemTypeInputId(workItemType)} type="checkbox" checked={draftAllowedWorkItemTypeNames.includes(workItemType.name)} onChange={() => toggleDraftWorkItemType(workItemType.name)} />
+                    <input id={getWorkItemTypeInputId(workItemType)} type="checkbox" checked={draftAllowedWorkItemTypeNames.includes(workItemType.name)} disabled={!currentUserIsTeamAdmin} onChange={() => toggleDraftWorkItemType(workItemType.name)} />
                   </td>
                   <td>
                     <label htmlFor={getWorkItemTypeInputId(workItemType)}>
@@ -340,8 +340,13 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
             </tbody>
           </table>
         </div>
+        {!currentUserIsTeamAdmin && (
+          <div className="inner">
+            <div className="board-metadata-form-section-information work-item-types-warning">{getIconElement("exclamation")} Only a Team Admin can edit work item types.</div>
+          </div>
+        )}
         <div className="inner">
-          <button className="button" onClick={saveWorkItemTypesDialog}>
+          <button className="button" onClick={saveWorkItemTypesDialog} disabled={!currentUserIsTeamAdmin} aria-disabled={!currentUserIsTeamAdmin}>
             {t("common_save")}
           </button>
           <button className="default button" onClick={closeWorkItemTypesDialog}>
@@ -371,7 +376,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
       </dialog>
 
       <details className="flex items-center relative">
-        <summary aria-label={t("common_settings")} title={t("common_settings")} className="extension-settings-button">
+        <summary aria-label={t("retrospective_settings")} title={t("retrospective_settings")} className="extension-settings-button">
           {getIconElement("gear")}
           <span className="hidden lg:inline">{t("common_settings")}</span>
         </summary>
@@ -396,17 +401,15 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
             {getIconElement("view-column")}
             {scrollMode === "column" ? t("scroll_by_board") : t("scroll_by_column")}
           </button>
-          {currentUserIsTeamAdmin && (
-            <button
-              className="admin-settings-menu-item"
-              onClick={() => {
-                workItemTypesDialogRef.current!.showModal();
-              }}
-            >
-              <span aria-hidden="true">{getIconElement("list-all")}</span>
-              Add work item types
-            </button>
-          )}
+          <button
+            className="admin-settings-menu-item"
+            onClick={() => {
+              workItemTypesDialogRef.current!.showModal();
+            }}
+          >
+            <span aria-hidden="true">{getIconElement("list-all")}</span>
+            Add work item types
+          </button>
         </div>
       </details>
 
