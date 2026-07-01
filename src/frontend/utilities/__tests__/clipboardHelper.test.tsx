@@ -27,6 +27,9 @@ describe("clipboardHelper", () => {
           textarea.parentNode.removeChild(textarea);
         }
       });
+
+      const dialogs = document.querySelectorAll("dialog");
+      dialogs.forEach(dialog => dialog.remove());
     });
 
     it("should copy text using Clipboard API when available", async () => {
@@ -110,6 +113,29 @@ describe("clipboardHelper", () => {
       const finalTextareaCount = document.querySelectorAll("textarea").length;
 
       expect(finalTextareaCount).toBe(initialTextareaCount);
+    });
+
+    it("should create fallback textarea inside open dialog when available", async () => {
+      Object.defineProperty(navigator, "clipboard", {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
+
+      const dialog = document.createElement("dialog");
+      dialog.setAttribute("open", "");
+      document.body.appendChild(dialog);
+
+      let fallbackParent: HTMLElement | null = null;
+      document.execCommand = jest.fn().mockImplementation(() => {
+        fallbackParent = document.querySelector("textarea")?.parentElement ?? null;
+        return true;
+      });
+
+      const result = await copyToClipboard("dialog text");
+
+      expect(result).toBe(true);
+      expect(fallbackParent).toBe(dialog);
     });
 
     it("should set correct styles on fallback textarea", async () => {

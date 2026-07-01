@@ -1,16 +1,13 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
-import { WorkItemType, WorkItemTypeReference } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { FeedbackBoardContainer, deduplicateTeamMembers } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
-import { TelemetryEvents } from "../../utilities/telemetryClient";
-import { reflectBackendService } from "../../dal/reflectBackendService";
 import { userDataService } from "../../dal/userDataService";
 import { itemDataService } from "../../dal/itemDataService";
 import BoardDataService from "../../dal/boardDataService";
@@ -19,8 +16,7 @@ import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { getService } from "azure-devops-extension-sdk";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
-import { workService } from "../../dal/azureDevOpsWorkService";
-import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../../utilities/sprintRetrospectiveHelper";
+import { copyToClipboard } from "../../utilities/clipboardHelper";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -479,6 +475,35 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.getByText("Fix release risk")).toBeInTheDocument();
     expect(screen.getByText("Board 2 - Risks - Jan 1, 2024")).toBeInTheDocument();
     expect(screen.queryByText("Keep the release calm")).not.toBeInTheDocument();
+  });
+
+  it("copies generated email summary content from the preview dialog", async () => {
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getBoardUrl).mockResolvedValue("https://example.com/board");
+    mocked(shareBoardHelper.generateEmailText).mockResolvedValue("mock email body");
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(mockBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Board Actions Menu"));
+    fireEvent.click(screen.getByText("Create email summary"));
+
+    expect(await screen.findByLabelText("Email summary for retrospective")).toHaveValue("mock email body");
+
+    fireEvent.click(screen.getByRole("button", { name: "Copy to clipboard" }));
+
+    await waitFor(() => expect(copyToClipboard).toHaveBeenCalledWith("mock email body"));
   });
 
   it("shows all project teams in the team selector when enabled from settings", async () => {
