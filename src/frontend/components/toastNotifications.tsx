@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 
 export type ToastIntent = "info" | "success" | "warning" | "error";
 
@@ -156,9 +157,12 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ className, toast
     return null;
   }
 
+  const openDialogs = typeof document === "undefined" ? [] : Array.from(document.querySelectorAll<HTMLDialogElement>("dialog[open]"));
+  const dialogPortalTarget = openDialogs[openDialogs.length - 1] ?? null;
+
   const roleForIntent = (intent: ToastIntent): "status" | "alert" => (intent === "warning" || intent === "error" ? "alert" : "status");
 
-  return (
+  const toastContainer = (
     <div className={classNames("retro-toast-container", className)}>
       {records.map(record => (
         <div key={record.id} className={classNames("retro-toast", toastClassName)}>
@@ -173,6 +177,8 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ className, toast
       ))}
     </div>
   );
+
+  return dialogPortalTarget ? createPortal(toastContainer, dialogPortalTarget) : toastContainer;
 };
 
 export default toast;
