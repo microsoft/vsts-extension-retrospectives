@@ -321,7 +321,7 @@ describe("Feedback Item", () => {
       const feedbackItem: IFeedbackItemDocument = {
         id: "hidden-item",
         boardId: testBoardId,
-        title: "Top secret",
+        title: "Sample hidden feedback",
         columnId: testColumnUuidOne,
         originalColumnId: testColumnUuidOne,
         upvotes: 0,
@@ -406,7 +406,7 @@ describe("Feedback Item", () => {
 
       // Should remain in non-editing state (no input/textarea editor visible).
       expect(container.querySelector(".editable-text-input-container")).toBeNull();
-      expect(container.textContent).toContain("Top secret");
+      expect(container.textContent).toContain("Sample hidden feedback");
     });
   });
 
