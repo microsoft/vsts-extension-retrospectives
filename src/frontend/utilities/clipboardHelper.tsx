@@ -1,3 +1,8 @@
+const getFallbackClipboardContainer = (): HTMLElement => {
+  const openDialogs = Array.from(document.querySelectorAll<HTMLDialogElement>("dialog[open]"));
+  return openDialogs[openDialogs.length - 1] ?? document.body;
+};
+
 /**
  * Copy text to clipboard using the native Clipboard API with fallback for older browsers.
  * @param text The text to copy to the clipboard
@@ -31,14 +36,15 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     textArea.setAttribute("readonly", "");
     textArea.setAttribute("aria-hidden", "true");
 
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
+    getFallbackClipboardContainer().appendChild(textArea);
+    try {
+      textArea.focus();
+      textArea.select();
 
-    const successful = document.execCommand("copy");
-    document.body.removeChild(textArea);
-
-    return successful;
+      return document.execCommand("copy");
+    } finally {
+      textArea.remove();
+    }
   } catch (err) {
     console.error("Failed to copy using fallback method:", err);
     return false;
