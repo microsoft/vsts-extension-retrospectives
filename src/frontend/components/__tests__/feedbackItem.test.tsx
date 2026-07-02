@@ -636,7 +636,7 @@ describe("Feedback Item", () => {
       expect(getByText("Secret Feedback Content")).toBeInTheDocument();
 
       // Screen readers should hear hidden-feedback semantics, not content.
-      expect(card.getAttribute("aria-label")).toContain("Title: feedback hidden.");
+      expect(card.getAttribute("aria-label")).toContain("Title: feedback blurred.");
       expect(cardContent.getAttribute("aria-hidden")).toBe("true");
     });
 
@@ -2895,7 +2895,7 @@ describe("Feedback Item", () => {
       const contentElement = feedbackItemElement?.querySelector(".card-content");
 
       expect(feedbackItemElement).not.toHaveAttribute("aria-hidden");
-      expect(feedbackItemElement).toHaveAttribute("aria-label", expect.stringContaining("Title: feedback hidden."));
+      expect(feedbackItemElement).toHaveAttribute("aria-label", expect.stringContaining("Title: feedback blurred."));
       expect(contentElement).toHaveAttribute("aria-hidden", "true");
     });
 

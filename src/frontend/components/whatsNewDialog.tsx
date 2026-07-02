@@ -6,16 +6,14 @@ interface IWhatsNewDialogProps {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
 }
 
-const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.56 and v1.92.55 include:";
+const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.57 and v1.92.56 include:";
 
 const WHATS_NEW_ITEMS = [
+  "Improved hidden feedback behavior to display blurred feedback while reading \"feedback blurred\".",
   "Added user settings to toggle between show all teams or my teams and to toggle between scrolling by board or by column.",
   "Added team admin setting for configuring available work item types in \"Add work item\".",
   "Defaulted add-work-item type options to Requirement Backlog types for the Act tab and Focus mode.",
   "Adjusted the \"Add work item\" selection to ensure the full list of work item types is visible for the Act tab and Focus mode, even with a long list of custom types.",
-  "Added function to search for feedback across all boards in the current team.",
-  "Restricted editing and deleting feedback cards to the card creator or board owner.",
-  "Resolved initial-load race conditions that could result in missing teams or boards.",
 ];
 
 const WHATS_NEW_FOOTER_TEXT = "Refer to the Changelog for a complete history of updates.";

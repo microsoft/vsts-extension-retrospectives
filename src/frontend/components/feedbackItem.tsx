@@ -979,7 +979,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   // A feedback card may only be edited or deleted by the user who created it or by the board owner.
   const canModifyFeedbackItem = props.isBoardOwner || props.userIdRef === getUserIdentity().id;
   const displayTitle = props.title;
-  const accessibleDisplayTitle = hideFeedbackItems ? "feedback hidden" : props.title;
+  const accessibleDisplayTitle = hideFeedbackItems ? "feedback blurred" : props.title;
   const visualTitle = props.title;
   const creationDateFormatter = useMemo(() => new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric" }), []);
   const creationDateLabel = useMemo(() => {

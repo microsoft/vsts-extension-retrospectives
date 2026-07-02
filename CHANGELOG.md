@@ -2,10 +2,11 @@
 
 You can find the changelog of the Retrospective Extension below.
 
-## v1.92.56
+## v1.92.57
 
-* Updated changelog and what's new to reflect current version updates and untangled changelog for prior two versions. From [GitHub PR #1783](https://github.com/microsoft/vsts-extension-retrospectives/pull/1783)
-* Introduced user setting with an option to toggle between scrolling by board or by column. From [GitHub PR #1780](https://github.com/microsoft/vsts-extension-retrospectives/pull/1780)
+* Improved hidden feedback behavior so screen displays blurred feedback and screen reader says "feedback blurred". From [GitHub PR #1796](https://github.com/microsoft/vsts-extension-retrospectives/pull/1796)
+
+## v1.92.56
 
 * Introduced Admin Settings with an option to configure available work item types for "Add work item".
 * Set available work item types to default to Requirement Backlog types for both the Act tab and Focus mode.
@@ -16,6 +17,9 @@ You can find the changelog of the Retrospective Extension below.
 
 From [GitHub PR #1777](https://github.com/microsoft/vsts-extension-retrospectives/pull/1777)
 
+* Updated changelog and what's new to reflect current version updates and untangled changelog for prior two versions. From [GitHub PR #1783](https://github.com/microsoft/vsts-extension-retrospectives/pull/1783)
+* Introduced user setting with an option to toggle between scrolling by board or by column. From [GitHub PR #1780](https://github.com/microsoft/vsts-extension-retrospectives/pull/1780)
+
 ## v1.92.55
 
 * Added function to search feedback across all boards for the current team. From [GitHub PR #1774](https://github.com/microsoft/vsts-extension-retrospectives/pull/1774)
@@ -24,8 +28,6 @@ From [GitHub PR #1777](https://github.com/microsoft/vsts-extension-retrospective
 * Isolated What's New for simpler maintenance and updated Changelog history. From [GitHub PR #1753](https://github.com/microsoft/vsts-extension-retrospectives/pull/1753)
 
 ## v1.92.54
-
-* Enhanced validation and error handling for retrospective title input. From [GitHub PR #1740](https://github.com/microsoft/vsts-extension-retrospectives/pull/1740)
 
 * Ensured editing a retrospective updates the intended board name and prevents accidental renames.
 * Prevented duplicate-name side effects that can impact board retrieval when updating board metadata.
@@ -38,8 +40,9 @@ From [GitHub PR #1777](https://github.com/microsoft/vsts-extension-retrospective
 * Reverted dialog backdrop styling from blurred background to shaded background for better context visibility and consistency with ADO.
 * Addressed remaining test code coverage gaps so now at 100%.
 
-From [GitHub PR #1728](https://github.com/microsoft/vsts-extension-retrospectives/pull/1728) and From [GitHub PR #1723](https://github.com/microsoft/vsts-extension-retrospectives/pull/1723)
+From [GitHub PR #1728](https://github.com/microsoft/vsts-extension-retrospectives/pull/1728) and [GitHub PR #1723](https://github.com/microsoft/vsts-extension-retrospectives/pull/1723)
 
+* Enhanced validation and error handling for retrospective title input. From [GitHub PR #1740](https://github.com/microsoft/vsts-extension-retrospectives/pull/1740)
 * Improved live-sync scoping when switching teams or boards so updates followed the currently selected retrospective context. From [GitHub PR #1678](https://github.com/microsoft/vsts-extension-retrospectives/pull/1678)
 
 ## v1.92.53
