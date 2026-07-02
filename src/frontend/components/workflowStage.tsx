@@ -1,5 +1,4 @@
 ﻿import React, { useCallback } from "react";
-import { cn } from "../utilities/classNameHelper";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
@@ -31,8 +30,6 @@ const WorkflowStage: React.FC<IWorkflowStageProps> = ({ display, value, isActive
     [clickEventCallback, value],
   );
 
-  const classes = cn("workflow-stage-tab", isActive && "workflow-stage-tab--active");
-
   const combinedKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       trackActivity();
@@ -42,7 +39,7 @@ const WorkflowStage: React.FC<IWorkflowStageProps> = ({ display, value, isActive
   );
 
   return (
-    <div className={classes} aria-setsize={4} aria-posinset={ariaPosInSet} aria-label={display} aria-selected={isActive} role="tab" onClick={handleClick} onKeyDown={combinedKeyDown} onMouseMove={trackActivity} onTouchStart={trackActivity} tabIndex={0}>
+    <div className={`workflow-stage-tab${isActive ? " workflow-stage-tab--active" : ""}`} aria-setsize={4} aria-posinset={ariaPosInSet} aria-label={display} aria-selected={isActive} role="tab" onClick={handleClick} onKeyDown={combinedKeyDown} onMouseMove={trackActivity} onTouchStart={trackActivity} tabIndex={0}>
       <p className="stage-text">{display}</p>
     </div>
   );
