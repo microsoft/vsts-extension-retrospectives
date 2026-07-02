@@ -4,7 +4,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.57
 
-* Improved hidden feedback behavior so screen displays blurred feedback and screen reader says "feedback blurred". From [GitHub PR #1796](https://github.com/microsoft/vsts-extension-retrospectives/pull/1796)
+* Improved hidden feedback behavior so screen displays blurred feedback and screen reader announces "feedback blurred". From [GitHub PR #1796](https://github.com/microsoft/vsts-extension-retrospectives/pull/1796)
 
 ## v1.92.56
 
