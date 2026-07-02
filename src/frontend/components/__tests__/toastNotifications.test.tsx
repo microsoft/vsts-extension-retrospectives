@@ -11,7 +11,10 @@ describe("toastNotifications", () => {
   });
 
   afterEach(() => {
-    act(() => toast.dismiss());
+    act(() => {
+      toast.dismiss();
+      document.querySelectorAll("dialog").forEach(dialog => dialog.remove());
+    });
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
   });
@@ -71,6 +74,25 @@ describe("toastNotifications", () => {
     expect(toastElement).toHaveClass("custom-toast");
 
     expect(container.querySelector(".custom-progress")).toBeNull();
+  });
+
+  it("renders toasts inside the topmost open dialog", () => {
+    const firstDialog = document.createElement("dialog");
+    const secondDialog = document.createElement("dialog");
+    document.body.append(firstDialog, secondDialog);
+    firstDialog.showModal();
+    secondDialog.showModal();
+
+    const { container } = render(<ToastContainer />);
+
+    act(() => {
+      toast("Dialog toast", { autoClose: null });
+    });
+
+    expect(container.querySelector(".retro-toast-container")).toBeNull();
+    expect(firstDialog.querySelector(".retro-toast-container")).toBeNull();
+    expect(secondDialog.querySelector(".retro-toast-container")).toBeTruthy();
+    expect(secondDialog.textContent).toContain("Dialog toast");
   });
 
   it("dismisses every toast when called without an identifier", () => {
