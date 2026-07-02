@@ -964,10 +964,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     totalVotes = groupedVotes;
   }
 
-  const isDraggable = workflowState.isGroupPhase && !state.isMarkedForDeletion;
-  const showVoteButton = workflowState.isVotePhase;
-  const showVotes = showVoteButton || workflowState.isActPhase;
-
   const groupItemsCount = (props.groupedItemProps?.groupedCount ?? 0) + 1;
   const currentColumnItems = props.columns[props.columnId]?.columnItems;
 
@@ -978,9 +974,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const hideFeedbackItems = props.workflowPhase === "Collect" && props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id;
   // A feedback card may only be edited or deleted by the user who created it or by the board owner.
   const canModifyFeedbackItem = props.isBoardOwner || props.userIdRef === getUserIdentity().id;
-  const displayTitle = props.title;
-  const accessibleDisplayTitle = hideFeedbackItems ? "feedback blurred" : props.title;
-  const visualTitle = props.title;
   const creationDateFormatter = useMemo(() => new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric" }), []);
   const creationDateLabel = useMemo(() => {
     if (!props.createdDate) {
@@ -995,7 +988,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       label = isMainItem ? `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items. ` : `Grouped feedback item. `;
     }
 
-    label += `Title: ${accessibleDisplayTitle}. `;
+    label += `Title: ${hideFeedbackItems ? "feedback blurred" : props.title}. `;
     if (props.createdBy && !hideFeedbackItems) {
       label += `Created by ${props.createdBy}. `;
     }
@@ -1004,15 +997,15 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       label += `Created on ${creationDateLabel}. `;
     }
 
-    if (showVotes) {
+    if (workflowState.isVotePhase || workflowState.isActPhase) {
       label += `${totalVotes} total votes.`;
-      if (showVoteButton) {
+      if (workflowState.isVotePhase) {
         label += ` You have ${votesByUser} votes on this item.`;
       }
     }
 
     return label;
-  }, [itemPosition, totalItemsInColumn, isNotGroupedItem, isMainItem, groupItemsCount, accessibleDisplayTitle, props.createdBy, hideFeedbackItems, creationDateLabel, showVotes, totalVotes, showVoteButton, votesByUser]);
+  }, [itemPosition, totalItemsInColumn, isNotGroupedItem, isMainItem, groupItemsCount, hideFeedbackItems, props.title, props.createdBy, creationDateLabel, workflowState.isVotePhase, workflowState.isActPhase, totalVotes, votesByUser]);
 
   const curTimerState = props.timerState;
 
@@ -1025,7 +1018,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       role="article"
       aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"}
       className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", props.showAddedAnimation && "newFeedbackItem", state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")}
-      draggable={isDraggable}
+      draggable={workflowState.isGroupPhase && !state.isMarkedForDeletion}
       onDragStart={dragFeedbackItemStart}
       onDragOver={isNotGroupedItem ? dragFeedbackItemOverFeedbackItem : undefined}
       onDragEnd={dragFeedbackItemEnd}
@@ -1049,12 +1042,12 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       }}
     >
       <div className="document-card-wrapper">
-        <DocumentCard className={cn("feedback-card-surface", isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")} draggable={isDraggable}>
+        <DocumentCard className={cn("feedback-card-surface", isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")} draggable={workflowState.isGroupPhase && !state.isMarkedForDeletion}>
           <div className="card-integral-part" style={{ borderLeftColor: props.accentColor }}>
             <div className="card-header">
               {mainGroupedItemInFocusMode && renderGroupButton(groupItemsCount, true)}
               {mainGroupedItemNotInFocusMode && renderGroupButton(groupItemsCount, false)}
-              {showVotes && (
+              {(workflowState.isVotePhase || workflowState.isActPhase) && (
                 <>
                   <button
                     title="Vote"
@@ -1062,7 +1055,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                     aria-label={`Vote up. Current vote count is ${props.upvotes}`}
                     tabIndex={-1}
                     data-card-control="true"
-                    disabled={!showVoteButton || state.showVotedAnimation}
+                    disabled={!workflowState.isVotePhase || state.showVotedAnimation}
                     className={cn("feedback-action-button", "feedback-add-vote", state.showVotedAnimation && "voteAnimation")}
                     onClick={e => {
                       e.preventDefault();
@@ -1083,7 +1076,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                     aria-label={`Vote down. Current vote count is ${props.upvotes}`}
                     tabIndex={-1}
                     data-card-control="true"
-                    disabled={!showVoteButton || state.showVotedAnimation}
+                    disabled={!workflowState.isVotePhase || state.showVotedAnimation}
                     className={cn("feedback-action-button", "feedback-add-vote", state.showVotedAnimation && "voteAnimation")}
                     onClick={e => {
                       e.preventDefault();
@@ -1152,17 +1145,17 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             </div>
             <div className="card-content" aria-hidden={hideFeedbackItems || undefined}>
               {workflowState.isActPhase && isMainItem && <FeedbackItemTimer feedbackItemId={props.id} timerSecs={props.timerSecs} timerState={curTimerState} onTimerToggle={timerSwitch} />}
-              <EditableDocumentCardTitle isDisabled={hideFeedbackItems} isReadOnly={!canModifyFeedbackItem} isMultiline={true} title={visualTitle} isChangeEventRequired={false} onSave={onDocumentCardTitleSave} />
+              <EditableDocumentCardTitle isDisabled={hideFeedbackItems} isReadOnly={!canModifyFeedbackItem} isMultiline={true} title={props.title} isChangeEventRequired={false} onSave={onDocumentCardTitleSave} />
               {props.isFocusModalHidden && !workflowState.isCollectPhase && props.columnId !== props.originalColumnId && <div className="original-column-info">Original Column: {props.columns[props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
             </div>
             {feedbackCreationInformationContent()}
             <div className="card-footer">
               <div className="card-id">#{itemPosition}</div>
-              {showVoteButton && <div>{isNotGroupedItem || !isMainItem || (isMainItem && props.groupedItemProps!.isGroupExpanded) ? <span className="feedback-yourvote-count">[My Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[My Votes: {groupedVotesByUser}]</span>}</div>}
+              {workflowState.isVotePhase && <div>{isNotGroupedItem || !isMainItem || (isMainItem && props.groupedItemProps!.isGroupExpanded) ? <span className="feedback-yourvote-count">[My Votes: {votesByUser}]</span> : <span className="feedback-yourvote-count bold">[My Votes: {groupedVotesByUser}]</span>}</div>}
             </div>
           </div>
           {isGroupedCarouselItem && isMainItem && state.isShowingGroupedChildrenTitles && <GroupedFeedbackList childrenIds={childrenIds} columnItems={columnItems} columns={props.columns} currentColumnId={props.columnId} workflowPhase={props.workflowPhase} hideFeedbackItems={props.hideFeedbackItems} isFocusModalHidden={props.isFocusModalHidden} />}
-          <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={displayTitle} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} shouldFocusActionItems={props.isFocusModalHidden} />}</div>
+          <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={props.title} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} shouldFocusActionItems={props.isFocusModalHidden} />}</div>
         </DocumentCard>
       </div>
       <dialog ref={deleteFeedbackDialogRef} className="delete-feedback-item-dialog dialog-width-sm" aria-label="Delete Feedback" onClose={() => setStateMerge({ isDeleteItemConfirmationDialogHidden: true })}>
@@ -1173,7 +1166,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           </button>
         </div>
         <div className="subText">
-          {`Are you sure you want to delete the feedback "${displayTitle}"?`}
+          {`Are you sure you want to delete the feedback "${props.title}"?`}
           {!isNotGroupedItem && isMainItem ? " Any feedback grouped underneath this one will be ungrouped." : ""}
         </div>
         <div className="inner">
@@ -1291,7 +1284,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
             {getIconElement("close")}
           </button>
         </div>
-        <div className="subText">{`Are you sure you want to remove the feedback "${displayTitle}" from its current group?`}</div>
+        <div className="subText">{`Are you sure you want to remove the feedback "${props.title}" from its current group?`}</div>
         <div className="inner">
           <button className="button" onClick={onConfirmRemoveFeedbackItemFromGroup}>
             {t("remove_feedback_from_group")}
