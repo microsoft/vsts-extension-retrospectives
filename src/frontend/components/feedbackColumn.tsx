@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
-import { cn } from "../utilities/classNameHelper";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { itemDataService } from "../dal/itemDataService";
@@ -467,7 +466,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
           )}
         </div>
       </div>
-      <div className={cn("feedback-column-content", isCollapsed && "hide-collapse")}>
+      <div className={`feedback-column-content${isCollapsed ? " hide-collapse" : ""}`}>
         {workflowPhase === WorkflowPhase.Collect && (
           <button className="create-button" title={t("add_new_feedback")} aria-label={t("add_new_feedback")} onClick={createEmptyFeedbackItem}>
             {getIconElement("add")}
