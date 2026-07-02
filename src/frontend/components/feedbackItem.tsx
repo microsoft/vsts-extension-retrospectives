@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
-import { cn } from "../utilities/classNameHelper";
 import { DocumentCard, DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
 import { SearchBox } from "@fluentui/react/lib/SearchBox";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
@@ -1017,7 +1016,15 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       aria-label={ariaLabel}
       role="article"
       aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"}
-      className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", props.showAddedAnimation && "newFeedbackItem", state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")}
+      className={[
+        isNotGroupedItem ? "feedbackItem" : "feedbackItemGroupItem",
+        !isNotGroupedItem && !isMainItem ? "feedbackItemGroupGroupedItem" : "",
+        props.showAddedAnimation ? "newFeedbackItem" : "",
+        state.isMarkedForDeletion ? "removeFeedbackItem" : "",
+        hideFeedbackItems ? "hideFeedbackItem" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       draggable={workflowState.isGroupPhase && !state.isMarkedForDeletion}
       onDragStart={dragFeedbackItemStart}
       onDragOver={isNotGroupedItem ? dragFeedbackItemOverFeedbackItem : undefined}
@@ -1042,7 +1049,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       }}
     >
       <div className="document-card-wrapper">
-        <DocumentCard className={cn("feedback-card-surface", isMainItem && "mainItemCard", !isMainItem && "groupedItemCard")} draggable={workflowState.isGroupPhase && !state.isMarkedForDeletion}>
+        <DocumentCard className={`feedback-card-surface ${isMainItem ? "mainItemCard" : "groupedItemCard"}`} draggable={workflowState.isGroupPhase && !state.isMarkedForDeletion}>
           <div className="card-integral-part" style={{ borderLeftColor: props.accentColor }}>
             <div className="card-header">
               {mainGroupedItemInFocusMode && renderGroupButton(groupItemsCount, true)}
@@ -1056,7 +1063,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                     tabIndex={-1}
                     data-card-control="true"
                     disabled={!workflowState.isVotePhase || state.showVotedAnimation}
-                    className={cn("feedback-action-button", "feedback-add-vote", state.showVotedAnimation && "voteAnimation")}
+                    className={`feedback-action-button feedback-add-vote${state.showVotedAnimation ? " voteAnimation" : ""}`}
                     onClick={e => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -1077,7 +1084,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                     tabIndex={-1}
                     data-card-control="true"
                     disabled={!workflowState.isVotePhase || state.showVotedAnimation}
-                    className={cn("feedback-action-button", "feedback-add-vote", state.showVotedAnimation && "voteAnimation")}
+                    className={`feedback-action-button feedback-add-vote${state.showVotedAnimation ? " voteAnimation" : ""}`}
                     onClick={e => {
                       e.preventDefault();
                       e.stopPropagation();
