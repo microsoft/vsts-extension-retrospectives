@@ -129,7 +129,7 @@ describe("GroupedFeedbackList", () => {
   });
 
   describe("Hidden feedback items", () => {
-    it("should show [Hidden Feedback] when hideFeedbackItems is true and item belongs to different user", () => {
+    it("should keep visual text but announce hidden feedback when hideFeedbackItems is true and item belongs to different user", () => {
       const childItem = createFeedbackItem({
         id: "child-1",
         title: "Secret Feedback",
@@ -139,8 +139,9 @@ describe("GroupedFeedbackList", () => {
 
       render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} hideFeedbackItems={true} />);
 
-      expect(screen.getByText("[Hidden Feedback]")).toBeInTheDocument();
-      expect(screen.queryByText("Secret Feedback")).not.toBeInTheDocument();
+      const titleElement = screen.getByTitle("Hidden feedback");
+      expect(screen.getByText("Secret Feedback")).toBeInTheDocument();
+      expect(titleElement).toHaveAttribute("aria-label", "Related feedback: Hidden feedback");
     });
 
     it("should show actual title when hideFeedbackItems is true but item belongs to current user", () => {
@@ -166,8 +167,10 @@ describe("GroupedFeedbackList", () => {
 
       render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} hideFeedbackItems={true} />);
 
-      const titleElement = screen.getByTitle("[Hidden Feedback]");
-      expect(titleElement).toHaveAttribute("aria-hidden", "true");
+      const titleElement = screen.getByTitle("Hidden feedback");
+      const visualTitle = screen.getByText("Hidden Item");
+      expect(titleElement).not.toHaveAttribute("aria-hidden");
+      expect(visualTitle).toHaveAttribute("aria-hidden", "true");
     });
   });
 
@@ -308,7 +311,7 @@ describe("GroupedFeedbackList", () => {
       render(<GroupedFeedbackList {...defaultProps} childrenIds={["child-1"]} columnItems={columnItems} hideFeedbackItems={false} />);
 
       expect(screen.getByText("Visible Feedback")).toBeInTheDocument();
-      expect(screen.queryByText("[Hidden Feedback]")).not.toBeInTheDocument();
+      expect(screen.getByTitle("Visible Feedback")).toBeInTheDocument();
     });
 
     it("should not have aria-hidden when item is not hidden", () => {

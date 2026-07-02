@@ -978,7 +978,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const hideFeedbackItems = props.workflowPhase === "Collect" && props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id;
   // A feedback card may only be edited or deleted by the user who created it or by the board owner.
   const canModifyFeedbackItem = props.isBoardOwner || props.userIdRef === getUserIdentity().id;
-  const displayTitle = hideFeedbackItems ? "[Hidden Feedback]" : props.title;
+  const displayTitle = props.title;
+  const accessibleDisplayTitle = hideFeedbackItems ? "feedback hidden" : props.title;
+  const visualTitle = props.title;
   const creationDateFormatter = useMemo(() => new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric" }), []);
   const creationDateLabel = useMemo(() => {
     if (!props.createdDate) {
@@ -993,7 +995,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       label = isMainItem ? `Feedback group main item ${itemPosition} of ${totalItemsInColumn}. Group has ${groupItemsCount} items. ` : `Grouped feedback item. `;
     }
 
-    label += `Title: ${displayTitle}. `;
+    label += `Title: ${accessibleDisplayTitle}. `;
     if (props.createdBy && !hideFeedbackItems) {
       label += `Created by ${props.createdBy}. `;
     }
@@ -1010,7 +1012,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     }
 
     return label;
-  }, [itemPosition, totalItemsInColumn, isNotGroupedItem, isMainItem, groupItemsCount, displayTitle, props.createdBy, hideFeedbackItems, creationDateLabel, showVotes, totalVotes, showVoteButton, votesByUser]);
+  }, [itemPosition, totalItemsInColumn, isNotGroupedItem, isMainItem, groupItemsCount, accessibleDisplayTitle, props.createdBy, hideFeedbackItems, creationDateLabel, showVotes, totalVotes, showVoteButton, votesByUser]);
 
   const curTimerState = props.timerState;
 
@@ -1020,7 +1022,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       data-feedback-item-id={props.id}
       tabIndex={0}
       aria-label={ariaLabel}
-      aria-hidden={hideFeedbackItems || undefined}
       role="article"
       aria-roledescription={isNotGroupedItem ? "feedback item" : isMainItem ? "feedback group" : "grouped feedback item"}
       className={cn(isNotGroupedItem && "feedbackItem", !isNotGroupedItem && "feedbackItemGroupItem", !isNotGroupedItem && !isMainItem && "feedbackItemGroupGroupedItem", props.showAddedAnimation && "newFeedbackItem", state.isMarkedForDeletion && "removeFeedbackItem", hideFeedbackItems && "hideFeedbackItem")}
@@ -1149,9 +1150,9 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
                 </div>
               )}
             </div>
-            <div className="card-content">
+            <div className="card-content" aria-hidden={hideFeedbackItems || undefined}>
               {workflowState.isActPhase && isMainItem && <FeedbackItemTimer feedbackItemId={props.id} timerSecs={props.timerSecs} timerState={curTimerState} onTimerToggle={timerSwitch} />}
-              <EditableDocumentCardTitle isDisabled={hideFeedbackItems} isReadOnly={!canModifyFeedbackItem} isMultiline={true} title={displayTitle} isChangeEventRequired={false} onSave={onDocumentCardTitleSave} />
+              <EditableDocumentCardTitle isDisabled={hideFeedbackItems} isReadOnly={!canModifyFeedbackItem} isMultiline={true} title={visualTitle} isChangeEventRequired={false} onSave={onDocumentCardTitleSave} />
               {props.isFocusModalHidden && !workflowState.isCollectPhase && props.columnId !== props.originalColumnId && <div className="original-column-info">Original Column: {props.columns[props.originalColumnId]?.columnProperties?.title ?? "n/a"}</div>}
             </div>
             {feedbackCreationInformationContent()}

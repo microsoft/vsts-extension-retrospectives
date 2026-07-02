@@ -2275,6 +2275,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       & .related-feedback-title {
         @apply ml-2.5 text-(--text-primary-color) text-xs content-center [-webkit-box-orient:vertical] overflow-hidden text-ellipsis [-webkit-line-clamp:2];
         display: -webkit-box;
+
+        & .hidden-related-feedback-title {
+          @apply blur-xs pointer-events-none;
+        }
       }
     }
   }

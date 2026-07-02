@@ -406,7 +406,7 @@ describe("Feedback Item", () => {
 
       // Should remain in non-editing state (no input/textarea editor visible).
       expect(container.querySelector(".editable-text-input-container")).toBeNull();
-      expect(container.textContent).toContain("[Hidden Feedback]");
+      expect(container.textContent).toContain("Top secret");
     });
   });
 
@@ -602,7 +602,7 @@ describe("Feedback Item", () => {
       expect(container.querySelector(".hideFeedbackItem")).toBeTruthy();
     });
 
-    test("replaces title with placeholder text when hideFeedbackItems is true", () => {
+    test("keeps visual title but hides content from screen readers when hideFeedbackItems is true", () => {
       const props: any = {
         id: "test-hidden-text",
         title: "Secret Feedback Content",
@@ -628,13 +628,16 @@ describe("Feedback Item", () => {
         timerId: "",
         isGroupedCarouselItem: false,
       };
-      const { container, queryByText } = render(<FeedbackItem {...props} />);
+      const { container, getByText } = render(<FeedbackItem {...props} />);
+      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+      const cardContent = container.querySelector(".card-content") as HTMLElement;
 
-      // Should show placeholder text
-      expect(container.textContent).toContain("[Hidden Feedback]");
+      // Should render real title text for visual blur treatment.
+      expect(getByText("Secret Feedback Content")).toBeInTheDocument();
 
-      // Should NOT show the actual title
-      expect(queryByText("Secret Feedback Content")).not.toBeInTheDocument();
+      // Screen readers should hear hidden-feedback semantics, not content.
+      expect(card.getAttribute("aria-label")).toContain("Title: feedback hidden.");
+      expect(cardContent.getAttribute("aria-hidden")).toBe("true");
     });
 
     test("shows actual title when user is the owner", () => {
@@ -2858,7 +2861,7 @@ describe("Feedback Item", () => {
   });
 
   describe("Accessibility - Obscured feedback (Issue #1318)", () => {
-    test("adds aria-hidden='true' to obscured feedback items", () => {
+    test("adds aria-hidden='true' to obscured feedback content", () => {
       const props: any = {
         id: "test-obscured-aria",
         title: "Hidden Feedback",
@@ -2889,8 +2892,11 @@ describe("Feedback Item", () => {
 
       const { container } = render(<FeedbackItem {...props} />);
       const feedbackItemElement = container.querySelector('[data-feedback-item-id="test-obscured-aria"]');
+      const contentElement = feedbackItemElement?.querySelector(".card-content");
 
-      expect(feedbackItemElement).toHaveAttribute("aria-hidden", "true");
+      expect(feedbackItemElement).not.toHaveAttribute("aria-hidden");
+      expect(feedbackItemElement).toHaveAttribute("aria-label", expect.stringContaining("Title: feedback hidden."));
+      expect(contentElement).toHaveAttribute("aria-hidden", "true");
     });
 
     test("does not add aria-hidden when feedback is not obscured", () => {
@@ -3756,9 +3762,9 @@ describe("Feedback Item", () => {
 
       const ariaLabel = voteUpButton.getAttribute("aria-label");
 
-      // Should not contain the title or [Hidden Feedback]
+      // Should not contain the original hidden feedback title.
       expect(ariaLabel).not.toContain("Hidden feedback title");
-      expect(ariaLabel).not.toContain("[Hidden Feedback]");
+      expect(ariaLabel).not.toContain("Hidden feedback");
 
       // Should contain simplified text
       expect(ariaLabel).toContain("Vote up");
@@ -9057,8 +9063,8 @@ describe("FeedbackItem additional coverage (merged)", () => {
     if (groupStack) {
       expect(container.textContent).toContain("Grouped Feedback");
 
-      // Check for hidden feedback placeholder for child1 (different user)
-      expect(container.textContent).toContain("[Hidden Feedback]");
+      // Hidden child content should render original text for visual blur treatment.
+      expect(container.textContent).toContain("Child 1");
 
       // Check for original column info for child1
       expect(container.textContent).toContain("Original Column:");
