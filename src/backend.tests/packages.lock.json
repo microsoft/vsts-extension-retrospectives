@@ -132,19 +132,19 @@
       },
       "Microsoft.Azure.SignalR": {
         "type": "Transitive",
-        "resolved": "1.33.0",
-        "contentHash": "MExV/CBiVGQG8M2sW59iXH//8Kc6+OZR1roIKM/q5zZcIaA2h5bcmrpUdCOBuFfV7zHtGpXCun5A0qVf/u+Jtw==",
+        "resolved": "1.33.1",
+        "contentHash": "WdHXYYxR8Ed7EAivuK143oSQMAp3dDlql6pf7p5xwW/l5hxAM5IF9KlHE+SeHz0B5dg2jUnRNCYCAplVEcBHdg==",
         "dependencies": {
           "Azure.Identity": "1.11.4",
-          "Microsoft.Azure.SignalR.Protocols": "1.33.0",
+          "Microsoft.Azure.SignalR.Protocols": "1.33.1",
           "Microsoft.Extensions.Http": "2.1.0",
           "Newtonsoft.Json": "13.0.3"
         }
       },
       "Microsoft.Azure.SignalR.Protocols": {
         "type": "Transitive",
-        "resolved": "1.33.0",
-        "contentHash": "xb4iPY5zDEqIxI493Iz8O7NPhmL2THB4vIftPWSsHh78zCz39YSUw0IJX3LtglDDQK2Hb16HLlLRcpRJrFvt5A==",
+        "resolved": "1.33.1",
+        "contentHash": "LrYSu8y0aSrt1r50A40mcNPpOgHbHEKXkp069YvJcdOTj4E7X1ZKHOtBOfNAeu/O03qSkaOw+GACcf+JIhP/1A==",
         "dependencies": {
           "Microsoft.Extensions.Primitives": "2.1.1"
         }
@@ -542,7 +542,7 @@
           "Azure.Security.KeyVault.Secrets": "[4.11.0, )",
           "Microsoft.ApplicationInsights.AspNetCore": "[3.1.2, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.9, )",
-          "Microsoft.Azure.SignalR": "[1.33.0, )",
+          "Microsoft.Azure.SignalR": "[1.33.1, )",
           "System.IdentityModel.Tokens.Jwt": "[8.19.1, )"
         }
       }
