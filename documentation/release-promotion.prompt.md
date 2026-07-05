@@ -20,7 +20,7 @@ Use these rules:
 - If production metadata uses a placeholder version and no newer tag is available, infer the target version as the next patch version after the latest `CHANGELOG.md` release heading.
 - Treat the previous production version as the release immediately before the target version in `CHANGELOG.md` or Git tags.
 - If the changelog is behind by multiple versions, document the full latest production range needed to bring release-facing content current.
-- If evidence conflicts, choose the latest semver-like production version reachable from the repo state, proceed, and call out the assumption in the final response.
+- If evidence conflicts, choose the latest production semantic version reachable from the repo state, proceed, and call out the assumption in the final response.
 - Only stop to ask a question if the repo has no usable version signal or no usable Git history to identify changes.
 
 ## Files To Update
@@ -32,7 +32,7 @@ Update these files as needed:
 - `README.md`, only if the release changes user-facing behavior, setup, screenshots, or core positioning
 - `src/frontend/assets/PACKAGE-DESCRIPTION.md`, only if the release changes marketplace-facing behavior, screenshots, or positioning
 
-Do not manually edit generated files such as coverage output or bundled distribution files unless this repo's release process explicitly requires it.
+Do not manually edit generated files such as coverage output or bundled distribution files unless this repository's release process explicitly requires it.
 
 ## What To Review
 
@@ -46,7 +46,7 @@ Before editing, inspect the changes between the inferred previous production ver
 
 Identify user-facing features, behavior changes, bug fixes, accessibility improvements, reliability improvements, and meaningful non-dependency maintenance changes. Exclude noisy internal churn unless it matters to users, operators, maintainers, security, performance, or reliability.
 
-Do not include dependency-only updates in release-facing content. Exclude Dependabot PRs, package manager updates, lockfile-only changes, and dependency or devDependency version changes in files such as `package.json`, `package-lock.json`, `.csproj`, or `packages.lock.json`. If a PR only updates dependencies or dependency metadata, ignore it for `CHANGELOG.md`, What's New, README, and package description updates.
+Do not include dependency-only updates in release-facing content. Exclude Dependabot PRs, package manager updates, changes that only update a lockfile, and dependency or development dependency version changes in files such as `package.json`, `package-lock.json`, `.csproj`, or `packages.lock.json`. If a PR only updates dependencies or dependency metadata, ignore it for `CHANGELOG.md`, What's New, README, and package description updates.
 
 ## Changelog Requirements
 
@@ -57,9 +57,9 @@ Update `CHANGELOG.md` so it is accurate for the inferred target production versi
 - The changelog must not be ahead of or behind the promoted version.
 - The target version entry must be comprehensive for the release.
 - Include meaningful user-facing changes, fixes, accessibility updates, reliability improvements, and relevant non-dependency maintenance items.
-- Do not include dependency updates, Dependabot PRs, lockfile changes, or package manifest dependency/devDependency version bumps.
+- Do not include dependency updates, Dependabot PRs, lockfile changes, or package manifest dependency or development dependency version bumps.
 - Keep entries concise but specific enough that users and maintainers understand what changed.
-- Preserve the repo's existing changelog style, including PR links where available.
+- Preserve the repository's existing changelog style, including PR links where available.
 - Use past tense consistently.
 - Do not use future tense or roadmap language such as "will add", "will fix", "will improve", "coming soon", or "planned".
 
@@ -72,7 +72,7 @@ Update `src/frontend/components/whatsNewDialog.tsx` so the in-app What's New dia
 - Prefer 3 to 7 concise items focused on changes users are likely to notice or care about.
 - Include major fixes and reliability/accessibility improvements when they affect users.
 - Omit low-level maintenance unless it has clear user impact.
-- Omit dependency updates, Dependabot PRs, lockfile changes, and package manifest dependency/devDependency version bumps.
+- Omit dependency updates, Dependabot PRs, lockfile changes, and package manifest dependency or development dependency version bumps.
 - Use past tense consistently.
 - Do not use future tense or roadmap language.
 - Keep the existing component structure and style unless a minimal structural change is required.

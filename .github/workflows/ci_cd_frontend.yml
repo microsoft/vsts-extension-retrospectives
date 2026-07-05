@@ -142,6 +142,9 @@ jobs:
           echo "memoizing" >> base.txt
           echo "websocket" >> base.txt
           echo "customizable" >> base.txt
+          echo "Dependabot" >> base.txt
+          echo "lockfile" >> base.txt
+          echo "roadmap" >> base.txt
           echo "Bain" >> base.txt
           echo "Edmondson" >> base.txt
           echo "Forsgren" >> base.txt
