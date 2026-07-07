@@ -1,10 +1,10 @@
-- name: "backend"
-  color: "7121c6"
-  description: "Pull requests that update backend code"
-
 - name: "accessibility"
   color: "006b75"
   description: "Accessibility of using the tool"
+
+- name: "backend"
+  color: "7121c6"
+  description: "Pull requests that update backend code"
 
 - name: "dependencies"
   color: "0366d6"
@@ -17,6 +17,14 @@
 - name: "developer experience"
   color: "D2FB52"
   description: "The category for improvements to the process of contributing to this project."
+
+- name: "docs not needed"
+  color: "cfd3d7"
+  description: "What's New, Changelog, Readme, and package description updates are not required."
+
+- name: "docs updated"
+  color: "0E8A16"
+  description: "What's New, Changelog, Readme, and package description updates are included."
 
 - name: "documentation"
   color: "0075ca"
@@ -58,6 +66,10 @@
   color: "91D111"
   description: "These issues are associated with the Vote and its associated functionality"
 
+- name: "frontend"
+  color: "168700"
+  description: "Pull requests that update frontend code"
+
 - name: "github actions"
   color: "000000"
   description: "Pull requests that update GitHub Actions code"
@@ -65,10 +77,6 @@
 - name: "help wanted"
   color: "008672"
   description: "Extra attention is needed"
-
-- name: "frontend"
-  color: "168700"
-  description: "Pull requests that update frontend code"
 
 - name: "more information needed"
   color: "d876e3"
