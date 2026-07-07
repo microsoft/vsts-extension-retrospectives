@@ -180,14 +180,14 @@ describe("UI-level integration tests for ActionItem", () => {
     const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
 
     // Click the unlink button
-    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item"]');
     expect(unlinkButton).toBeTruthy();
 
     fireEvent.click(unlinkButton!);
 
     // Wait for dialog to appear
     await waitFor(() => {
-      expect(getByText("Remove Work Item Link")).toBeTruthy();
+      expect(getByText("Remove link to work item")).toBeTruthy();
     });
 
     // Click the Remove button in the dialog
@@ -204,12 +204,12 @@ describe("UI-level integration tests for ActionItem", () => {
     const { container, getByText, queryByText } = render(<ActionItem {...defaultTestProps} />);
 
     // Click the unlink button
-    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item"]');
     fireEvent.click(unlinkButton!);
 
     // Wait for dialog to appear
     await waitFor(() => {
-      expect(getByText("Remove Work Item Link")).toBeTruthy();
+      expect(getByText("Remove link to work item")).toBeTruthy();
     });
 
     // Click the Cancel button
@@ -226,12 +226,12 @@ describe("UI-level integration tests for ActionItem", () => {
     const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
 
     // Click the unlink button
-    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item"]');
     fireEvent.click(unlinkButton!);
 
     // Wait for dialog to appear
     await waitFor(() => {
-      expect(getByText("Remove Work Item Link")).toBeTruthy();
+      expect(getByText("Remove link to work item")).toBeTruthy();
     });
 
     // Click the close (X) button in the dialog header
@@ -250,7 +250,7 @@ describe("UI-level integration tests for ActionItem", () => {
     const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
 
     // Get the unlink button
-    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item"]');
     expect(unlinkButton).toBeTruthy();
 
     // Press Enter on the unlink button
@@ -258,7 +258,7 @@ describe("UI-level integration tests for ActionItem", () => {
 
     // Wait for dialog to appear
     await waitFor(() => {
-      expect(getByText("Remove Work Item Link")).toBeTruthy();
+      expect(getByText("Remove link to work item")).toBeTruthy();
     });
   });
 
@@ -330,11 +330,11 @@ describe("UI-level integration tests for ActionItem", () => {
     const { container, getByText } = render(<ActionItem {...defaultTestProps} />);
 
     // Click the unlink button
-    const unlinkButton = container.querySelector('[aria-label="Remove link to work item button"]');
+    const unlinkButton = container.querySelector('[aria-label="Remove link to work item"]');
     fireEvent.click(unlinkButton!);
 
     await waitFor(() => {
-      expect(getByText("Remove Work Item Link")).toBeTruthy();
+      expect(getByText("Remove link to work item")).toBeTruthy();
     });
 
     // Create a mock event with stopPropagation
