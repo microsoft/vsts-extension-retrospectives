@@ -2113,25 +2113,25 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                           {getIconElement("more-horizontal")}
                         </summary>
                         <div className="callout-menu left" role="menu" aria-label="Board Actions">
-                          <button key="createBoard" type="button" title="Create new retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
+                          <button key="createBoard" type="button" title={t("feedback_board_create_new")} onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
                             {getIconElement("add")}
-                            Create new retrospective
+                            {t("feedback_board_create_new")}
                           </button>
                           <button key="createBoardForCurrentSprint" type="button" title={t("sprint_retro_create_current")} onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
                             {getIconElement("add")}
                             {t("sprint_retro_create_current")}
                           </button>
-                          <button key="duplicateBoard" type="button" title="Create copy of retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
+                          <button key="duplicateBoard" type="button" title={t("feedback_board_create_copy")} onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
                             {getIconElement("content-copy")}
-                            Create copy of retrospective
+                            {t("feedback_board_create_copy")}
                           </button>
-                          <button key="editBoard" type="button" title="Edit retrospective" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
+                          <button key="editBoard" type="button" title={t("feedback_board_edit")} onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
                             {getIconElement("edit")}
-                            Edit retrospective
+                            {t("feedback_board_edit")}
                           </button>
-                          <button key="searchAllBoards" type="button" title="Search all boards" onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
+                          <button key="searchAllBoards" type="button" title={t("feedback_board_search_all_boards")} onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
                             {getIconElement("search")}
-                            Search all boards
+                            {t("feedback_board_search_all_boards")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
                           <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
@@ -2139,23 +2139,23 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                             {`Copy link to ${state.currentBoard.activePhase} phase`}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="exportCSV" type="button" title="Export CSV content" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
+                          <button key="exportCSV" type="button" title={t("feedback_board_export_csv_content")} onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
                             {getIconElement("sim-card-download")}
-                            Export CSV content
+                            {t("feedback_board_export_csv_content")}
                           </button>
-                          <button key="emailPreview" type="button" title="Create email summary" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
+                          <button key="emailPreview" type="button" title={t("feedback_board_create_email_summary")} onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
                             {getIconElement("forward-to-inbox")}
-                            Create email summary
+                            {t("feedback_board_create_email_summary")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="retroSummary" type="button" title="Show retrospective summary" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
+                          <button key="retroSummary" type="button" title={t("feedback_board_show_retro_summary")} onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
                             {getIconElement("source")}
-                            Show retrospective summary
+                            {t("feedback_board_show_retro_summary")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="archiveBoard" type="button" title="Archive retrospective" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
+                          <button key="archiveBoard" type="button" title={t("feedback_board_archive_title")} onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
                             {getIconElement("inventory")}
-                            Archive retrospective
+                            {t("feedback_board_archive_title")}
                           </button>
                         </div>
                       </details>
@@ -2475,7 +2475,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         <dialog
           ref={searchAllBoardsDialogRef}
           className="retrospectives-all-board-feedback-search-dialog dialog-width-md"
-          aria-label="Search all boards"
+          aria-label={t("feedback_board_search_all_boards")}
           role="dialog"
           onClose={() => {
             resetAllBoardFeedbackSearch();
@@ -2483,7 +2483,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           }}
         >
           <div className="header">
-            <h2 className="title">Search all boards</h2>
+            <h2 className="title">{t("feedback_board_search_all_boards")}</h2>
             <button type="button" onClick={hideAllBoardFeedbackSearchDialog} aria-label="Close">
               {getIconElement("close")}
             </button>
