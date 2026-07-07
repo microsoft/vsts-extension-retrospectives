@@ -94,7 +94,9 @@ If you want to contribute code changes, bug fixes, or new features:
 
 5. Update any documentation, user and contributor, that is impacted by your changes.
 
-6. You may merge the pull request in once you have the sign-off from one developer from the [Retrospectives team](mailto:retrospectives@microsoft.com), or if you do not have permission to do that, you may request the reviewer to merge it for you.
+6. Add one release documentation label to your pull request: `docs updated` when you updated release-facing content such as the changelog, What's New, README, or package description; or `docs not needed` when you reviewed those files and no update is required. The frontend CI pipeline fails when neither label is present.
+
+7. You may merge the pull request in once you have the sign-off from one developer from the [Retrospectives team](mailto:retrospectives@microsoft.com), or if you do not have permission to do that, you may request the reviewer to merge it for you.
 
 ### Continuous Integration (CI) and Pre-commit Hook
 
