@@ -2336,13 +2336,17 @@ describe("FeedbackBoard Component", () => {
       expect(focusModeModel?.canManageBoard).toBe(true);
     });
 
-    it("sets canManageBoard to false when the board has no creator and user is not Team Admin", async () => {
+    it("sets canManageBoard to false when the current user is not the board creator and not Team Admin", async () => {
       const onFocusModeModelChange = jest.fn();
-      const boardWithoutCreator: IFeedbackBoardDocument = { ...mockedBoard, createdBy: undefined };
+      const boardWithDifferentOwner: IFeedbackBoardDocument = {
+        ...mockedBoard,
+        createdBy: { ...mockedIdentity, id: "board-owner-id" },
+      };
       const nonOwnerProps = {
         ...mockedProps,
-        board: boardWithoutCreator,
-        userId: "some-other-user",
+        board: boardWithDifferentOwner,
+        userId: "current-user-id",
+        currentUserIsTeamAdmin: false,
         onFocusModeModelChange,
       };
 

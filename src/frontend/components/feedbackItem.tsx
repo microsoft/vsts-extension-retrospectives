@@ -557,7 +557,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   }, [props.createdBy, props.createdByProfileImage, props.createdDate]);
 
   const deleteFeedbackItem = useCallback(() => {
-    // Only the feedback item's creator or a board manager (owner or Team Admin) may delete it.
+    // Only the feedback item's creator, the board owner, or a team admin may delete it.
     const canDelete = props.canManageBoard || props.userIdRef === getUserIdentity().id;
     if (!canDelete) {
       return;
@@ -746,7 +746,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           if (target.tagName !== "BUTTON" && target.tagName !== "A") {
             const isOwnFeedbackItem = props.userIdRef === getUserIdentity().id;
             // Block entering edit mode when the card is obscured during collection, or when the
-            // current user is neither the creator nor a board manager (owner or Team Admin).
+            // current user is neither the creator, nor the board owner, nor a team admin.
             if ((props.hideFeedbackItems && !isOwnFeedbackItem) || (!isOwnFeedbackItem && !props.canManageBoard)) {
               e.preventDefault();
               return;
@@ -971,7 +971,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const totalItemsInColumn = numberedColumnItems.length;
 
   const hideFeedbackItems = props.workflowPhase === "Collect" && props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id;
-  // A feedback card may only be edited or deleted by the user who created it or by a board manager.
+  // A feedback card may only be edited or deleted by the user who created it, the board owner, or a team admin.
   const canModifyFeedbackItem = props.canManageBoard || props.userIdRef === getUserIdentity().id;
   const creationDateFormatter = useMemo(() => new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric" }), []);
   const creationDateLabel = useMemo(() => {
