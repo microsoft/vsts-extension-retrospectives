@@ -1,0 +1,83 @@
+- name: "backend"
+  color: "7121c6"
+  description: "Pull requests that update backend code"
+
+- name: "accessibility"
+  color: "006b75"
+  description: "Accessibility of using the tool"
+
+- name: "dependencies"
+  color: "0366d6"
+  description: "Pull requests that update a dependency file"
+
+- name: "devcontainers package manager"
+  color: "2753E3"
+  description: "Pull requests that update devcontainers package manager code"
+
+- name: "developer experience"
+  color: "D2FB52"
+  description: "The category for improvements to the process of contributing to this project."
+
+- name: "documentation"
+  color: "0075ca"
+  description: "Improvements or additions to documentation"
+
+- name: "enhancement"
+  color: "a2eeef"
+  description: "New feature or request"
+
+- name: "feature: Act Phase"
+  color: "7487D8"
+  description: "These issues are associated with the Act Phase and its associated functionality"
+
+- name: "feature: Collect Phase"
+  color: "5AFAEB"
+  description: "These issues are associated with the Collect Phase and its associated functionality"
+
+- name: "feature: Create/Update Retro"
+  color: "4D0D02"
+  description: "These issues are associated with the Create/Update Screen and its associated functionality"
+
+- name: "feature: Extension Experience"
+  color: "F54090"
+  description: "These issues are related to the overall experience of using the extension. A more broad category"
+
+- name: "feature: Group Phase"
+  color: "14C423"
+  description: "These issues are associated with the Group Phase and its associated functionality"
+
+- name: "feature: Retro History"
+  color: "562C00"
+  description: "These issues are associated with the History Tab and its associated functionality"
+
+- name: "feature: Team Assessment"
+  color: "E42A83"
+  description: "Related to Team Assessments"
+
+- name: "feature: Vote Phase"
+  color: "91D111"
+  description: "These issues are associated with the Vote and its associated functionality"
+
+- name: "github actions"
+  color: "000000"
+  description: "Pull requests that update GitHub Actions code"
+
+- name: "help wanted"
+  color: "008672"
+  description: "Extra attention is needed"
+
+- name: "frontend"
+  color: "168700"
+  description: "Pull requests that update frontend code"
+
+- name: "more information needed"
+  color: "d876e3"
+  description: "Further information is requested"
+
+- name: "security bug"
+  color: "491C00"
+  description: "Security bug"
+
+- name: "usage: on-prem"
+  color: "E83766"
+  description: "A category for issues arising on on-premises instances of the tool."
