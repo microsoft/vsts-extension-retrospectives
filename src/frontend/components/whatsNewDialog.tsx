@@ -9,6 +9,7 @@ interface IWhatsNewDialogProps {
 const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.57 and v1.92.56 include:";
 
 const WHATS_NEW_ITEMS = [
+  "Extended permissions so team admins can also update column notes and edit or delete feedback cards.",
   "Improved hidden feedback behavior to display blurred feedback while announcing \"feedback blurred\".",
   "Added user settings to toggle between show all teams or my teams and to toggle between scrolling by board or by column.",
   "Added team admin setting for configuring available work item types in \"Add work item\".",
