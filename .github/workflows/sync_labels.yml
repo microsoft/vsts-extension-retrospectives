@@ -1,0 +1,155 @@
+name: "Sync Labels"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/labels.yml"
+      - ".github/workflows/sync_labels.yml"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync:
+    name: "Sync labels"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Sync labels from .github/labels.yml"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          REF: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          gh api "repos/${REPOSITORY}/contents/.github/labels.yml?ref=${REF}" --jq '.content' | base64 -d > labels.yml
+
+          node <<'NODE'
+          const { execFileSync } = require("node:child_process");
+          const { readFileSync } = require("node:fs");
+
+          const repository = process.env.REPOSITORY;
+          const configuredLabels = parseLabels(readFileSync("labels.yml", "utf8"));
+          const existingLabels = JSON.parse(ghApi([`repos/${repository}/labels?per_page=100`]));
+          const existingByName = new Map(existingLabels.map(label => [label.name, label]));
+          const configuredNames = new Set(configuredLabels.map(label => label.name));
+
+          for (const label of configuredLabels) {
+            const existingLabel = existingByName.get(label.name);
+
+            if (!existingLabel) {
+              console.log(`Creating label: ${label.name}`);
+              ghApi(["--method", "POST", `repos/${repository}/labels`, "-f", `name=${label.name}`, "-f", `color=${label.color}`, "-f", `description=${label.description}`]);
+              continue;
+            }
+
+            const existingDescription = existingLabel.description || "";
+            if (normalizeColor(existingLabel.color) !== normalizeColor(label.color) || existingDescription !== label.description) {
+              console.log(`Updating label: ${label.name}`);
+              ghApi([
+                "--method",
+                "PATCH",
+                `repos/${repository}/labels/${encodeURIComponent(label.name)}`,
+                "-f",
+                `new_name=${label.name}`,
+                "-f",
+                `color=${label.color}`,
+                "-f",
+                `description=${label.description}`,
+              ]);
+            }
+          }
+
+          for (const label of existingLabels) {
+            if (!configuredNames.has(label.name)) {
+              console.log(`Deleting label: ${label.name}`);
+              ghApi(["--method", "DELETE", `repos/${repository}/labels/${encodeURIComponent(label.name)}`]);
+            }
+          }
+
+          console.log(`Synced ${configuredLabels.length} labels from .github/labels.yml.`);
+
+          function ghApi(args) {
+            return execFileSync("gh", ["api", ...args], { encoding: "utf8", stdio: ["pipe", "pipe", "inherit"] });
+          }
+
+          function parseLabels(content) {
+            const labels = [];
+            let currentLabel;
+
+            for (const rawLine of content.split(/\r?\n/)) {
+              const line = rawLine.trimEnd();
+              const trimmedLine = line.trim();
+
+              if (!trimmedLine || trimmedLine.startsWith("#")) {
+                continue;
+              }
+
+              const labelStart = line.match(/^- name:\s*(.*)$/);
+              if (labelStart) {
+                currentLabel = { name: parseScalar(labelStart[1]) };
+                labels.push(currentLabel);
+                continue;
+              }
+
+              const labelField = line.match(/^\s+(color|description):\s*(.*)$/);
+              if (labelField && currentLabel) {
+                currentLabel[labelField[1]] = parseScalar(labelField[2]);
+                continue;
+              }
+
+              throw new Error(`Unsupported labels.yml line: ${rawLine}`);
+            }
+
+            const names = new Set();
+            for (const [index, label] of labels.entries()) {
+              if (!label.name) {
+                throw new Error(`Label ${index + 1} is missing name.`);
+              }
+
+              if (names.has(label.name)) {
+                throw new Error(`Duplicate label name: ${label.name}`);
+              }
+              names.add(label.name);
+
+              if (!label.color) {
+                throw new Error(`Label ${label.name} is missing color.`);
+              }
+
+              label.color = label.color.replace(/^#/, "");
+              if (!/^[0-9A-Fa-f]{6}$/.test(label.color)) {
+                throw new Error(`Label ${label.name} has invalid color: ${label.color}`);
+              }
+
+              label.description = label.description || "";
+            }
+
+            return labels;
+          }
+
+          function parseScalar(value) {
+            const trimmedValue = value.trim();
+
+            if (!trimmedValue) {
+              return "";
+            }
+
+            if (trimmedValue.startsWith('"') && trimmedValue.endsWith('"')) {
+              return JSON.parse(trimmedValue);
+            }
+
+            if (trimmedValue.startsWith("'") && trimmedValue.endsWith("'")) {
+              return trimmedValue.slice(1, -1).replace(/''/g, "'");
+            }
+
+            return trimmedValue.replace(/\s+#.*$/, "");
+          }
+
+          function normalizeColor(color) {
+            return color.replace(/^#/, "").toLowerCase();
+          }
+          NODE
