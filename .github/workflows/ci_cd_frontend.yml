@@ -115,6 +115,10 @@ jobs:
           echo "ReactTable" >> base.txt
           echo "README" >> base.txt
           echo "OpenSSF" >> base.txt
+          echo "Dependabot" >> base.txt
+          echo "lockfile" >> base.txt
+          echo "devDependency" >> base.txt
+          echo "roadmap" >> base.txt
           echo "CI_Backend" >> base.txt
           echo "Moq" >> base.txt
           echo "xUnit" >> base.txt

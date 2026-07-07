@@ -2400,6 +2400,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
                     hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
                     userId={state.currentUserId}
+                    currentUserIsTeamAdmin={isCurrentUserTeamAdmin()}
                     onVoteCasted={updateCurrentVoteCount}
                     onColumnNotesChange={persistColumnNotes}
                     scrollMode={state.scrollMode}

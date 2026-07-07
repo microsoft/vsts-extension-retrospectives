@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
+import { canCurrentUserManageBoard, isCurrentUserTeamAdmin } from "../utilities/boardAccessHelper";
 import { getIconElement } from "./icons";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
@@ -35,9 +36,12 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
-  const isBoardOwner = props.isNewBoardCreation || props.board?.createdBy?.id === props.currentUserId;
-  const isTeamAdmin = props.permissionOptions.some(option => option.id === props.currentUserId && option.isTeamAdmin);
-  const canEditPermissions = isBoardOwner || isTeamAdmin;
+  const canManageBoard = canCurrentUserManageBoard({
+    boardOwnerId: props.board?.createdBy?.id,
+    currentUserId: props.currentUserId,
+    isTeamAdmin: isCurrentUserTeamAdmin(props.currentUserId, props.permissionOptions),
+    isNewBoardCreation: props.isNewBoardCreation,
+  });
   const isGroupOption = (option: FeedbackBoardPermissionOption): boolean => {
     return /^\[[^\]]+\]\\/.test(option.name); // assumes groups have names like [project]\group
   };
@@ -46,7 +50,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
   const handleSelectAllClicked = (checked: boolean) => {
-    if (!canEditPermissions) return;
+    if (!canManageBoard) return;
     const nextChecked = checked;
 
     if (nextChecked) {
@@ -61,7 +65,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
-    if (!canEditPermissions) return;
+    if (!canManageBoard) return;
 
     let permissionList: string[] = option.type === "team" ? teamPermissions : memberPermissions;
 
@@ -129,7 +133,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const emitChangeEvent = () => {
-    if (canEditPermissions) {
+    if (canManageBoard) {
       props.onPermissionChanged({
         permissions: {
           Teams: teamPermissions,
@@ -156,7 +160,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const PermissionEditWarning = () => {
-    if (!canEditPermissions) {
+    if (!canManageBoard) {
       return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the Board Owner or a Team Admin can edit permissions</div>;
     }
     return null;
@@ -195,7 +199,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                     className="my-2"
                     id="select-all-permission-options-visible"
                     aria-label="Add permission to every team or member in the table."
-                    disabled={!canEditPermissions}
+                    disabled={!canManageBoard}
                     checked={selectAllChecked}
                     onChange={event => handleSelectAllClicked(event.target.checked)}
                     type="checkbox"

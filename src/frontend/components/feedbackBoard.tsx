@@ -15,6 +15,7 @@ import type { FocusModeModel } from "./feedbackCarousel";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
+import { getBoardAccess } from "../utilities/boardAccessHelper";
 import { getIconElement } from "./icons";
 
 export interface FeedbackBoardProps {
@@ -30,6 +31,7 @@ export interface FeedbackBoardProps {
   hideFeedbackItems: boolean;
   onFocusModeModelChange?: (model: FocusModeModel) => void;
   userId: string;
+  currentUserIsTeamAdmin?: boolean;
   onVoteCasted?: () => void;
   onColumnNotesChange?: (columnId: string, notes: string) => Promise<void>;
   scrollMode?: "column" | "board";
@@ -102,7 +104,7 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   return resetFocusForStateColumns;
 };
 
-export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, onVoteCasted, onColumnNotesChange, scrollMode = "column" }) => {
+export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, currentUserIsTeamAdmin = false, onVoteCasted, onColumnNotesChange, scrollMode = "column" }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -228,6 +230,12 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     setActiveTimerFeedbackItemId(prev => getActiveTimerFeedbackItemIdAfterStop(prev, feedbackItemId));
   }, []);
 
+  const { canManageBoard } = getBoardAccess({
+    boardOwnerId: board.createdBy?.id,
+    currentUserId: userId,
+    isTeamAdmin: currentUserIsTeamAdmin,
+  });
+
   const addFeedbackItems = useCallback((columnId: string, feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItemsParam: boolean) => {
     setColumns(previousColumns => {
       const firstAddedItemId = feedbackItems.length && feedbackItems[0].id;
@@ -323,7 +331,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       nonHiddenWorkItemTypes: focusModeNonHiddenWorkItemTypes ?? nonHiddenWorkItemTypes,
       allWorkItemTypes,
       hideFeedbackItems,
-      isBoardOwner: board.createdBy?.id === userId,
+      canManageBoard,
       onVoteCasted: () => {
         onVoteCasted?.();
       },
@@ -334,7 +342,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
       removeFeedbackItemFromColumn,
       refreshFeedbackItems,
     };
-  }, [columns, columnIds, workflowPhase, team, board.id, board.title, board.createdBy?.id, userId, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems]);
+  }, [columns, columnIds, workflowPhase, team, board.id, board.title, focusModeNonHiddenWorkItemTypes, nonHiddenWorkItemTypes, allWorkItemTypes, hideFeedbackItems, canManageBoard, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems, defaultActionItemAreaPath, defaultActionItemIteration]);
 
   const initColumns = useCallback(() => {
     const columnProperties = board.columns;
@@ -703,8 +711,6 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
   }, [getFocusModeModel, onFocusModeModelChange]);
 
   const getFeedbackColumnPropsList = useCallback((): FeedbackColumnProps[] => {
-    const canCurrentUserEditBoard = board.createdBy?.id === userId;
-
     return columnIds.map((columnId, index) => {
       return {
         key: columnId,
@@ -729,12 +735,12 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         nonHiddenWorkItemTypes: nonHiddenWorkItemTypes,
         allWorkItemTypes: allWorkItemTypes,
         isBoardAnonymous: isAnonymous,
-        isBoardOwner: !!canCurrentUserEditBoard,
+        canManageBoard: canManageBoard,
         shouldFocusOnCreateFeedback: !!columns[columnId].shouldFocusOnCreateFeedback,
         hideFeedbackItems: hideFeedbackItems,
         isFocusModalHidden: true,
         groupIds: [] as string[],
-        showColumnEditButton: !!canCurrentUserEditBoard,
+        showColumnEditButton: canManageBoard,
         columnNotes: getColumnNotesOrEmpty(columnNotes, columnId),
         onColumnNotesChange: (notes: string) => handleColumnNotesChange(columnId, notes),
         onVoteCasted: () => {
@@ -747,7 +753,7 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
         notifyTimerStopped: handleTimerStopped,
       };
     });
-  }, [board.createdBy?.id, board.id, board.title, userId, columnIds, columns, team, isDataLoaded, workflowPhase, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, columnNotes, handleColumnNotesChange, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped]);
+  }, [columnIds, columns, team, board.id, board.title, isDataLoaded, workflowPhase, addFeedbackItems, removeFeedbackItemFromColumn, refreshFeedbackItems, defaultActionItemAreaPath, defaultActionItemIteration, nonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, canManageBoard, columnNotes, handleColumnNotesChange, onVoteCasted, activeTimerFeedbackItemId, requestTimerStart, handleTimerStopped]);
 
   if (!displayBoard) {
     return <div> An unexpected exception occurred. </div>;

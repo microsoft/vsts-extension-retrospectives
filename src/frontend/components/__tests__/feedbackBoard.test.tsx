@@ -1800,6 +1800,29 @@ describe("FeedbackBoard Component", () => {
       const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
       expect(columnProps?.showColumnEditButton).toBe(false);
     });
+
+    it("shows column edit button when user is Team Admin but not board creator", async () => {
+      const creatorBoard = {
+        ...mockedBoard,
+        createdBy: { ...mockedIdentity, id: "different-user-id" },
+      };
+      const propsWithTeamAdmin = {
+        ...mockedProps,
+        board: creatorBoard,
+        userId: "current-user-id",
+        currentUserIsTeamAdmin: true,
+      };
+
+      render(<FeedbackBoard {...propsWithTeamAdmin} />);
+
+      await waitFor(() => {
+        expect(feedbackColumnPropsSpy).toHaveBeenCalled();
+      });
+
+      const columnProps = feedbackColumnPropsSpy.mock.calls[feedbackColumnPropsSpy.mock.calls.length - 1]?.[0];
+      expect(columnProps?.showColumnEditButton).toBe(true);
+      expect(columnProps?.canManageBoard).toBe(true);
+    });
   });
 
   describe("Column Item Finding", () => {
@@ -2293,7 +2316,7 @@ describe("FeedbackBoard Component", () => {
       expect(onVoteCasted).toHaveBeenCalled();
     });
 
-    it("sets isBoardOwner to true when the current user created the board", async () => {
+    it("sets canManageBoard to true when the current user created the board", async () => {
       const onFocusModeModelChange = jest.fn();
       // mockedProps.userId and mockedBoard.createdBy.id are both "", so the current user is the owner.
       const ownerProps = {
@@ -2310,16 +2333,20 @@ describe("FeedbackBoard Component", () => {
       });
 
       const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
-      expect(focusModeModel?.isBoardOwner).toBe(true);
+      expect(focusModeModel?.canManageBoard).toBe(true);
     });
 
-    it("sets isBoardOwner to false when the board has no creator", async () => {
+    it("sets canManageBoard to false when the current user is not the board creator and not Team Admin", async () => {
       const onFocusModeModelChange = jest.fn();
-      const boardWithoutCreator: IFeedbackBoardDocument = { ...mockedBoard, createdBy: undefined };
+      const boardWithDifferentOwner: IFeedbackBoardDocument = {
+        ...mockedBoard,
+        createdBy: { ...mockedIdentity, id: "board-owner-id" },
+      };
       const nonOwnerProps = {
         ...mockedProps,
-        board: boardWithoutCreator,
-        userId: "some-other-user",
+        board: boardWithDifferentOwner,
+        userId: "current-user-id",
+        currentUserIsTeamAdmin: false,
         onFocusModeModelChange,
       };
 
@@ -2332,7 +2359,33 @@ describe("FeedbackBoard Component", () => {
       });
 
       const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
-      expect(focusModeModel?.isBoardOwner).toBe(false);
+      expect(focusModeModel?.canManageBoard).toBe(false);
+    });
+
+    it("sets canManageBoard true when the current user is Team Admin", async () => {
+      const onFocusModeModelChange = jest.fn();
+      const boardWithDifferentOwner: IFeedbackBoardDocument = {
+        ...mockedBoard,
+        createdBy: { ...mockedIdentity, id: "different-user-id" },
+      };
+      const teamAdminProps = {
+        ...mockedProps,
+        board: boardWithDifferentOwner,
+        userId: "current-user-id",
+        currentUserIsTeamAdmin: true,
+        onFocusModeModelChange,
+      };
+
+      (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+
+      render(<FeedbackBoard {...teamAdminProps} />);
+
+      await waitFor(() => {
+        expect(onFocusModeModelChange).toHaveBeenCalled();
+      });
+
+      const focusModeModel = onFocusModeModelChange.mock.calls[onFocusModeModelChange.mock.calls.length - 1]?.[0];
+      expect(focusModeModel?.canManageBoard).toBe(true);
     });
 
     it("uses focus mode work item types when they are provided", async () => {

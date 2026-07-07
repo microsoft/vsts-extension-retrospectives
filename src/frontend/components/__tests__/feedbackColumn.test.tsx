@@ -135,6 +135,28 @@ describe("Feedback Column ", () => {
       expect(feedbackItemProps.accentColor).toEqual(expectedAccentColor);
     });
 
+    it("defaults canManageBoard to false when column props do not provide it", () => {
+      const columnPropsWithoutCanManageBoard = {
+        ...testColumnProps,
+        canManageBoard: undefined as boolean | undefined,
+      };
+
+      const feedbackItemProps = createFeedbackItemProps(columnPropsWithoutCanManageBoard, testColumnProps.columnItems[0]);
+
+      expect(feedbackItemProps.canManageBoard).toBe(false);
+    });
+
+    it("uses canManageBoard from column props when provided", () => {
+      const columnPropsWithCanManageBoard = {
+        ...testColumnProps,
+        canManageBoard: true,
+      };
+
+      const feedbackItemProps = createFeedbackItemProps(columnPropsWithCanManageBoard, testColumnProps.columnItems[0]);
+
+      expect(feedbackItemProps.canManageBoard).toBe(true);
+    });
+
     it("renders grouped items with FeedbackItemGroup", () => {
       const baseFeedbackItem = {
         id: "parent-item",
