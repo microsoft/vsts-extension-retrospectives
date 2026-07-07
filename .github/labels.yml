@@ -86,6 +86,10 @@
   color: "491C00"
   description: "Security bug"
 
+- name: "translations"
+  color: "5319E7"
+  description: "Improvements or additions to translations and localization"
+
 - name: "usage: on-prem"
   color: "E83766"
   description: "A category for issues arising on on-premises instances of the tool."
