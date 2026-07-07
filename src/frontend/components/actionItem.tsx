@@ -108,9 +108,9 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
       {!areActionIconsHidden && (
         <button
           type="button"
-          title="Remove link to work item"
+          title={t("common_remove_link_to_work_item")}
           className="action"
-          aria-label="Remove link to work item button"
+          aria-label={t("common_remove_link_to_work_item")}
           onClick={event => {
             event.stopPropagation();
             unlinkWorkItemDialogRef.current!.showModal();
@@ -120,9 +120,9 @@ export const ActionItem: React.FC<ActionItemProps> = ({ feedbackItemId, boardId,
           {getIconElement("link-off")}
         </button>
       )}
-      <dialog className="unlink-work-item-confirmation-dialog dialog-width-sm" aria-label="Remove Work Item Link" ref={unlinkWorkItemDialogRef} onClose={() => unlinkWorkItemDialogRef.current!.close()}>
+      <dialog className="unlink-work-item-confirmation-dialog dialog-width-sm" aria-label={t("common_remove_link_to_work_item")} ref={unlinkWorkItemDialogRef} onClose={() => unlinkWorkItemDialogRef.current!.close()}>
         <div className="header">
-          <h2 className="title">Remove Work Item Link</h2>
+          <h2 className="title">{t("common_remove_link_to_work_item")}</h2>
           <button onClick={() => unlinkWorkItemDialogRef.current!.close()} aria-label="Close">
             {getIconElement("close")}
           </button>
