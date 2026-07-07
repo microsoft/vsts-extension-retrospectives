@@ -8110,6 +8110,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       shouldHaveFocus: false,
       hideFeedbackItems: false,
       userIdRef: doc.userIdRef,
+      canManageBoard: false,
       timerSecs: 0,
       timerState: false,
       timerId: null,
@@ -8154,7 +8155,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     test("shows the delete option to the feedback creator", async () => {
       // The mocked current user id is "test-user-id".
-      const props = makeProps({ userIdRef: "test-user-id", isBoardOwner: false });
+      const props = makeProps({ userIdRef: "test-user-id", canManageBoard: false });
       render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8164,7 +8165,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     test("shows the delete option to the board owner for another user's feedback", async () => {
-      const props = makeProps({ userIdRef: "another-user", isBoardOwner: true });
+      const props = makeProps({ userIdRef: "another-user", canManageBoard: true });
       render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8174,7 +8175,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     test("shows the delete option to the board owner for their own feedback", async () => {
-      const props = makeProps({ userIdRef: "test-user-id", isBoardOwner: true });
+      const props = makeProps({ userIdRef: "test-user-id", canManageBoard: true });
       render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8184,7 +8185,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     test("hides the delete option from users who neither created the feedback nor own the board", async () => {
-      const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
+      const props = makeProps({ userIdRef: "another-user", canManageBoard: false });
       render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8196,7 +8197,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     test("does not open the delete dialog when a non-owner presses the Delete key", async () => {
-      const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
+      const props = makeProps({ userIdRef: "another-user", canManageBoard: false });
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8214,7 +8215,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
   describe("Edit permission (creator or board owner only)", () => {
     test("lets the creator edit their own feedback title", async () => {
-      const props = makeProps({ userIdRef: "test-user-id", isBoardOwner: false });
+      const props = makeProps({ userIdRef: "test-user-id", canManageBoard: false });
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8227,7 +8228,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     test("lets the board owner edit another user's feedback title", async () => {
-      const props = makeProps({ userIdRef: "another-user", isBoardOwner: true });
+      const props = makeProps({ userIdRef: "another-user", canManageBoard: true });
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8240,7 +8241,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     test("lets the board owner edit their own feedback title", async () => {
-      const props = makeProps({ userIdRef: "test-user-id", isBoardOwner: true });
+      const props = makeProps({ userIdRef: "test-user-id", canManageBoard: true });
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8253,7 +8254,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     test("marks another user's feedback title as read-only for non-owners", async () => {
-      const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
+      const props = makeProps({ userIdRef: "another-user", canManageBoard: false });
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
@@ -8269,7 +8270,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     test("does not enter edit mode when a non-owner presses Enter on the card", async () => {
-      const props = makeProps({ userIdRef: "another-user", isBoardOwner: false });
+      const props = makeProps({ userIdRef: "another-user", canManageBoard: false });
       const { container } = render(<FeedbackItem {...props} />);
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 

@@ -55,7 +55,7 @@ export interface IFeedbackItemProps {
   shouldHaveFocus: boolean;
   hideFeedbackItems: boolean;
   userIdRef: string;
-  isBoardOwner?: boolean;
+  canManageBoard: boolean;
   timerSecs: number;
   timerState: boolean;
   timerId: ReturnType<typeof setInterval> | null;
@@ -557,13 +557,13 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   }, [props.createdBy, props.createdByProfileImage, props.createdDate]);
 
   const deleteFeedbackItem = useCallback(() => {
-    // Only the feedback item's creator or the board owner may delete it.
-    const canDelete = props.isBoardOwner || props.userIdRef === getUserIdentity().id;
+    // Only the feedback item's creator or a board manager (owner or Team Admin) may delete it.
+    const canDelete = props.canManageBoard || props.userIdRef === getUserIdentity().id;
     if (!canDelete) {
       return;
     }
     showDeleteItemConfirmationDialog();
-  }, [showDeleteItemConfirmationDialog, props.isBoardOwner, props.userIdRef]);
+  }, [showDeleteItemConfirmationDialog, props.canManageBoard, props.userIdRef]);
 
   const dragFeedbackItemOverFeedbackItem = useCallback(
     (
@@ -746,8 +746,8 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           if (target.tagName !== "BUTTON" && target.tagName !== "A") {
             const isOwnFeedbackItem = props.userIdRef === getUserIdentity().id;
             // Block entering edit mode when the card is obscured during collection, or when the
-            // current user is neither the creator nor the board owner.
-            if ((props.hideFeedbackItems && !isOwnFeedbackItem) || (!isOwnFeedbackItem && !props.isBoardOwner)) {
+            // current user is neither the creator nor a board manager (owner or Team Admin).
+            if ((props.hideFeedbackItems && !isOwnFeedbackItem) || (!isOwnFeedbackItem && !props.canManageBoard)) {
               e.preventDefault();
               return;
             }
@@ -971,8 +971,8 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const totalItemsInColumn = numberedColumnItems.length;
 
   const hideFeedbackItems = props.workflowPhase === "Collect" && props.hideFeedbackItems && props.userIdRef !== getUserIdentity().id;
-  // A feedback card may only be edited or deleted by the user who created it or by the board owner.
-  const canModifyFeedbackItem = props.isBoardOwner || props.userIdRef === getUserIdentity().id;
+  // A feedback card may only be edited or deleted by the user who created it or by a board manager.
+  const canModifyFeedbackItem = props.canManageBoard || props.userIdRef === getUserIdentity().id;
   const creationDateFormatter = useMemo(() => new Intl.DateTimeFormat("default", { year: "numeric", month: "long", day: "numeric" }), []);
   const creationDateLabel = useMemo(() => {
     if (!props.createdDate) {
@@ -1257,7 +1257,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
               shouldHaveFocus: props.shouldHaveFocus,
               hideFeedbackItems: props.hideFeedbackItems,
               userIdRef: searchItem.userIdRef,
-              isBoardOwner: props.isBoardOwner,
+              canManageBoard: props.canManageBoard,
               timerSecs: searchItem.timerSecs,
               timerState: searchItem.timerState,
               timerId: searchItem.timerId,
