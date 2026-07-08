@@ -627,22 +627,29 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   }, [state, handleBoardTimerReset, handleBoardTimerToggle, handleCountdownDurationChange]);
 
   const updateUrlWithBoardAndTeamInformation = React.useCallback(async (teamId: string, boardId: string) => {
-    getService<IHostNavigationService>(CommonServiceIds.HostNavigationService).then(service => {
+    try {
+      const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
       const phase = state.currentBoard?.activePhase;
-      service.setHash(`teamId=${teamId}&boardId=${boardId}${phase ? `&phase=${phase}` : ""}`);
-    });
+      await service.setHash(`teamId=${teamId}&boardId=${boardId}${phase ? `&phase=${phase}` : ""}`);
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "updateUrlWithBoardAndTeamInformation",
+        teamId,
+        boardId,
+      });
+    }
   }, [state.currentBoard?.activePhase]);
 
-  const parseUrlForBoardAndTeamInformation = React.useCallback(async (): Promise<{ teamId: string; boardId: string; phase?: WorkflowPhase }> => {
+  const parseUrlForBoardAndTeamInformation = React.useCallback(async (): Promise<{ teamId?: string; boardId?: string; phase?: WorkflowPhase }> => {
     const service = await getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
     let hash = await service.getHash();
     if (hash.startsWith("#")) {
       hash = hash.substring(1);
     }
     const hashParams = new URLSearchParams(hash);
-    const teamId = hashParams.get("teamId");
-    const boardId = hashParams.get("boardId");
-    const phase = hashParams.get("phase") as WorkflowPhase;
+    const teamId = hashParams.get("teamId") ?? undefined;
+    const boardId = hashParams.get("boardId") ?? undefined;
+    const phase = (hashParams.get("phase") ?? undefined) as WorkflowPhase | undefined;
 
     return { teamId, boardId, phase };
   }, []);
@@ -917,12 +924,39 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     teamBoardDeletedDialogTitle: string;
     teamBoardDeletedDialogMessage: string;
   }> => {
-    const userTeams = await azureDevOpsCoreService.getAllTeams(projectId, true);
-    userTeams?.sort((t1, t2) => {
-      return t1.name.localeCompare(t2.name, [], { sensitivity: "accent" });
-    });
+    let userTeams: WebApiTeam[] = [];
+    try {
+      userTeams = sortTeamsByName((await azureDevOpsCoreService.getAllTeams(projectId, true)) ?? []);
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "initializeFeedbackBoard.getCurrentUserTeams",
+        projectId,
+      });
+    }
 
-    const defaultTeam = userTeams?.length ? userTeams[0] : await azureDevOpsCoreService.getDefaultTeam(projectId);
+    let defaultTeam = userTeams.length ? userTeams[0] : undefined;
+    if (!defaultTeam) {
+      try {
+        defaultTeam = await azureDevOpsCoreService.getDefaultTeam(projectId);
+      } catch (error) {
+        appInsights.trackException(error, {
+          action: "initializeFeedbackBoard.getDefaultTeam",
+          projectId,
+        });
+      }
+    }
+
+    if (!defaultTeam) {
+      try {
+        const projectTeams = sortTeamsByName((await azureDevOpsCoreService.getAllTeams(projectId, false)) ?? []);
+        defaultTeam = projectTeams[0];
+      } catch (error) {
+        appInsights.trackException(error, {
+          action: "initializeFeedbackBoard.getProjectTeamsFallback",
+          projectId,
+        });
+      }
+    }
 
     const baseTeamState = {
       userTeams,
@@ -932,6 +966,22 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       teamBoardDeletedDialogTitle: "",
       teamBoardDeletedDialogMessage: "",
     };
+
+    if (!defaultTeam) {
+      appInsights.trackException({ exception: new Error("No teams available for project.") }, {
+        action: "initializeFeedbackBoard.noDefaultTeam",
+        projectId,
+      });
+
+      return {
+        ...baseTeamState,
+        boards: [],
+        currentBoard: null,
+        isTeamBoardDeletedInfoDialogHidden: false,
+        teamBoardDeletedDialogTitle: "Team not found",
+        teamBoardDeletedDialogMessage: "Could not find a team for this project.",
+      };
+    }
 
     const searchParams = new URLSearchParams(document.location.search);
     if (searchParams.has("name")) {
@@ -955,7 +1005,15 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       parent.location.href = await getBoardUrl(state.currentTeam.id, newBoard.id, newBoard.activePhase);
     }
 
-    const info = await parseUrlForBoardAndTeamInformation();
+    let info: { teamId?: string; boardId?: string; phase?: WorkflowPhase } | undefined;
+    try {
+      info = await parseUrlForBoardAndTeamInformation();
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "initializeFeedbackBoard.parseUrlForBoardAndTeamInformation",
+        projectId,
+      });
+    }
     try {
       if (!info) {
         if (!isHostedAzureDevOps) {
@@ -1171,7 +1229,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           FeedbackBoardDocumentHelper.filter(
             board,
             userTeams.map(t => t.id),
-            state.currentUserId,
+            currentUserId,
           ),
         )
         .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
@@ -1892,7 +1950,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     return <div>{t("feedback_board_team_list_error")}</div>;
   }
 
-  const selectableTeams = showAllTeams && state.projectTeams.length ? state.projectTeams : state.userTeams;
+  const selectableTeams = showAllTeams && state.projectTeams.length ? state.projectTeams : state.userTeams.length ? state.userTeams : [state.currentTeam];
 
   const handleShowAllTeamsChange = async (shouldShowAllTeams: boolean): Promise<void> => {
     if (!shouldShowAllTeams) {
