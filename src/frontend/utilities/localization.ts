@@ -494,9 +494,19 @@ type InterpolationValues = Record<string, string | number>;
 let activeLocale = DEFAULT_LOCALE;
 let activeLanguage: SupportedLanguage = "en";
 
+function normalizeLocale(locale?: string | null): string {
+  const candidate = locale?.trim().replace(/_/g, "-") || DEFAULT_LOCALE;
+
+  try {
+    return Intl.getCanonicalLocales(candidate)[0] ?? DEFAULT_LOCALE;
+  } catch {
+    return DEFAULT_LOCALE;
+  }
+}
+
 function detectPreferredLocale(): string {
   const documentLocale = typeof document !== "undefined" ? document.documentElement.lang : "";
-  const browserLocale = typeof navigator !== "undefined" ? navigator.languages?.[0] ?? navigator.language : "";
+  const browserLocale = typeof navigator !== "undefined" ? (navigator.languages?.[0] ?? navigator.language) : "";
 
   return documentLocale || browserLocale || DEFAULT_LOCALE;
 }
@@ -522,7 +532,7 @@ function interpolate(template: string, values?: InterpolationValues): string {
 }
 
 export function setLocale(locale?: string | null): string {
-  activeLocale = locale?.trim() || DEFAULT_LOCALE;
+  activeLocale = normalizeLocale(locale);
   activeLanguage = resolveLanguage(activeLocale);
 
   if (typeof document !== "undefined") {

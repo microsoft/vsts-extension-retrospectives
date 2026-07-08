@@ -958,6 +958,20 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
     }
 
+    let info: { teamId?: string; boardId?: string; phase?: WorkflowPhase } | undefined;
+    try {
+      info = await parseUrlForBoardAndTeamInformation();
+    } catch (error) {
+      appInsights.trackException(error, {
+        action: "initializeFeedbackBoard.parseUrlForBoardAndTeamInformation",
+        projectId,
+      });
+    }
+
+    if (!defaultTeam && info?.teamId) {
+      defaultTeam = await azureDevOpsCoreService.getTeam(projectId, info.teamId);
+    }
+
     const baseTeamState = {
       userTeams,
       filteredUserTeams: userTeams,
@@ -1005,15 +1019,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       parent.location.href = await getBoardUrl(state.currentTeam.id, newBoard.id, newBoard.activePhase);
     }
 
-    let info: { teamId?: string; boardId?: string; phase?: WorkflowPhase } | undefined;
-    try {
-      info = await parseUrlForBoardAndTeamInformation();
-    } catch (error) {
-      appInsights.trackException(error, {
-        action: "initializeFeedbackBoard.parseUrlForBoardAndTeamInformation",
-        projectId,
-      });
-    }
     try {
       if (!info) {
         if (!isHostedAzureDevOps) {
@@ -1053,7 +1058,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
     // Attempt to pre-select the team based on the teamId query param.
     const teamIdQueryParam = info.teamId;
-    const matchedTeam = await azureDevOpsCoreService.getTeam(projectId, teamIdQueryParam);
+    const matchedTeam = defaultTeam?.id === teamIdQueryParam ? defaultTeam : await azureDevOpsCoreService.getTeam(projectId, teamIdQueryParam);
 
     if (!matchedTeam) {
       // If the teamId query param wasn't valid attempt to pre-select a team and board by last
