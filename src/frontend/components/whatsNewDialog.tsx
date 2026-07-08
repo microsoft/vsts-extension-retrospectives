@@ -9,6 +9,7 @@ interface IWhatsNewDialogProps {
 const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.57 and v1.92.56 include:";
 
 const WHATS_NEW_ITEMS = [
+  "Fixed the email summary Copy to clipboard action so it works reliably from the preview dialog.",
   "Extended permissions so team admins can also update column notes and edit or delete feedback cards.",
   "Improved hidden feedback behavior to display blurred feedback while announcing \"feedback blurred\".",
   "Added user settings to toggle between show all teams or my teams and to toggle between scrolling by board or by column.",

@@ -4,7 +4,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.57
 
-* Fixed double-scrollbar behavior in the Create email summary dialog at higher zoom levels. From [GitHub PR #1816](https://github.com/microsoft/vsts-extension-retrospectives/pull/1816)
+* Fixed double scrollbar behavior in the Create email summary dialog at higher zoom levels. From [GitHub PR #1816](https://github.com/microsoft/vsts-extension-retrospectives/pull/1816)
 * Extended permissions so board owners and team admins can update column notes and edit or delete feedback cards. From [GitHub PR #1805](https://github.com/microsoft/vsts-extension-retrospectives/pull/1805)
 * Improved hidden feedback behavior so screen displays blurred feedback and screen reader announces "feedback blurred". From [GitHub PR #1796](https://github.com/microsoft/vsts-extension-retrospectives/pull/1796)
 * Updated toast rendering so notifications appear within the topmost open dialog. From [GitHub PR #1794](https://github.com/microsoft/vsts-extension-retrospectives/pull/1794)
