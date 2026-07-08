@@ -558,6 +558,27 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
   });
 
+  it("loads a board from the URL team when team list lookups fail", async () => {
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=t1&boardId=b1&phase=Collect"), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockRejectedValue(new Error("Cannot load teams"));
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockRejectedValue(new Error("Cannot load default team"));
+    mocked(azureDevOpsCoreService.getTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(mockBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(azureDevOpsCoreService.getTeam).toHaveBeenCalledWith("1", "t1");
+    expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
+  });
+
   it("falls back to default team selection when board URL parsing fails", async () => {
     mocked(getService).mockRejectedValue(new Error("Host navigation unavailable"));
     mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
@@ -947,4 +968,3 @@ describe("FeedbackBoardContainer - Real-time collaboration", () => {
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
-
