@@ -973,6 +973,21 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply bg-primary font-normal h-8 leading-8 sticky p-1.5 top-0 z-1;
       }
 
+      & tr th .board-summary-sort-button {
+        @apply flex items-center justify-center gap-1 w-full h-full p-0 border-0 bg-transparent cursor-pointer;
+        font: inherit;
+        color: inherit;
+        line-height: inherit;
+      }
+
+      & tr th .board-summary-sort-icon {
+        @apply inline-flex items-center justify-center shrink-0 w-4 h-4;
+
+        & svg {
+          @apply w-4 h-4;
+        }
+      }
+
       & tr th:first-of-type {
         @apply w-9 max-w-9 min-w-9;
       }
