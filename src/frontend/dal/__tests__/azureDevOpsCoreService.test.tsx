@@ -4,6 +4,7 @@ import { TeamMember } from "azure-devops-extension-api/WebApi";
 
 // Mock azure-devops-extension-api
 const mockGetTeams = jest.fn();
+const mockGetProject = jest.fn();
 const mockGetTeam = jest.fn();
 const mockGetTeamMembersWithExtendedProperties = jest.fn();
 const mockGetClient = jest.fn();
@@ -20,6 +21,7 @@ describe("AzureDevOpsCoreService", () => {
 
     mockGetClient.mockReturnValue({
       getTeams: mockGetTeams,
+      getProject: mockGetProject,
       getTeam: mockGetTeam,
       getTeamMembersWithExtendedProperties: mockGetTeamMembersWithExtendedProperties,
     });
@@ -31,44 +33,52 @@ describe("AzureDevOpsCoreService", () => {
   });
 
   describe("getDefaultTeam", () => {
-    it("should return the first team for a project", async () => {
-      const mockTeam: WebApiTeam = {
-        id: "team-1",
-        name: "Default Team",
-        description: "The default team",
-      } as any;
+    it("should return the project default team", async () => {
+      const defaultTeam = { id: "team-1", name: "Default Team", url: "https://example.com/team-1" };
 
-      mockGetTeams.mockResolvedValue([mockTeam]);
+      mockGetProject.mockResolvedValue({
+        id: "project-123",
+        name: "Test Project",
+        defaultTeam,
+      });
 
       const result = await azureDevOpsCoreService.getDefaultTeam("project-123");
 
-      expect(result).toEqual(mockTeam);
-      expect(mockGetTeams).toHaveBeenCalledWith("project-123", false, 1);
+      expect(result).toEqual({
+        ...defaultTeam,
+        projectId: "project-123",
+        projectName: "Test Project",
+      });
+      expect(mockGetProject).toHaveBeenCalledWith("project-123");
+      expect(mockGetTeams).not.toHaveBeenCalled();
     });
 
-    it("should handle multiple teams and return only the first one", async () => {
-      const mockTeams: WebApiTeam[] = [{ id: "team-1", name: "Team 1" } as any, { id: "team-2", name: "Team 2" } as any];
-
-      mockGetTeams.mockResolvedValue(mockTeams);
+    it("should return null when the project has no default team", async () => {
+      mockGetProject.mockResolvedValue({
+        id: "project-456",
+        name: "Project without teams",
+      });
 
       const result = await azureDevOpsCoreService.getDefaultTeam("project-456");
 
-      expect(result).toEqual(mockTeams[0]);
-      expect(result.id).toBe("team-1");
+      expect(result).toBeNull();
     });
 
     it("should handle different project ids", async () => {
-      const mockTeam: WebApiTeam = {
-        id: "team-xyz",
-        name: "XYZ Team",
-      } as any;
-
-      mockGetTeams.mockResolvedValue([mockTeam]);
+      mockGetProject.mockResolvedValue({
+        id: "project-xyz",
+        name: "XYZ Project",
+        defaultTeam: {
+          id: "team-xyz",
+          name: "XYZ Team",
+        },
+      });
 
       const result = await azureDevOpsCoreService.getDefaultTeam("project-xyz");
 
       expect(result.id).toBe("team-xyz");
-      expect(mockGetTeams).toHaveBeenCalledWith("project-xyz", false, 1);
+      expect(result.projectName).toBe("XYZ Project");
+      expect(mockGetProject).toHaveBeenCalledWith("project-xyz");
     });
   });
 
@@ -181,7 +191,7 @@ describe("AzureDevOpsCoreService", () => {
 
       expect(result).toEqual(mockTeams);
       expect(result).toHaveLength(3);
-      expect(mockGetTeams).toHaveBeenCalledWith("project-123", false, 100, 0, true);
+      expect(mockGetTeams).toHaveBeenCalledWith("project-123", false, 100, 0);
       expect(mockGetTeams).toHaveBeenCalledTimes(1);
     });
 
@@ -199,8 +209,8 @@ describe("AzureDevOpsCoreService", () => {
 
       expect(result).toHaveLength(102);
       expect(mockGetTeams).toHaveBeenCalledTimes(2);
-      expect(mockGetTeams).toHaveBeenNthCalledWith(1, "project-123", false, 100, 0, true);
-      expect(mockGetTeams).toHaveBeenNthCalledWith(2, "project-123", false, 100, 100, true);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(1, "project-123", false, 100, 0);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(2, "project-123", false, 100, 100);
     });
 
     it("should handle multiple pagination rounds", async () => {
@@ -222,7 +232,7 @@ describe("AzureDevOpsCoreService", () => {
 
       expect(result).toHaveLength(201);
       expect(mockGetTeams).toHaveBeenCalledTimes(3);
-      expect(mockGetTeams).toHaveBeenNthCalledWith(3, "project-123", false, 100, 200, true);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(3, "project-123", false, 100, 200);
     });
 
     it("should respect forCurrentUserOnly parameter", async () => {
@@ -232,7 +242,7 @@ describe("AzureDevOpsCoreService", () => {
 
       await azureDevOpsCoreService.getAllTeams("project-456", true);
 
-      expect(mockGetTeams).toHaveBeenCalledWith("project-456", true, 100, 0, true);
+      expect(mockGetTeams).toHaveBeenCalledWith("project-456", true, 100, 0);
     });
 
     it("should handle empty teams list", async () => {
@@ -279,8 +289,8 @@ describe("AzureDevOpsCoreService", () => {
 
       await azureDevOpsCoreService.getAllTeams("project-xyz", true);
 
-      expect(mockGetTeams).toHaveBeenNthCalledWith(1, "project-xyz", true, 100, 0, true);
-      expect(mockGetTeams).toHaveBeenNthCalledWith(2, "project-xyz", true, 100, 100, true);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(1, "project-xyz", true, 100, 0);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(2, "project-xyz", true, 100, 100);
     });
   });
 });

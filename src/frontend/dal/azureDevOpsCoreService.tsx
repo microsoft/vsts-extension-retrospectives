@@ -11,7 +11,18 @@ class AzureDevOpsCoreService {
   }
 
   public async getDefaultTeam(projectId: string): Promise<WebApiTeam> {
-    return (await this._httpCoreClient.getTeams(projectId, false, 1))[0];
+    const project = await this._httpCoreClient.getProject(projectId);
+    const defaultTeam = project?.defaultTeam;
+
+    if (!defaultTeam) {
+      return null;
+    }
+
+    return {
+      ...defaultTeam,
+      projectId: project.id || projectId,
+      projectName: project.name,
+    } as WebApiTeam;
   }
 
   /**
@@ -51,7 +62,7 @@ class AzureDevOpsCoreService {
     const _httpCoreClient: CoreRestClient = getClient(CoreRestClient);
 
     const getTeamBatch = async (skip: number) => {
-      const teamBatch: WebApiTeam[] = await _httpCoreClient.getTeams(projectId, forCurrentUserOnly, 100, skip, true);
+      const teamBatch: WebApiTeam[] = await _httpCoreClient.getTeams(projectId, forCurrentUserOnly, 100, skip);
 
       if (teamBatch.length > 0) {
         allTeams.push(...teamBatch);
