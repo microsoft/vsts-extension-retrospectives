@@ -33,6 +33,7 @@ export interface IFeedbackColumnCard {
 }
 
 const maxColumnCount = 5;
+const maxColumnTitleLength = 50;
 
 const allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.length > 0);
 
@@ -456,7 +457,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                       <EditableDocumentCardTitle
                         isDisabled={columnCard.markedForDeletion}
                         isMultiline={false}
-                        maxLength={25}
+                        maxLength={maxColumnTitleLength}
                         title={columnCard.column.title}
                         isChangeEventRequired={true}
                         onSave={(newText: string) => {
