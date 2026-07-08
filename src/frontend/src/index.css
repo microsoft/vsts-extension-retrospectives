@@ -533,7 +533,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .preview-email-content {
-  @apply w-full p-2;
+  @apply w-full flex-1 min-h-0 p-2 resize-none overflow-y-auto box-border;
+}
+
+.preview-email-dialog {
+  @apply flex flex-col overflow-hidden;
+
+  & .subText {
+    @apply flex flex-1 min-h-0 overflow-hidden;
+  }
 }
 
 .choose-feedback-column-icon-button {
