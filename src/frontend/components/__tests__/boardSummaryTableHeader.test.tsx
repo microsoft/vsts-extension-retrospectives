@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import BoardSummaryTableHeader from "../boardSummaryTableHeader";
 import type { ISimpleColumn } from "../boardSummaryTable";
@@ -61,6 +61,21 @@ describe("BoardSummaryTableHeader", () => {
     const headers = container.querySelectorAll("th");
     const boardNameHeader = Array.from(headers).find(h => h.textContent === "Retrospective Name");
     expect(boardNameHeader).toHaveClass("asc");
+  });
+
+  it("renders sortable headers as buttons with visible sort icons", () => {
+    const onSort = jest.fn();
+    render(
+      <table>
+        <BoardSummaryTableHeader columns={mockColumns} sortColumn="boardName" sortDirection="asc" onSort={onSort} />
+      </table>,
+    );
+
+    const boardNameButton = screen.getByRole("button", { name: "Retrospective Name" });
+    const createdDateButton = screen.getByRole("button", { name: "Created Date" });
+
+    expect(boardNameButton.querySelector(".icon-chevron-up")).toBeInTheDocument();
+    expect(createdDateButton.querySelector(".board-summary-sort-icon.unsorted")).toBeInTheDocument();
   });
 
   it("calls onSort when sortable column header is clicked", () => {
