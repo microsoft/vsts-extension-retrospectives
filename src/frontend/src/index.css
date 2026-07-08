@@ -988,16 +988,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         }
       }
 
-      & tr th .board-summary-sort-icon.unsorted {
-        flex-direction: column;
-
-        & svg {
-          width: 0.75rem;
-          height: 0.75rem;
-          margin-block: -0.125rem;
-        }
-      }
-
       & tr th:first-of-type {
         @apply w-9 max-w-9 min-w-9;
       }

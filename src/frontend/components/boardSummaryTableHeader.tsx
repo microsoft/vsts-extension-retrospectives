@@ -40,12 +40,7 @@ const BoardSummaryTableHeader: React.FC<BoardSummaryTableHeaderProps> = ({ colum
       return <span className="board-summary-sort-icon" aria-hidden="true">{getIconElement("chevron-down")}</span>;
     }
 
-    return (
-      <span className="board-summary-sort-icon unsorted" aria-hidden="true">
-        {getIconElement("chevron-up")}
-        {getIconElement("chevron-down")}
-      </span>
-    );
+    return null;
   };
 
   const renderHeaderContent = (column: ISimpleColumn) => {

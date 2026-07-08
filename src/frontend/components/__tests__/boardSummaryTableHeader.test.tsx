@@ -63,7 +63,7 @@ describe("BoardSummaryTableHeader", () => {
     expect(boardNameHeader).toHaveClass("asc");
   });
 
-  it("renders sortable headers as buttons with visible sort icons", () => {
+  it("renders sortable headers as buttons and only shows icons for sorted columns", () => {
     const onSort = jest.fn();
     render(
       <table>
@@ -75,7 +75,7 @@ describe("BoardSummaryTableHeader", () => {
     const createdDateButton = screen.getByRole("button", { name: "Created Date" });
 
     expect(boardNameButton.querySelector(".icon-chevron-up")).toBeInTheDocument();
-    expect(createdDateButton.querySelector(".board-summary-sort-icon.unsorted")).toBeInTheDocument();
+    expect(createdDateButton.querySelector(".board-summary-sort-icon")).not.toBeInTheDocument();
   });
 
   it("calls onSort when sortable column header is clicked", () => {
