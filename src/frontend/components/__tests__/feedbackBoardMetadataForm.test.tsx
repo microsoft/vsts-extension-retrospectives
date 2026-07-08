@@ -943,6 +943,28 @@ describe("FeedbackBoardMetadataForm - Column Title Editing", () => {
     mockedProps.currentBoard = null;
   });
 
+  it("should allow column titles up to 50 characters", async () => {
+    const user = userEvent.setup();
+    const onFormSubmit = jest.fn();
+    const longColumnTitle = "A".repeat(50);
+    const { container } = render(<FeedbackBoardMetadataForm {...mockedProps} onFormSubmit={onFormSubmit} />);
+
+    await user.type(screen.getByLabelText(/please enter new retrospective title/i), "Board with longer column title");
+
+    const firstColumnTitle = container.querySelector(".feedback-column-card .editable-text") as HTMLElement;
+    await user.click(firstColumnTitle);
+
+    const editInput = screen.getByLabelText("Please enter feedback title") as HTMLInputElement;
+    await user.clear(editInput);
+    await user.type(editInput, longColumnTitle);
+
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(onFormSubmit).toHaveBeenCalledWith("Board with longer column title", 5, expect.arrayContaining([expect.objectContaining({ title: longColumnTitle })]), true, false, false, expect.anything(), expect.any(Array));
+    });
+  });
+
   it("should render editable column titles", () => {
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
@@ -2280,16 +2302,7 @@ describe("FeedbackBoardMetadataForm custom team assessment questions", () => {
     await user.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
-      expect(onFormSubmit).toHaveBeenCalledWith(
-        "Board with custom questions",
-        5,
-        expect.any(Array),
-        true,
-        false,
-        false,
-        expect.anything(),
-        expect.arrayContaining([expect.objectContaining({ title: "How healthy are our handoffs?", iconClassName: "assessment", isCustom: true })]),
-      );
+      expect(onFormSubmit).toHaveBeenCalledWith("Board with custom questions", 5, expect.any(Array), true, false, false, expect.anything(), expect.arrayContaining([expect.objectContaining({ title: "How healthy are our handoffs?", iconClassName: "assessment", isCustom: true })]));
     });
   });
 
