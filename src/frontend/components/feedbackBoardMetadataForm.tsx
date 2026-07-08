@@ -34,6 +34,7 @@ export interface IFeedbackColumnCard {
 }
 
 const maxColumnCount = 5;
+const maxColumnTitleLength = 50;
 
 const allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.length > 0);
 
@@ -264,43 +265,15 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     setMaxVotesPerUser(Number((event.target as HTMLInputElement | HTMLTextAreaElement).value));
   }, []);
 
-  const retrospectiveNameInput = React.useMemo(
-    () => (
-      <input
-        ref={retrospectiveNameInputRef}
-        aria-label="Please enter new retrospective title"
-        aria-required={true}
-        placeholder={placeholderText}
-        aria-describedby="retrospective-name-label"
-        className="title-input-container"
-        id="retrospective-title-input"
-        value={title}
-        maxLength={100}
-        onChange={handleInputChange}
-      />
-    ),
-    [handleInputChange, placeholderText, title],
-  );
+  const retrospectiveNameInput = React.useMemo(() => <input ref={retrospectiveNameInputRef} aria-label="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} aria-describedby="retrospective-name-label" className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />, [handleInputChange, placeholderText, title]);
 
-  const maxVotesPerUserInput = React.useMemo(
-    () => <input className="title-input-container" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />,
-    [handleMaxVotePerUserChange, maxVotesPerUser],
-  );
+  const maxVotesPerUserInput = React.useMemo(() => <input className="title-input-container" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />, [handleMaxVotePerUserChange, maxVotesPerUser]);
 
-  const shouldShowFeedbackAfterCollectInput = React.useMemo(
-    () => <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />,
-    [handleShouldShowFeedbackAfterCollectChange, isNewBoardCreation, shouldShowFeedbackAfterCollect],
-  );
+  const shouldShowFeedbackAfterCollectInput = React.useMemo(() => <input id="obscure-feedback-checkbox" type="checkbox" aria-label="Only show feedback after Collect phase. This selection cannot be modified after board creation." checked={shouldShowFeedbackAfterCollect} disabled={!isNewBoardCreation} onChange={handleShouldShowFeedbackAfterCollectChange} />, [handleShouldShowFeedbackAfterCollectChange, isNewBoardCreation, shouldShowFeedbackAfterCollect]);
 
-  const isBoardAnonymousInput = React.useMemo(
-    () => <input id="feedback-display-names-checkbox" type="checkbox" aria-label="Make participant feedback anonymous. This selection cannot be modified after board creation." checked={isBoardAnonymous} disabled={!isNewBoardCreation} onChange={handleIsAnonymousCheckboxChange} />,
-    [handleIsAnonymousCheckboxChange, isBoardAnonymous, isNewBoardCreation],
-  );
+  const isBoardAnonymousInput = React.useMemo(() => <input id="feedback-display-names-checkbox" type="checkbox" aria-label="Make participant feedback anonymous. This selection cannot be modified after board creation." checked={isBoardAnonymous} disabled={!isNewBoardCreation} onChange={handleIsAnonymousCheckboxChange} />, [handleIsAnonymousCheckboxChange, isBoardAnonymous, isNewBoardCreation]);
 
-  const isIncludeTeamEffectivenessMeasurementInput = React.useMemo(
-    () => <input id="include-team-assessment-checkbox" type="checkbox" aria-label="Include Team Assessment. This selection cannot be modified after board creation." checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />,
-    [handleIsIncludeTeamEffectivenessMeasurementCheckboxChange, isIncludeTeamEffectivenessMeasurement, isNewBoardCreation],
-  );
+  const isIncludeTeamEffectivenessMeasurementInput = React.useMemo(() => <input id="include-team-assessment-checkbox" type="checkbox" aria-label="Include Team Assessment. This selection cannot be modified after board creation." checked={isIncludeTeamEffectivenessMeasurement} disabled={!isNewBoardCreation} onChange={handleIsIncludeTeamEffectivenessMeasurementCheckboxChange} />, [handleIsIncludeTeamEffectivenessMeasurementCheckboxChange, isIncludeTeamEffectivenessMeasurement, isNewBoardCreation]);
 
   const customTeamAssessmentQuestionInputs = React.useMemo(
     () =>
@@ -320,13 +293,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               });
             }}
           />
-          <button
-            className="feedback-column-card-delete-button"
-            title="Delete"
-            aria-label={`Remove custom team assessment question ${index + 1}`}
-            type="button"
-            onClick={() => setCustomTeamAssessmentQuestions(previousQuestions => previousQuestions.filter((_, currentIndex) => currentIndex !== index))}
-          >
+          <button className="feedback-column-card-delete-button" title="Delete" aria-label={`Remove custom team assessment question ${index + 1}`} type="button" onClick={() => setCustomTeamAssessmentQuestions(previousQuestions => previousQuestions.filter((_, currentIndex) => currentIndex !== index))}>
             {getIconElement("delete")}
           </button>
         </div>
@@ -414,9 +381,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
               <section className="board-metadata-edit-column-settings">
                 <h2 className="board-metadata-form-section-header">Custom Team Assessment Questions</h2>
-                <div className="board-metadata-form-section-subheader grid-cols-1!">
-                  {customTeamAssessmentQuestionInputs}
-                </div>
+                <div className="board-metadata-form-section-subheader grid-cols-1!">{customTeamAssessmentQuestionInputs}</div>
                 <button type="button" className="create-feedback-column-card-button" aria-label="Add custom question" onClick={() => setCustomTeamAssessmentQuestions([...customTeamAssessmentQuestions, ""])}>
                   {getIconElement("add")}
                   Add custom question
@@ -485,7 +450,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                         <EditableDocumentCardTitle
                           isDisabled={columnCard.markedForDeletion}
                           isMultiline={false}
-                          maxLength={25}
+                          maxLength={maxColumnTitleLength}
                           title={columnCard.column.title}
                           isChangeEventRequired={true}
                           onSave={(newText: string) => {
@@ -584,12 +549,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               </button>
             </section>
             {currentBoard && !isDeleteColumnConfirmationDialogHidden && (
-              <dialog
-                ref={deleteColumnConfirmDialogRef}
-                className="confirm-changes-dialog dialog-width-sm"
-                aria-label="Confirm Changes"
-                onClose={() => setIsDeleteColumnConfirmationDialogHidden(true)}
-              >
+              <dialog ref={deleteColumnConfirmDialogRef} className="confirm-changes-dialog dialog-width-sm" aria-label="Confirm Changes" onClose={() => setIsDeleteColumnConfirmationDialogHidden(true)}>
                 <div className="header">
                   <h2 className="title">Confirm Changes</h2>
                   <button onClick={hideDeleteColumnConfirmationDialog} aria-label="Close">
@@ -598,10 +558,10 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 </div>
                 <div className="subText">{`Are you sure you want to remove columns from '${currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`}</div>
                 <div className="inner">
-                  <button onClick={handleDeleteColumnConfirm}>
-                    {t("common_confirm")}
+                  <button onClick={handleDeleteColumnConfirm}>{t("common_confirm")}</button>
+                  <button className="default button" onClick={hideDeleteColumnConfirmationDialog}>
+                    {t("common_cancel")}
                   </button>
-                  <button className="default button" onClick={hideDeleteColumnConfirmationDialog}>{t("common_cancel")}</button>
                 </div>
               </dialog>
             )}
@@ -701,7 +661,11 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         </PivotItem>
       </Pivot>
       <div className="inner">
-        {error && <span className="input-validation-message">{getIconElement("report")} {error}</span>}
+        {error && (
+          <span className="input-validation-message">
+            {getIconElement("report")} {error}
+          </span>
+        )}
         <button
           className="metadata-form-save-button"
           onClick={async event => {
