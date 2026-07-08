@@ -60,6 +60,21 @@ describe("Feedback Column ", () => {
     expect(feedbackColumn).toBeTruthy();
   });
 
+  it("renders column name tooltip as a hint popover", () => {
+    const { container, getByRole } = render(<FeedbackColumn {...testColumnProps} />);
+
+    const columnName = container.querySelector(".feedback-column-name");
+    const tooltipTrigger = getByRole("button", { name: testColumnProps.columnName });
+    const tooltipId = tooltipTrigger.getAttribute("interestfor");
+    const tooltip = container.querySelector(".feedback-column-name-tooltip");
+
+    expect(columnName).not.toHaveAttribute("title");
+    expect(tooltipId).toBeTruthy();
+    expect(tooltipTrigger).toHaveAttribute("aria-describedby", tooltipId);
+    expect(tooltip).toHaveAttribute("id", tooltipId);
+    expect(tooltip).toHaveAttribute("popover", "hint");
+  });
+
   describe("edit column button", () => {
     it("is not rendered when the user cannot edit", () => {
       const { container } = render(<FeedbackColumn {...testColumnProps} showColumnEditButton={false} />);
@@ -86,22 +101,33 @@ describe("Feedback Column ", () => {
     });
   });
 
-  describe("info button", () => {
-    it("shows the info icon with notes in tooltip when notes exist", () => {
-      const props = { ...testColumnProps, columnNotes: "Saved notes", showColumnEditButton: false };
-      const { getByRole } = render(<FeedbackColumn {...props} />);
+  describe("column notes tooltip", () => {
+    it("shows saved notes as a hint popover on the edit button", () => {
+      const props = { ...testColumnProps, columnNotes: "Saved notes", showColumnEditButton: true };
+      const { container, getByRole } = render(<FeedbackColumn {...props} />);
 
-      const infoButton = getByRole("button", { name: `Column notes: ${props.columnNotes}` });
-      expect(infoButton).toBeInTheDocument();
-      expect(infoButton).toHaveAttribute("title", "Saved notes");
+      const editButton = getByRole("button", { name: `Edit column ${props.columnName}` });
+      const tooltipId = editButton.getAttribute("interestfor");
+      const tooltip = container.querySelector(".feedback-column-notes-tooltip");
+
+      expect(editButton).not.toHaveAttribute("title");
+      expect(tooltipId).toBeTruthy();
+      expect(editButton).toHaveAttribute("aria-describedby", tooltipId);
+      expect(tooltip).toHaveAttribute("id", tooltipId);
+      expect(tooltip).toHaveAttribute("popover", "hint");
+      expect(tooltip).toHaveTextContent("Saved notes");
     });
 
-    it("does not show info button when no notes exist", () => {
-      const props = { ...testColumnProps, columnNotes: "", showColumnEditButton: false };
-      const { queryByRole } = render(<FeedbackColumn {...props} />);
+    it("does not add a notes tooltip when no notes exist", () => {
+      const props = { ...testColumnProps, columnNotes: "", showColumnEditButton: true };
+      const { container, getByRole, queryByRole } = render(<FeedbackColumn {...props} />);
 
-      const infoButton = queryByRole("button", { name: /Column notes:/ });
-      expect(infoButton).not.toBeInTheDocument();
+      const editButton = getByRole("button", { name: `Edit column ${props.columnName}` });
+
+      expect(editButton).not.toHaveAttribute("interestfor");
+      expect(editButton).not.toHaveAttribute("aria-describedby");
+      expect(container.querySelector(".feedback-column-notes-tooltip")).toBeNull();
+      expect(queryByRole("button", { name: /Column notes:/ })).not.toBeInTheDocument();
     });
   });
 

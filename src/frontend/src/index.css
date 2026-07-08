@@ -1330,15 +1330,19 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & .feedback-column-name {
-      @apply text-sm ml-1.5 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap;
+      @apply text-sm ml-1.5 min-w-0 block w-full border-0 p-0 overflow-hidden text-ellipsis whitespace-nowrap cursor-help;
+    }
+
+    & .feedback-column-name-tooltip {
+      @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-72 whitespace-normal pointer-events-none;
+      position-area: bottom;
     }
   }
 
   & .feedback-column-actions {
     @apply inline-flex items-center gap-1 justify-self-end;
 
-    & .feedback-column-edit-button,
-    & .feedback-column-info-button {
+    & .feedback-column-edit-button {
       @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] cursor-pointer bg-transparent border-0 p-2 rounded-sm transition-colors duration-200 ml-0.5;
 
       &:hover {
@@ -1352,6 +1356,11 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       & svg {
         @apply w-5 h-5;
       }
+    }
+
+    & .feedback-column-notes-tooltip {
+      @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-72 whitespace-normal pointer-events-none;
+      position-area: bottom;
     }
   }
 }

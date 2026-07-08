@@ -2245,7 +2245,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     </div>
                     <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
                       <details className="flex items-center relative">
-                        <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
+                        <summary aria-label="Board Actions Menu" className="contextual-menu-button">
                           {getIconElement("more-horizontal")}
                         </summary>
                         <div className="callout-menu left" role="menu" aria-label="Board Actions">
@@ -2387,7 +2387,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                               </div>
                             </dialog>
                           )}
-                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} title="Team Assessment" aria-label="Team Assessment" type="button">
+                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} aria-label="Team Assessment" type="button">
                             {getIconElement("assessment")}
                             <span className="hidden lg:inline">Team Assessment</span>
                           </button>
