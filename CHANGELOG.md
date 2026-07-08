@@ -2,6 +2,13 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## Unreleased
+
+* Increased the custom column title limit to 50 characters and kept longer column names readable in board headers. From [GitHub PR #1820](https://github.com/microsoft/vsts-extension-retrospectives/pull/1820)
+* Fixed retrospective board links for Azure DevOps organizations in the Pakistan region by normalizing underscore-formatted locales before date and number formatting. From [GitHub PR #1819](https://github.com/microsoft/vsts-extension-retrospectives/pull/1819)
+* Updated default team selection to use the project default team and handle projects without a configured default team. From [GitHub PR #1818](https://github.com/microsoft/vsts-extension-retrospectives/pull/1818)
+* Improved board and team loading recovery by falling back to default, project, or URL-selected teams when team lookups or navigation hash parsing failed. From [GitHub PR #1817](https://github.com/microsoft/vsts-extension-retrospectives/pull/1817)
+
 ## v1.92.57
 
 * Fixed double scrollbar behavior in the Create email summary dialog at higher zoom levels. From [GitHub PR #1816](https://github.com/microsoft/vsts-extension-retrospectives/pull/1816)

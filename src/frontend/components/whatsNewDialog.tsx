@@ -6,16 +6,13 @@ interface IWhatsNewDialogProps {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
 }
 
-const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.57 and v1.92.56 include:";
+const WHATS_NEW_HEADER_TEXT = "Highlights from release v1.92.58 include:";
 
 const WHATS_NEW_ITEMS = [
-  "Fixed the email summary Copy to clipboard action so it works reliably from the preview dialog.",
-  "Extended permissions so team admins can also update column notes and edit or delete feedback cards.",
-  "Improved hidden feedback behavior to display blurred feedback while announcing \"feedback blurred\".",
-  "Added user settings to toggle between show all teams or my teams and to toggle between scrolling by board or by column.",
-  "Added team admin setting for configuring available work item types in \"Add work item\".",
-  "Defaulted add-work-item type options to Requirement Backlog types for the Act tab and Focus mode.",
-  "Adjusted the \"Add work item\" selection to ensure the full list of work item types is visible for the Act tab and Focus mode, even with a long list of custom types.",
+  "Increased the custom column title limit to 50 characters and kept longer column names readable in board headers.",
+  "Fixed retrospective board links for Azure DevOps organizations in the Pakistan region.",
+  "Improved startup reliability by using the project default team and handling projects without a configured default team.",
+  "Improved board loading recovery when team lookups or navigation hash parsing failed.",
 ];
 
 const WHATS_NEW_FOOTER_TEXT = "Refer to the Changelog for a complete history of updates.";
