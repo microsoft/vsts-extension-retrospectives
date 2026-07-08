@@ -58,7 +58,7 @@ const translations = {
     app_init_failed_step_refresh: "Refresh the page",
     feedback_board_team_list_error: "We are unable to retrieve the list of teams for this project. Try reloading the page.",
     feedback_board_link_copied: "The link to retrospective {{title}} ({{phase}} phase) has been copied to your clipboard.",
-    feedback_board_email_copied: "The email summary for \"{{title}}\" has been copied to your clipboard.",
+    feedback_board_email_copied: 'The email summary for "{{title}}" has been copied to your clipboard.',
     feedback_board_answer_all_questions: "Please answer all questions before saving",
     feedback_board_archive_title: "Archive retrospective",
     feedback_board_archive_message: "The retrospective board {{title}} with its feedback will be archived.",
@@ -179,7 +179,7 @@ const translations = {
     app_init_failed_step_refresh: "Recarga la pagina",
     feedback_board_team_list_error: "No podemos recuperar la lista de equipos de este proyecto. Intenta recargar la pagina.",
     feedback_board_link_copied: "El enlace a la retrospectiva {{title}} (fase {{phase}}) se copio a tu portapapeles.",
-    feedback_board_email_copied: "El resumen por correo de \"{{title}}\" se copio a tu portapapeles.",
+    feedback_board_email_copied: 'El resumen por correo de "{{title}}" se copio a tu portapapeles.',
     feedback_board_answer_all_questions: "Responde todas las preguntas antes de guardar",
     feedback_board_archive_title: "Archivar la retrospectiva",
     feedback_board_archive_message: "Se archivara el tablero de retrospectiva {{title}} con sus comentarios.",
@@ -300,7 +300,7 @@ const translations = {
     app_init_failed_step_refresh: "Aktualisieren Sie die Seite",
     feedback_board_team_list_error: "Die Teamliste fuer dieses Projekt konnte nicht abgerufen werden. Versuchen Sie, die Seite neu zu laden.",
     feedback_board_link_copied: "Der Link zur Retrospektive {{title}} (Phase {{phase}}) wurde in Ihre Zwischenablage kopiert.",
-    feedback_board_email_copied: "Die E-Mail-Zusammenfassung fuer \"{{title}}\" wurde in Ihre Zwischenablage kopiert.",
+    feedback_board_email_copied: 'Die E-Mail-Zusammenfassung fuer "{{title}}" wurde in Ihre Zwischenablage kopiert.',
     feedback_board_answer_all_questions: "Bitte beantworten Sie alle Fragen, bevor Sie speichern",
     feedback_board_archive_title: "Retrospektive archivieren",
     feedback_board_archive_message: "Das Retrospektiven-Board {{title}} wird zusammen mit seinem Feedback archiviert.",
@@ -421,7 +421,7 @@ const translations = {
     app_init_failed_step_refresh: "Actualisez la page",
     feedback_board_team_list_error: "Impossible de recuperer la liste des equipes pour ce projet. Essayez d'actualiser la page.",
     feedback_board_link_copied: "Le lien vers la retrospective {{title}} (phase {{phase}}) a ete copie dans votre presse-papiers.",
-    feedback_board_email_copied: "Le resume par e-mail de \"{{title}}\" a ete copie dans votre presse-papiers.",
+    feedback_board_email_copied: 'Le resume par e-mail de "{{title}}" a ete copie dans votre presse-papiers.',
     feedback_board_answer_all_questions: "Veuillez repondre a toutes les questions avant d'enregistrer",
     feedback_board_archive_title: "Archiver la retrospective",
     feedback_board_archive_message: "Le tableau de retrospective {{title}} sera archive avec ses commentaires.",
@@ -494,9 +494,19 @@ type InterpolationValues = Record<string, string | number>;
 let activeLocale = DEFAULT_LOCALE;
 let activeLanguage: SupportedLanguage = "en";
 
+function normalizeLocale(locale?: string | null): string {
+  const candidate = locale?.trim().replace(/_/g, "-") || DEFAULT_LOCALE;
+
+  try {
+    return Intl.getCanonicalLocales(candidate)[0] ?? DEFAULT_LOCALE;
+  } catch {
+    return DEFAULT_LOCALE;
+  }
+}
+
 function detectPreferredLocale(): string {
   const documentLocale = typeof document !== "undefined" ? document.documentElement.lang : "";
-  const browserLocale = typeof navigator !== "undefined" ? navigator.languages?.[0] ?? navigator.language : "";
+  const browserLocale = typeof navigator !== "undefined" ? (navigator.languages?.[0] ?? navigator.language) : "";
 
   return documentLocale || browserLocale || DEFAULT_LOCALE;
 }
@@ -522,7 +532,7 @@ function interpolate(template: string, values?: InterpolationValues): string {
 }
 
 export function setLocale(locale?: string | null): string {
-  activeLocale = locale?.trim() || DEFAULT_LOCALE;
+  activeLocale = normalizeLocale(locale);
   activeLanguage = resolveLanguage(activeLocale);
 
   if (typeof document !== "undefined") {
