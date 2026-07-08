@@ -85,70 +85,71 @@ jobs:
         run: |
           wget https://raw.githubusercontent.com/tbroadley/spellchecker-cli/ddb8f07599b5b15147168d3bcd8bbede0df8d2c7/dictionaries/base.txt
           echo "" >> base.txt
-          echo "azure-devops-extension-" >> base.txt
-          echo "parens" >> base.txt
-          echo "emailable" >> base.txt
+          echo "AdjustIcon" >> base.txt
+          echo "allowlist" >> base.txt
           echo "anonymize" >> base.txt
-          echo "pre-populated" >> base.txt
-          echo "favorability" >> base.txt
-          echo "Dev" >> base.txt
-          echo "tooltip" >> base.txt
-          echo "outloud" >> base.txt
-          echo "timebox" >> base.txt
-          echo "uncast" >> base.txt
-          echo "PRs" >> base.txt
-          echo "CodeCov" >> base.txt
+          echo "Async" >> base.txt
+          echo "azure-devops-extension-" >> base.txt
           echo "Backend" >> base.txt
-          echo "Pre-commit" >> base.txt
-          echo "SignalR" >> base.txt
-          echo "WIP" >> base.txt
-          echo "OKR" >> base.txt
-          echo "OKRs" >> base.txt
-          echo "CSV" >> base.txt
-          echo "SDK" >> base.txt
-          echo "GitHub" >> base.txt
-          echo "DevOps" >> base.txt
-          echo "Frontend" >> base.txt
-          echo "ERD" >> base.txt
+          echo "Bain" >> base.txt
+          echo "camelCase" >> base.txt
           echo "Changelog" >> base.txt
           echo "changelog" >> base.txt
-          echo "ReactTable" >> base.txt
-          echo "README" >> base.txt
-          echo "OpenSSF" >> base.txt
-          echo "Dependabot" >> base.txt
-          echo "lockfile" >> base.txt
-          echo "devDependency" >> base.txt
-          echo "roadmap" >> base.txt
           echo "CI_Backend" >> base.txt
-          echo "Moq" >> base.txt
-          echo "xUnit" >> base.txt
-          echo "Kanban" >> base.txt
+          echo "CodeCov" >> base.txt
+          echo "CSV" >> base.txt
+          echo "customizable" >> base.txt
+          echo "Dependabot" >> base.txt
+          echo "devDependency" >> base.txt
+          echo "Dev" >> base.txt
+          echo "DevOps" >> base.txt
+          echo "Edmondson" >> base.txt
+          echo "emailable" >> base.txt
           echo "enum" >> base.txt
-          echo "uncheck" >> base.txt
-          echo "unaggregated" >> base.txt
-          echo "gitleaks" >> base.txt
-          echo "ESNext" >> base.txt
+          echo "ERD" >> base.txt
           echo "ES2020" >> base.txt
+          echo "ESNext" >> base.txt
+          echo "favorability" >> base.txt
+          echo "favorability-band" >> base.txt
+          echo "Forsgren" >> base.txt
+          echo "Frontend" >> base.txt
+          echo "GitHub" >> base.txt
+          echo "gitleaks" >> base.txt
+          echo "hostname" >> base.txt
           echo "JSX" >> base.txt
-          echo "Async" >> base.txt
+          echo "Kanban" >> base.txt
+          echo "lockfile" >> base.txt
+          echo "memoizing" >> base.txt
+          echo "Moq" >> base.txt
+          echo "OKR" >> base.txt
+          echo "OKRs" >> base.txt
+          echo "on-prem" >> base.txt
+          echo "OpenSSF" >> base.txt
+          echo "outloud" >> base.txt
+          echo "parens" >> base.txt
           echo "PascalCase" >> base.txt
-          echo "camelCase" >> base.txt
+          echo "pre-populated" >> base.txt
+          echo "Pre-commit" >> base.txt
+          echo "PRs" >> base.txt
+          echo "README" >> base.txt
+          echo "ReactTable" >> base.txt
+          echo "reconnection" >> base.txt
+          echo "roadmap" >> base.txt
+          echo "scrollbar" >> base.txt
+          echo "SDK" >> base.txt
+          echo "SignalR" >> base.txt
+          echo "timebox" >> base.txt
+          echo "tooltip" >> base.txt
+          echo "unaggregated" >> base.txt
+          echo "uncast" >> base.txt
+          echo "uncheck" >> base.txt
           echo "useCallback" >> base.txt
           echo "useState" >> base.txt
-          echo "AdjustIcon" >> base.txt
-          echo "reconnection" >> base.txt
-          echo "ZTNA" >> base.txt
           echo "WebSocket" >> base.txt
-          echo "hostname" >> base.txt
-          echo "on-prem" >> base.txt
-          echo "allowlist" >> base.txt
-          echo "favorability-band" >> base.txt
-          echo "memoizing" >> base.txt
           echo "websocket" >> base.txt
-          echo "customizable" >> base.txt
-          echo "Bain" >> base.txt
-          echo "Edmondson" >> base.txt
-          echo "Forsgren" >> base.txt
+          echo "WIP" >> base.txt
+          echo "xUnit" >> base.txt
+          echo "ZTNA" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
       - if: steps.changes.outputs.src == 'true'
