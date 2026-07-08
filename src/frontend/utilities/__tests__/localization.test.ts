@@ -99,8 +99,22 @@ describe("localization", () => {
     expect(document.documentElement.lang).toBe("en-GB");
   });
 
+  it("normalizes underscore locale separators before formatting dates and numbers", () => {
+    expect(setLocale("en_PK")).toBe("en-PK");
+    expect(getCurrentLocale()).toBe("en-PK");
+    expect(document.documentElement.lang).toBe("en-PK");
+    expect(() => formatDate(new Date("2024-03-15T00:00:00Z"), { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })).not.toThrow();
+    expect(() => formatNumber(1234.5, { minimumFractionDigits: 1, maximumFractionDigits: 1 })).not.toThrow();
+  });
+
   it("falls back to the default locale when setLocale receives a blank value", () => {
     expect(setLocale("   ")).toBe("en-US");
+    expect(getCurrentLocale()).toBe("en-US");
+    expect(document.documentElement.lang).toBe("en-US");
+  });
+
+  it("falls back to the default locale when setLocale receives an invalid locale identifier", () => {
+    expect(setLocale("constructor-GB")).toBe("en-US");
     expect(getCurrentLocale()).toBe("en-US");
     expect(document.documentElement.lang).toBe("en-US");
   });
