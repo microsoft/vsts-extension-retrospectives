@@ -5,6 +5,12 @@ on:
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
 
 concurrency:
   group: ${{ github.workflow }}
@@ -20,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: read
       pull-requests: read
       statuses: write
       checks: write
@@ -36,6 +43,27 @@ jobs:
         name: "Setup node"
         with:
           node-version: "24"
+
+      - if: github.event_name == 'pull_request'
+        name: "Check release-facing content label"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          updated_label="docs updated"
+          not_required_label="docs not needed"
+          labels=$(gh api "repos/${REPOSITORY}/issues/${PR_NUMBER}/labels" --jq '.[].name')
+
+          if grep -Fxq "${updated_label}" <<< "${labels}" || grep -Fxq "${not_required_label}" <<< "${labels}"; then
+            echo "Release-facing content label found."
+            exit 0
+          fi
+
+          echo "::error::Add either '${updated_label}' or '${not_required_label}' to this PR."
+          exit 1
 
       - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
         id: changes
@@ -172,7 +200,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: "Prepare package"
-        working-directory: 'src/frontend'
+        working-directory: "src/frontend"
         run: |
           ext_file="vss-extension-dev.json"
 
@@ -197,7 +225,7 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: "Publish extension to dev environment"
-        working-directory: 'src/frontend'
+        working-directory: "src/frontend"
         env:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
