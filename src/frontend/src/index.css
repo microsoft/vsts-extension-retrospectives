@@ -649,18 +649,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-metadata-form-permissions .board-metadata-form-board-settings {
-  & .board-metadata-form-section-information {
-    @apply m-2.5;
-  }
-
-  & .search-bar {
-    @apply pt-0 px-2.5 pb-2.5;
-
-    & .permission-search-input {
-      @apply w-full p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
-    }
-  }
-
   & .board-metadata-table-container {
     @apply max-h-85 overflow-auto;
   }
@@ -1521,7 +1509,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-section-information {
-    @apply grid grid-cols-[auto_1fr] items-center gap-1 border-3 border-gray-medium bg-gray-medium my-1.5 mx-0 mb-2.5 p-1;
+    @apply grid grid-cols-[auto_1fr] items-center gap-1 bg-(--text-primary-color) text-(--background-color) my-3 p-1;
 
     &.warning-information {
       @apply bg-task-yellow border-task-yellow;
@@ -1529,6 +1517,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     & svg {
       @apply w-5 h-5;
+    }
+  }
+
+  & .search-bar {
+    @apply mb-3;
+
+    & .permission-search-input {
+      @apply w-full p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
     }
   }
 
