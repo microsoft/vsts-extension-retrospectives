@@ -459,7 +459,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .inner {
-    @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
+    @apply flex items-center justify-end gap-3 py-3 shrink-0;
 
     & .input-validation-message {
       @apply flex items-center gap-1 text-error text-sm;
@@ -486,6 +486,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
     }
   }
+}
+
+.board-metadata-dialog {
+  @apply flex flex-col overflow-hidden;
 }
 
 .dialog-width-sm {
@@ -654,9 +658,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
+.board-metadata-form-permissions {
+  @apply h-full min-h-0 flex flex-col;
+}
+
 .board-metadata-form-permissions .board-metadata-form-board-settings {
+  @apply flex flex-1 min-h-0 flex-col;
+
   & .board-metadata-table-container {
-    @apply max-h-85 overflow-auto;
+    @apply flex-1 min-h-0 overflow-auto;
   }
 
   & .board-metadata-table {
@@ -1500,7 +1510,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board-metadata-form {
-  @apply grid grid-rows-[auto_1fr_auto] px-5 py-3;
+  @apply grid flex-1 min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden px-5 py-3;
+}
+
+.feedback-board-metadata-form > #board-metadata-general-panel {
+  @apply min-h-0 overflow-auto;
+}
+
+.feedback-board-metadata-form > #board-metadata-permissions-panel {
+  @apply min-h-0 overflow-hidden;
 }
 
 .board-metadata-form {
