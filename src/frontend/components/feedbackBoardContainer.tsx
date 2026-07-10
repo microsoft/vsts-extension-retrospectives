@@ -46,6 +46,7 @@ import { workService } from "../dal/azureDevOpsWorkService";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
+const TOOLTIP_SHOW_DELAY_MS = 500;
 
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
@@ -227,6 +228,14 @@ function useShowModalWhenVisible(isVisible: boolean, dialogRef: React.RefObject<
   }, [dialogRef, isVisible]);
 }
 
+function isPopoverOpen(popover: HTMLElement): boolean {
+  try {
+    return popover.matches(":popover-open");
+  } catch {
+    return false;
+  }
+}
+
 export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isHostedAzureDevOps: boolean; projectId: string }) {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardContainer");
 
@@ -246,6 +255,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const prevActiveTabRef = React.useRef<FeedbackBoardContainerState["activeTab"]>(initialState.activeTab);
 
   const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
+  const teamSelectorRef = React.useRef<HTMLSelectElement | null>(null);
+  const teamSelectorTooltipRef = React.useRef<HTMLDivElement | null>(null);
+  const teamSelectorTooltipShowTimeoutIdRef = React.useRef<number | undefined>(undefined);
 
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
@@ -293,6 +305,51 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     },
     [setDialogVisible],
   );
+
+  const clearTeamSelectorTooltipShowTimeout = React.useCallback(() => {
+    if (teamSelectorTooltipShowTimeoutIdRef.current === undefined) {
+      return;
+    }
+
+    window.clearTimeout(teamSelectorTooltipShowTimeoutIdRef.current);
+    teamSelectorTooltipShowTimeoutIdRef.current = undefined;
+  }, []);
+
+  const showTeamSelectorTooltip = React.useCallback(() => {
+    const tooltip = teamSelectorTooltipRef.current;
+    if (!tooltip || isPopoverOpen(tooltip) || teamSelectorTooltipShowTimeoutIdRef.current !== undefined) {
+      return;
+    }
+
+    teamSelectorTooltipShowTimeoutIdRef.current = window.setTimeout(() => {
+      teamSelectorTooltipShowTimeoutIdRef.current = undefined;
+
+      const currentTooltip = teamSelectorTooltipRef.current;
+      const select = teamSelectorRef.current;
+      const showPopover = (currentTooltip as (HTMLDivElement & { showPopover?: (options?: { source?: HTMLSelectElement }) => void }) | null)?.showPopover;
+      if (!currentTooltip || !select || isPopoverOpen(currentTooltip) || !showPopover) {
+        return;
+      }
+
+      try {
+        showPopover.call(currentTooltip, { source: select });
+      } catch {
+        showPopover.call(currentTooltip);
+      }
+    }, TOOLTIP_SHOW_DELAY_MS);
+  }, []);
+
+  const hideTeamSelectorTooltip = React.useCallback(() => {
+    clearTeamSelectorTooltipShowTimeout();
+
+    const tooltip = teamSelectorTooltipRef.current;
+    const hidePopover = (tooltip as (HTMLDivElement & { hidePopover?: () => void }) | null)?.hidePopover;
+    if (tooltip && isPopoverOpen(tooltip) && hidePopover) {
+      hidePopover.call(tooltip);
+    }
+  }, [clearTeamSelectorTooltipShowTimeout]);
+
+  React.useEffect(() => clearTeamSelectorTooltipShowTimeout, [clearTeamSelectorTooltipShowTimeout]);
 
   useShowModalWhenVisible(visibleDialogs.isArchiveBoardDialogVisible, archiveBoardDialogRef);
   useShowModalWhenVisible(visibleDialogs.isBoardCreationDialogVisible, boardCreationDialogRef);
@@ -2193,14 +2250,14 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           <label htmlFor="team-selector" className="sr-only">
             Team
           </label>
-          <select id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} aria-label="Team" aria-describedby="team-selector-tooltip" interestFor="team-selector-tooltip">
+          <select ref={teamSelectorRef} id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} onPointerEnter={showTeamSelectorTooltip} onFocus={showTeamSelectorTooltip} onPointerLeave={hideTeamSelectorTooltip} onBlur={hideTeamSelectorTooltip} aria-label="Team" aria-describedby="team-selector-tooltip" interestFor="team-selector-tooltip">
             {selectableTeams.map(team => (
               <option key={team.id} value={team.id}>
                 {team.name}
               </option>
             ))}
           </select>
-          <div id="team-selector-tooltip" className="tooltip" popover="hint" role="tooltip">
+          <div ref={teamSelectorTooltipRef} id="team-selector-tooltip" className="tooltip" popover="hint" role="tooltip">
             By default, you see only the teams you're in. You can enable all teams from the settings menu.
           </div>
         </div>

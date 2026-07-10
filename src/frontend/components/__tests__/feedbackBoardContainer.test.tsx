@@ -529,14 +529,45 @@ describe("FeedbackBoardContainer integration", () => {
 
     expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
     const teamSelector = screen.getByRole("combobox", { name: "Team" });
-    const teamSelectorTooltipId = teamSelector.getAttribute("interestfor");
-    const teamSelectorTooltip = document.getElementById(teamSelectorTooltipId!);
+    const teamSelectorTooltipId = teamSelector.getAttribute("aria-describedby");
+    const teamSelectorTooltip = document.getElementById(teamSelectorTooltipId!)!;
 
     expect(teamSelectorTooltipId).toBe("team-selector-tooltip");
+    expect(teamSelector).not.toHaveAttribute("interestfor");
     expect(teamSelector).toHaveAttribute("aria-describedby", teamSelectorTooltipId);
     expect(teamSelectorTooltip).toHaveAttribute("popover", "hint");
     expect(teamSelectorTooltip).toHaveClass("tooltip");
     expect(teamSelectorTooltip).toHaveTextContent("By default, you see only the teams you're in. You can enable all teams from the settings menu.");
+
+    let isTooltipOpen = false;
+    const showPopover = jest.fn(() => {
+      isTooltipOpen = true;
+    });
+    const hidePopover = jest.fn(() => {
+      isTooltipOpen = false;
+    });
+    const matchesSpy = jest.spyOn(teamSelectorTooltip, "matches").mockImplementation(selector => (selector === ":popover-open" ? isTooltipOpen : false));
+    (teamSelectorTooltip as any).showPopover = showPopover;
+    (teamSelectorTooltip as any).hidePopover = hidePopover;
+
+    jest.useFakeTimers();
+    try {
+      fireEvent.pointerEnter(teamSelector);
+      expect(showPopover).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(499);
+      expect(showPopover).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(1);
+      expect(showPopover).toHaveBeenCalledWith({ source: teamSelector });
+
+      fireEvent.pointerLeave(teamSelector);
+      expect(hidePopover).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+      matchesSpy.mockRestore();
+    }
+
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", true);
     expect(azureDevOpsCoreService.getAllTeams).not.toHaveBeenCalledWith("1", false);
     expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
