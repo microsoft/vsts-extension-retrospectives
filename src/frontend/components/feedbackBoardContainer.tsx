@@ -36,7 +36,7 @@ import { formatDate, formatNumber, t } from "../utilities/localization";
 import { buildSprintRetrospectiveTitle, getCurrentIteration } from "../utilities/sprintRetrospectiveHelper";
 import { FeedbackBoardPermissionOption } from "./feedbackBoardMetadataFormPermissions";
 import { CommonServiceIds, IHostNavigationService } from "azure-devops-extension-api/Common/CommonServices";
-import { getService } from "azure-devops-extension-sdk";
+import { getConfiguration, getService } from "azure-devops-extension-sdk";
 import { getIconElement } from "./icons";
 import { playStartChime, playStopChime } from "../utilities/audioHelper";
 import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../utilities/pdfHelper";
@@ -195,6 +195,12 @@ type AllBoardFeedbackSearchResult = {
   board: IFeedbackBoardDocument;
   feedbackItem: IFeedbackItemDocument;
 };
+
+type ExtensionConfiguration = {
+  team?: Partial<WebApiTeam>;
+};
+
+const fallbackTeamName = "Selected team";
 
 const initialDialogVisibilityState: DialogVisibilityState = {
   isArchiveBoardDialogVisible: false,
@@ -654,6 +660,33 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     return { teamId, boardId, phase };
   }, []);
 
+  const getConfiguredTeam = React.useCallback(
+    (teamId?: string): WebApiTeam | undefined => {
+      const configuredTeam = (getConfiguration() as ExtensionConfiguration | undefined)?.team;
+      if (!configuredTeam?.id || (teamId && configuredTeam.id !== teamId)) {
+        return undefined;
+      }
+
+      return {
+        ...configuredTeam,
+        id: configuredTeam.id,
+        name: configuredTeam.name || fallbackTeamName,
+        projectId: configuredTeam.projectId || projectId,
+      } as WebApiTeam;
+    },
+    [projectId],
+  );
+
+  const createFallbackTeam = React.useCallback(
+    (teamId: string): WebApiTeam =>
+      ({
+        id: teamId,
+        name: fallbackTeamName,
+        projectId,
+      }) as WebApiTeam,
+    [projectId],
+  );
+
   const updateFeedbackItemsAndContributors = React.useCallback(
     async (currentTeam: WebApiTeam, currentBoard: IFeedbackBoardDocument) => {
       if (!currentTeam || !currentBoard) {
@@ -925,20 +958,46 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     teamBoardDeletedDialogMessage: string;
   }> => {
     let userTeams: WebApiTeam[] = [];
+    let teamRestLookupFailed = false;
+    let info: { teamId?: string; boardId?: string; phase?: WorkflowPhase } | undefined;
     try {
-      userTeams = sortTeamsByName((await azureDevOpsCoreService.getAllTeams(projectId, true)) ?? []);
+      info = await parseUrlForBoardAndTeamInformation();
     } catch (error) {
       appInsights.trackException(error, {
-        action: "initializeFeedbackBoard.getCurrentUserTeams",
+        action: "initializeFeedbackBoard.parseUrlForBoardAndTeamInformation",
         projectId,
       });
     }
 
-    let defaultTeam = userTeams.length ? userTeams[0] : undefined;
+    const configuredTeam = info?.teamId ? getConfiguredTeam(info.teamId) : getConfiguredTeam();
+    let defaultTeam =
+      !isHostedAzureDevOps && info?.teamId
+        ? configuredTeam || createFallbackTeam(info.teamId)
+        : !isHostedAzureDevOps
+          ? configuredTeam
+          : undefined;
+    if (defaultTeam) {
+      userTeams = [defaultTeam];
+    }
+
+    if (!defaultTeam) {
+      try {
+        userTeams = sortTeamsByName((await azureDevOpsCoreService.getAllTeams(projectId, true)) ?? []);
+      } catch (error) {
+        teamRestLookupFailed = true;
+        appInsights.trackException(error, {
+          action: "initializeFeedbackBoard.getCurrentUserTeams",
+          projectId,
+        });
+      }
+    }
+
+    defaultTeam = defaultTeam || (userTeams.length ? userTeams[0] : undefined);
     if (!defaultTeam) {
       try {
         defaultTeam = await azureDevOpsCoreService.getDefaultTeam(projectId);
       } catch (error) {
+        teamRestLookupFailed = true;
         appInsights.trackException(error, {
           action: "initializeFeedbackBoard.getDefaultTeam",
           projectId,
@@ -951,6 +1010,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         const projectTeams = sortTeamsByName((await azureDevOpsCoreService.getAllTeams(projectId, false)) ?? []);
         defaultTeam = projectTeams[0];
       } catch (error) {
+        teamRestLookupFailed = true;
         appInsights.trackException(error, {
           action: "initializeFeedbackBoard.getProjectTeamsFallback",
           projectId,
@@ -958,18 +1018,21 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
     }
 
-    let info: { teamId?: string; boardId?: string; phase?: WorkflowPhase } | undefined;
-    try {
-      info = await parseUrlForBoardAndTeamInformation();
-    } catch (error) {
-      appInsights.trackException(error, {
-        action: "initializeFeedbackBoard.parseUrlForBoardAndTeamInformation",
-        projectId,
-      });
+    if (!defaultTeam && info?.teamId) {
+      defaultTeam =
+        getConfiguredTeam(info.teamId) ||
+        (await azureDevOpsCoreService.getTeam(projectId, info.teamId)) ||
+        (teamRestLookupFailed ? createFallbackTeam(info.teamId) : undefined);
+      if (defaultTeam && !userTeams.some(team => team.id === defaultTeam.id)) {
+        userTeams = [defaultTeam];
+      }
     }
 
-    if (!defaultTeam && info?.teamId) {
-      defaultTeam = await azureDevOpsCoreService.getTeam(projectId, info.teamId);
+    if (!defaultTeam) {
+      defaultTeam = getConfiguredTeam();
+      if (defaultTeam && !userTeams.some(team => team.id === defaultTeam.id)) {
+        userTeams = [defaultTeam];
+      }
     }
 
     const baseTeamState = {
@@ -1058,7 +1121,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
     // Attempt to pre-select the team based on the teamId query param.
     const teamIdQueryParam = info.teamId;
-    const matchedTeam = defaultTeam?.id === teamIdQueryParam ? defaultTeam : await azureDevOpsCoreService.getTeam(projectId, teamIdQueryParam);
+    const matchedTeam =
+      defaultTeam?.id === teamIdQueryParam
+        ? defaultTeam
+        : getConfiguredTeam(teamIdQueryParam) ||
+          (await azureDevOpsCoreService.getTeam(projectId, teamIdQueryParam)) ||
+          (teamRestLookupFailed ? createFallbackTeam(teamIdQueryParam) : undefined);
 
     if (!matchedTeam) {
       // If the teamId query param wasn't valid attempt to pre-select a team and board by last
@@ -1195,7 +1263,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     const mostRecentUserVisit = await userDataService.getMostRecentVisit();
 
     if (mostRecentUserVisit) {
-      const mostRecentTeam = await azureDevOpsCoreService.getTeam(projectId, mostRecentUserVisit.teamId);
+      const mostRecentTeam =
+        mostRecentUserVisit.teamId === defaultTeam.id
+          ? defaultTeam
+          : !isHostedAzureDevOps
+            ? createFallbackTeam(mostRecentUserVisit.teamId)
+            : await azureDevOpsCoreService.getTeam(projectId, mostRecentUserVisit.teamId);
 
       if (mostRecentTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
