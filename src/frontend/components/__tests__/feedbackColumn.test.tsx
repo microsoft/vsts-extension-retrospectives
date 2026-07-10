@@ -77,7 +77,7 @@ describe("Feedback Column ", () => {
   });
 
   describe("edit column button", () => {
-    it("is not rendered when the user cannot edit", () => {
+    it("is not rendered when the user cannot edit and there are no saved notes", () => {
       const { container } = render(<FeedbackColumn {...testColumnProps} showColumnEditButton={false} />);
       expect(container.querySelector(".feedback-column-edit-button")).toBeNull();
     });
@@ -118,6 +118,26 @@ describe("Feedback Column ", () => {
       expect(tooltip).toHaveClass("tooltip");
       expect(tooltip).toHaveAttribute("popover", "hint");
       expect(tooltip).toHaveTextContent("Saved notes");
+    });
+
+    it("shows saved notes as a hint popover when the user cannot edit", () => {
+      const props = { ...testColumnProps, columnNotes: "Read-only saved notes", showColumnEditButton: false };
+      const { container, getByRole } = render(<FeedbackColumn {...props} />);
+
+      const notesButton = getByRole("button", { name: `Column notes for ${props.columnName}` });
+      const tooltipId = notesButton.getAttribute("interestfor");
+      const tooltip = container.querySelector(`[id="${tooltipId}"]`);
+
+      expect(notesButton).toHaveClass("feedback-column-edit-button");
+      expect(notesButton).toHaveAttribute("aria-describedby", tooltipId);
+      expect(tooltip).toHaveAttribute("id", tooltipId);
+      expect(tooltip).toHaveClass("tooltip");
+      expect(tooltip).toHaveAttribute("popover", "hint");
+      expect(tooltip).toHaveTextContent("Read-only saved notes");
+
+      fireEvent.click(notesButton);
+      const dialog = container.querySelector(".edit-column-notes-dialog") as HTMLDialogElement;
+      expect(dialog?.hasAttribute("open")).toBeFalsy();
     });
 
     it("does not add a notes tooltip when no notes exist", () => {

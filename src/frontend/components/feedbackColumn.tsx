@@ -145,6 +145,8 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   const editColumnNotesDialogRef = useRef<HTMLDialogElement>(null);
   const focusPreservation = useRef<FocusPreservation | null>(null);
   const prevColumnItemsLength = useRef<number>(currentColumnItems.length);
+  const notesTooltipId = columnNotes ? `feedback-column-${columnId}-notes-tooltip` : undefined;
+  const showColumnNotesButton = showColumnEditButton || Boolean(columnNotes);
 
   const getNavigableColumnItems = useCallback((): IColumnItem[] => {
     const sourceColumnItems: IColumnItem[] = currentColumnItems;
@@ -459,13 +461,13 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
           </div>
         </div>
         <div className="feedback-column-actions">
-          {showColumnEditButton && (
+          {showColumnNotesButton && (
             <>
-              <button className="feedback-column-edit-button" aria-label={`Edit column ${columnName}`} aria-describedby={columnNotes ? `feedback-column-${columnId}-notes-tooltip` : undefined} interestFor={columnNotes ? `feedback-column-${columnId}-notes-tooltip` : undefined} onClick={openEditDialog}>
-                {getIconElement("reviews")}
+              <button type="button" className="feedback-column-edit-button" aria-label={showColumnEditButton ? `Edit column ${columnName}` : `Column notes for ${columnName}`} aria-describedby={notesTooltipId} interestFor={notesTooltipId} onClick={showColumnEditButton ? openEditDialog : undefined}>
+                {getIconElement("info")}
               </button>
               {columnNotes && (
-                <div id={`feedback-column-${columnId}-notes-tooltip`} className="tooltip" popover="hint" role="tooltip">
+                <div id={notesTooltipId} className="tooltip" popover="hint" role="tooltip">
                   {columnNotes}
                 </div>
               )}
