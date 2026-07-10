@@ -66,12 +66,13 @@ describe("Feedback Column ", () => {
     const columnName = container.querySelector(".feedback-column-name");
     const tooltipTrigger = getByRole("button", { name: testColumnProps.columnName });
     const tooltipId = tooltipTrigger.getAttribute("interestfor");
-    const tooltip = container.querySelector(".feedback-column-name-tooltip");
+    const tooltip = container.querySelector(`[id="${tooltipId}"]`);
 
     expect(columnName).not.toHaveAttribute("title");
     expect(tooltipId).toBeTruthy();
     expect(tooltipTrigger).toHaveAttribute("aria-describedby", tooltipId);
     expect(tooltip).toHaveAttribute("id", tooltipId);
+    expect(tooltip).toHaveClass("tooltip");
     expect(tooltip).toHaveAttribute("popover", "hint");
   });
 
@@ -108,12 +109,13 @@ describe("Feedback Column ", () => {
 
       const editButton = getByRole("button", { name: `Edit column ${props.columnName}` });
       const tooltipId = editButton.getAttribute("interestfor");
-      const tooltip = container.querySelector(".feedback-column-notes-tooltip");
+      const tooltip = container.querySelector(`[id="${tooltipId}"]`);
 
       expect(editButton).not.toHaveAttribute("title");
       expect(tooltipId).toBeTruthy();
       expect(editButton).toHaveAttribute("aria-describedby", tooltipId);
       expect(tooltip).toHaveAttribute("id", tooltipId);
+      expect(tooltip).toHaveClass("tooltip");
       expect(tooltip).toHaveAttribute("popover", "hint");
       expect(tooltip).toHaveTextContent("Saved notes");
     });
@@ -126,7 +128,7 @@ describe("Feedback Column ", () => {
 
       expect(editButton).not.toHaveAttribute("interestfor");
       expect(editButton).not.toHaveAttribute("aria-describedby");
-      expect(container.querySelector(".feedback-column-notes-tooltip")).toBeNull();
+      expect(container.querySelector(`#feedback-column-${props.columnId}-notes-tooltip`)).toBeNull();
       expect(queryByRole("button", { name: /Column notes:/ })).not.toBeInTheDocument();
     });
   });

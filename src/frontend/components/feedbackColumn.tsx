@@ -454,7 +454,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
           <button type="button" className="feedback-column-name" interestFor={`feedback-column-${columnId}-name-tooltip`} aria-describedby={`feedback-column-${columnId}-name-tooltip`}>
             {columnName}
           </button>
-          <div id={`feedback-column-${columnId}-name-tooltip`} className="feedback-column-name-tooltip" popover="hint" role="tooltip">
+          <div id={`feedback-column-${columnId}-name-tooltip`} className="tooltip" popover="hint" role="tooltip">
             {columnName}
           </div>
         </div>
@@ -465,7 +465,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
                 {getIconElement("reviews")}
               </button>
               {columnNotes && (
-                <div id={`feedback-column-${columnId}-notes-tooltip`} className="feedback-column-notes-tooltip" popover="hint" role="tooltip">
+                <div id={`feedback-column-${columnId}-notes-tooltip`} className="tooltip" popover="hint" role="tooltip">
                   {columnNotes}
                 </div>
               )}

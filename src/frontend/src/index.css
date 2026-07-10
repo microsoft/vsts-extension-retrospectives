@@ -93,6 +93,11 @@ body {
   @apply outline-2 outline-primary outline-offset-2 rounded;
 }
 
+.tooltip {
+  @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-72 whitespace-normal pointer-events-none;
+  position-area: bottom;
+}
+
 .button-primary {
   @apply bg-primary text-white;
 }
@@ -1320,11 +1325,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     & .feedback-column-name {
       @apply text-sm ml-1.5 min-w-0 block w-full border-0 p-0 overflow-hidden text-ellipsis whitespace-nowrap cursor-help;
     }
-
-    & .feedback-column-name-tooltip {
-      @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-72 whitespace-normal pointer-events-none;
-      position-area: bottom;
-    }
   }
 
   & .feedback-column-actions {
@@ -1344,11 +1344,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       & svg {
         @apply w-5 h-5;
       }
-    }
-
-    & .feedback-column-notes-tooltip {
-      @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-72 whitespace-normal pointer-events-none;
-      position-area: bottom;
     }
   }
 }
