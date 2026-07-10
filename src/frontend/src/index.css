@@ -1324,7 +1324,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & .feedback-column-name {
-      @apply text-sm ml-1.5 min-w-0 block w-full border-0 p-0 overflow-hidden text-ellipsis whitespace-nowrap cursor-help;
+      @apply text-sm ml-1.5 min-w-0 block w-full border-0 p-0 overflow-hidden text-ellipsis whitespace-nowrap cursor-help text-left;
     }
   }
 
