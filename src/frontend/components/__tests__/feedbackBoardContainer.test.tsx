@@ -533,7 +533,7 @@ describe("FeedbackBoardContainer integration", () => {
     const teamSelectorTooltip = document.getElementById(teamSelectorTooltipId!)!;
 
     expect(teamSelectorTooltipId).toBe("team-selector-tooltip");
-    expect(teamSelector).not.toHaveAttribute("interestfor");
+    expect(teamSelector).toHaveAttribute("interestFor", teamSelectorTooltipId);
     expect(teamSelector).toHaveAttribute("aria-describedby", teamSelectorTooltipId);
     expect(teamSelectorTooltip).toHaveAttribute("popover", "hint");
     expect(teamSelectorTooltip).toHaveClass("tooltip");
