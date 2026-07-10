@@ -610,9 +610,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
-        <button type="button" className="workflow-stage-timer-toggle" title={state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={state.isBoardTimerRunning} aria-label={`${state.isBoardTimerRunning ? "Pause" : "Start"}. ${formatBoardTimer(state.boardTimerSeconds)} ${state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={handleBoardTimerToggle}>
+        <button type="button" className="workflow-stage-timer-toggle" aria-pressed={state.isBoardTimerRunning} aria-label={`${state.isBoardTimerRunning ? "Pause" : "Start"}. ${formatBoardTimer(state.boardTimerSeconds)} ${state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={handleBoardTimerToggle} interestFor="workflow-stage-timer-toggle-tooltip" aria-describedby="workflow-stage-timer-toggle-tooltip">
           {state.isBoardTimerRunning ? getIconElement("pause-circle") : getIconElement("play-circle")}
         </button>
+        <div id="workflow-stage-timer-toggle-tooltip" className="tooltip" popover="hint" role="tooltip">
+          {state.isBoardTimerRunning ? "Pause" : "Start"}
+        </div>
         {!state.isBoardTimerRunning && state.boardTimerSeconds === 0 ? (
           <select value={state.countdownDurationMinutes} onChange={handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
             <option value={0}>Stopwatch</option>
