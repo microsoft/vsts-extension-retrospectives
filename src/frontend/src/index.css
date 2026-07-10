@@ -94,8 +94,9 @@ body {
 }
 
 .tooltip {
-  @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-72 whitespace-normal pointer-events-none;
+  @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-md whitespace-normal wrap-break-word pointer-events-none;
   position-area: bottom;
+  position-try-fallbacks: flip-block, flip-inline;
 }
 
 .button-primary {
