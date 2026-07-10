@@ -1505,7 +1505,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .board-metadata-form-section-information {
-    @apply grid grid-cols-[auto_1fr] items-center gap-1 bg-[rgb(var(--palette-neutral-20))] text-(--background-color) my-3 p-1;
+    @apply grid grid-cols-[auto_1fr] items-center gap-1 bg-[rgb(var(--palette-neutral-60))] text-(--background-color) my-3 p-1;
 
     &.warning-information {
       @apply bg-task-yellow border-task-yellow;
