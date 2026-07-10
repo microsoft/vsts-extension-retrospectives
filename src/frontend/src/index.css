@@ -1499,6 +1499,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-5 h-5 rounded-full mr-1;
 }
 
+.feedback-board-metadata-form {
+  @apply grid grid-rows-[auto_1fr_auto] px-5 py-3;
+}
+
 .board-metadata-form {
   & hr {
     @apply border border-primary;
