@@ -2193,13 +2193,16 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           <label htmlFor="team-selector" className="sr-only">
             Team
           </label>
-          <select id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} aria-label="Team">
+          <select id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} aria-label="Team" aria-describedby="team-selector-tooltip" interestFor="team-selector-tooltip">
             {selectableTeams.map(team => (
               <option key={team.id} value={team.id}>
                 {team.name}
               </option>
             ))}
           </select>
+          <div id="team-selector-tooltip" className="tooltip" popover="hint" role="tooltip">
+            By default, you see only the teams you're in. You can enable all teams from the settings menu.
+          </div>
         </div>
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">

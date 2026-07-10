@@ -528,6 +528,15 @@ describe("FeedbackBoardContainer integration", () => {
     render(<FeedbackBoardContainer {...props} />);
 
     expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    const teamSelector = screen.getByRole("combobox", { name: "Team" });
+    const teamSelectorTooltipId = teamSelector.getAttribute("interestfor");
+    const teamSelectorTooltip = document.getElementById(teamSelectorTooltipId!);
+
+    expect(teamSelectorTooltipId).toBe("team-selector-tooltip");
+    expect(teamSelector).toHaveAttribute("aria-describedby", teamSelectorTooltipId);
+    expect(teamSelectorTooltip).toHaveAttribute("popover", "hint");
+    expect(teamSelectorTooltip).toHaveClass("tooltip");
+    expect(teamSelectorTooltip).toHaveTextContent("By default, you see only the teams you're in. You can enable all teams from the settings menu.");
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", true);
     expect(azureDevOpsCoreService.getAllTeams).not.toHaveBeenCalledWith("1", false);
     expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
