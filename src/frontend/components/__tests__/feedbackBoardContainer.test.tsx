@@ -13,7 +13,7 @@ import { itemDataService } from "../../dal/itemDataService";
 import BoardDataService from "../../dal/boardDataService";
 import { azureDevOpsCoreService } from "../../dal/azureDevOpsCoreService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
-import { getService } from "azure-devops-extension-sdk";
+import { getConfiguration, getService } from "azure-devops-extension-sdk";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { copyToClipboard } from "../../utilities/clipboardHelper";
@@ -148,6 +148,7 @@ jest.mock("../../utilities/azureDevOpsContextHelper", () => ({
 
 jest.mock("azure-devops-extension-sdk", () => ({
   getService: jest.fn(),
+  getConfiguration: jest.fn(() => ({})),
   init: jest.fn(),
   ready: jest.fn(),
   getUser: jest.fn(() => ({
@@ -368,6 +369,7 @@ describe("FeedbackBoardContainer integration", () => {
 
   beforeEach(() => {
     props = { isHostedAzureDevOps: false, projectId: "1" };
+    mocked(getConfiguration).mockReturnValue({});
   });
 
   it("renders main UI after loading", () => {
@@ -559,6 +561,7 @@ describe("FeedbackBoardContainer integration", () => {
   });
 
   it("loads a board from the URL team when team list lookups fail", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=t1&boardId=b1&phase=Collect"), setHash: jest.fn() } as any);
     mocked(azureDevOpsCoreService.getAllTeams).mockRejectedValue(new Error("Cannot load teams"));
     mocked(azureDevOpsCoreService.getDefaultTeam).mockRejectedValue(new Error("Cannot load default team"));
@@ -575,7 +578,58 @@ describe("FeedbackBoardContainer integration", () => {
     render(<FeedbackBoardContainer {...props} />);
 
     expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", true);
     expect(azureDevOpsCoreService.getTeam).toHaveBeenCalledWith("1", "t1");
+    expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
+  });
+
+  it("loads a board from the URL team when browser local-network restrictions block team REST lookups", async () => {
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=t1&boardId=b1&phase=Collect"), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockRejectedValue(new Error("Permission was denied for this request to access the local address space"));
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockRejectedValue(new Error("Permission was denied for this request to access the local address space"));
+    mocked(azureDevOpsCoreService.getTeam).mockResolvedValue(null);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(mockBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(azureDevOpsCoreService.getAllTeams).not.toHaveBeenCalled();
+    expect(azureDevOpsCoreService.getDefaultTeam).not.toHaveBeenCalled();
+    expect(azureDevOpsCoreService.getTeam).not.toHaveBeenCalled();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("t1");
+    expect(screen.getByRole("option", { name: "Selected team" })).toBeInTheDocument();
+    expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
+  });
+
+  it("loads a board from the configured team when browser local-network restrictions block team REST lookups", async () => {
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: mockTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockRejectedValue(new Error("Permission was denied for this request to access the local address space"));
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockRejectedValue(new Error("Permission was denied for this request to access the local address space"));
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(mockBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(azureDevOpsCoreService.getAllTeams).not.toHaveBeenCalled();
+    expect(azureDevOpsCoreService.getDefaultTeam).not.toHaveBeenCalled();
+    expect(azureDevOpsCoreService.getTeam).not.toHaveBeenCalled();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("t1");
+    expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
     expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
   });
 
