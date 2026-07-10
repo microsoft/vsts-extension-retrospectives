@@ -62,7 +62,7 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
         {subtitle}
       </th>
       <td className="effectiveness-measurement-tooltip-cell">
-        <button type="button" className="contextual-menu-button tooltip" aria-label={`More information about ${title}`} aria-description={tooltip} title={tooltip}>
+        <button type="button" className="contextual-menu-button" aria-label={`More information about ${title}`} aria-description={tooltip} title={tooltip}>
           {getIconElement("exclamation")}
         </button>
       </td>
