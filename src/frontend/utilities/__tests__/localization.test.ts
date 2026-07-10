@@ -119,10 +119,28 @@ describe("localization", () => {
     expect(document.documentElement.lang).toBe("en-US");
   });
 
+  it("falls back to the default locale when canonical locale lookup returns no value", () => {
+    const getCanonicalLocalesSpy = jest.spyOn(Intl, "getCanonicalLocales").mockReturnValue([]);
+
+    try {
+      expect(setLocale("en-US")).toBe("en-US");
+      expect(getCurrentLocale()).toBe("en-US");
+      expect(document.documentElement.lang).toBe("en-US");
+    } finally {
+      getCanonicalLocalesSpy.mockRestore();
+    }
+  });
+
   it("falls back to English templates when the locale token matches an inherited object property", () => {
     initializeLocale("constructor-GB");
 
     expect(t("common_cancel")).toBe("Cancel");
+  });
+
+  it("falls back to the English template lookup when the active language does not have a key", () => {
+    initializeLocale("es-ES");
+
+    expect((t as unknown as (key: string) => string)("missing_translation_key")).toBeUndefined();
   });
 
   it("formats dates and numbers using the active locale", () => {
