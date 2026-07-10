@@ -2255,47 +2255,47 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                           {getIconElement("more-horizontal")}
                         </summary>
                         <div className="callout-menu left" role="menu" aria-label="Board Actions">
-                          <button key="createBoard" type="button" title={t("feedback_board_create_new")} onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
+                          <button key="createBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
                             {getIconElement("add")}
                             {t("feedback_board_create_new")}
                           </button>
-                          <button key="createBoardForCurrentSprint" type="button" title={t("sprint_retro_create_current")} onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
+                          <button key="createBoardForCurrentSprint" type="button" onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
                             {getIconElement("add")}
                             {t("sprint_retro_create_current")}
                           </button>
-                          <button key="duplicateBoard" type="button" title={t("feedback_board_create_copy")} onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
+                          <button key="duplicateBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
                             {getIconElement("content-copy")}
                             {t("feedback_board_create_copy")}
                           </button>
-                          <button key="editBoard" type="button" title={t("feedback_board_edit")} onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
+                          <button key="editBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
                             {getIconElement("edit")}
                             {t("feedback_board_edit")}
                           </button>
-                          <button key="searchAllBoards" type="button" title={t("feedback_board_search_all_boards")} onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
+                          <button key="searchAllBoards" type="button" onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
                             {getIconElement("search")}
                             {t("feedback_board_search_all_boards")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
+                          <button key="copyLink" type="button" onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
                             {getIconElement("link")}
                             {`Copy link to ${state.currentBoard.activePhase} phase`}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="exportCSV" type="button" title={t("feedback_board_export_csv_content")} onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
+                          <button key="exportCSV" type="button" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
                             {getIconElement("sim-card-download")}
                             {t("feedback_board_export_csv_content")}
                           </button>
-                          <button key="emailPreview" type="button" title={t("feedback_board_create_email_summary")} onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
+                          <button key="emailPreview" type="button" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
                             {getIconElement("forward-to-inbox")}
                             {t("feedback_board_create_email_summary")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="retroSummary" type="button" title={t("feedback_board_show_retro_summary")} onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
+                          <button key="retroSummary" type="button" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
                             {getIconElement("source")}
                             {t("feedback_board_show_retro_summary")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="archiveBoard" type="button" title={t("feedback_board_archive_title")} onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
+                          <button key="archiveBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
                             {getIconElement("inventory")}
                             {t("feedback_board_archive_title")}
                           </button>
