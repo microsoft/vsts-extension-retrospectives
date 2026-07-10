@@ -55,11 +55,8 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
   return (
     <tr className="effectiveness-measurement-row">
       <th scope="row">
-        <p>
-          {getIconElement(iconClassName)}
-          {title}
-        </p>
-        {subtitle}
+        <p>{getIconElement(iconClassName)}{title}</p>
+        <span>{subtitle}</span>
       </th>
       <td className="effectiveness-measurement-tooltip-cell">
         <button type="button" className="contextual-menu-button" aria-label={`More information about ${title}`} aria-description={tooltip} title={tooltip}>
