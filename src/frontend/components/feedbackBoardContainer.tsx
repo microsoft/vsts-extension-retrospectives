@@ -685,9 +685,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         ) : (
           <span className={state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{formatBoardTimer(state.boardTimerSeconds)}</span>
         )}
-        <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!state.boardTimerSeconds && !state.isBoardTimerRunning} onClick={handleBoardTimerReset}>
+        <button type="button" className="workflow-stage-timer-reset" aria-label={t("common_reset")} disabled={!state.boardTimerSeconds && !state.isBoardTimerRunning} onClick={handleBoardTimerReset} interestFor="workflow-stage-timer-reset-tooltip" aria-describedby="workflow-stage-timer-reset-tooltip">
           {getIconElement("refresh")}
         </button>
+        <div id="workflow-stage-timer-reset-tooltip" className="tooltip" popover="hint" role="tooltip">
+          {t("common_reset")}
+        </div>
       </div>
     );
   }, [state, handleBoardTimerReset, handleBoardTimerToggle, handleCountdownDurationChange]);
