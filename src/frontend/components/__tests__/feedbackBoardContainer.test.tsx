@@ -580,6 +580,35 @@ describe("FeedbackBoardContainer integration", () => {
     expect(await screen.findByRole("option", { name: "Other Team" })).toBeInTheDocument();
   });
 
+  it("configures a custom tooltip for Focus Mode", async () => {
+    const actBoard = { ...mockBoard, activePhase: WorkflowPhase.Act };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([actBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(actBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    const focusModeButton = await screen.findByRole("button", { name: "Focus Mode" });
+    const tooltipId = focusModeButton.getAttribute("aria-describedby");
+    const tooltip = document.getElementById(tooltipId!)!;
+
+    expect(focusModeButton).not.toHaveAttribute("title");
+    expect(tooltipId).toBe("focus-mode-tooltip");
+    expect(focusModeButton).toHaveAttribute("interestFor", tooltipId);
+    expect(tooltip).toHaveAttribute("popover", "hint");
+    expect(tooltip).toHaveClass("tooltip");
+    expect(tooltip).toHaveTextContent("Focus Mode allows your team to focus on one feedback item at a time. Try it!");
+  });
+
   it("falls back to the default team when current user team lookup fails", async () => {
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
     mocked(azureDevOpsCoreService.getAllTeams).mockRejectedValueOnce(new Error("Cannot load current user teams"));

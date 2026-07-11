@@ -2431,10 +2431,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       )}
                       {state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
-                          <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
+                          <button className="focus-mode-button" onClick={showCarouselDialog} aria-label="Focus Mode" aria-describedby="focus-mode-tooltip" interestFor="focus-mode-tooltip" type="button">
                             {getIconElement("adjust")}
                             <span>Focus Mode</span>
                           </button>
+                          <div id="focus-mode-tooltip" className="tooltip" popover="hint" role="tooltip">
+                            {t("feedback_board_focus_mode_tooltip")}
+                          </div>
                           {visibleDialogs.isCarouselDialogVisible && (
                             <dialog ref={carouselDialogRef} className="carousel-dialog dialog-width-lg" role="dialog" aria-label="Focus Mode" onClose={() => setDialogVisible("isCarouselDialogVisible", false)}>
                               <div className="header">
