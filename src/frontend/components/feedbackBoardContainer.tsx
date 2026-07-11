@@ -2456,10 +2456,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               {state.activeTab === "History" && (
                 <>
                   <div className="mx-4 vertical-tab-separator" />
-                  <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
+                  <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} aria-label={t("feedback_board_team_assessment_history")} type="button" aria-describedby="team-assessment-history-tooltip" interestFor="team-assessment-history-tooltip">
                     {getIconElement("insights")}
-                    <span className="hidden lg:inline">Team Assessment History</span>
+                    <span className="hidden lg:inline">{t("feedback_board_team_assessment_history")}</span>
                   </button>
+                  <div id="team-assessment-history-tooltip" className="tooltip" popover="hint" role="tooltip">
+                    {t("feedback_board_team_assessment_history")}
+                  </div>
                 </>
               )}
             </div>
