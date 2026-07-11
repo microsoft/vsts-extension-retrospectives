@@ -2431,17 +2431,17 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       )}
                       {state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
-                          <button className="focus-mode-button" onClick={showCarouselDialog} aria-label="Focus Mode" aria-describedby="focus-mode-tooltip" interestFor="focus-mode-tooltip" type="button">
+                          <button className="focus-mode-button" onClick={showCarouselDialog} aria-label={t("feedback_board_focus_mode")} aria-describedby="focus-mode-tooltip" interestFor="focus-mode-tooltip" type="button">
                             {getIconElement("adjust")}
-                            <span>Focus Mode</span>
+                            <span>{t("feedback_board_focus_mode")}</span>
                           </button>
                           <div id="focus-mode-tooltip" className="tooltip" popover="hint" role="tooltip">
                             {t("feedback_board_focus_mode_tooltip")}
                           </div>
                           {visibleDialogs.isCarouselDialogVisible && (
-                            <dialog ref={carouselDialogRef} className="carousel-dialog dialog-width-lg" role="dialog" aria-label="Focus Mode" onClose={() => setDialogVisible("isCarouselDialogVisible", false)}>
+                            <dialog ref={carouselDialogRef} className="carousel-dialog dialog-width-lg" role="dialog" aria-label={t("feedback_board_focus_mode")} onClose={() => setDialogVisible("isCarouselDialogVisible", false)}>
                               <div className="header">
-                                <h2 className="title">Focus Mode</h2>
+                                <h2 className="title">{t("feedback_board_focus_mode")}</h2>
                                 <button onClick={hideCarouselDialog} aria-label="Close">
                                   {getIconElement("close")}
                                 </button>

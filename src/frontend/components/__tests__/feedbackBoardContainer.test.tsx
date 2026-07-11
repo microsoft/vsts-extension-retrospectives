@@ -17,6 +17,7 @@ import { getConfiguration, getService } from "azure-devops-extension-sdk";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { copyToClipboard } from "../../utilities/clipboardHelper";
+import { setLocale } from "../../utilities/localization";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -595,18 +596,30 @@ describe("FeedbackBoardContainer integration", () => {
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
     mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
 
-    render(<FeedbackBoardContainer {...props} />);
+    setLocale("es-ES");
+    const { unmount } = render(<FeedbackBoardContainer {...props} />);
 
-    const focusModeButton = await screen.findByRole("button", { name: "Focus Mode" });
-    const tooltipId = focusModeButton.getAttribute("aria-describedby");
-    const tooltip = document.getElementById(tooltipId!)!;
+    try {
+      const focusModeButton = await screen.findByRole("button", { name: "Modo de enfoque" });
+      const tooltipId = focusModeButton.getAttribute("aria-describedby");
+      const tooltip = document.getElementById(tooltipId!)!;
 
-    expect(focusModeButton).not.toHaveAttribute("title");
-    expect(tooltipId).toBe("focus-mode-tooltip");
-    expect(focusModeButton).toHaveAttribute("interestFor", tooltipId);
-    expect(tooltip).toHaveAttribute("popover", "hint");
-    expect(tooltip).toHaveClass("tooltip");
-    expect(tooltip).toHaveTextContent("Focus Mode allows your team to focus on one feedback item at a time. Try it!");
+      expect(focusModeButton).toHaveTextContent("Modo de enfoque");
+      expect(focusModeButton).not.toHaveAttribute("title");
+      expect(tooltipId).toBe("focus-mode-tooltip");
+      expect(focusModeButton).toHaveAttribute("interestFor", tooltipId);
+      expect(tooltip).toHaveAttribute("popover", "hint");
+      expect(tooltip).toHaveClass("tooltip");
+      expect(tooltip).toHaveTextContent("El modo de enfoque permite que tu equipo se centre en un elemento de feedback a la vez. Pruebalo!");
+
+      fireEvent.click(focusModeButton);
+
+      expect(await screen.findByRole("dialog", { name: "Modo de enfoque" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Modo de enfoque" })).toBeInTheDocument();
+    } finally {
+      unmount();
+      setLocale("en-US");
+    }
   });
 
   it("falls back to the default team when current user team lookup fails", async () => {
