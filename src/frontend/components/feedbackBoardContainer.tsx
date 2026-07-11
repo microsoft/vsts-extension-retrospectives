@@ -43,10 +43,10 @@ import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../util
 import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
+import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
-const TOOLTIP_SHOW_DELAY_MS = 500;
 
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
@@ -228,14 +228,6 @@ function useShowModalWhenVisible(isVisible: boolean, dialogRef: React.RefObject<
   }, [dialogRef, isVisible]);
 }
 
-function isPopoverOpen(popover: HTMLElement): boolean {
-  try {
-    return popover.matches(":popover-open");
-  } catch {
-    return false;
-  }
-}
-
 export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isHostedAzureDevOps: boolean; projectId: string }) {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardContainer");
 
@@ -255,9 +247,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const prevActiveTabRef = React.useRef<FeedbackBoardContainerState["activeTab"]>(initialState.activeTab);
 
   const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
-  const teamSelectorRef = React.useRef<HTMLSelectElement | null>(null);
-  const teamSelectorTooltipRef = React.useRef<HTMLDivElement | null>(null);
-  const teamSelectorTooltipShowTimeoutIdRef = React.useRef<number | undefined>(undefined);
+  const { triggerRef: teamSelectorRef, tooltipRef: teamSelectorTooltipRef, showTooltip: showTeamSelectorTooltip, hideTooltip: hideTeamSelectorTooltip } = useDelayedTooltip<HTMLSelectElement>();
 
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
@@ -305,51 +295,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     },
     [setDialogVisible],
   );
-
-  const clearTeamSelectorTooltipShowTimeout = React.useCallback(() => {
-    if (teamSelectorTooltipShowTimeoutIdRef.current === undefined) {
-      return;
-    }
-
-    window.clearTimeout(teamSelectorTooltipShowTimeoutIdRef.current);
-    teamSelectorTooltipShowTimeoutIdRef.current = undefined;
-  }, []);
-
-  const showTeamSelectorTooltip = React.useCallback(() => {
-    const tooltip = teamSelectorTooltipRef.current;
-    if (!tooltip || isPopoverOpen(tooltip) || teamSelectorTooltipShowTimeoutIdRef.current !== undefined) {
-      return;
-    }
-
-    teamSelectorTooltipShowTimeoutIdRef.current = window.setTimeout(() => {
-      teamSelectorTooltipShowTimeoutIdRef.current = undefined;
-
-      const currentTooltip = teamSelectorTooltipRef.current;
-      const select = teamSelectorRef.current;
-      const showPopover = (currentTooltip as (HTMLDivElement & { showPopover?: (options?: { source?: HTMLSelectElement }) => void }) | null)?.showPopover;
-      if (!currentTooltip || !select || isPopoverOpen(currentTooltip) || !showPopover) {
-        return;
-      }
-
-      try {
-        showPopover.call(currentTooltip, { source: select });
-      } catch {
-        showPopover.call(currentTooltip);
-      }
-    }, TOOLTIP_SHOW_DELAY_MS);
-  }, []);
-
-  const hideTeamSelectorTooltip = React.useCallback(() => {
-    clearTeamSelectorTooltipShowTimeout();
-
-    const tooltip = teamSelectorTooltipRef.current;
-    const hidePopover = (tooltip as (HTMLDivElement & { hidePopover?: () => void }) | null)?.hidePopover;
-    if (tooltip && isPopoverOpen(tooltip) && hidePopover) {
-      hidePopover.call(tooltip);
-    }
-  }, [clearTeamSelectorTooltipShowTimeout]);
-
-  React.useEffect(() => clearTeamSelectorTooltipShowTimeout, [clearTeamSelectorTooltipShowTimeout]);
 
   useShowModalWhenVisible(visibleDialogs.isArchiveBoardDialogVisible, archiveBoardDialogRef);
   useShowModalWhenVisible(visibleDialogs.isBoardCreationDialogVisible, boardCreationDialogRef);

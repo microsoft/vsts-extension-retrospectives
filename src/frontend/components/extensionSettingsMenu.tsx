@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { reactPlugin } from "../utilities/telemetryClient";
@@ -13,6 +14,7 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { getIconElement } from "./icons";
 import WhatsNewDialog from "./whatsNewDialog";
 import { t } from "../utilities/localization";
+import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
 
 interface IExportImportDataSchema {
   team: WebApiTeam;
@@ -29,6 +31,30 @@ interface KeyboardShortcut {
 const emptyWorkItemTypes: WorkItemType[] = [];
 const emptyWorkItemTypeNames: string[] = [];
 const getWorkItemTypeInputId = (workItemType: WorkItemType): string => `work-item-type-${encodeURIComponent(workItemType.referenceName ?? workItemType.name)}`;
+
+interface TooltipSummaryProps {
+  ariaLabel: string;
+  children: React.ReactNode;
+  tooltipId: string;
+}
+
+function TooltipSummary({ ariaLabel, children, tooltipId }: TooltipSummaryProps) {
+  const { triggerRef, tooltipRef, showTooltip, hideTooltip } = useDelayedTooltip<HTMLElement>();
+
+  return (
+    <>
+      <summary ref={triggerRef} aria-label={ariaLabel} role="button" className="extension-settings-button" interestFor={tooltipId} aria-describedby={tooltipId} onPointerEnter={showTooltip} onFocus={showTooltip} onPointerLeave={hideTooltip} onBlur={hideTooltip}>
+        {children}
+      </summary>
+      {createPortal(
+        <div ref={tooltipRef} id={tooltipId} className="tooltip" popover="hint" role="tooltip">
+          {ariaLabel}
+        </div>,
+        document.body,
+      )}
+    </>
+  );
+}
 
 export interface ExtensionSettingsMenuProps {
   showAllTeams?: boolean;
@@ -222,16 +248,19 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
 
   return (
     <div className="extension-settings-menu" ref={menuRootRef} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
-      <button onClick={() => primeDirectiveDialogRef.current!.showModal()} aria-label="Prime Directive" title="Prime Directive" className="extension-settings-button">
+      <button onClick={() => primeDirectiveDialogRef.current!.showModal()} aria-label={t("prime_directive")} className="extension-settings-button" interestFor="prime-directive-tooltip" aria-describedby="prime-directive-tooltip">
         {getIconElement("privacy-tip")}
         <span className="hidden lg:inline">{t("prime_directive")}</span>
       </button>
+      <div id="prime-directive-tooltip" className="tooltip" popover="hint" role="tooltip">
+        {t("the_prime_directive")}
+      </div>
 
       <details className="flex items-center relative">
-        <summary aria-label={t("data_import_export")} title={t("data_import_export")} className="extension-settings-button">
+        <TooltipSummary ariaLabel={t("data_import_export")} tooltipId="data-import-export-tooltip">
           {getIconElement("cloud")}
           <span className="hidden lg:inline">{t("common_data")}</span>
-        </summary>
+        </TooltipSummary>
 
         <div className="callout-menu right">
           <button
@@ -254,10 +283,10 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
       </details>
 
       <details className="flex items-center relative">
-        <summary aria-label={t("retrospective_help")} title={t("retrospective_help")} className="extension-settings-button">
+        <TooltipSummary ariaLabel={t("retrospective_help")} tooltipId="retrospective-help-tooltip">
           {getIconElement("help")}
           <span className="hidden lg:inline">{t("common_help")}</span>
-        </summary>
+        </TooltipSummary>
 
         <div className="callout-menu right">
           <button
@@ -376,10 +405,10 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
       </dialog>
 
       <details className="flex items-center relative">
-        <summary aria-label={t("retrospective_settings")} title={t("retrospective_settings")} className="extension-settings-button">
+        <TooltipSummary ariaLabel={t("retrospective_settings")} tooltipId="retrospective-settings-tooltip">
           {getIconElement("gear")}
           <span className="hidden lg:inline">{t("common_settings")}</span>
-        </summary>
+        </TooltipSummary>
 
         <div className="callout-menu right">
           <button
