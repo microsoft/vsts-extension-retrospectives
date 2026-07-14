@@ -131,16 +131,13 @@ describe("localization", () => {
     expect(document.documentElement.lang).toBe("en-US");
   });
 
-  it("falls back to the default locale when canonical locale lookup returns no value", () => {
-    const getCanonicalLocalesSpy = jest.spyOn(Intl, "getCanonicalLocales").mockReturnValue([]);
+  it("falls back to the default locale when canonical locales are empty", () => {
+    const getCanonicalLocalesSpy = jest.spyOn(Intl, "getCanonicalLocales").mockReturnValueOnce([]);
 
-    try {
-      expect(setLocale("en-US")).toBe("en-US");
-      expect(getCurrentLocale()).toBe("en-US");
-      expect(document.documentElement.lang).toBe("en-US");
-    } finally {
-      getCanonicalLocalesSpy.mockRestore();
-    }
+    expect(setLocale("es-ES")).toBe("en-US");
+    expect(getCurrentLocale()).toBe("en-US");
+    expect(document.documentElement.lang).toBe("en-US");
+    getCanonicalLocalesSpy.mockRestore();
   });
 
   it("falls back to English templates when the locale token matches an inherited object property", () => {
@@ -149,10 +146,10 @@ describe("localization", () => {
     expect(t("common_cancel")).toBe("Cancel");
   });
 
-  it("falls back to the English template lookup when the active language does not have a key", () => {
-    initializeLocale("es-ES");
+  it("returns undefined for unknown runtime translation keys", () => {
+    initializeLocale("en-US");
 
-    expect((t as unknown as (key: string) => string)("missing_translation_key")).toBeUndefined();
+    expect(t("missing_key" as never)).toBeUndefined();
   });
 
   it("formats dates and numbers using the active locale", () => {

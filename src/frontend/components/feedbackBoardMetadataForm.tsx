@@ -10,7 +10,7 @@ import { reactPlugin } from "../utilities/telemetryClient";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from "./feedbackBoardMetadataFormPermissions";
 import { generateUUID } from "../utilities/random";
-import { availableIcons, getIconElement } from "./icons";
+import { getIconElement, selectionTrayIcons } from "./icons";
 import { questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 export interface IFeedbackBoardMetadataFormProps {
@@ -35,7 +35,7 @@ export interface IFeedbackColumnCard {
 const maxColumnCount = 5;
 const maxColumnTitleLength = 50;
 
-const allIconClassNames = availableIcons.filter(icon => icon.tags && icon.tags.length > 0);
+const allIconClassNames = selectionTrayIcons;
 
 const allAccentColors: { friendlyName: string; colorCode: string }[] = [
   {
@@ -582,7 +582,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               </div>
               <div className="subText">{`Choose the column icon for column '${columnCardBeingEdited.column.title}'`}</div>
               <div className="subText">
-                <div className="grid grid-cols-7 gap-2 justify-items-center items-center">
+                <div className="grid grid-cols-6 gap-2 justify-items-center items-center">
                   {allIconClassNames.map(iconOption => {
                     return (
                       <button

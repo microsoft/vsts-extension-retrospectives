@@ -1,14 +1,30 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { availableIcons, fluentUiIcons, getIconElement } from "../icons";
+import { fluentUiIcons, getIconElement, iconDefinitions, legacyIconMappings, selectionTrayIcons } from "../icons";
 
 describe("icons", () => {
   it("renders every available icon", () => {
-    for (const [index, iconDefinition] of availableIcons.entries()) {
+    for (const [index, iconDefinition] of selectionTrayIcons.entries()) {
       const { container, unmount } = render(React.cloneElement(iconDefinition.icon, { key: `${iconDefinition.id}-${index}` }));
 
       expect(container.querySelector(`.icon-${iconDefinition.id}`)).toBeTruthy();
+      unmount();
+    }
+  });
+
+  it("does not allow duplicate non-zero trayOrder values", () => {
+    const nonZeroTrayOrders = iconDefinitions.map(iconDefinition => iconDefinition.trayOrder).filter(trayOrder => trayOrder > 0);
+    const uniqueTrayOrders = new Set(nonZeroTrayOrders);
+
+    expect(uniqueTrayOrders.size).toBe(nonZeroTrayOrders.length);
+  });
+
+  it("keeps legacy icon aliases separate from the tray list", () => {
+    for (const legacyMapping of legacyIconMappings) {
+      const { container, unmount } = render(getIconElement(legacyMapping.legacyId));
+
+      expect(container.querySelector(`.icon-${legacyMapping.iconId}`)).toBeTruthy();
       unmount();
     }
   });
@@ -23,13 +39,30 @@ describe("icons", () => {
   });
 
   describe("getIconElement", () => {
-    it("returns PlumbingIcon for plumbing id", () => {
+    it("returns specific non-tray icon components by ID", () => {
+      const iconExpectations = [
+        ["assessment", ".icon-assessment"],
+        ["pause-circle", ".icon-pause-circle"],
+        ["person", ".icon-person"],
+        ["insights", ".icon-insights"],
+      ] as const;
+
+      for (const [iconId, selector] of iconExpectations) {
+        const icon = getIconElement(iconId);
+        const { container, unmount } = render(icon);
+
+        expect(container.querySelector(selector)).toBeTruthy();
+        unmount();
+      }
+    });
+
+    it("returns PlumbingIcon for plumbing ID", () => {
       const icon = getIconElement("plumbing");
       const { container } = render(icon);
       expect(container.querySelector(".icon-plumbing")).toBeTruthy();
     });
 
-    it("returns TableChartIcon for table-chart id", () => {
+    it("returns TableChartIcon for table-chart ID", () => {
       const icon = getIconElement("table-chart");
       const { container } = render(icon);
       expect(container.querySelector(".icon-table-chart")).toBeTruthy();
@@ -42,7 +75,7 @@ describe("icons", () => {
       expect(container.querySelector(".icon-coffee")).toBeTruthy();
     });
 
-    it("falls back to PlayCircleIcon for an unknown id", () => {
+    it("falls back to PlayCircleIcon for an unknown ID", () => {
       const icon = getIconElement("unknown-icon");
       const { container } = render(icon);
 
