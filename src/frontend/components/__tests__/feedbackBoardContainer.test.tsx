@@ -428,6 +428,12 @@ describe("FeedbackBoardContainer integration", () => {
       title: "Board 2",
       columns: [{ id: "risk", title: "Risks", accentColor: "#d83b01" }],
     };
+    const archivedBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "b3",
+      title: "Archived Board",
+      isArchived: true,
+    };
     const firstBoardFeedback: IFeedbackItemDocument = {
       id: "f1",
       boardId: "b1",
@@ -452,6 +458,12 @@ describe("FeedbackBoardContainer integration", () => {
       columnId: "risk",
       originalColumnId: "risk",
     };
+    const archivedBoardFeedback: IFeedbackItemDocument = {
+      ...firstBoardFeedback,
+      id: "f3",
+      boardId: "b3",
+      title: "Archived release insight",
+    };
 
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
     mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
@@ -459,9 +471,17 @@ describe("FeedbackBoardContainer integration", () => {
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([firstBoard, secondBoard]);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([firstBoard, secondBoard, archivedBoard]);
     mocked(itemDataService.getBoardItem).mockResolvedValue(firstBoard);
-    mocked(itemDataService.getFeedbackItemsForBoard).mockImplementation(async boardId => (boardId === "b2" ? [secondBoardFeedback] : [firstBoardFeedback]));
+    mocked(itemDataService.getFeedbackItemsForBoard).mockImplementation(async boardId => {
+      if (boardId === "b2") {
+        return [secondBoardFeedback];
+      }
+      if (boardId === "b3") {
+        return [archivedBoardFeedback];
+      }
+      return [firstBoardFeedback];
+    });
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
     mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
 
@@ -478,6 +498,14 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.getByText("Fix release risk")).toBeInTheDocument();
     expect(screen.getByText("Board 2 - Risks - Jan 1, 2024")).toBeInTheDocument();
     expect(screen.queryByText("Keep the release calm")).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText("Enter words to search"), { target: { value: "archived" } });
+    expect(await screen.findByText("No feedback found.")).toBeInTheDocument();
+    expect(screen.queryByText("Archived release insight")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("checkbox", { name: /include archived boards/i }));
+
+    expect(await screen.findByText("Archived release insight")).toBeInTheDocument();
   });
 
   it("copies generated email summary content from the preview dialog", async () => {

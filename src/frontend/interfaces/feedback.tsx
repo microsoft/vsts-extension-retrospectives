@@ -47,16 +47,17 @@ export class FeedbackBoardDocumentHelper {
    * @param board - Current board being evaluated
    * @param teamIds - List of team ids the user has access to
    * @param userId - Id of the current user
+   * @param includeArchivedBoards - Whether archived boards should be included
    * @returns
    */
-  static filter(board: IFeedbackBoardDocument, teamIds: string[], userId: string): boolean {
+  static filter(board: IFeedbackBoardDocument, teamIds: string[], userId: string, includeArchivedBoards = false): boolean {
     const isBoardOwner = board.createdBy?.id === userId;
     const isBoardPublic = board.isPublic === undefined || board.isPublic === true;
     const hasAccessByMember = board.permissions?.Members === undefined || board.permissions.Members.includes(userId);
     const hasAccessByTeam = board.permissions?.Teams === undefined || teamIds.some(t => board.permissions.Teams.includes(t));
     const isBoardNotArchived = board.isArchived === undefined || board.isArchived === false;
 
-    const hasAccess = isBoardNotArchived && (isBoardOwner || isBoardPublic || hasAccessByMember || hasAccessByTeam);
+    const hasAccess = (includeArchivedBoards || isBoardNotArchived) && (isBoardOwner || isBoardPublic || hasAccessByMember || hasAccessByTeam);
 
     return hasAccess;
   }
