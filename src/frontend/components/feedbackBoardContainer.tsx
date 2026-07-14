@@ -236,6 +236,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const [allBoardFeedbackSearchTerm, setAllBoardFeedbackSearchTerm] = React.useState("");
   const [allBoardFeedbackSearchResults, setAllBoardFeedbackSearchResults] = React.useState<AllBoardFeedbackSearchResult[]>([]);
   const [isSearchingAllBoardFeedback, setIsSearchingAllBoardFeedback] = React.useState(false);
+  const [includeArchivedBoardsInSearch, setIncludeArchivedBoardsInSearch] = React.useState(false);
   const [showAllTeams, setShowAllTeams] = React.useState(false);
 
   const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
@@ -770,51 +771,51 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   }, []);
 
   const handleBoardCreated = React.useCallback(async (teamId: string, boardId: string) => {
-      if (!teamId) {
-        return;
+    if (!teamId) {
+      return;
+    }
+
+    const boardToAdd = await BoardDataService.getBoardForTeamById(teamId, boardId);
+
+    if (!boardToAdd) {
+      return;
+    }
+
+    setContainerState(prevState => {
+      if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
+        return prevState;
       }
 
-      const boardToAdd = await BoardDataService.getBoardForTeamById(teamId, boardId);
+      const boardsForTeam = [...prevState.boards, boardToAdd]
+        .filter((board: IFeedbackBoardDocument) =>
+          FeedbackBoardDocumentHelper.filter(
+            board,
+            prevState.userTeams.map(t => t.id),
+            prevState.currentUserId,
+          ),
+        )
+        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
 
-      if (!boardToAdd) {
-        return;
-      }
+      const newCurrentBoard = boardsForTeam.length === 1 ? boardsForTeam[0] : prevState.currentBoard;
 
-      setContainerState(prevState => {
-        if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
-          return prevState;
-        }
+      return {
+        ...prevState,
+        boards: boardsForTeam,
+        currentBoard: newCurrentBoard,
+        isTeamBoardDeletedInfoDialogHidden: true,
+      };
+    });
+  }, []);
 
-        const boardsForTeam = [...prevState.boards, boardToAdd]
-          .filter((board: IFeedbackBoardDocument) =>
-            FeedbackBoardDocumentHelper.filter(
-              board,
-              prevState.userTeams.map(t => t.id),
-              prevState.currentUserId,
-            ),
-          )
-          .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+  const getActionItemWorkItemTypes = (availableWorkItemTypes: WorkItemType[], requirementWorkItemTypeNames: string[], allowedWorkItemTypeNames: string[]): WorkItemType[] => {
+    const allowedNames = allowedWorkItemTypeNames.length ? allowedWorkItemTypeNames : requirementWorkItemTypeNames;
 
-        const newCurrentBoard = boardsForTeam.length === 1 ? boardsForTeam[0] : prevState.currentBoard;
+    if (!allowedNames.length) {
+      return availableWorkItemTypes;
+    }
 
-        return {
-          ...prevState,
-          boards: boardsForTeam,
-          currentBoard: newCurrentBoard,
-          isTeamBoardDeletedInfoDialogHidden: true,
-        };
-      });
-    }, []);
-
-    const getActionItemWorkItemTypes = (availableWorkItemTypes: WorkItemType[], requirementWorkItemTypeNames: string[], allowedWorkItemTypeNames: string[]): WorkItemType[] => {
-      const allowedNames = allowedWorkItemTypeNames.length ? allowedWorkItemTypeNames : requirementWorkItemTypeNames;
-
-      if (!allowedNames.length) {
-        return availableWorkItemTypes;
-      }
-
-      return availableWorkItemTypes.filter(workItemType => allowedNames.includes(workItemType.name));
-    };
+    return availableWorkItemTypes.filter(workItemType => allowedNames.includes(workItemType.name));
+  };
 
   const setSupportedWorkItemTypesForProject = React.useCallback(async (teamId?: string): Promise<void> => {
     const allWorkItemTypes: WorkItemType[] = await workItemService.getWorkItemTypesForCurrentProject();
@@ -868,86 +869,86 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   );
 
   const handleBoardUpdated = React.useCallback(async (teamId: string, updatedBoardId: string) => {
-      if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
-        return;
+    if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
+      return;
+    }
+
+    const updatedBoard = await BoardDataService.getBoardForTeamById(teamId, updatedBoardId);
+
+    if (!updatedBoard) {
+      // Board has been deleted after the update. Just ignore the update. The delete should be handled on its own.
+      return;
+    }
+
+    setContainerState(prevState => {
+      if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
+        return prevState;
       }
 
-      const updatedBoard = await BoardDataService.getBoardForTeamById(teamId, updatedBoardId);
+      const boards = prevState.boards.map(board => (board.id === updatedBoard.id ? updatedBoard : board));
+      const currentBoard = prevState.currentBoard?.id === updatedBoard.id ? updatedBoard : prevState.currentBoard;
 
-      if (!updatedBoard) {
-        // Board has been deleted after the update. Just ignore the update. The delete should be handled on its own.
-        return;
-      }
-
-      setContainerState(prevState => {
-        if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
-          return prevState;
-        }
-
-        const boards = prevState.boards.map(board => (board.id === updatedBoard.id ? updatedBoard : board));
-        const currentBoard = prevState.currentBoard?.id === updatedBoard.id ? updatedBoard : prevState.currentBoard;
-
-        return {
-          ...prevState,
-          boards,
-          currentBoard,
-        };
-      });
-    }, [state.currentTeam]);
+      return {
+        ...prevState,
+        boards,
+        currentBoard,
+      };
+    });
+  }, [state.currentTeam]);
 
   const handleBoardDeleted = React.useCallback(async (teamId: string, deletedBoardId: string) => {
-      if (!teamId) {
-        return;
+    if (!teamId) {
+      return;
+    }
+
+    let selectedBoardId: string | undefined;
+    let shouldAddVisit = false;
+    setContainerState(prevState => {
+      if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
+        return prevState;
       }
 
-      let selectedBoardId: string | undefined;
-      let shouldAddVisit = false;
-      setContainerState(prevState => {
-        if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
-          return prevState;
-        }
+      shouldAddVisit = true;
+      selectedBoardId = prevState.currentBoard?.id;
+      const currentBoards = prevState.boards;
+      const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);
 
-        shouldAddVisit = true;
-        selectedBoardId = prevState.currentBoard?.id;
-        const currentBoards = prevState.boards;
-        const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);
-
-        if (prevState.currentBoard && deletedBoardId === prevState.currentBoard.id) {
-          if (!boardsForTeam || boardsForTeam.length === 0) {
-            selectedBoardId = undefined;
-            reflectBackendService.switchToBoard(undefined);
-            return {
-              ...prevState,
-              boards: [],
-              currentBoard: null,
-              isTeamBoardDeletedInfoDialogHidden: false,
-              teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
-              teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user.",
-            };
-          }
-
-          const currentBoard = boardsForTeam[0];
-          selectedBoardId = currentBoard.id;
-          reflectBackendService.switchToBoard(currentBoard.id);
+      if (prevState.currentBoard && deletedBoardId === prevState.currentBoard.id) {
+        if (!boardsForTeam || boardsForTeam.length === 0) {
+          selectedBoardId = undefined;
+          reflectBackendService.switchToBoard(undefined);
           return {
             ...prevState,
-            boards: boardsForTeam,
-            currentBoard: currentBoard,
+            boards: [],
+            currentBoard: null,
             isTeamBoardDeletedInfoDialogHidden: false,
             teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
-            teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.",
+            teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user.",
           };
         }
 
+        const currentBoard = boardsForTeam[0];
+        selectedBoardId = currentBoard.id;
+        reflectBackendService.switchToBoard(currentBoard.id);
         return {
           ...prevState,
           boards: boardsForTeam,
+          currentBoard: currentBoard,
+          isTeamBoardDeletedInfoDialogHidden: false,
+          teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
+          teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.",
         };
-      });
-      if (shouldAddVisit) {
-        await userDataService.addVisit(teamId, selectedBoardId);
       }
-    }, []);
+
+      return {
+        ...prevState,
+        boards: boardsForTeam,
+      };
+    });
+    if (shouldAddVisit) {
+      await userDataService.addVisit(teamId, selectedBoardId);
+    }
+  }, []);
 
   /**
    * @description Loads team data for this project and the current user. Attempts to use query
@@ -1130,11 +1131,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     // Attempt to pre-select the team based on the teamId query param.
     const teamIdQueryParam = info.teamId;
     const matchedTeam =
-      defaultTeam?.id === teamIdQueryParam
-        ? defaultTeam
-        : getConfiguredTeam(teamIdQueryParam) ||
-          (await azureDevOpsCoreService.getTeam(projectId, teamIdQueryParam)) ||
-          (teamRestLookupFailed ? createFallbackTeam(teamIdQueryParam) : undefined);
+      defaultTeam?.id === teamIdQueryParam ? defaultTeam : getConfiguredTeam(teamIdQueryParam) || (await azureDevOpsCoreService.getTeam(projectId, teamIdQueryParam)) || (teamRestLookupFailed ? createFallbackTeam(teamIdQueryParam) : undefined);
 
     if (!matchedTeam) {
       // If the teamId query param wasn't valid attempt to pre-select a team and board by last
@@ -1494,6 +1491,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     setAllBoardFeedbackSearchTerm("");
     setAllBoardFeedbackSearchResults([]);
     setIsSearchingAllBoardFeedback(false);
+    setIncludeArchivedBoardsInSearch(false);
   }, []);
 
   const showAllBoardFeedbackSearchDialog = (): void => {
@@ -1506,59 +1504,87 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     hideDialog("isSearchAllBoardsDialogVisible", searchAllBoardsDialogRef);
   };
 
-  const handleAllBoardFeedbackSearchInputChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const trimmedSearchTerm = event.currentTarget.value.trim();
-    const requestId = allBoardFeedbackSearchRequestIdRef.current + 1;
-    allBoardFeedbackSearchRequestIdRef.current = requestId;
+  const searchAllBoardFeedback = React.useCallback(
+    async (trimmedSearchTerm: string, includeArchivedBoards: boolean): Promise<void> => {
+      const requestId = allBoardFeedbackSearchRequestIdRef.current + 1;
+      allBoardFeedbackSearchRequestIdRef.current = requestId;
 
-    setAllBoardFeedbackSearchTerm(trimmedSearchTerm);
-
-    if (!trimmedSearchTerm) {
-      setAllBoardFeedbackSearchResults([]);
-      setIsSearchingAllBoardFeedback(false);
-      return;
-    }
-
-    setIsSearchingAllBoardFeedback(true);
-
-    try {
-      const normalizedSearchTerm = trimmedSearchTerm.toLowerCase();
-      const boardFeedbackItems = await Promise.all(
-        state.boards.map(async board => ({
-          board,
-          feedbackItems: await itemDataService.getFeedbackItemsForBoard(board.id),
-        })),
-      );
-
-      if (allBoardFeedbackSearchRequestIdRef.current !== requestId) {
+      if (!trimmedSearchTerm) {
+        setAllBoardFeedbackSearchResults([]);
+        setIsSearchingAllBoardFeedback(false);
         return;
       }
 
-      const searchResults = boardFeedbackItems.flatMap(({ board, feedbackItems }) => {
-        return feedbackItems
-          .filter(feedbackItem => {
-            const isHiddenCollectFeedback = board.activePhase === WorkflowPhase.Collect && board.shouldShowFeedbackAfterCollect && feedbackItem.userIdRef !== state.currentUserId;
-            if (isHiddenCollectFeedback) {
-              return false;
-            }
+      setIsSearchingAllBoardFeedback(true);
 
-            return feedbackItem.title.toLowerCase().includes(normalizedSearchTerm) || board.title.toLowerCase().includes(normalizedSearchTerm);
-          })
-          .map(feedbackItem => ({ board, feedbackItem }));
-      });
+      try {
+        const normalizedSearchTerm = trimmedSearchTerm.toLowerCase();
+        const boardsToSearch = includeArchivedBoards
+          ? (await BoardDataService.getBoardsForTeam(state.currentTeam.id)).filter(board =>
+            FeedbackBoardDocumentHelper.filter(
+              board,
+              state.userTeams.map(team => team.id),
+              state.currentUserId,
+              true,
+            ),
+          )
+          : state.boards;
+        const boardFeedbackItems = await Promise.all(
+          boardsToSearch.map(async board => ({
+            board,
+            feedbackItems: await itemDataService.getFeedbackItemsForBoard(board.id),
+          })),
+        );
 
-      setAllBoardFeedbackSearchResults(searchResults);
-    } catch (error) {
-      appInsights.trackException(error, { action: "searchAllBoardFeedback" });
-      if (allBoardFeedbackSearchRequestIdRef.current === requestId) {
-        setAllBoardFeedbackSearchResults([]);
+        if (allBoardFeedbackSearchRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        const searchResults = boardFeedbackItems.flatMap(({ board, feedbackItems }) => {
+          return feedbackItems
+            .filter(feedbackItem => {
+              const isHiddenCollectFeedback = board.activePhase === WorkflowPhase.Collect && board.shouldShowFeedbackAfterCollect && feedbackItem.userIdRef !== state.currentUserId;
+              if (isHiddenCollectFeedback) {
+                return false;
+              }
+
+              return feedbackItem.title.toLowerCase().includes(normalizedSearchTerm) || board.title.toLowerCase().includes(normalizedSearchTerm);
+            })
+            .map(feedbackItem => ({ board, feedbackItem }));
+        });
+
+        setAllBoardFeedbackSearchResults(searchResults);
+      } catch (error) {
+        appInsights.trackException(error, { action: "searchAllBoardFeedback" });
+        if (allBoardFeedbackSearchRequestIdRef.current === requestId) {
+          setAllBoardFeedbackSearchResults([]);
+        }
+      } finally {
+        if (allBoardFeedbackSearchRequestIdRef.current === requestId) {
+          setIsSearchingAllBoardFeedback(false);
+        }
       }
-    } finally {
-      if (allBoardFeedbackSearchRequestIdRef.current === requestId) {
-        setIsSearchingAllBoardFeedback(false);
-      }
-    }
-  }, [state.boards, state.currentUserId]);
+    },
+    [state.boards, state.currentTeam?.id, state.currentUserId, state.userTeams],
+  );
+
+  const handleAllBoardFeedbackSearchInputChange = React.useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+      const trimmedSearchTerm = event.currentTarget.value.trim();
+      setAllBoardFeedbackSearchTerm(trimmedSearchTerm);
+      await searchAllBoardFeedback(trimmedSearchTerm, includeArchivedBoardsInSearch);
+    },
+    [includeArchivedBoardsInSearch, searchAllBoardFeedback],
+  );
+
+  const handleIncludeArchivedBoardsInSearchChange = React.useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+      const includeArchivedBoards = event.currentTarget.checked;
+      setIncludeArchivedBoardsInSearch(includeArchivedBoards);
+      await searchAllBoardFeedback(allBoardFeedbackSearchTerm, includeArchivedBoards);
+    },
+    [allBoardFeedbackSearchTerm, searchAllBoardFeedback],
+  );
 
   const openAllBoardFeedbackSearchResult = async (board: IFeedbackBoardDocument): Promise<void> => {
     await changeSelectedBoard(board);
@@ -1743,9 +1769,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       [...new Set(measurements.map(item => item.id))]
         .filter(questionId => questions.some(question => question.id === questionId))
         .forEach(questionId => {
-        const responsesForQuestion = measurements.filter(m => m.id === questionId);
-        const average = responsesForQuestion.reduce((sum, m) => sum + m.selected, 0) / responsesForQuestion.length;
-        questionAverages.push({ questionId, average });
+          const responsesForQuestion = measurements.filter(m => m.id === questionId);
+          const average = responsesForQuestion.reduce((sum, m) => sum + m.selected, 0) / responsesForQuestion.length;
+          questionAverages.push({ questionId, average });
         });
 
       return {
@@ -2021,6 +2047,16 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       />
     ),
     [handleAllBoardFeedbackSearchInputChange],
+  );
+
+  const includeArchivedBoardsCheckbox = React.useMemo(
+    () => (
+      <label className="subText">
+        <input type="checkbox" className="mr-2" checked={includeArchivedBoardsInSearch} onChange={handleIncludeArchivedBoardsInSearchChange} />
+        Include archived boards
+      </label>
+    ),
+    [handleIncludeArchivedBoardsInSearchChange, includeArchivedBoardsInSearch],
   );
 
   if (!state.isAppInitialized || !state.isTeamDataLoaded) {
@@ -2662,6 +2698,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             })}
           </div>
           <div className="inner">
+            {includeArchivedBoardsCheckbox}
             <button type="button" className="default button" onClick={hideAllBoardFeedbackSearchDialog}>
               Close
             </button>
