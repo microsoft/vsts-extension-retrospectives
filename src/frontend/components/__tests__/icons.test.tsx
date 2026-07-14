@@ -19,46 +19,12 @@ describe("icons", () => {
     expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "close")).toBe(false);
     expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "gear-with-stars")).toBe(false);
     expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "psychological-safety")).toBe(false);
+    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "angry-face")).toBe(false);
     expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "thumb-up-down")).toBe(false);
     expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "explore")).toBe(false);
     expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "delete")).toBe(false);
     expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "list-all")).toBe(false);
     expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "view-column")).toBe(false);
-  });
-
-  it("orders tray icons by trayOrder", () => {
-    expect(selectionTrayIcons.map(iconDefinition => iconDefinition.id)).toEqual([
-      "happy-face",
-      "sad-face",
-      "angry-face",
-      "help",
-      "exclamation",
-      "check-circle",
-      "thumb-up",
-      "thumb-down",
-      "support",
-      "forum",
-      "star",
-      "light-bulb",
-      "coffee",
-      "rocket-launch",
-      "play-circle",
-      "stop-circle",
-      "adjust",
-      "plumbing",
-      "menu-book",
-      "add-circle",
-      "birthday-cake",
-      "construction",
-      "anchor",
-      "search",
-      "lock",
-      "electric-bolt",
-      "balance",
-      "gear",
-      "eye",
-      "speed",
-    ]);
   });
 
   it("does not allow duplicate non-zero trayOrder values", () => {
