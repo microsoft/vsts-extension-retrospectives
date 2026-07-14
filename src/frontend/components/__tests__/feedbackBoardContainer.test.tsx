@@ -503,7 +503,7 @@ describe("FeedbackBoardContainer integration", () => {
     expect(await screen.findByText("No feedback found.")).toBeInTheDocument();
     expect(screen.queryByText("Archived release insight")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("checkbox", { name: "include archived boards" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: /include archived boards/i }));
 
     expect(await screen.findByText("Archived release insight")).toBeInTheDocument();
   });
