@@ -82,10 +82,18 @@ describe("ExtensionSettingsMenu", () => {
     return iconButton ?? closeButtons[0];
   };
 
+  const getPrimeDirectiveButton = (): HTMLElement => screen.getByRole("button", { name: "Directive" });
+
+  const getDataMenuSummary = (): HTMLElement => screen.getByRole("button", { name: "Data Import/Export" });
+
+  const getHelpMenuSummary = (): HTMLElement => screen.getByRole("button", { name: "Retrospective Help" });
+
+  const getSettingsMenuSummary = (): HTMLElement => screen.getByRole("button", { name: "User/Admin Settings" });
+
   const getHelpMenuDetails = (): HTMLElement => {
-    const helpMenuDetails = screen.getByTitle("Retrospective Help").closest("details") as HTMLElement;
+    const helpMenuDetails = getHelpMenuSummary().closest("details") as HTMLElement;
     if (!helpMenuDetails.hasAttribute("open")) {
-      fireEvent.click(screen.getByTitle("Retrospective Help"));
+      fireEvent.click(getHelpMenuSummary());
     }
     return helpMenuDetails;
   };
@@ -134,10 +142,10 @@ describe("ExtensionSettingsMenu", () => {
 
   it("renders all buttons", () => {
     render(<ExtensionSettingsMenu />);
-    expect(screen.getByTitle("Prime Directive")).toBeInTheDocument();
-    expect(screen.getByTitle("User/Admin Settings")).toBeInTheDocument();
-    expect(screen.getByTitle("Data Import/Export")).toBeInTheDocument();
-    expect(screen.getByTitle("Retrospective Help")).toBeInTheDocument();
+    expect(getPrimeDirectiveButton()).toBeInTheDocument();
+    expect(getSettingsMenuSummary()).toBeInTheDocument();
+    expect(getDataMenuSummary()).toBeInTheDocument();
+    expect(getHelpMenuSummary()).toBeInTheDocument();
   });
 
   it("shows labels when wide", () => {
@@ -148,11 +156,67 @@ describe("ExtensionSettingsMenu", () => {
     expect(screen.getByText("Help")).toBeInTheDocument();
   });
 
+  it.each([
+    ["Data Import/Export", "data-import-export-tooltip"],
+    ["Retrospective Help", "retrospective-help-tooltip"],
+    ["User/Admin Settings", "retrospective-settings-tooltip"],
+  ])("shows the %s summary tooltip for pointer and keyboard focus", (accessibleName, expectedTooltipId) => {
+    render(<ExtensionSettingsMenu />);
+
+    const summary = screen.getByRole("button", { name: accessibleName });
+    const tooltipId = summary.getAttribute("aria-describedby");
+    const tooltip = document.getElementById(tooltipId!)!;
+    const details = summary.closest("details");
+
+    expect(details).not.toHaveAttribute("open");
+    expect(summary).not.toHaveAttribute("title");
+    expect(tooltipId).toBe(expectedTooltipId);
+    expect(tooltip.closest("details")).toBeNull();
+    expect(tooltip.parentElement).toBe(document.body);
+    expect(tooltip).toHaveAttribute("popover", "hint");
+    expect(tooltip).toHaveTextContent(accessibleName);
+
+    let isTooltipOpen = false;
+    const showPopover = jest.fn(() => {
+      isTooltipOpen = true;
+    });
+    const hidePopover = jest.fn(() => {
+      isTooltipOpen = false;
+    });
+    const matchesSpy = jest.spyOn(tooltip, "matches").mockImplementation(selector => (selector === ":popover-open" ? isTooltipOpen : false));
+    (tooltip as any).showPopover = showPopover;
+    (tooltip as any).hidePopover = hidePopover;
+
+    jest.useFakeTimers();
+    try {
+      fireEvent.pointerEnter(summary);
+      jest.advanceTimersByTime(499);
+      expect(showPopover).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(1);
+      expect(showPopover).toHaveBeenCalledWith({ source: summary });
+
+      fireEvent.pointerLeave(summary);
+      expect(hidePopover).toHaveBeenCalledTimes(1);
+
+      fireEvent.focus(summary);
+      jest.advanceTimersByTime(500);
+      expect(showPopover).toHaveBeenCalledTimes(2);
+      expect(showPopover).toHaveBeenLastCalledWith({ source: summary });
+
+      fireEvent.blur(summary);
+      expect(hidePopover).toHaveBeenCalledTimes(2);
+    } finally {
+      jest.useRealTimers();
+      matchesSpy.mockRestore();
+    }
+  });
+
   it("toggles showing all teams", () => {
     const onShowAllTeamsChange = jest.fn();
     render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
     fireEvent.click(screen.getByRole("button", { name: "Show all teams" }));
 
     expect(onShowAllTeamsChange).toHaveBeenCalledWith(true);
@@ -161,7 +225,7 @@ describe("ExtensionSettingsMenu", () => {
   it("handles show all teams when no change callback is provided", () => {
     render(<ExtensionSettingsMenu showAllTeams={true} />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
 
     expect(() => fireEvent.click(screen.getByRole("button", { name: "Show my teams" }))).not.toThrow();
   });
@@ -170,7 +234,7 @@ describe("ExtensionSettingsMenu", () => {
     const onScrollModeChange = jest.fn();
     render(<ExtensionSettingsMenu scrollMode="column" onScrollModeChange={onScrollModeChange} />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
     fireEvent.click(screen.getByRole("button", { name: "Scroll by board" }));
 
     expect(onScrollModeChange).toHaveBeenCalledWith("board");
@@ -180,7 +244,7 @@ describe("ExtensionSettingsMenu", () => {
     const onScrollModeChange = jest.fn();
     render(<ExtensionSettingsMenu scrollMode="board" onScrollModeChange={onScrollModeChange} />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
     fireEvent.click(screen.getByRole("button", { name: "Scroll by column" }));
 
     expect(onScrollModeChange).toHaveBeenCalledWith("column");
@@ -189,7 +253,7 @@ describe("ExtensionSettingsMenu", () => {
   it("handles scroll mode toggle when no change callback is provided", () => {
     render(<ExtensionSettingsMenu scrollMode="column" />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
 
     expect(() => fireEvent.click(screen.getByRole("button", { name: "Scroll by board" }))).not.toThrow();
   });
@@ -198,7 +262,7 @@ describe("ExtensionSettingsMenu", () => {
     const onShowAllTeamsChange = jest.fn();
     render(<ExtensionSettingsMenu showAllTeams={false} onShowAllTeamsChange={onShowAllTeamsChange} />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
     const showAllTeamsButton = screen.getByRole("button", { name: "Show all teams" });
     const closestSpy = jest.spyOn(Element.prototype, "closest").mockReturnValue(null);
 
@@ -219,7 +283,7 @@ describe("ExtensionSettingsMenu", () => {
 
     render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} allWorkItemTypes={allWorkItemTypes} allowedActionItemWorkItemTypeNames={["Task"]} onSaveAllowedActionItemWorkItemTypes={onSaveAllowedActionItemWorkItemTypes} />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
     fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
 
     const dialog = screen.getByRole("dialog", { name: "Add work item types" });
@@ -251,7 +315,7 @@ describe("ExtensionSettingsMenu", () => {
 
     render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} allWorkItemTypes={allWorkItemTypes} allowedActionItemWorkItemTypeNames={["Task"]} />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
     fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
 
     const dialog = screen.getByRole("dialog", { name: "Add work item types" });
@@ -269,7 +333,7 @@ describe("ExtensionSettingsMenu", () => {
   it("closes admin add work item type settings after save without a callback", async () => {
     render(<ExtensionSettingsMenu currentUserIsTeamAdmin={true} />);
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(getSettingsMenuSummary());
     fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
 
     const dialog = screen.getByRole("dialog", { name: "Add work item types" });
@@ -283,7 +347,7 @@ describe("ExtensionSettingsMenu", () => {
   it("shows add work item types option for non-admin users", () => {
     render(<ExtensionSettingsMenu currentUserIsTeamAdmin={false} />);
 
-    fireEvent.click(screen.getByTitle(/settings/i));
+    fireEvent.click(getSettingsMenuSummary());
 
     expect(screen.getByRole("button", { name: "Add work item types" })).toBeInTheDocument();
   });
@@ -293,7 +357,7 @@ describe("ExtensionSettingsMenu", () => {
 
     render(<ExtensionSettingsMenu currentUserIsTeamAdmin={false} allWorkItemTypes={allWorkItemTypes} allowedActionItemWorkItemTypeNames={["Task"]} />);
 
-    fireEvent.click(screen.getByTitle(/settings/i));
+    fireEvent.click(getSettingsMenuSummary());
     fireEvent.click(screen.getByRole("button", { name: "Add work item types" }));
 
     const dialog = screen.getByRole("dialog", { name: "Add work item types" });
@@ -316,8 +380,8 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens Prime Directive dialog", () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Prime Directive"));
-    expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
+    fireEvent.click(getPrimeDirectiveButton());
+    expect(screen.getByRole("dialog", { name: "The Prime Directive" })).toHaveAttribute("open");
   });
 
   it("opens keyboard shortcuts dialog with '?' hotkey", () => {
@@ -333,14 +397,14 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens retrospective wiki", () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Prime Directive"));
+    fireEvent.click(getPrimeDirectiveButton());
     fireEvent.click(screen.getByRole("button", { name: "Open retrospective wiki" }));
     expect(windowOpenSpy).toHaveBeenCalledWith("https://retrospectivewiki.org", "_blank");
   });
 
   it("opens What's New dialog", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("What's new"));
     });
@@ -351,7 +415,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens User Guide dialog", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("User guide"));
     });
@@ -362,7 +426,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens Volunteer dialog", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
     });
@@ -373,7 +437,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens Keyboard Shortcuts dialog", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
     });
@@ -384,7 +448,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("closes Keyboard Shortcuts dialog", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
     });
@@ -401,7 +465,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens GitHub issues", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("Contact us"));
     });
@@ -458,7 +522,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("closes the What's New dialog with the header close button", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("What's new"));
     });
@@ -474,7 +538,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("closes the User Guide dialog with the header close button", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("User guide"));
     });
@@ -490,7 +554,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("closes the Volunteer dialog with the header close button", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
     });
@@ -506,7 +570,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("closes the Keyboard Shortcuts dialog with the header close button", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
     });
@@ -523,34 +587,34 @@ describe("ExtensionSettingsMenu", () => {
   it("handles dialog cancel events for all help dialogs", async () => {
     render(<ExtensionSettingsMenu />);
 
-    fireEvent.click(screen.getByTitle("Prime Directive"));
+    fireEvent.click(getPrimeDirectiveButton());
     const primeDirectiveDialog = screen.getByRole("dialog", { name: "The Prime Directive" });
     expect(primeDirectiveDialog).toHaveAttribute("open");
     fireEvent(primeDirectiveDialog, new Event("cancel", { bubbles: false, cancelable: true }));
     expect(primeDirectiveDialog).not.toHaveAttribute("open");
 
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     fireEvent.click(getHelpMenuButton("What's new"));
     const whatsNewDialog = screen.getByRole("dialog", { name: "What is New" });
     expect(whatsNewDialog).toHaveAttribute("open");
     fireEvent(whatsNewDialog, new Event("cancel", { bubbles: false, cancelable: true }));
     expect(whatsNewDialog).not.toHaveAttribute("open");
 
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     fireEvent.click(getHelpMenuButton("User guide"));
     const userGuideDialog = screen.getByRole("dialog", { name: "Retrospectives User Guide" });
     expect(userGuideDialog).toHaveAttribute("open");
     fireEvent(userGuideDialog, new Event("cancel", { bubbles: false, cancelable: true }));
     expect(userGuideDialog).not.toHaveAttribute("open");
 
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
     const volunteerDialog = screen.getByRole("dialog", { name: "Volunteer" });
     expect(volunteerDialog).toHaveAttribute("open");
     fireEvent(volunteerDialog, new Event("cancel", { bubbles: false, cancelable: true }));
     expect(volunteerDialog).not.toHaveAttribute("open");
 
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     fireEvent.click(getHelpMenuButton("Keyboard shortcuts"));
     const keyboardShortcutsDialog = screen.getByRole("dialog", { name: "Keyboard Shortcuts" });
     expect(keyboardShortcutsDialog).toHaveAttribute("open");
@@ -560,18 +624,18 @@ describe("ExtensionSettingsMenu", () => {
 
   it("handles keyboard shortcuts", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Prime Directive"));
-    expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
+    fireEvent.click(getPrimeDirectiveButton());
     const dialog = screen.getByRole("dialog", { name: "The Prime Directive" });
+    expect(dialog).toHaveAttribute("open");
     fireEvent.click(within(dialog).getByText("Close"));
     await waitFor(() => {
-      expect(screen.queryByText("The Prime Directive")).not.toBeVisible();
+      expect(dialog).not.toHaveAttribute("open");
     });
   });
 
   it("closes What's New dialog", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("What's new"));
     });
@@ -587,7 +651,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens changelog from What's New", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("What's new"));
     });
@@ -599,7 +663,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens readme from User Guide", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("User guide"));
     });
@@ -611,7 +675,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("closes User Guide dialog", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(getHelpMenuButton("User guide"));
     });
@@ -627,7 +691,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("opens contributing from Volunteer", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
     });
@@ -639,7 +703,7 @@ describe("ExtensionSettingsMenu", () => {
 
   it("closes Volunteer dialog", async () => {
     render(<ExtensionSettingsMenu />);
-    fireEvent.click(screen.getByTitle("Retrospective Help"));
+    fireEvent.click(getHelpMenuSummary());
     await waitFor(() => {
       fireEvent.click(screen.getByRole("button", { name: "Volunteer" }));
     });
@@ -694,7 +758,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Data menu
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       // Click Export Data button
@@ -717,7 +781,7 @@ describe("ExtensionSettingsMenu", () => {
     const { container } = render(<ExtensionSettingsMenu />);
 
     // Open the Data menu
-    const dataButton = screen.getByTitle("Data Import/Export");
+    const dataButton = getDataMenuSummary();
     fireEvent.click(dataButton);
 
     // Verify the import button exists
@@ -732,7 +796,7 @@ describe("ExtensionSettingsMenu", () => {
     const { container } = render(<ExtensionSettingsMenu />);
 
     // Open the Data menu
-    const dataButton = screen.getByTitle("Data Import/Export");
+    const dataButton = getDataMenuSummary();
     fireEvent.click(dataButton);
 
     // Click Import Data button (first button - Import is before Export in the menu)
@@ -835,7 +899,7 @@ describe("ExtensionSettingsMenu", () => {
     const { container } = render(<ExtensionSettingsMenu />);
 
     // Open the Data menu
-    const dataButton = screen.getByTitle("Data Import/Export");
+    const dataButton = getDataMenuSummary();
     fireEvent.click(dataButton);
 
     // Verify the import button exists
@@ -919,7 +983,7 @@ describe("ExtensionSettingsMenu", () => {
     const { container } = render(<ExtensionSettingsMenu />);
 
     // Open the Data menu
-    const dataButton = screen.getByTitle("Data Import/Export");
+    const dataButton = getDataMenuSummary();
     fireEvent.click(dataButton);
 
     // Verify the menu opened with buttons
@@ -959,7 +1023,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Data menu
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       // Click Export Data button
@@ -980,7 +1044,7 @@ describe("ExtensionSettingsMenu", () => {
     expect(menuComponent).toBeInTheDocument();
 
     // Open the Data Import/Export menu
-    const dataButton = screen.getByTitle("Data Import/Export");
+    const dataButton = getDataMenuSummary();
     fireEvent.click(dataButton);
 
     // Find Import Data button
@@ -1039,7 +1103,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open a details menu
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       const detailsElement = container.querySelector("details[open]");
@@ -1057,7 +1121,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open a details menu
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       const detailsElement = container.querySelector("details[open]");
@@ -1079,16 +1143,16 @@ describe("ExtensionSettingsMenu", () => {
 
     it("opens Prime Directive dialog when clicking Prime Directive button", () => {
       render(<ExtensionSettingsMenu />);
-      const primeDirectiveButton = screen.getByTitle("Prime Directive");
+      const primeDirectiveButton = getPrimeDirectiveButton();
 
       fireEvent.click(primeDirectiveButton);
 
-      expect(screen.getByText("The Prime Directive")).toBeInTheDocument();
+      expect(screen.getByRole("dialog", { name: "The Prime Directive" })).toHaveAttribute("open");
     });
 
     it("closes Prime Directive dialog when clicking close button", () => {
       const { container } = render(<ExtensionSettingsMenu />);
-      const primeDirectiveButton = screen.getByTitle("Prime Directive");
+      const primeDirectiveButton = getPrimeDirectiveButton();
 
       fireEvent.click(primeDirectiveButton);
 
@@ -1105,7 +1169,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Help menu
-      const helpButton = screen.getByTitle("Retrospective Help");
+      const helpButton = getHelpMenuSummary();
       fireEvent.click(helpButton);
 
       // Click What's new button in the callout menu
@@ -1122,7 +1186,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Help menu
-      const helpButton = screen.getByTitle("Retrospective Help");
+      const helpButton = getHelpMenuSummary();
       fireEvent.click(helpButton);
 
       // Click Keyboard shortcuts button - second button in help menu
@@ -1140,7 +1204,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Help menu
-      const helpButton = screen.getByTitle("Retrospective Help");
+      const helpButton = getHelpMenuSummary();
       fireEvent.click(helpButton);
 
       // Click User guide button - third button in help menu
@@ -1158,7 +1222,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Help menu
-      const helpButton = screen.getByTitle("Retrospective Help");
+      const helpButton = getHelpMenuSummary();
       fireEvent.click(helpButton);
 
       // Click Volunteer button - fourth button in help menu
@@ -1178,7 +1242,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Help menu
-      const helpButton = screen.getByTitle("Retrospective Help");
+      const helpButton = getHelpMenuSummary();
       fireEvent.click(helpButton);
 
       // Click Contact us button - fifth button in help menu
@@ -1197,7 +1261,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open Prime Directive dialog
-      const primeDirectiveButton = screen.getByTitle("Prime Directive");
+      const primeDirectiveButton = getPrimeDirectiveButton();
       fireEvent.click(primeDirectiveButton);
 
       const dialog = container.querySelector(".prime-directive-dialog") as HTMLDialogElement;
@@ -1240,7 +1304,7 @@ describe("ExtensionSettingsMenu", () => {
       const appendSpy = jest.spyOn(itemDataService, "appendItemToBoard").mockResolvedValue({} as any);
 
       // Open the Data menu and click Import
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       // Set up document.createElement mock AFTER render
@@ -1310,7 +1374,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Data menu and click Import
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       // Set up document.createElement mock AFTER render
@@ -1371,7 +1435,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Data menu
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       // Verify the import and export buttons exist
@@ -1394,7 +1458,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Data menu
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       // Verify the menu is open
@@ -1426,7 +1490,7 @@ describe("ExtensionSettingsMenu", () => {
       const { container } = render(<ExtensionSettingsMenu />);
 
       // Open the Data menu and click Export
-      const dataButton = screen.getByTitle("Data Import/Export");
+      const dataButton = getDataMenuSummary();
       fireEvent.click(dataButton);
 
       const calloutMenu = container.querySelector("details[open] .callout-menu");

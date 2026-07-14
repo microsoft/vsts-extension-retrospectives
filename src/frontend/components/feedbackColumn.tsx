@@ -145,6 +145,8 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   const editColumnNotesDialogRef = useRef<HTMLDialogElement>(null);
   const focusPreservation = useRef<FocusPreservation | null>(null);
   const prevColumnItemsLength = useRef<number>(currentColumnItems.length);
+  const notesTooltipId = columnNotes ? `feedback-column-${columnId}-notes-tooltip` : undefined;
+  const showColumnNotesButton = showColumnEditButton || Boolean(columnNotes);
 
   const getNavigableColumnItems = useCallback((): IColumnItem[] => {
     const sourceColumnItems: IColumnItem[] = currentColumnItems;
@@ -451,24 +453,31 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
       <div className="feedback-column-header">
         <div className="feedback-column-title" aria-label={`${columnName} (${currentColumnItems.length} feedback items)`}>
           <div className="feedback-column-icon">{icon}</div>
-          <h2 className="feedback-column-name">{columnName}</h2>
+          <button type="button" className="feedback-column-name" interestFor={`feedback-column-${columnId}-name-tooltip`} aria-describedby={`feedback-column-${columnId}-name-tooltip`}>
+            {columnName}
+          </button>
+          <div id={`feedback-column-${columnId}-name-tooltip`} className="tooltip" popover="hint" role="tooltip">
+            {columnName}
+          </div>
         </div>
         <div className="feedback-column-actions">
-          {showColumnEditButton && (
-            <button className="feedback-column-edit-button" title="Edit column notes" aria-label={`Edit column ${columnName}`} onClick={openEditDialog}>
-              {getIconElement("reviews")}
-            </button>
-          )}
-          {columnNotes && (
-            <button className="feedback-column-info-button" title={columnNotes} aria-label={`Column notes: ${columnNotes}`}>
-              {getIconElement("info")}
-            </button>
+          {showColumnNotesButton && (
+            <>
+              <button type="button" className="feedback-column-edit-button" aria-label={showColumnEditButton ? `Edit column ${columnName}` : `Column notes for ${columnName}`} aria-describedby={notesTooltipId} interestFor={notesTooltipId} onClick={showColumnEditButton ? openEditDialog : undefined}>
+                {getIconElement("info")}
+              </button>
+              {columnNotes && (
+                <div id={notesTooltipId} className="tooltip" popover="hint" role="tooltip">
+                  {columnNotes}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
       <div className={`feedback-column-content${isCollapsed ? " hide-collapse" : ""}`}>
         {workflowPhase === WorkflowPhase.Collect && (
-          <button className="create-button" title={t("add_new_feedback")} aria-label={t("add_new_feedback")} onClick={createEmptyFeedbackItem}>
+          <button className="create-button" aria-label={t("add_new_feedback")} onClick={createEmptyFeedbackItem}>
             {getIconElement("add")}
             {t("add_new_feedback")}
           </button>

@@ -55,16 +55,16 @@ const EffectivenessMeasurementRow: React.FC<EffectivenessMeasurementRowProps> = 
   return (
     <tr className="effectiveness-measurement-row">
       <th scope="row">
-        <p>
-          {getIconElement(iconClassName)}
-          {title}
-        </p>
-        {subtitle}
+        <p>{getIconElement(iconClassName)}{title}</p>
+        <span>{subtitle}</span>
       </th>
       <td className="effectiveness-measurement-tooltip-cell">
-        <button type="button" className="contextual-menu-button tooltip" aria-label={`More information about ${title}`} aria-description={tooltip} title={tooltip}>
+        <button type="button" className="contextual-menu-button" aria-label={`More information about ${title}`} aria-describedby={`effectiveness-measurement-${questionId ?? title.toLowerCase().replace(/\W+/g, "-")}-tooltip`} interestFor={`effectiveness-measurement-${questionId ?? title.toLowerCase().replace(/\W+/g, "-")}-tooltip`}>
           {getIconElement("exclamation")}
         </button>
+        <div id={`effectiveness-measurement-${questionId ?? title.toLowerCase().replace(/\W+/g, "-")}-tooltip`} className="tooltip effectiveness-measurement-tooltip" popover="hint" role="tooltip">
+          {tooltip}
+        </div>
       </td>
       {VOTING_SCALE.map((value: number) => {
         const isSelected = selected === value;

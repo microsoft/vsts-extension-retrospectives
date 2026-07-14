@@ -28,6 +28,77 @@ export interface FeedbackBoardPermissionOption {
   isTeamAdmin?: boolean;
 }
 
+interface PermissionOptionInputProps {
+  optionId: string;
+  optionType: FeedbackBoardPermissionOption["type"];
+  isBoardOwner: boolean;
+  isChecked: boolean;
+  isIndeterminate: boolean;
+  onPermissionClicked: (optionId: string, optionType: FeedbackBoardPermissionOption["type"], hasPermission: boolean) => void;
+}
+
+const isGroupOption = (option: FeedbackBoardPermissionOption): boolean => {
+  return /^\[[^\]]+\]\\/.test(option.name); // assumes groups have names like [project]\group
+};
+
+const PublicWarningBanner = React.memo(function PublicWarningBanner(props: { isVisible: boolean }): React.JSX.Element | null {
+  if (props.isVisible) {
+    return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} This board is visible to every member in the project</div>;
+  }
+
+  return null;
+});
+
+const PermissionSearchInput = React.memo(function PermissionSearchInput(props: { searchTerm: string; onSearchTermChanged: (newSearchTerm: string) => void }): React.JSX.Element {
+  return (
+    <input
+      aria-label="Search for a team or a member to add permissions"
+      aria-required={true}
+      placeholder="Search teams or users"
+      id="retrospective-permission-search-input"
+      value={props.searchTerm}
+      onChange={event => props.onSearchTermChanged(event.target.value)}
+      type="text"
+      className="permission-search-input"
+    />
+  );
+});
+
+const SelectAllPermissionOptionsInput = React.memo(function SelectAllPermissionOptionsInput(props: { canManageBoard: boolean; isChecked: boolean; onSelectAllClicked: (checked: boolean) => void }): React.JSX.Element {
+  return (
+    <input
+      className="my-2"
+      id="select-all-permission-options-visible"
+      aria-label="Add permission to every team or member in the table."
+      disabled={!props.canManageBoard}
+      checked={props.isChecked}
+      onChange={event => props.onSelectAllClicked(event.target.checked)}
+      type="checkbox"
+    />
+  );
+});
+
+const PermissionOptionInput = React.memo(function PermissionOptionInput(props: PermissionOptionInputProps): React.JSX.Element {
+  return (
+    <input
+      className="my-2"
+      id={`permission-option-${props.optionId}`}
+      aria-label="Add permission to every team or member in the table"
+      disabled={props.isBoardOwner}
+      checked={props.isChecked}
+      onChange={event => {
+        props.onPermissionClicked(props.optionId, props.optionType, event.target.checked);
+      }}
+      type="checkbox"
+      ref={input => {
+        if (input) {
+          input.indeterminate = props.isIndeterminate;
+        }
+      }}
+    />
+  );
+});
+
 function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMetadataFormPermissionsProps>): React.JSX.Element {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardMetadataFormPermissions");
 
@@ -35,6 +106,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [memberPermissions, setMemberPermissions] = React.useState(props.permissions?.Members ?? []);
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
+  const boardOwnerId = props.isNewBoardCreation ? props.currentUserId : props.board?.createdBy?.id;
 
   const canManageBoard = canCurrentUserManageBoard({
     boardOwnerId: props.board?.createdBy?.id,
@@ -42,67 +114,53 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     isTeamAdmin: isCurrentUserTeamAdmin(props.currentUserId, props.permissionOptions),
     isNewBoardCreation: props.isNewBoardCreation,
   });
-  const isGroupOption = (option: FeedbackBoardPermissionOption): boolean => {
-    return /^\[[^\]]+\]\\/.test(option.name); // assumes groups have names like [project]\group
-  };
 
-  const cleanPermissionOptions = props.permissionOptions.filter(option => !isGroupOption(option)); // removes groups
+  const cleanPermissionOptions = React.useMemo(() => props.permissionOptions.filter(option => !isGroupOption(option)), [props.permissionOptions]); // removes groups
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
-  const handleSelectAllClicked = (checked: boolean) => {
-    if (!canManageBoard) return;
-    const nextChecked = checked;
-
-    if (nextChecked) {
-      setTeamPermissions([...teamPermissions, ...filteredPermissionOptions.filter(o => o.type === "team" && !teamPermissions.includes(o.id)).map(o => o.id)]);
-      setMemberPermissions([...memberPermissions, ...filteredPermissionOptions.filter(o => o.type === "member" && !memberPermissions.includes(o.id)).map(o => o.id)]);
-    } else {
-      setTeamPermissions(teamPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
-      setMemberPermissions(memberPermissions.filter(o => !filteredPermissionOptions.map(o => o.id).includes(o)));
-    }
-
-    setSelectAllState();
-  };
-
-  const handlePermissionClicked = (option: FeedbackBoardPermissionOption, hasPermission: boolean) => {
+  const handlePermissionClicked = React.useCallback((optionId: string, optionType: FeedbackBoardPermissionOption["type"], hasPermission: boolean) => {
     if (!canManageBoard) return;
 
-    let permissionList: string[] = option.type === "team" ? teamPermissions : memberPermissions;
+    const setPermissionList = optionType === "team" ? setTeamPermissions : setMemberPermissions;
+    setPermissionList(permissionList => {
+      if (hasPermission) {
+        return permissionList.includes(optionId) ? permissionList : [...permissionList, optionId];
+      }
 
-    if (hasPermission) {
-      permissionList.push(option.id);
-    } else {
-      permissionList = permissionList.filter(t => t !== option.id);
-    }
-
-    if (option.type === "team") {
-      setTeamPermissions([...permissionList]);
-    } else {
-      setMemberPermissions([...permissionList]);
-    }
-  };
-
-  const handleSearchTermChanged = (newSearchTerm: string) => {
-    setSearchTerm(newSearchTerm);
-
-    const filteredOptions = cleanPermissionOptions.filter(option => {
-      if (newSearchTerm.length === 0) return true;
-      return option.name.toLowerCase().includes(newSearchTerm.toLowerCase());
+      return permissionList.filter(t => t !== optionId);
     });
+  }, [canManageBoard]);
 
-    setSelectAllState();
-    setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
-  };
-
-  const setSelectAllState = () => {
+  const setSelectAllState = React.useCallback(() => {
     const allVisibleIds = filteredPermissionOptions.map(o => o.id);
     const allPermissionIds = [...teamPermissions, ...memberPermissions];
     const allVisibleIdsAreInFilteredOptions: boolean = allVisibleIds.every(id => allPermissionIds.includes(id));
 
     setSelectAllChecked(allVisibleIdsAreInFilteredOptions);
-  };
+  }, [filteredPermissionOptions, memberPermissions, teamPermissions]);
 
-  const orderedPermissionOptions = (options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
+  const handleSelectAllClicked = React.useCallback(
+    (checked: boolean) => {
+      if (!canManageBoard) return;
+      const visibleIds = filteredPermissionOptions.map(o => o.id);
+
+      if (checked) {
+        const visibleTeamIds = filteredPermissionOptions.filter(o => o.type === "team").map(o => o.id);
+        const visibleMemberIds = filteredPermissionOptions.filter(o => o.type === "member").map(o => o.id);
+
+        setTeamPermissions(current => [...current, ...visibleTeamIds.filter(id => !current.includes(id))]);
+        setMemberPermissions(current => [...current, ...visibleMemberIds.filter(id => !current.includes(id))]);
+      } else {
+        setTeamPermissions(current => current.filter(id => !visibleIds.includes(id)));
+        setMemberPermissions(current => current.filter(id => !visibleIds.includes(id)));
+      }
+
+      setSelectAllState();
+    },
+    [canManageBoard, filteredPermissionOptions, setSelectAllState],
+  );
+
+  const orderedPermissionOptions = React.useCallback((options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
     const orderedPermissionOptions = options
       .map(o => {
         o.hasPermission = teamPermissions.includes(o.id) || memberPermissions.includes(o.id);
@@ -110,7 +168,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       })
       .sort((a, b) => {
         // Step 1: Ensure the board owner appears first
-        const boardOwnerId = props.isNewBoardCreation ? props.currentUserId : props.board?.createdBy?.id;
         const isAOwner = a.id === boardOwnerId;
         const isBOwner = b.id === boardOwnerId;
         if (isAOwner && !isBOwner) return -1;
@@ -130,7 +187,22 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       });
 
     return orderedPermissionOptions;
-  };
+  }, [boardOwnerId, memberPermissions, teamPermissions]);
+
+  const handleSearchTermChanged = React.useCallback(
+    (newSearchTerm: string) => {
+      setSearchTerm(newSearchTerm);
+
+      const filteredOptions = cleanPermissionOptions.filter(option => {
+        if (newSearchTerm.length === 0) return true;
+        return option.name.toLowerCase().includes(newSearchTerm.toLowerCase());
+      });
+
+      setSelectAllState();
+      setFilteredPermissionOptions(orderedPermissionOptions(filteredOptions));
+    },
+    [cleanPermissionOptions, orderedPermissionOptions, setSelectAllState],
+  );
 
   const emitChangeEvent = () => {
     if (canManageBoard) {
@@ -151,14 +223,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission for ${props.option.name}`} />;
   };
 
-  const PublicWarningBanner = () => {
-    if (teamPermissions.length === 0 && memberPermissions.length === 0) {
-      return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} This board is visible to every member in the project</div>;
-    }
-
-    return null;
-  };
-
   const PermissionEditWarning = () => {
     if (!canManageBoard) {
       return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the Board Owner or a Team Admin can edit permissions</div>;
@@ -175,19 +239,10 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   return (
     <div className="board-metadata-form board-metadata-form-permissions" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
-        <PublicWarningBanner />
+        <PublicWarningBanner isVisible={teamPermissions.length === 0 && memberPermissions.length === 0} />
 
         <div className="search-bar">
-          <input
-            aria-label="Search for a team or a member to add permissions"
-            aria-required={true}
-            placeholder="Search teams or users"
-            id="retrospective-permission-search-input"
-            value={searchTerm}
-            onChange={event => handleSearchTermChanged(event.target.value)}
-            type="text"
-            className="permission-search-input"
-          />
+          <PermissionSearchInput searchTerm={searchTerm} onSearchTermChanged={handleSearchTermChanged} />
         </div>
 
         <div className="board-metadata-table-container">
@@ -195,14 +250,10 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
             <thead>
               <tr>
                 <th className="cell-checkbox" scope="col">
-                  <input
-                    className="my-2"
-                    id="select-all-permission-options-visible"
-                    aria-label="Add permission to every team or member in the table."
-                    disabled={!canManageBoard}
-                    checked={selectAllChecked}
-                    onChange={event => handleSelectAllClicked(event.target.checked)}
-                    type="checkbox"
+                  <SelectAllPermissionOptionsInput
+                    canManageBoard={canManageBoard}
+                    isChecked={selectAllChecked}
+                    onSelectAllClicked={handleSelectAllClicked}
                   />
                 </th>
                 <th className={"text-left"} scope="col">
@@ -212,25 +263,17 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
             </thead>
             <tbody>
               {filteredPermissionOptions.map(option => {
-                const isBoardOwner: boolean = props.isNewBoardCreation ? option.id === props.currentUserId : option.id === props.board?.createdBy?.id;
+                const isBoardOwner: boolean = option.id === boardOwnerId;
                 return (
                   <tr key={option.id} className="option-row">
                     <td>
-                      <input
-                        className="my-2"
-                        id={`permission-option-${option.id}`}
-                        aria-label="Add permission to every team or member in the table"
-                        disabled={isBoardOwner}
-                        checked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
-                        onChange={event => {
-                          handlePermissionClicked(option, event.target.checked);
-                        }}
-                        type="checkbox"
-                        ref={input => {
-                          if (input) {
-                            input.indeterminate = teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner;
-                          }
-                        }}
+                      <PermissionOptionInput
+                        optionId={option.id}
+                        optionType={option.type}
+                        isBoardOwner={isBoardOwner}
+                        isChecked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
+                        isIndeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner}
+                        onPermissionClicked={handlePermissionClicked}
                       />
                     </td>
                     <td className="cell-content flex flex-row flex-nowrap">

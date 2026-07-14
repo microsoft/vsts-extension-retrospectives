@@ -93,6 +93,12 @@ body {
   @apply outline-2 outline-primary outline-offset-2 rounded;
 }
 
+.tooltip {
+  @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-md whitespace-normal wrap-break-word pointer-events-none;
+  position-area: bottom;
+  position-try-fallbacks: flip-block, flip-inline;
+}
+
 .button-primary {
   @apply bg-primary text-white;
 }
@@ -453,7 +459,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .inner {
-    @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
+    @apply flex items-center justify-end gap-3 py-3 shrink-0;
 
     & .input-validation-message {
       @apply flex items-center gap-1 text-error text-sm;
@@ -480,6 +486,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       }
     }
   }
+}
+
+.board-metadata-dialog {
+  @apply flex flex-col overflow-hidden;
 }
 
 .dialog-width-sm {
@@ -648,21 +658,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
+.board-metadata-form-permissions {
+  @apply h-full min-h-0 flex flex-col;
+}
+
 .board-metadata-form-permissions .board-metadata-form-board-settings {
-  & .board-metadata-form-section-information {
-    @apply m-2.5;
-  }
-
-  & .search-bar {
-    @apply pt-0 px-2.5 pb-2.5;
-
-    & .permission-search-input {
-      @apply w-full p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
-    }
-  }
+  @apply flex flex-1 min-h-0 flex-col;
 
   & .board-metadata-table-container {
-    @apply max-h-85 overflow-auto;
+    @apply flex-1 min-h-0 overflow-auto;
   }
 
   & .board-metadata-table {
@@ -1330,15 +1334,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
 
     & .feedback-column-name {
-      @apply text-sm ml-1.5 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap;
+      @apply text-sm ml-1.5 min-w-0 block w-fit max-w-full justify-self-start border-0 p-0 overflow-hidden text-ellipsis whitespace-nowrap text-left;
     }
   }
 
   & .feedback-column-actions {
     @apply inline-flex items-center gap-1 justify-self-end;
 
-    & .feedback-column-edit-button,
-    & .feedback-column-info-button {
+    & .feedback-column-edit-button {
       @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] cursor-pointer bg-transparent border-0 p-2 rounded-sm transition-colors duration-200 ml-0.5;
 
       &:hover {
@@ -1506,20 +1509,40 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply w-5 h-5 rounded-full mr-1;
 }
 
+.feedback-board-metadata-form {
+  @apply grid flex-1 min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden px-5 py-3;
+}
+
+.feedback-board-metadata-form > #board-metadata-general-panel {
+  @apply min-h-0 overflow-auto;
+}
+
+.feedback-board-metadata-form > #board-metadata-permissions-panel {
+  @apply min-h-0 overflow-hidden;
+}
+
 .board-metadata-form {
   & hr {
     @apply border border-primary;
   }
 
   & .board-metadata-form-section-information {
-    @apply grid grid-cols-[auto_1fr] items-center gap-1 border-3 border-gray-medium bg-gray-medium my-1.5 mx-0 mb-2.5 p-1;
+    @apply grid grid-cols-[auto_1fr] items-center gap-1 bg-[rgb(var(--palette-neutral-10))] text-(--text-primary-color) my-3 p-1;
 
     &.warning-information {
-      @apply bg-task-yellow border-task-yellow;
+      @apply bg-(--status-warning-background) text-(--status-warning-text);
     }
 
     & svg {
       @apply w-5 h-5;
+    }
+  }
+
+  & .search-bar {
+    @apply mb-3;
+
+    & .permission-search-input {
+      @apply w-full p-1 border border-(--border-subtle-color) bg-[rgb(var(--palette-neutral-4))] text-(--text-primary-color);
     }
   }
 

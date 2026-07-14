@@ -64,6 +64,32 @@ describe("AzureDevOpsCoreService", () => {
       expect(result).toBeNull();
     });
 
+    it("should return null when the project lookup returns null", async () => {
+      mockGetProject.mockResolvedValue(null);
+
+      const result = await azureDevOpsCoreService.getDefaultTeam("project-without-data");
+
+      expect(result).toBeNull();
+    });
+
+    it("should use the requested project id when the project response has no id", async () => {
+      const defaultTeam = { id: "team-with-fallback-project", name: "Fallback Project Team" };
+
+      mockGetProject.mockResolvedValue({
+        id: "",
+        name: "Project without id",
+        defaultTeam,
+      });
+
+      const result = await azureDevOpsCoreService.getDefaultTeam("requested-project-id");
+
+      expect(result).toEqual({
+        ...defaultTeam,
+        projectId: "requested-project-id",
+        projectName: "Project without id",
+      });
+    });
+
     it("should handle different project ids", async () => {
       mockGetProject.mockResolvedValue({
         id: "project-xyz",

@@ -25,5 +25,5 @@
     "isolatedModules": false,
     "noEmit": false
   },
-  "include": ["src"]
+  "include": ["src", "react-html-attributes.d.ts"]
 }

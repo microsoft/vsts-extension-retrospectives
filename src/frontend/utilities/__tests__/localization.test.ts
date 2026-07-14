@@ -49,6 +49,18 @@ describe("localization", () => {
     expect(t("common_cancel")).toBe("Annuler");
   });
 
+  it.each([
+    ["en-US", "Focus Mode", "Focus Mode allows your team to focus on one feedback item at a time. Try it!"],
+    ["es-ES", "Modo de enfoque", "El modo de enfoque permite que tu equipo se centre en un elemento de feedback a la vez. Pruebalo!"],
+    ["de-DE", "Fokusmodus", "Im Fokusmodus kann sich Ihr Team jeweils auf einen Feedback-Eintrag konzentrieren. Probieren Sie ihn aus!"],
+    ["fr-FR", "Mode Focus", "Le mode Focus permet a votre equipe de se concentrer sur un element de feedback a la fois. Essayez-le !"],
+  ])("translates Focus Mode and its tooltip for %s", (locale, expectedLabel, expectedTooltip) => {
+    initializeLocale(locale);
+
+    expect(t("feedback_board_focus_mode")).toBe(expectedLabel);
+    expect(t("feedback_board_focus_mode_tooltip")).toBe(expectedTooltip);
+  });
+
   it("falls back to English strings for unsupported locales", () => {
     initializeLocale("it-IT");
 
@@ -119,10 +131,28 @@ describe("localization", () => {
     expect(document.documentElement.lang).toBe("en-US");
   });
 
+  it("falls back to the default locale when canonical locale lookup returns no value", () => {
+    const getCanonicalLocalesSpy = jest.spyOn(Intl, "getCanonicalLocales").mockReturnValue([]);
+
+    try {
+      expect(setLocale("en-US")).toBe("en-US");
+      expect(getCurrentLocale()).toBe("en-US");
+      expect(document.documentElement.lang).toBe("en-US");
+    } finally {
+      getCanonicalLocalesSpy.mockRestore();
+    }
+  });
+
   it("falls back to English templates when the locale token matches an inherited object property", () => {
     initializeLocale("constructor-GB");
 
     expect(t("common_cancel")).toBe("Cancel");
+  });
+
+  it("falls back to the English template lookup when the active language does not have a key", () => {
+    initializeLocale("es-ES");
+
+    expect((t as unknown as (key: string) => string)("missing_translation_key")).toBeUndefined();
   });
 
   it("formats dates and numbers using the active locale", () => {

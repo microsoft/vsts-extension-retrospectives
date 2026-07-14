@@ -43,6 +43,7 @@ import { createPdfFromText, downloadPdfBlob, generatePdfFileName } from "../util
 import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
+import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
@@ -246,6 +247,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const prevActiveTabRef = React.useRef<FeedbackBoardContainerState["activeTab"]>(initialState.activeTab);
 
   const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
+  const { triggerRef: teamSelectorRef, tooltipRef: teamSelectorTooltipRef, showTooltip: showTeamSelectorTooltip, hideTooltip: hideTeamSelectorTooltip } = useDelayedTooltip<HTMLSelectElement>();
 
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
@@ -610,9 +612,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
     return (
       <div className="workflow-stage-timer" role="status" aria-live="polite">
-        <button type="button" className="workflow-stage-timer-toggle" title={state.isBoardTimerRunning ? "Pause" : "Start"} aria-pressed={state.isBoardTimerRunning} aria-label={`${state.isBoardTimerRunning ? "Pause" : "Start"}. ${formatBoardTimer(state.boardTimerSeconds)} ${state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={handleBoardTimerToggle}>
+        <button type="button" className="workflow-stage-timer-toggle" aria-pressed={state.isBoardTimerRunning} aria-label={`${state.isBoardTimerRunning ? "Pause" : "Start"}. ${formatBoardTimer(state.boardTimerSeconds)} ${state.countdownDurationMinutes === 0 ? "elapsed" : "remaining"}.`} onClick={handleBoardTimerToggle} interestFor="workflow-stage-timer-toggle-tooltip" aria-describedby="workflow-stage-timer-toggle-tooltip">
           {state.isBoardTimerRunning ? getIconElement("pause-circle") : getIconElement("play-circle")}
         </button>
+        <div id="workflow-stage-timer-toggle-tooltip" className="tooltip" popover="hint" role="tooltip">
+          {state.isBoardTimerRunning ? "Pause" : "Start"}
+        </div>
         {!state.isBoardTimerRunning && state.boardTimerSeconds === 0 ? (
           <select value={state.countdownDurationMinutes} onChange={handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
             <option value={0}>Stopwatch</option>
@@ -625,9 +630,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         ) : (
           <span className={state.boardTimerSeconds < 0 ? "timer-overtime" : ""}>{formatBoardTimer(state.boardTimerSeconds)}</span>
         )}
-        <button type="button" className="workflow-stage-timer-reset" title="Reset" aria-label="Reset" disabled={!state.boardTimerSeconds && !state.isBoardTimerRunning} onClick={handleBoardTimerReset}>
+        <button type="button" className="workflow-stage-timer-reset" aria-label={t("common_reset")} disabled={!state.boardTimerSeconds && !state.isBoardTimerRunning} onClick={handleBoardTimerReset} interestFor="workflow-stage-timer-reset-tooltip" aria-describedby="workflow-stage-timer-reset-tooltip">
           {getIconElement("refresh")}
         </button>
+        <div id="workflow-stage-timer-reset-tooltip" className="tooltip" popover="hint" role="tooltip">
+          {t("common_reset")}
+        </div>
       </div>
     );
   }, [state, handleBoardTimerReset, handleBoardTimerToggle, handleCountdownDurationChange]);
@@ -1874,7 +1882,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     return (
-      <dialog className="board-metadata-dialog dialog-width-lg" ref={dialogRef} role="dialog" aria-label={dialogTitle} onClose={onDialogClose}>
+      <dialog className="board-metadata-dialog dialog-width-md" ref={dialogRef} role="dialog" aria-label={dialogTitle} onClose={onDialogClose}>
         <div className="header">
           <h2 className="title">{dialogTitle}</h2>
           <button type="button" onClick={onDismiss} aria-label="Close">
@@ -2190,13 +2198,16 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           <label htmlFor="team-selector" className="sr-only">
             Team
           </label>
-          <select id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} aria-label="Team">
+          <select ref={teamSelectorRef} id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} onPointerEnter={showTeamSelectorTooltip} onFocus={showTeamSelectorTooltip} onPointerLeave={hideTeamSelectorTooltip} onBlur={hideTeamSelectorTooltip} aria-label="Team" aria-describedby="team-selector-tooltip" interestFor="team-selector-tooltip">
             {selectableTeams.map(team => (
               <option key={team.id} value={team.id}>
                 {team.name}
               </option>
             ))}
           </select>
+          <div ref={teamSelectorTooltipRef} id="team-selector-tooltip" className="tooltip" popover="hint" role="tooltip">
+            By default, you see only the teams you're in. You can enable all teams from the settings menu.
+          </div>
         </div>
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
@@ -2245,51 +2256,51 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     </div>
                     <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
                       <details className="flex items-center relative">
-                        <summary aria-label="Board Actions Menu" title="Board Actions" className="contextual-menu-button">
+                        <summary aria-label="Board Actions Menu" className="contextual-menu-button">
                           {getIconElement("more-horizontal")}
                         </summary>
                         <div className="callout-menu left" role="menu" aria-label="Board Actions">
-                          <button key="createBoard" type="button" title={t("feedback_board_create_new")} onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
+                          <button key="createBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showBoardCreationDialog, event)}>
                             {getIconElement("add")}
                             {t("feedback_board_create_new")}
                           </button>
-                          <button key="createBoardForCurrentSprint" type="button" title={t("sprint_retro_create_current")} onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
+                          <button key="createBoardForCurrentSprint" type="button" onClick={event => handleBoardActionMenuItemClick(createCurrentSprintRetrospective, event)}>
                             {getIconElement("add")}
                             {t("sprint_retro_create_current")}
                           </button>
-                          <button key="duplicateBoard" type="button" title={t("feedback_board_create_copy")} onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
+                          <button key="duplicateBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showBoardDuplicateDialog, event)}>
                             {getIconElement("content-copy")}
                             {t("feedback_board_create_copy")}
                           </button>
-                          <button key="editBoard" type="button" title={t("feedback_board_edit")} onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
+                          <button key="editBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
                             {getIconElement("edit")}
                             {t("feedback_board_edit")}
                           </button>
-                          <button key="searchAllBoards" type="button" title={t("feedback_board_search_all_boards")} onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
+                          <button key="searchAllBoards" type="button" onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
                             {getIconElement("search")}
                             {t("feedback_board_search_all_boards")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="copyLink" type="button" title={`Copy link to ${state.currentBoard.activePhase} phase`} onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
+                          <button key="copyLink" type="button" onClick={event => handleBoardActionMenuItemClick(copyBoardUrl, event)}>
                             {getIconElement("link")}
                             {`Copy link to ${state.currentBoard.activePhase} phase`}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="exportCSV" type="button" title={t("feedback_board_export_csv_content")} onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
+                          <button key="exportCSV" type="button" onClick={event => handleBoardActionMenuItemClick(generateCSVContent, event)}>
                             {getIconElement("sim-card-download")}
                             {t("feedback_board_export_csv_content")}
                           </button>
-                          <button key="emailPreview" type="button" title={t("feedback_board_create_email_summary")} onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
+                          <button key="emailPreview" type="button" onClick={event => handleBoardActionMenuItemClick(generateEmailSummaryContent, event)}>
                             {getIconElement("forward-to-inbox")}
                             {t("feedback_board_create_email_summary")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="retroSummary" type="button" title={t("feedback_board_show_retro_summary")} onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
+                          <button key="retroSummary" type="button" onClick={event => handleBoardActionMenuItemClick(showRetroSummaryDialog, event)}>
                             {getIconElement("source")}
                             {t("feedback_board_show_retro_summary")}
                           </button>
                           <div key="seperator" className="divider" role="separator" />
-                          <button key="archiveBoard" type="button" title={t("feedback_board_archive_title")} onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
+                          <button key="archiveBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showArchiveBoardConfirmationDialog, event)}>
                             {getIconElement("inventory")}
                             {t("feedback_board_archive_title")}
                           </button>
@@ -2387,7 +2398,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                               </div>
                             </dialog>
                           )}
-                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} title="Team Assessment" aria-label="Team Assessment" type="button">
+                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} aria-label="Team Assessment" type="button">
                             {getIconElement("assessment")}
                             <span className="hidden lg:inline">Team Assessment</span>
                           </button>
@@ -2420,14 +2431,17 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       )}
                       {state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
-                          <button className="focus-mode-button" onClick={showCarouselDialog} title="Focus Mode allows your team to focus on one feedback item at a time. Try it!" aria-label="Focus Mode" type="button">
+                          <button className="focus-mode-button" onClick={showCarouselDialog} aria-label={t("feedback_board_focus_mode")} aria-describedby="focus-mode-tooltip" interestFor="focus-mode-tooltip" type="button">
                             {getIconElement("adjust")}
-                            <span>Focus Mode</span>
+                            <span>{t("feedback_board_focus_mode")}</span>
                           </button>
+                          <div id="focus-mode-tooltip" className="tooltip" popover="hint" role="tooltip">
+                            {t("feedback_board_focus_mode_tooltip")}
+                          </div>
                           {visibleDialogs.isCarouselDialogVisible && (
-                            <dialog ref={carouselDialogRef} className="carousel-dialog dialog-width-lg" role="dialog" aria-label="Focus Mode" onClose={() => setDialogVisible("isCarouselDialogVisible", false)}>
+                            <dialog ref={carouselDialogRef} className="carousel-dialog dialog-width-lg" role="dialog" aria-label={t("feedback_board_focus_mode")} onClose={() => setDialogVisible("isCarouselDialogVisible", false)}>
                               <div className="header">
-                                <h2 className="title">Focus Mode</h2>
+                                <h2 className="title">{t("feedback_board_focus_mode")}</h2>
                                 <button onClick={hideCarouselDialog} aria-label="Close">
                                   {getIconElement("close")}
                                 </button>
@@ -2445,10 +2459,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               {state.activeTab === "History" && (
                 <>
                   <div className="mx-4 vertical-tab-separator" />
-                  <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} title="Team Assessment History" aria-label="Team Assessment History" type="button">
+                  <button className="team-assessment-history-button" onClick={showTeamAssessmentHistoryDialog} aria-label={t("feedback_board_team_assessment_history")} type="button" aria-describedby="team-assessment-history-tooltip" interestFor="team-assessment-history-tooltip">
                     {getIconElement("insights")}
-                    <span className="hidden lg:inline">Team Assessment History</span>
+                    <span className="hidden lg:inline">{t("feedback_board_team_assessment_history")}</span>
                   </button>
+                  <div id="team-assessment-history-tooltip" className="tooltip" popover="hint" role="tooltip">
+                    {t("feedback_board_team_assessment_history")}
+                  </div>
                 </>
               )}
             </div>
