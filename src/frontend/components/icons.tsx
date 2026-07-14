@@ -699,6 +699,7 @@ export interface IIconDefinition {
 }
 
 export const iconDefinitions: IIconDefinition[] = [
+  { id: "happy-face", name: "Smile", icon: <HappyFaceIcon />, trayOrder: 1, legacyAliases: ["fas fa-cart-plus", "far fa-smile"] },
   { id: "sad-face", name: "Frown", icon: <SadFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown"] },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 3, legacyAliases: ["far fa-angry"] },
   { id: "help", name: "Question", icon: <HelpIcon />, trayOrder: 4, legacyAliases: ["fas fa-question", "far fa-question"] },
