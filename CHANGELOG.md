@@ -2,6 +2,14 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.59
+
+* Refactored icon definitions separating legacy alias resolution from selection tray behavior.
+* Edited icon selection tray adjusting display order and removing 7 lower value icons.
+* Closed test code coverage gaps.
+
+From [GitHub PR #1832](https://github.com/microsoft/vsts-extension-retrospectives/pull/1832)
+
 ## v1.92.57
 
 * Fixed double scrollbar behavior in the Create email summary dialog at higher zoom levels. From [GitHub PR #1816](https://github.com/microsoft/vsts-extension-retrospectives/pull/1816)
