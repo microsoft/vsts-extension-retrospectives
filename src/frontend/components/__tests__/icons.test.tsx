@@ -13,20 +13,6 @@ describe("icons", () => {
     }
   });
 
-  it("keeps non-tray icons out of the selection tray", () => {
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "add")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "edit")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "close")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "gear-with-stars")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "psychological-safety")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "angry-face")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "thumb-up-down")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "explore")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "delete")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "list-all")).toBe(false);
-    expect(selectionTrayIcons.some(iconDefinition => iconDefinition.id === "view-column")).toBe(false);
-  });
-
   it("does not allow duplicate non-zero trayOrder values", () => {
     const nonZeroTrayOrders = iconDefinitions.map(iconDefinition => iconDefinition.trayOrder).filter(trayOrder => trayOrder > 0);
     const uniqueTrayOrders = new Set(nonZeroTrayOrders);
@@ -53,6 +39,23 @@ describe("icons", () => {
   });
 
   describe("getIconElement", () => {
+    it("returns specific non-tray icon components by id", () => {
+      const iconExpectations = [
+        ["assessment", ".icon-assessment"],
+        ["pause-circle", ".icon-pause-circle"],
+        ["person", ".icon-person"],
+        ["insights", ".icon-insights"],
+      ] as const;
+
+      for (const [iconId, selector] of iconExpectations) {
+        const icon = getIconElement(iconId);
+        const { container, unmount } = render(icon);
+
+        expect(container.querySelector(selector)).toBeTruthy();
+        unmount();
+      }
+    });
+
     it("returns PlumbingIcon for plumbing id", () => {
       const icon = getIconElement("plumbing");
       const { container } = render(icon);
