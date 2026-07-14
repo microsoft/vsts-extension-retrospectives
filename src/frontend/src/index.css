@@ -459,7 +459,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .inner {
-    @apply flex items-center justify-end gap-3 py-3 shrink-0;
+    @apply flex items-center justify-end gap-3 px-5 py-3 shrink-0;
 
     & .input-validation-message {
       @apply flex items-center gap-1 text-error text-sm;
