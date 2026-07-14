@@ -337,7 +337,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   }, []);
 
   return (
-    <div className="flex flex-col flex-nowrap px-5 py-3" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+    <div className="feedback-board-metadata-form" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <div className="header-tabs" role="tablist" aria-label="Board Metadata Settings">
         <button id="board-metadata-general-tab" className={`pivot-tab general ${activeMetadataTab === "General" ? "active" : ""}`} type="button" role="tab" aria-selected={activeMetadataTab === "General"} aria-controls="board-metadata-general-panel" onClick={() => setActiveMetadataTab("General")}>
           General

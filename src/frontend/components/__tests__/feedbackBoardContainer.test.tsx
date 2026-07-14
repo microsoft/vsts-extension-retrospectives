@@ -17,6 +17,7 @@ import { getConfiguration, getService } from "azure-devops-extension-sdk";
 import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { copyToClipboard } from "../../utilities/clipboardHelper";
+import { setLocale } from "../../utilities/localization";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -528,16 +529,97 @@ describe("FeedbackBoardContainer integration", () => {
     render(<FeedbackBoardContainer {...props} />);
 
     expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    const teamSelector = screen.getByRole("combobox", { name: "Team" });
+    const teamSelectorTooltipId = teamSelector.getAttribute("aria-describedby");
+    const teamSelectorTooltip = document.getElementById(teamSelectorTooltipId!)!;
+
+    expect(teamSelectorTooltipId).toBe("team-selector-tooltip");
+    expect(teamSelector).toHaveAttribute("interestFor", teamSelectorTooltipId);
+    expect(teamSelector).toHaveAttribute("aria-describedby", teamSelectorTooltipId);
+    expect(teamSelectorTooltip).toHaveAttribute("popover", "hint");
+    expect(teamSelectorTooltip).toHaveClass("tooltip");
+    expect(teamSelectorTooltip).toHaveTextContent("By default, you see only the teams you're in. You can enable all teams from the settings menu.");
+
+    let isTooltipOpen = false;
+    const showPopover = jest.fn(() => {
+      isTooltipOpen = true;
+    });
+    const hidePopover = jest.fn(() => {
+      isTooltipOpen = false;
+    });
+    const matchesSpy = jest.spyOn(teamSelectorTooltip, "matches").mockImplementation(selector => (selector === ":popover-open" ? isTooltipOpen : false));
+    (teamSelectorTooltip as any).showPopover = showPopover;
+    (teamSelectorTooltip as any).hidePopover = hidePopover;
+
+    jest.useFakeTimers();
+    try {
+      fireEvent.pointerEnter(teamSelector);
+      expect(showPopover).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(499);
+      expect(showPopover).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(1);
+      expect(showPopover).toHaveBeenCalledWith({ source: teamSelector });
+
+      fireEvent.pointerLeave(teamSelector);
+      expect(hidePopover).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+      matchesSpy.mockRestore();
+    }
+
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", true);
     expect(azureDevOpsCoreService.getAllTeams).not.toHaveBeenCalledWith("1", false);
     expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "Other Team" })).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByTitle("User/Admin Settings"));
+    fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
     fireEvent.click(screen.getByRole("button", { name: "Show all teams" }));
 
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
     expect(await screen.findByRole("option", { name: "Other Team" })).toBeInTheDocument();
+  });
+
+  it("configures a custom tooltip for Focus Mode", async () => {
+    const actBoard = { ...mockBoard, activePhase: WorkflowPhase.Act };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([actBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(actBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    setLocale("es-ES");
+    const { unmount } = render(<FeedbackBoardContainer {...props} />);
+
+    try {
+      const focusModeButton = await screen.findByRole("button", { name: "Modo de enfoque" });
+      const tooltipId = focusModeButton.getAttribute("aria-describedby");
+      const tooltip = document.getElementById(tooltipId!)!;
+
+      expect(focusModeButton).toHaveTextContent("Modo de enfoque");
+      expect(focusModeButton).not.toHaveAttribute("title");
+      expect(tooltipId).toBe("focus-mode-tooltip");
+      expect(focusModeButton).toHaveAttribute("interestFor", tooltipId);
+      expect(tooltip).toHaveAttribute("popover", "hint");
+      expect(tooltip).toHaveClass("tooltip");
+      expect(tooltip).toHaveTextContent("El modo de enfoque permite que tu equipo se centre en un elemento de feedback a la vez. Pruebalo!");
+
+      fireEvent.click(focusModeButton);
+
+      expect(await screen.findByRole("dialog", { name: "Modo de enfoque" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Modo de enfoque" })).toBeInTheDocument();
+    } finally {
+      unmount();
+      setLocale("en-US");
+    }
   });
 
   it("falls back to the default team when current user team lookup fails", async () => {

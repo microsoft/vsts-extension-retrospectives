@@ -507,6 +507,36 @@ describe("Board Metadata Form Permissions", () => {
       expect(container.firstChild).toBeTruthy();
     });
 
+    it("should not duplicate an existing team permission when checked again", async () => {
+      const onPermissionChanged = jest.fn();
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef(testUserId, "Test User"),
+        },
+        currentUserId: testUserId,
+        isNewBoardCreation: true,
+        permissions: { Teams: ["team1"], Members: [] },
+        permissionOptions: [{ id: "team1", name: "Team One", uniqueName: "team-one", type: "team" }],
+        onPermissionChanged,
+      });
+
+      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const checkbox = container.querySelector("#permission-option-team1") as HTMLInputElement;
+
+      checkbox.checked = false;
+      await act(async () => {
+        fireEvent.click(checkbox);
+      });
+
+      expect(onPermissionChanged).toHaveBeenLastCalledWith({
+        permissions: {
+          Teams: ["team1"],
+          Members: [],
+        },
+      });
+    });
+
     it("should handle individual permission checkbox click for member", async () => {
       const onPermissionChanged = jest.fn();
       const props = makeProps({

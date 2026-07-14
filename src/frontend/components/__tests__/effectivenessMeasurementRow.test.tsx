@@ -82,8 +82,18 @@ describe("EffectivenessMeasurementRow", () => {
       const { getByRole } = render(<EffectivenessMeasurementRow {...defaultProps} />);
 
       const tooltipHost = getByRole("button", { name: getInfoAriaLabel(defaultProps.title) });
+      const tooltipId = tooltipHost.getAttribute("aria-describedby");
+      const tooltipElement = document.getElementById(tooltipId!);
+
       expect(tooltipHost).toBeInTheDocument();
-      expect(tooltipHost).toHaveAttribute("title", defaultProps.tooltip);
+      expect(tooltipHost).not.toHaveAttribute("title");
+      expect(tooltipHost).toHaveAttribute("aria-describedby", tooltipId);
+      expect(tooltipHost).toHaveAttribute("interestFor", tooltipId);
+      expect(tooltipElement).toHaveAttribute("popover", "hint");
+      expect(tooltipElement).toHaveAttribute("role", "tooltip");
+      expect(tooltipElement).toHaveClass("tooltip");
+      expect(tooltipElement).toHaveClass("effectiveness-measurement-tooltip");
+      expect(tooltipElement).toHaveTextContent(defaultProps.tooltip);
     });
 
     it("renders all 10 voting buttons", () => {
