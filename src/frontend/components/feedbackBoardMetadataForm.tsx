@@ -337,337 +337,339 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
   }, []);
 
   return (
-    <div className="feedback-board-metadata-form" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
-      <div className="header-tabs" role="tablist" aria-label="Board Metadata Settings">
-        <button id="board-metadata-general-tab" className={`pivot-tab general ${activeMetadataTab === "General" ? "active" : ""}`} type="button" role="tab" aria-selected={activeMetadataTab === "General"} aria-controls="board-metadata-general-panel" onClick={() => setActiveMetadataTab("General")}>
-          General
-        </button>
-        <button id="board-metadata-permissions-tab" className={`pivot-tab permissions ${activeMetadataTab === "Permissions" ? "active" : ""}`} type="button" role="tab" aria-selected={activeMetadataTab === "Permissions"} aria-controls="board-metadata-permissions-panel" onClick={() => setActiveMetadataTab("Permissions")}>
-          {t("feedback_board_permissions")}
-        </button>
-      </div>
-      {activeMetadataTab === "General" && (
-        <div id="board-metadata-general-panel" className="board-metadata-form" role="tabpanel" aria-labelledby="board-metadata-general-tab">
-          <section className="board-metadata-edit-column-settings board-metadata-board-settings-section">
-            <h2 className="board-metadata-form-section-header">Board Settings</h2>
-            <div className="board-metadata-form-section-subheader board-metadata-title-row">
-              <label id="retrospective-name-label" htmlFor="retrospective-title-input">
-                Retrospective Name:
-              </label>
-              {retrospectiveNameInput}
-            </div>
-            <div className="board-metadata-form-section-subheader">
-              <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
-                Max Votes per User:
-              </label>
-              {maxVotesPerUserInput}
-            </div>
-            <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation.</div>
-            <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
-              <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
-                {shouldShowFeedbackAfterCollectInput}
-                <span>Hide feedback during Collect phase</span>
-              </label>
-              <span className="board-metadata-form-option-helper">Feedback displayed in Group, Vote, and Act phases.</span>
-            </div>
-            <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
-              <label className="flex items-center gap-2" htmlFor="feedback-display-names-checkbox">
-                {isBoardAnonymousInput}
-                <span>Make participant feedback anonymous</span>
-              </label>
-              <span className="board-metadata-form-option-helper">Participant names not tracked on board, nor in summary.</span>
-            </div>
-            <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
-              <label className="flex items-center gap-2" htmlFor="include-team-assessment-checkbox">
-                {isIncludeTeamEffectivenessMeasurementInput}
-                <span>Include Team Assessment</span>
-              </label>
-              <span className="board-metadata-form-option-helper">Team Assessment responses always stored anonymously.</span>
-            </div>
-          </section>
-          {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
+    <>
+      <div className="feedback-board-metadata-form" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+        <div className="header-tabs" role="tablist" aria-label="Board Metadata Settings">
+          <button id="board-metadata-general-tab" className={`pivot-tab general ${activeMetadataTab === "General" ? "active" : ""}`} type="button" role="tab" aria-selected={activeMetadataTab === "General"} aria-controls="board-metadata-general-panel" onClick={() => setActiveMetadataTab("General")}>
+            General
+          </button>
+          <button id="board-metadata-permissions-tab" className={`pivot-tab permissions ${activeMetadataTab === "Permissions" ? "active" : ""}`} type="button" role="tab" aria-selected={activeMetadataTab === "Permissions"} aria-controls="board-metadata-permissions-panel" onClick={() => setActiveMetadataTab("Permissions")}>
+            {t("feedback_board_permissions")}
+          </button>
+        </div>
+        {activeMetadataTab === "General" && (
+          <div id="board-metadata-general-panel" className="board-metadata-form" role="tabpanel" aria-labelledby="board-metadata-general-tab">
+            <section className="board-metadata-edit-column-settings board-metadata-board-settings-section">
+              <h2 className="board-metadata-form-section-header">Board Settings</h2>
+              <div className="board-metadata-form-section-subheader board-metadata-title-row">
+                <label id="retrospective-name-label" htmlFor="retrospective-title-input">
+                  Retrospective Name:
+                </label>
+                {retrospectiveNameInput}
+              </div>
+              <div className="board-metadata-form-section-subheader">
+                <label className="board-metadata-form-setting-label" htmlFor="max-vote-counter">
+                  Max Votes per User:
+                </label>
+                {maxVotesPerUserInput}
+              </div>
+              <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation.</div>
+              <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
+                <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
+                  {shouldShowFeedbackAfterCollectInput}
+                  <span>Hide feedback during Collect phase</span>
+                </label>
+                <span className="board-metadata-form-option-helper">Feedback displayed in Group, Vote, and Act phases.</span>
+              </div>
+              <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
+                <label className="flex items-center gap-2" htmlFor="feedback-display-names-checkbox">
+                  {isBoardAnonymousInput}
+                  <span>Make participant feedback anonymous</span>
+                </label>
+                <span className="board-metadata-form-option-helper">Participant names not tracked on board, nor in summary.</span>
+              </div>
+              <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
+                <label className="flex items-center gap-2" htmlFor="include-team-assessment-checkbox">
+                  {isIncludeTeamEffectivenessMeasurementInput}
+                  <span>Include Team Assessment</span>
+                </label>
+                <span className="board-metadata-form-option-helper">Team Assessment responses always stored anonymously.</span>
+              </div>
+            </section>
+            {isNewBoardCreation && isIncludeTeamEffectivenessMeasurement && (
+              <section className="board-metadata-edit-column-settings">
+                <h2 className="board-metadata-form-section-header">Custom Team Assessment Questions</h2>
+                <div className="board-metadata-form-section-subheader grid-cols-1!">{customTeamAssessmentQuestionInputs}</div>
+                <button type="button" className="create-feedback-column-card-button" aria-label="Add custom question" onClick={() => setCustomTeamAssessmentQuestions([...customTeamAssessmentQuestions, ""])}>
+                  {getIconElement("add")}
+                  Add custom question
+                </button>
+              </section>
+            )}
             <section className="board-metadata-edit-column-settings">
-              <h2 className="board-metadata-form-section-header">Custom Team Assessment Questions</h2>
-              <div className="board-metadata-form-section-subheader grid-cols-1!">{customTeamAssessmentQuestionInputs}</div>
-              <button type="button" className="create-feedback-column-card-button" aria-label="Add custom question" onClick={() => setCustomTeamAssessmentQuestions([...customTeamAssessmentQuestions, ""])}>
+              <h2 className="board-metadata-form-section-header">Column Settings</h2>
+              <div className="board-metadata-form-section-information">
+                {getIconElement("exclamation")} You can create a maximum of {maxColumnCount} columns in a retrospective.
+              </div>
+              {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Changing template after feedback entered may result in loss of feedback!</div>}
+              <div className="board-metadata-form-section-subheader">
+                <label htmlFor="column-template-dropdown">Apply template:</label>
+                <select onChange={handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">
+                  <option value="">Select a template</option>
+                  <option disabled>─────────────</option>
+                  <option value="start-stop-continue">Start-Stop-Continue</option>
+                  <option value="good-improve-ideas-thanks">Good-Improve-Ideas-Thanks</option>
+                  <option value="mad-sad-glad">Mad-Sad-Glad</option>
+                  <option value="4ls">4Ls</option>
+                  <option value="daki">Drop-Add-Keep-Improve</option>
+                  <option value="kalm">Keep-Add-Less-More</option>
+                  <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
+                  <option value="1to1">Good-to-Done</option>
+                  <option value="speedboat">Speedboat</option>
+                  <option disabled>─────────────</option>
+                  <option value="clarity">Clarity</option>
+                  <option value="energy">Energy</option>
+                  <option value="psy-safety">Psychological Safety</option>
+                  <option value="wlb">Work-life Balance</option>
+                  <option value="confidence">Confidence</option>
+                  <option value="efficiency">Efficiency</option>
+                </select>
+              </div>
+              <List
+                items={columnCards}
+                onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
+                  return (
+                    <div className={columnCard.markedForDeletion ? "feedback-column-card marked-for-deletion" : "feedback-column-card"}>
+                      <div className="flex grow items-center">
+                        <button
+                          className="feedback-column-card-icon-button"
+                          aria-label="Change column icon"
+                          title="Change column icon"
+                          disabled={columnCard.markedForDeletion}
+                          type="button"
+                          onClick={() => {
+                            openChooseColumnIconDialog(columnCard);
+                          }}
+                        >
+                          {getIconElement(columnCard.column.iconClass)}
+                        </button>
+                        <button
+                          className="feedback-column-card-accent-color-button"
+                          aria-label="Change column color"
+                          title="Change column color"
+                          disabled={columnCard.markedForDeletion}
+                          onClick={() => {
+                            setColumnCardBeingEdited(columnCard);
+                            setIsChooseColumnAccentColorDialogHidden(false);
+                          }}
+                        >
+                          <i className="feedback-column-card-accent-color fas fa-square" style={{ color: columnCard.column.accentColor }} />
+                        </button>
+                        <EditableDocumentCardTitle
+                          isDisabled={columnCard.markedForDeletion}
+                          isMultiline={false}
+                          maxLength={maxColumnTitleLength}
+                          title={columnCard.column.title}
+                          isChangeEventRequired={true}
+                          onSave={(newText: string) => {
+                            columnCard.column.title = newText;
+                            setColumnCards([...columnCards]);
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-none items-center">
+                        <button
+                          className="feedback-column-card-move-up-button"
+                          title="Move Up"
+                          aria-label="Move Up"
+                          disabled={columnCard.markedForDeletion || index === 0}
+                          type="button"
+                          onClick={() => {
+                            const newColumns = [...columnCards];
+                            [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
+                            setColumnCards(newColumns);
+                          }}
+                        >
+                          {getIconElement("chevron-up")}
+                        </button>
+                        <button
+                          className="feedback-column-card-move-down-button"
+                          title="Move Down"
+                          aria-label="Move Down"
+                          disabled={columnCard.markedForDeletion || index === columnCards.length - 1}
+                          type="button"
+                          onClick={() => {
+                            const newColumns = [...columnCards];
+                            [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
+                            setColumnCards(newColumns);
+                          }}
+                        >
+                          {getIconElement("chevron-down")}
+                        </button>
+                        {!columnCard.markedForDeletion && (
+                          <button
+                            className="feedback-column-card-delete-button"
+                            title="Delete"
+                            aria-label="Delete"
+                            disabled={columnCards.filter(cc => !cc.markedForDeletion).length <= 1}
+                            type="button"
+                            onClick={() => {
+                              const newColumns = [...columnCards];
+                              newColumns[index].markedForDeletion = true;
+                              setColumnCards(newColumns);
+                            }}
+                          >
+                            {getIconElement("delete")}
+                          </button>
+                        )}
+                        {columnCard.markedForDeletion && (
+                          <button
+                            className="feedback-column-card-undelete-button"
+                            title="Undo Delete"
+                            aria-label="Undo Delete"
+                            disabled={columnCards.filter(cc => !cc.markedForDeletion).length >= maxColumnCount}
+                            type="button"
+                            onClick={() => {
+                              const newColumns = [...columnCards];
+                              newColumns[index].markedForDeletion = false;
+                              setColumnCards(newColumns);
+                            }}
+                          >
+                            {getIconElement("undo")}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+              <button
+                className="create-feedback-column-card-button"
+                aria-label="Add new column"
+                disabled={columnCards.filter(columnCard => !columnCard.markedForDeletion).length >= maxColumnCount}
+                onClick={() => {
+                  const newColumns: IFeedbackColumnCard[] = [...columnCards];
+                  newColumns.push({
+                    column: {
+                      id: generateUUID(),
+                      title: "New Column",
+                      iconClass: getRandomArrayElement(allIconClassNames).id,
+                      accentColor: getRandomArrayElement(allAccentColors).colorCode,
+                      notes: "",
+                    },
+                    markedForDeletion: false,
+                  });
+                  setColumnCards(newColumns);
+                }}
+              >
                 {getIconElement("add")}
-                Add custom question
+                Add new column
               </button>
             </section>
-          )}
-          <section className="board-metadata-edit-column-settings">
-            <h2 className="board-metadata-form-section-header">Column Settings</h2>
-            <div className="board-metadata-form-section-information">
-              {getIconElement("exclamation")} You can create a maximum of {maxColumnCount} columns in a retrospective.
-            </div>
-            {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Changing template after feedback entered may result in loss of feedback!</div>}
-            <div className="board-metadata-form-section-subheader">
-              <label htmlFor="column-template-dropdown">Apply template:</label>
-              <select onChange={handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">
-                <option value="">Select a template</option>
-                <option disabled>─────────────</option>
-                <option value="start-stop-continue">Start-Stop-Continue</option>
-                <option value="good-improve-ideas-thanks">Good-Improve-Ideas-Thanks</option>
-                <option value="mad-sad-glad">Mad-Sad-Glad</option>
-                <option value="4ls">4Ls</option>
-                <option value="daki">Drop-Add-Keep-Improve</option>
-                <option value="kalm">Keep-Add-Less-More</option>
-                <option value="wlai">Went Well-Learned-Accelerators-Impediments</option>
-                <option value="1to1">Good-to-Done</option>
-                <option value="speedboat">Speedboat</option>
-                <option disabled>─────────────</option>
-                <option value="clarity">Clarity</option>
-                <option value="energy">Energy</option>
-                <option value="psy-safety">Psychological Safety</option>
-                <option value="wlb">Work-life Balance</option>
-                <option value="confidence">Confidence</option>
-                <option value="efficiency">Efficiency</option>
-              </select>
-            </div>
-            <List
-              items={columnCards}
-              onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
-                return (
-                  <div className={columnCard.markedForDeletion ? "feedback-column-card marked-for-deletion" : "feedback-column-card"}>
-                    <div className="flex grow items-center">
-                      <button
-                        className="feedback-column-card-icon-button"
-                        aria-label="Change column icon"
-                        title="Change column icon"
-                        disabled={columnCard.markedForDeletion}
-                        type="button"
-                        onClick={() => {
-                          openChooseColumnIconDialog(columnCard);
-                        }}
-                      >
-                        {getIconElement(columnCard.column.iconClass)}
-                      </button>
-                      <button
-                        className="feedback-column-card-accent-color-button"
-                        aria-label="Change column color"
-                        title="Change column color"
-                        disabled={columnCard.markedForDeletion}
-                        onClick={() => {
-                          setColumnCardBeingEdited(columnCard);
-                          setIsChooseColumnAccentColorDialogHidden(false);
-                        }}
-                      >
-                        <i className="feedback-column-card-accent-color fas fa-square" style={{ color: columnCard.column.accentColor }} />
-                      </button>
-                      <EditableDocumentCardTitle
-                        isDisabled={columnCard.markedForDeletion}
-                        isMultiline={false}
-                        maxLength={maxColumnTitleLength}
-                        title={columnCard.column.title}
-                        isChangeEventRequired={true}
-                        onSave={(newText: string) => {
-                          columnCard.column.title = newText;
-                          setColumnCards([...columnCards]);
-                        }}
-                      />
-                    </div>
-                    <div className="flex flex-none items-center">
-                      <button
-                        className="feedback-column-card-move-up-button"
-                        title="Move Up"
-                        aria-label="Move Up"
-                        disabled={columnCard.markedForDeletion || index === 0}
-                        type="button"
-                        onClick={() => {
-                          const newColumns = [...columnCards];
-                          [newColumns[index], newColumns[index - 1]] = [newColumns[index - 1], newColumns[index]];
-                          setColumnCards(newColumns);
-                        }}
-                      >
-                        {getIconElement("chevron-up")}
-                      </button>
-                      <button
-                        className="feedback-column-card-move-down-button"
-                        title="Move Down"
-                        aria-label="Move Down"
-                        disabled={columnCard.markedForDeletion || index === columnCards.length - 1}
-                        type="button"
-                        onClick={() => {
-                          const newColumns = [...columnCards];
-                          [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
-                          setColumnCards(newColumns);
-                        }}
-                      >
-                        {getIconElement("chevron-down")}
-                      </button>
-                      {!columnCard.markedForDeletion && (
+            {currentBoard && !isDeleteColumnConfirmationDialogHidden && (
+              <dialog ref={deleteColumnConfirmDialogRef} className="confirm-changes-dialog dialog-width-sm" aria-label="Confirm Changes" onClose={() => setIsDeleteColumnConfirmationDialogHidden(true)}>
+                <div className="header">
+                  <h2 className="title">Confirm Changes</h2>
+                  <button onClick={hideDeleteColumnConfirmationDialog} aria-label="Close">
+                    {getIconElement("close")}
+                  </button>
+                </div>
+                <div className="subText">{`Are you sure you want to remove columns from '${currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`}</div>
+                <div className="inner">
+                  <button onClick={handleDeleteColumnConfirm}>{t("common_confirm")}</button>
+                  <button className="default button" onClick={hideDeleteColumnConfirmationDialog}>
+                    {t("common_cancel")}
+                  </button>
+                </div>
+              </dialog>
+            )}
+            {columnCardBeingEdited && isChooseColumnIconDialogOpen && (
+              <dialog className="choose-column-icon-dialog dialog-width-md" aria-label="Choose column icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
+                <div className="header">
+                  <h2 className="title">Choose column icon</h2>
+                  <button type="button" onClick={() => chooseColumnIconDialogRef.current!.close()} aria-label="Close">
+                    {getIconElement("close")}
+                  </button>
+                </div>
+                <div className="subText">{`Choose the column icon for column '${columnCardBeingEdited.column.title}'`}</div>
+                <div className="subText">
+                  <div className="grid grid-cols-6 gap-2 justify-items-center items-center">
+                    {allIconClassNames.map(iconOption => {
+                      return (
                         <button
-                          className="feedback-column-card-delete-button"
-                          title="Delete"
-                          aria-label="Delete"
-                          disabled={columnCards.filter(cc => !cc.markedForDeletion).length <= 1}
+                          title={`Choose the icon: ${iconOption.name}`}
+                          aria-label={`Choose the icon: ${iconOption.name}`}
+                          className="choose-feedback-column-icon-button"
+                          key={iconOption.id}
                           type="button"
                           onClick={() => {
-                            const newColumns = [...columnCards];
-                            newColumns[index].markedForDeletion = true;
-                            setColumnCards(newColumns);
+                            columnCardBeingEdited.column.iconClass = iconOption.id;
+                            setColumnCards([...columnCards]);
+                            chooseColumnIconDialogRef.current!.close();
                           }}
                         >
-                          {getIconElement("delete")}
+                          {getIconElement(iconOption.id)}
                         </button>
-                      )}
-                      {columnCard.markedForDeletion && (
-                        <button
-                          className="feedback-column-card-undelete-button"
-                          title="Undo Delete"
-                          aria-label="Undo Delete"
-                          disabled={columnCards.filter(cc => !cc.markedForDeletion).length >= maxColumnCount}
-                          type="button"
-                          onClick={() => {
-                            const newColumns = [...columnCards];
-                            newColumns[index].markedForDeletion = false;
-                            setColumnCards(newColumns);
-                          }}
-                        >
-                          {getIconElement("undo")}
-                        </button>
-                      )}
-                    </div>
+                      );
+                    })}
                   </div>
-                );
-              }}
-            />
-            <button
-              className="create-feedback-column-card-button"
-              aria-label="Add new column"
-              disabled={columnCards.filter(columnCard => !columnCard.markedForDeletion).length >= maxColumnCount}
-              onClick={() => {
-                const newColumns: IFeedbackColumnCard[] = [...columnCards];
-                newColumns.push({
-                  column: {
-                    id: generateUUID(),
-                    title: "New Column",
-                    iconClass: getRandomArrayElement(allIconClassNames).id,
-                    accentColor: getRandomArrayElement(allAccentColors).colorCode,
-                    notes: "",
-                  },
-                  markedForDeletion: false,
-                });
-                setColumnCards(newColumns);
-              }}
-            >
-              {getIconElement("add")}
-              Add new column
-            </button>
-          </section>
-          {currentBoard && !isDeleteColumnConfirmationDialogHidden && (
-            <dialog ref={deleteColumnConfirmDialogRef} className="confirm-changes-dialog dialog-width-sm" aria-label="Confirm Changes" onClose={() => setIsDeleteColumnConfirmationDialogHidden(true)}>
-              <div className="header">
-                <h2 className="title">Confirm Changes</h2>
-                <button onClick={hideDeleteColumnConfirmationDialog} aria-label="Close">
-                  {getIconElement("close")}
-                </button>
-              </div>
-              <div className="subText">{`Are you sure you want to remove columns from '${currentBoard.title}'? The feedback items in those columns will also be deleted. You will not be able to recover this data.`}</div>
-              <div className="inner">
-                <button onClick={handleDeleteColumnConfirm}>{t("common_confirm")}</button>
-                <button className="default button" onClick={hideDeleteColumnConfirmationDialog}>
-                  {t("common_cancel")}
-                </button>
-              </div>
-            </dialog>
-          )}
-          {columnCardBeingEdited && isChooseColumnIconDialogOpen && (
-            <dialog className="choose-column-icon-dialog dialog-width-md" aria-label="Choose column icon" ref={chooseColumnIconDialogRef} onClose={handleChooseColumnIconDialogClose}>
-              <div className="header">
-                <h2 className="title">Choose column icon</h2>
-                <button type="button" onClick={() => chooseColumnIconDialogRef.current!.close()} aria-label="Close">
-                  {getIconElement("close")}
-                </button>
-              </div>
-              <div className="subText">{`Choose the column icon for column '${columnCardBeingEdited.column.title}'`}</div>
-              <div className="subText">
-                <div className="grid grid-cols-6 gap-2 justify-items-center items-center">
-                  {allIconClassNames.map(iconOption => {
+                </div>
+                <div className="inner">
+                  <button type="button" className="default button" onClick={() => chooseColumnIconDialogRef.current!.close()}>
+                    {t("common_close")}
+                  </button>
+                </div>
+              </dialog>
+            )}
+            {columnCardBeingEdited && !isChooseColumnAccentColorDialogHidden && (
+              <dialog
+                ref={chooseColumnAccentColorDialogRef}
+                className="choose-column-accent-color-dialog dialog-width-md"
+                aria-label="Choose Column Color"
+                onClose={event => {
+                  event.stopPropagation();
+                  setIsChooseColumnAccentColorDialogHidden(true);
+                  setColumnCardBeingEdited(null);
+                }}
+              >
+                <div className="header">
+                  <h2 className="title">Choose Column Color</h2>
+                  <button
+                    onClick={() => {
+                      chooseColumnAccentColorDialogRef.current?.close();
+                    }}
+                    aria-label="Close"
+                  >
+                    {getIconElement("close")}
+                  </button>
+                </div>
+                <div className="subText">{`Choose the column color for column '${columnCardBeingEdited.column.title}'`}</div>
+                <div className="subText">
+                  {allAccentColors.map(accentColor => {
                     return (
                       <button
-                        title={`Choose the icon: ${iconOption.name}`}
-                        aria-label={`Choose the icon: ${iconOption.name}`}
-                        className="choose-feedback-column-icon-button"
-                        key={iconOption.id}
-                        type="button"
+                        key={accentColor.friendlyName}
+                        aria-label={"Choose the color " + accentColor.friendlyName}
+                        title={"Choose the color " + accentColor.friendlyName}
+                        className="choose-feedback-column-accent-color-button"
                         onClick={() => {
-                          columnCardBeingEdited.column.iconClass = iconOption.id;
+                          columnCardBeingEdited.column.accentColor = accentColor.colorCode;
+                          setIsChooseColumnAccentColorDialogHidden(true);
+                          setColumnCardBeingEdited(null);
                           setColumnCards([...columnCards]);
-                          chooseColumnIconDialogRef.current!.close();
+                          chooseColumnAccentColorDialogRef.current?.close();
                         }}
                       >
-                        {getIconElement(iconOption.id)}
+                        <i
+                          className={"fas fa-square"}
+                          style={{
+                            color: accentColor.colorCode,
+                          }}
+                        />
                       </button>
                     );
                   })}
                 </div>
-              </div>
-              <div className="inner">
-                <button type="button" className="default button" onClick={() => chooseColumnIconDialogRef.current!.close()}>
-                  {t("common_close")}
-                </button>
-              </div>
-            </dialog>
-          )}
-          {columnCardBeingEdited && !isChooseColumnAccentColorDialogHidden && (
-            <dialog
-              ref={chooseColumnAccentColorDialogRef}
-              className="choose-column-accent-color-dialog dialog-width-md"
-              aria-label="Choose Column Color"
-              onClose={event => {
-                event.stopPropagation();
-                setIsChooseColumnAccentColorDialogHidden(true);
-                setColumnCardBeingEdited(null);
-              }}
-            >
-              <div className="header">
-                <h2 className="title">Choose Column Color</h2>
-                <button
-                  onClick={() => {
-                    chooseColumnAccentColorDialogRef.current?.close();
-                  }}
-                  aria-label="Close"
-                >
-                  {getIconElement("close")}
-                </button>
-              </div>
-              <div className="subText">{`Choose the column color for column '${columnCardBeingEdited.column.title}'`}</div>
-              <div className="subText">
-                {allAccentColors.map(accentColor => {
-                  return (
-                    <button
-                      key={accentColor.friendlyName}
-                      aria-label={"Choose the color " + accentColor.friendlyName}
-                      title={"Choose the color " + accentColor.friendlyName}
-                      className="choose-feedback-column-accent-color-button"
-                      onClick={() => {
-                        columnCardBeingEdited.column.accentColor = accentColor.colorCode;
-                        setIsChooseColumnAccentColorDialogHidden(true);
-                        setColumnCardBeingEdited(null);
-                        setColumnCards([...columnCards]);
-                        chooseColumnAccentColorDialogRef.current?.close();
-                      }}
-                    >
-                      <i
-                        className={"fas fa-square"}
-                        style={{
-                          color: accentColor.colorCode,
-                        }}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            </dialog>
-          )}
-        </div>
-      )}
-      {activeMetadataTab === "Permissions" && (
-        <div id="board-metadata-permissions-panel" role="tabpanel" aria-labelledby="board-metadata-permissions-tab">
-          <FeedbackBoardMetadataFormPermissions board={currentBoard} permissions={permissions} permissionOptions={availablePermissionOptions} currentUserId={currentUserId} isNewBoardCreation={isNewBoardCreation} onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)} />
-        </div>
-      )}
+              </dialog>
+            )}
+          </div>
+        )}
+        {activeMetadataTab === "Permissions" && (
+          <div id="board-metadata-permissions-panel" role="tabpanel" aria-labelledby="board-metadata-permissions-tab">
+            <FeedbackBoardMetadataFormPermissions board={currentBoard} permissions={permissions} permissionOptions={availablePermissionOptions} currentUserId={currentUserId} isNewBoardCreation={isNewBoardCreation} onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)} />
+          </div>
+        )}
+      </div>
       <div className="inner">
         {error && (
           <span className="input-validation-message">
@@ -719,7 +721,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
           {t("common_cancel")}
         </button>
       </div>
-    </div>
+    </>
   );
 };
 
