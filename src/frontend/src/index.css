@@ -1906,6 +1906,30 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply flex items-center gap-3 flex-nowrap;
 }
 
+.workflow-stage-wrapper {
+  @apply relative flex flex-col items-center;
+}
+
+.workflow-stage-move-everyone {
+  @apply absolute -top-10 left-1/2 -translate-x-1/2 flex items-center justify-center w-30 h-8 p-1 border border-(--nav-header-active-item-background) cursor-pointer z-10;
+
+  &:focus-visible {
+    @apply outline-2 outline-primary outline-offset-2;
+  }
+
+  &:disabled {
+    @apply cursor-default opacity-60;
+  }
+
+  & svg {
+    @apply w-4 h-4;
+  }
+
+  & span {
+    @apply text-xs;
+  }
+}
+
 .workflow-stage-tab {
   @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
 
