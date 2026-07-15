@@ -22,10 +22,12 @@ describe("icons", () => {
 
   it("keeps legacy icon aliases separate from the tray list", () => {
     for (const legacyMapping of legacyIconMappings) {
-      const { container, unmount } = render(getIconElement(legacyMapping.legacyId));
+      const { container: legacyContainer, unmount: unmountLegacy } = render(getIconElement(legacyMapping.legacyId));
+      const { container: canonicalContainer, unmount: unmountCanonical } = render(getIconElement(legacyMapping.iconId));
 
-      expect(container.querySelector(`.icon-${legacyMapping.iconId}`)).toBeTruthy();
-      unmount();
+      expect(legacyContainer.innerHTML).toEqual(canonicalContainer.innerHTML);
+      unmountLegacy();
+      unmountCanonical();
     }
   });
 
