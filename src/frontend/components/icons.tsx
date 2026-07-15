@@ -445,9 +445,9 @@ export const AssignmentTurnedInIcon = () => {
   );
 };
 
-export const ReviewsIcon = () => {
+export const CommentsIcon = () => {
   return (
-    <svg className="icon-reviews" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-comments" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M8,11a1,1,0,1,0,1,1A1,1,0,0,0,8,11Zm4,0a1,1,0,1,0,1,1A1,1,0,0,0,12,11Zm4,0a1,1,0,1,0,1,1A1,1,0,0,0,16,11ZM12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.26,6.33l-2,2a1,1,0,0,0-.21,1.09A1,1,0,0,0,3,22h9A10,10,0,0,0,12,2Zm0,18H5.41l.93-.93a1,1,0,0,0,.3-.71,1,1,0,0,0-.3-.7A8,8,0,1,1,12,20Z" />
     </svg>
   );
@@ -465,6 +465,19 @@ export const AdjustIcon = () => {
   return (
     <svg className="icon-adjust" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm7 3c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm7-11h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4z" />
+    </svg>
+  );
+};
+
+export const BullseyeIcon = () => {
+  return (
+    <svg className="icon-target icon-bullseye" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="8" fill="var(--background-color, #fff)" />
+      <circle cx="12" cy="12" r="6" fill="currentColor" />
+      <circle cx="12" cy="12" r="4" fill="var(--background-color, #fff)" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
     </svg>
   );
 };
@@ -561,21 +574,19 @@ export const BirthdayCakeIcon = () => {
   );
 };
 
-export const ConstructionIcon = () => {
+export const LaptopIcon = () => {
   return (
-    <svg className="icon-construction" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <rect height="8.48" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -6.8717 17.6255)" width="3" x="16.34" y="12.87" />
-      <path d="M17.5,10c1.93,0,3.5-1.57,3.5-3.5c0-0.58-0.16-1.12-0.41-1.6l-2.7,2.7L16.4,6.11l2.7-2.7C18.62,3.16,18.08,3,17.5,3 C15.57,3,14,4.57,14,6.5c0,0.41,0.08,0.8,0.21,1.16l-1.85,1.85l-1.78-1.78l0.71-0.71L9.88,5.61L12,3.49 c-1.17-1.17-3.07-1.17-4.24,0L4.22,7.03l1.41,1.41H2.81L2.1,9.15l3.54,3.54l0.71-0.71V9.15l1.41,1.41l0.71-0.71l1.78,1.78 l-7.41,7.41l2.12,2.12L16.34,9.79C16.7,9.92,17.09,10,17.5,10z" />
+    <svg className="icon-laptop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2zM4 6h16v10H4z" />
     </svg>
   );
 };
 
-export const PlumbingIcon = () => {
+export const ToolsIcon = () => {
   return (
-    <svg className="icon-plumbing" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M19.28,4.93l-2.12-2.12c-0.78-0.78-2.05-0.78-2.83,0L11.5,5.64l2.12,2.12l2.12-2.12l3.54,3.54 C20.45,8,20.45,6.1,19.28,4.93z" />
-      <path d="M5.49,13.77c0.59,0.59,1.54,0.59,2.12,0l2.47-2.47L7.96,9.17l-2.47,2.47C4.9,12.23,4.9,13.18,5.49,13.77L5.49,13.77z" />
-      <path d="M15.04,7.76l-0.71,0.71l-0.71,0.71l-3.18-3.18C9.85,5.4,8.9,5.4,8.32,5.99c-0.59,0.59-0.59,1.54,0,2.12l3.18,3.18 L10.79,12l-6.36,6.36c-0.78,0.78-0.78,2.05,0,2.83c0.78,0.78,2.05,0.78,2.83,0L16.45,12c0.39,0.39,1.02,0.39,1.41,0 c0.39-0.39,0.39-1.02,0-1.41L15.04,7.76z" />
+    <svg className="icon-tools icon-plumbing" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <rect height="8.48" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -6.8717 17.6255)" width="3" x="16.34" y="12.87" />
+      <path d="M17.5,10c1.93,0,3.5-1.57,3.5-3.5c0-0.58-0.16-1.12-0.41-1.6l-2.7,2.7L16.4,6.11l2.7-2.7C18.62,3.16,18.08,3,17.5,3 C15.57,3,14,4.57,14,6.5c0,0.41,0.08,0.8,0.21,1.16l-1.85,1.85l-1.78-1.78l0.71-0.71L9.88,5.61L12,3.49 c-1.17-1.17-3.07-1.17-4.24,0L4.22,7.03l1.41,1.41H2.81L2.1,9.15l3.54,3.54l0.71-0.71V9.15l1.41,1.41l0.71-0.71l1.78,1.78 l-7.41,7.41l2.12,2.12L16.34,9.79C16.7,9.92,17.09,10,17.5,10z" />
     </svg>
   );
 };
@@ -824,7 +835,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "exclamation", name: "Exclamation", icon: <ExclamationIcon />, trayOrder: 6, legacyAliases: ["fas fa-exclamation", "fas fa-exclamation-triangle", "far fa-exclamation"] },
   { id: "thumb-up", name: "Thumb Up", icon: <ThumbUpIcon />, trayOrder: 7, legacyAliases: ["far fa-thumbs-up"] },
   { id: "thumb-down", name: "Thumb Down", icon: <ThumbDownIcon />, trayOrder: 8, legacyAliases: ["fas fa-skull-crossbones", "far fa-thumbs-down"] },
-  { id: "reviews", name: "Reviews", icon: <ReviewsIcon />, trayOrder: 9 },
+  { id: "explore", name: "Explore", icon: <ExploreIcon />, trayOrder: 9, legacyAliases: ["far fa-compass"] },
   { id: "forum", name: "Forum", icon: <ForumIcon />, trayOrder: 10, legacyAliases: ["far fa-comments"] },
   { id: "star", name: "Star", icon: <StarIcon />, trayOrder: 11, legacyAliases: ["far fa-star", "fas fa-star"] },
   { id: "light-bulb", name: "Light Bulb", icon: <LightBulbIcon />, trayOrder: 12, legacyAliases: ["far fa-lightbulb"] },
@@ -832,12 +843,12 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "birthday-cake", name: "Birthday Cake", icon: <BirthdayCakeIcon />, trayOrder: 14, legacyAliases: ["fas fa-birthday-cake"] },
   { id: "play-circle", name: "Play", icon: <PlayCircleIcon />, trayOrder: 15, legacyAliases: ["far fa-circle-play"] },
   { id: "stop-circle", name: "Stop", icon: <StopCircleIcon />, trayOrder: 16, legacyAliases: ["far fa-circle-stop"] },
-  { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 17, legacyAliases: ["far fa-circle-dot", "fa-bullseye"] },
+  { id: "bullseye", name: "Bullseye", icon: <BullseyeIcon />, trayOrder: 17, legacyAliases: ["fa-bullseye"] },
   { id: "eye", name: "Eye", icon: <EyeIcon />, trayOrder: 18, legacyAliases: ["eye", "far fa-eye"] },
   { id: "menu-book", name: "Book", icon: <MenuBookIcon />, trayOrder: 19, legacyAliases: ["fas fa-book"] },
   { id: "rocket-launch", name: "Rocket", icon: <RocketLaunchIcon />, trayOrder: 20, legacyAliases: ["fas fa-rocket", "fas fa-fan"] },
-  { id: "plumbing", name: "Plumbing", icon: <PlumbingIcon />, trayOrder: 21, legacyAliases: ["far fa-plumbing", "far fa-wrench", "fas fa-wrench"] },
-  { id: "construction", name: "Construction", icon: <ConstructionIcon />, trayOrder: 22, legacyAliases: ["fas fa-chalkboard", "fas fa-construction"] },
+  { id: "tools", name: "Tools", icon: <ToolsIcon />, trayOrder: 21, legacyAliases: ["plumbing", "construction", "fas fa-construction", "plumber", "wrench", "far fa-plumbing", "far fa-wrench", "fas fa-wrench"] },
+  { id: "laptop", name: "Laptop", icon: <LaptopIcon />, trayOrder: 22, legacyAliases: ["fas fa-chalkboard"] },
   { id: "anchor", name: "Anchor", icon: <AnchorIcon />, trayOrder: 23, legacyAliases: ["fas fa-anchor"] },
   { id: "support", name: "Support", icon: <SupportIcon />, trayOrder: 24, legacyAliases: ["fas fa-life-ring"] },
   { id: "search", name: "Search", icon: <SearchIcon />, trayOrder: 25, legacyAliases: ["search", "fa-solid fa-magnifying-glass"] },
@@ -846,9 +857,10 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "balance", name: "Balance", icon: <BalanceIcon />, trayOrder: 28, legacyAliases: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"] },
   { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 29, legacyAliases: ["gear"] },
   { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 30, legacyAliases: ["fa-solid fa-square-poll-vertical"] },
+  { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
   { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
-  { id: "explore", name: "Explore", icon: <ExploreIcon />, trayOrder: 0, legacyAliases: ["far fa-compass"] },
+  { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-dot"] },
   { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
   { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 0, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },
   { id: "gear-with-stars", name: "Gear With Stars", icon: <GearWithStarsIcon />, trayOrder: 0, legacyAliases: ["gears", "gear-with-stars", "fa-solid fa-gears"] },
@@ -965,7 +977,7 @@ export function getIconElement(iconId: string | undefined | null): React.ReactEl
   const foundIcon = resolvedIconId ? iconDefinitionById.get(resolvedIconId) : undefined;
 
   if (!foundIcon) {
-    return <img className="icon-retrospective-logo" src={getRetrospectiveLogoUrl()} width="24" height="24" alt="" aria-hidden="true" />;
+    return <CommentsIcon />;
   }
 
   return foundIcon.icon;

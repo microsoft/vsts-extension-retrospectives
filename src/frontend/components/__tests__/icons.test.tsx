@@ -56,7 +56,7 @@ describe("icons", () => {
       }
     });
 
-    it("returns PlumbingIcon for plumbing ID", () => {
+    it("returns ToolsIcon for plumbing alias", () => {
       const icon = getIconElement("plumbing");
       const { container } = render(icon);
       expect(container.querySelector(".icon-plumbing")).toBeTruthy();
@@ -75,29 +75,11 @@ describe("icons", () => {
       expect(container.querySelector(".icon-coffee")).toBeTruthy();
     });
 
-    it("falls back to retrospective logo for an unknown ID", () => {
+    it("falls back to CommentsIcon for an unknown ID", () => {
       const icon = getIconElement("unknown-icon");
       const { container } = render(icon);
 
-      const fallbackIcon = container.querySelector(".icon-retrospective-logo") as HTMLImageElement | null;
-      expect(fallbackIcon).toBeTruthy();
-      expect(fallbackIcon?.getAttribute("src")).toContain("images/logos/logo_navbar_light_theme.png");
-      expect(fallbackIcon?.getAttribute("width")).toBe("24");
-      expect(fallbackIcon?.getAttribute("height")).toBe("24");
-    });
-
-    it("uses dark theme fallback logo when data-theme is dark", () => {
-      document.documentElement.setAttribute("data-theme", "dark");
-
-      try {
-        const icon = getIconElement("unknown-icon");
-        const { container } = render(icon);
-
-        const fallbackIcon = container.querySelector(".icon-retrospective-logo") as HTMLImageElement | null;
-        expect(fallbackIcon?.getAttribute("src")).toContain("images/logos/logo_navbar_dark_theme.png");
-      } finally {
-        document.documentElement.removeAttribute("data-theme");
-      }
+      expect(container.querySelector(".icon-comments")).toBeTruthy();
     });
   });
 });
