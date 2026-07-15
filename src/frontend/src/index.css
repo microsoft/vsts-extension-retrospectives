@@ -1866,7 +1866,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply mx-2;
 
   & summary {
-    @apply contents list-none cursor-pointer;
+    @apply inline-flex items-center list-none cursor-pointer;
 
     & svg {
       @apply w-4 h-4;
