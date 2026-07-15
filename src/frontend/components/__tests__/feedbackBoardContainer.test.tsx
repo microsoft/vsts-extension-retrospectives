@@ -1,5 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
@@ -415,6 +416,52 @@ describe("FeedbackBoardContainer integration", () => {
     render(<FeedbackBoardContainer {...props} />);
     const spinner = screen.getByText("Loading...");
     expect(spinner).toBeInTheDocument();
+  });
+
+  it("supports keyboard navigation for view tabs and Board Actions", async () => {
+    const user = userEvent.setup();
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(mockBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+
+    const boardTab = screen.getByRole("tab", { name: "Board" });
+    const historyTab = screen.getByRole("tab", { name: "History" });
+    const boardSelector = screen.getByRole("combobox", { name: "Retrospective Board" });
+    const boardActions = screen.getByLabelText("Board Actions Menu");
+
+    boardTab.focus();
+    await user.tab();
+    expect(historyTab).toHaveFocus();
+    await user.tab();
+    expect(boardSelector).toHaveFocus();
+    await user.tab();
+    expect(boardActions).toHaveFocus();
+
+    await user.keyboard("{Enter}");
+    expect(boardActions.closest("details")).toHaveAttribute("open");
+
+    historyTab.focus();
+    await user.keyboard("{Enter}");
+    expect(historyTab).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("board-summary-table")).toBeInTheDocument();
+
+    boardTab.focus();
+    await user.keyboard(" ");
+    expect(boardTab).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("feedback-board")).toBeInTheDocument();
   });
 
   it("searches feedback in all boards from the Board Actions menu", async () => {

@@ -1232,7 +1232,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-assessment-button {
-  @apply flex items-center gap-1 bg-transparent cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none border border-solid border-(--nav-header-active-item-background) rounded-lg;
+  @apply flex items-center gap-1 bg-transparent cursor-pointer text-sm py-2 px-4 hover:bg-transparent border border-solid border-(--nav-header-active-item-background) rounded-lg;
 
   &:hover {
     @apply border border-solid text-primary;
@@ -1866,7 +1866,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply mx-2;
 
   & summary {
-    @apply contents list-none cursor-pointer;
+    @apply inline-flex items-center list-none cursor-pointer;
 
     & svg {
       @apply w-4 h-4;

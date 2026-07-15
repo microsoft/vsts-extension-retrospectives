@@ -341,6 +341,18 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   }, []);
 
+  const handleBoardActionsMenuKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    const detailsElement = event.currentTarget.closest("details");
+    if (detailsElement) {
+      detailsElement.open = !detailsElement.open;
+    }
+  }, []);
+
   const handleBoardActionMenuItemClick = React.useCallback(async (handler: () => void | Promise<void>, event: React.MouseEvent<HTMLButtonElement>) => {
     const detailsElement = event.currentTarget.closest("details");
     detailsElement?.removeAttribute("open");
@@ -2267,13 +2279,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         <div className="w-full">
           {state.currentBoard && (
             <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className="header-tabs">
-                <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
+              <div className="header-tabs" role="tablist" aria-label="Retrospective views">
+                <button className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} type="button" role="tab" aria-selected={state.activeTab === "Board"} onClick={() => handlePivotClick("Board")}>
                   Board
-                </div>
-                <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
+                </button>
+                <button className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} type="button" role="tab" aria-selected={state.activeTab === "History"} onClick={() => handlePivotClick("History")}>
                   History
-                </div>
+                </button>
               </div>
               {state.activeTab === "Board" && (
                 <>
@@ -2292,7 +2304,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     </div>
                     <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
                       <details className="flex items-center relative">
-                        <summary aria-label="Board Actions Menu" className="contextual-menu-button">
+                        <summary aria-label="Board Actions Menu" className="contextual-menu-button" tabIndex={0} onKeyDown={handleBoardActionsMenuKeyDown}>
                           {getIconElement("more-horizontal")}
                         </summary>
                         <div className="callout-menu left" role="menu" aria-label="Board Actions">
