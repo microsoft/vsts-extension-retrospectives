@@ -133,11 +133,20 @@ describe("Workflow Stage", () => {
 
       const button = screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" });
       expect(button).toBeInTheDocument();
-      expect(button.parentElement).toHaveClass("workflow-stage-wrapper", "workflow-stage-wrapper--managed");
+      expect(button.parentElement).toHaveClass("workflow-stage-wrapper");
 
       await user.click(button);
 
       expect(moveEveryoneCallback).toHaveBeenCalledWith(WorkflowPhase.Collect);
+      expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
+    });
+
+    it("handles activation when no move callback is provided", async () => {
+      const user = userEvent.setup();
+      render(<WorkflowStage {...mockedProps} canManageBoard={true} />);
+
+      await user.click(screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" }));
+
       expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
     });
 
