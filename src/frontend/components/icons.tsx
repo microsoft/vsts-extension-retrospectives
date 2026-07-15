@@ -1,5 +1,7 @@
 import React from "react";
 
+const retrospectiveLogoUrl = "images/logos/logo_navbar.svg";
+
 export const CloseIcon = () => {
   return (
     <svg className="icon-close" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -52,8 +54,95 @@ export const AssessmentIcon = () => {
 
 export const PlayCircleIcon = () => {
   return (
-    <svg className="icon-play-circle" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+    <svg className="icon-play-circle icon-retrospective-logo" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 16 16" width="24" fill="currentColor" aria-hidden="true">
+      <rect x="2" y="0" width="1" height="1" opacity="0.3765" />
+      <rect x="3" y="0" width="1" height="1" opacity="0.251" />
+      <rect x="4" y="0" width="1" height="1" opacity="0.0627" />
+      <rect x="0" y="1" width="1" height="1" opacity="0.0627" />
+      <rect x="1" y="1" width="1" height="1" opacity="0.6902" />
+      <rect x="2" y="1" width="1" height="1" opacity="0.6275" />
+      <rect x="3" y="1" width="1" height="1" opacity="0.7529" />
+      <rect x="4" y="1" width="2" height="1" opacity="0.9412" />
+      <rect x="6" y="1" width="1" height="1" opacity="0.7529" />
+      <rect x="7" y="1" width="1" height="1" opacity="0.502" />
+      <rect x="8" y="1" width="1" height="1" opacity="0.3137" />
+      <rect x="9" y="1" width="1" height="1" opacity="0.1255" />
+      <rect x="0" y="2" width="1" height="1" opacity="0.251" />
+      <rect x="1" y="2" width="1" height="1" opacity="0.6902" />
+      <rect x="5" y="2" width="1" height="1" opacity="0.0627" />
+      <rect x="6" y="2" width="1" height="1" opacity="0.251" />
+      <rect x="7" y="2" width="1" height="1" opacity="0.502" />
+      <rect x="8" y="2" width="1" height="1" opacity="0.6902" />
+      <rect x="9" y="2" width="1" height="1" opacity="0.8157" />
+      <rect x="10" y="2" width="1" height="1" />
+      <rect x="11" y="2" width="1" height="1" opacity="0.3137" />
+      <rect x="0" y="3" width="1" height="1" opacity="0.4392" />
+      <rect x="1" y="3" width="1" height="1" opacity="0.502" />
+      <rect x="10" y="3" width="1" height="1" opacity="0.0627" />
+      <rect x="11" y="3" width="1" height="1" opacity="0.8784" />
+      <rect x="12" y="3" width="1" height="1" opacity="0.0627" />
+      <rect x="0" y="4" width="1" height="1" opacity="0.6275" />
+      <rect x="1" y="4" width="1" height="1" opacity="0.3137" />
+      <rect x="11" y="4" width="1" height="1" opacity="0.8157" />
+      <rect x="12" y="4" width="1" height="1" opacity="0.1255" />
+      <rect x="0" y="5" width="1" height="1" opacity="0.8157" />
+      <rect x="1" y="5" width="1" height="1" opacity="0.1255" />
+      <rect x="11" y="5" width="1" height="1" />
+      <rect x="0" y="6" width="1" height="1" opacity="0.9412" />
+      <rect x="10" y="6" width="1" height="1" opacity="0.251" />
+      <rect x="11" y="6" width="1" height="1" opacity="0.8157" />
+      <rect x="12" y="6" width="1" height="1" opacity="0.251" />
+      <rect x="13" y="6" width="2" height="1" opacity="0.4392" />
+      <rect x="0" y="7" width="1" height="1" opacity="0.8157" />
+      <rect x="1" y="7" width="1" height="1" opacity="0.0627" />
+      <rect x="7" y="7" width="1" height="1" opacity="0.3137" />
+      <rect x="8" y="7" width="2" height="1" opacity="0.7529" />
+      <rect x="10" y="7" width="5" height="1" />
+      <rect x="15" y="7" width="1" height="1" opacity="0.502" />
+      <rect x="0" y="8" width="1" height="1" opacity="0.5647" />
+      <rect x="1" y="8" width="1" height="1" opacity="0.9412" />
+      <rect x="2" y="8" width="1" height="1" opacity="0.7529" />
+      <rect x="4" y="8" width="1" height="1" opacity="0.0627" />
+      <rect x="5" y="8" width="1" height="1" opacity="0.1882" />
+      <rect x="7" y="8" width="8" height="1" />
+      <rect x="15" y="8" width="1" height="1" opacity="0.7529" />
+      <rect x="2" y="9" width="1" height="1" opacity="0.9412" />
+      <rect x="3" y="9" width="1" height="1" opacity="0.1882" />
+      <rect x="4" y="9" width="1" height="1" opacity="0.8157" />
+      <rect x="5" y="9" width="1" height="1" opacity="0.7529" />
+      <rect x="6" y="9" width="1" height="1" opacity="0.9412" />
+      <rect x="7" y="9" width="8" height="1" />
+      <rect x="15" y="9" width="1" height="1" opacity="0.8157" />
+      <rect x="1" y="10" width="1" height="1" opacity="0.251" />
+      <rect x="2" y="10" width="1" height="1" opacity="0.9412" />
+      <rect x="3" y="10" width="1" height="1" opacity="0.8784" />
+      <rect x="4" y="10" width="1" height="1" opacity="0.3765" />
+      <rect x="7" y="10" width="1" height="1" opacity="0.8157" />
+      <rect x="8" y="10" width="8" height="1" />
+      <rect x="1" y="11" width="1" height="1" opacity="0.3765" />
+      <rect x="2" y="11" width="1" height="1" opacity="0.8157" />
+      <rect x="3" y="11" width="1" height="1" opacity="0.1882" />
+      <rect x="7" y="11" width="1" height="1" opacity="0.7529" />
+      <rect x="8" y="11" width="8" height="1" />
+      <rect x="1" y="12" width="1" height="1" opacity="0.251" />
+      <rect x="2" y="12" width="1" height="1" opacity="0.0627" />
+      <rect x="7" y="12" width="1" height="1" opacity="0.5647" />
+      <rect x="8" y="12" width="6" height="1" />
+      <rect x="14" y="12" width="1" height="1" opacity="0.8157" />
+      <rect x="15" y="12" width="1" height="1" opacity="0.4392" />
+      <rect x="7" y="13" width="1" height="1" opacity="0.0627" />
+      <rect x="8" y="13" width="2" height="1" opacity="0.4392" />
+      <rect x="10" y="13" width="1" height="1" opacity="0.251" />
+      <rect x="11" y="13" width="1" height="1" opacity="0.502" />
+      <rect x="12" y="13" width="2" height="1" />
+      <rect x="14" y="13" width="1" height="1" opacity="0.6275" />
+      <rect x="12" y="14" width="1" height="1" opacity="0.1882" />
+      <rect x="13" y="14" width="1" height="1" opacity="0.8784" />
+      <rect x="14" y="14" width="1" height="1" opacity="0.9412" />
+      <rect x="15" y="14" width="1" height="1" opacity="0.0627" />
+      <rect x="13" y="15" width="1" height="1" opacity="0.0627" />
+      <rect x="14" y="15" width="1" height="1" opacity="0.5647" />
+      <rect x="15" y="15" width="1" height="1" opacity="0.3765" />
     </svg>
   );
 };
@@ -848,7 +937,7 @@ export function getIconElement(iconId: string | undefined | null): React.ReactEl
   const foundIcon = resolvedIconId ? iconDefinitionById.get(resolvedIconId) : undefined;
 
   if (!foundIcon) {
-    return <PlayCircleIcon />;
+    return <img className="icon-retrospective-logo" src={retrospectiveLogoUrl} width="24" height="24" alt="" aria-hidden="true" />;
   }
 
   return foundIcon.icon;

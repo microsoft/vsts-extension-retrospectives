@@ -75,11 +75,14 @@ describe("icons", () => {
       expect(container.querySelector(".icon-coffee")).toBeTruthy();
     });
 
-    it("falls back to PlayCircleIcon for an unknown ID", () => {
+    it("falls back to retrospective logo for an unknown ID", () => {
       const icon = getIconElement("unknown-icon");
       const { container } = render(icon);
 
-      expect(container.querySelector(".icon-play-circle")).toBeTruthy();
+      const fallbackIcon = container.querySelector(".icon-retrospective-logo") as HTMLImageElement | null;
+      expect(fallbackIcon).toBeTruthy();
+      expect(fallbackIcon?.getAttribute("width")).toBe("24");
+      expect(fallbackIcon?.getAttribute("height")).toBe("24");
     });
   });
 });
