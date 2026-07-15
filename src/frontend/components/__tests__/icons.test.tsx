@@ -56,8 +56,8 @@ describe("icons", () => {
       }
     });
 
-    it("returns ToolsIcon for plumbing alias", () => {
-      const icon = getIconElement("plumbing");
+    it("returns ToolsIcon for construction alias", () => {
+      const icon = getIconElement("construction");
       const { container } = render(icon);
       expect(container.querySelector(".icon-plumbing")).toBeTruthy();
     });
@@ -69,10 +69,10 @@ describe("icons", () => {
     });
 
     it("returns icons by legacy tag", () => {
-      const icon = getIconElement("fas fa-coffee");
+      const icon = getIconElement("fa-play-circle");
       const { container } = render(icon);
 
-      expect(container.querySelector(".icon-coffee")).toBeTruthy();
+      expect(container.querySelector(".icon-play-circle")).toBeTruthy();
     });
 
     it("falls back to CommentsIcon for an unknown ID", () => {
