@@ -459,7 +459,7 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.getByTestId("board-summary-table")).toBeInTheDocument();
 
     boardTab.focus();
-    await user.keyboard("{Space}");
+    await user.keyboard(" ");
     expect(boardTab).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("feedback-board")).toBeInTheDocument();
   });
