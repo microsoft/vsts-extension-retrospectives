@@ -81,8 +81,23 @@ describe("icons", () => {
 
       const fallbackIcon = container.querySelector(".icon-retrospective-logo") as HTMLImageElement | null;
       expect(fallbackIcon).toBeTruthy();
+      expect(fallbackIcon?.getAttribute("src")).toContain("images/logos/logo_navbar_light_theme.png");
       expect(fallbackIcon?.getAttribute("width")).toBe("24");
       expect(fallbackIcon?.getAttribute("height")).toBe("24");
+    });
+
+    it("uses dark theme fallback logo when data-theme is dark", () => {
+      document.documentElement.setAttribute("data-theme", "dark");
+
+      try {
+        const icon = getIconElement("unknown-icon");
+        const { container } = render(icon);
+
+        const fallbackIcon = container.querySelector(".icon-retrospective-logo") as HTMLImageElement | null;
+        expect(fallbackIcon?.getAttribute("src")).toContain("images/logos/logo_navbar_dark_theme.png");
+      } finally {
+        document.documentElement.removeAttribute("data-theme");
+      }
     });
   });
 });

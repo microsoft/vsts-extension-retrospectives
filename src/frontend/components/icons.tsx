@@ -1,6 +1,34 @@
 import React from "react";
 
-const retrospectiveLogoUrl = "images/logos/logo_navbar.svg";
+const retrospectiveLogoLightUrl = "images/logos/logo_navbar_light_theme.png";
+const retrospectiveLogoDarkUrl = "images/logos/logo_navbar_dark_theme.png";
+
+function getRetrospectiveLogoUrl(): string {
+  if (typeof document !== "undefined") {
+    const themeContext = [
+      document.documentElement.getAttribute("data-theme"),
+      document.body?.getAttribute("data-theme"),
+      document.documentElement.className,
+      document.body?.className,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    if (themeContext.includes("dark") || themeContext.includes("hc-black")) {
+      return retrospectiveLogoDarkUrl;
+    }
+  }
+
+  if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+    const darkColorSchemeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    if (darkColorSchemeMediaQuery?.matches) {
+      return retrospectiveLogoDarkUrl;
+    }
+  }
+
+  return retrospectiveLogoLightUrl;
+}
 
 export const CloseIcon = () => {
   return (
@@ -555,7 +583,7 @@ export const PlumbingIcon = () => {
 export const ExploreIcon = () => {
   return (
     <svg className="icon-explore" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1.41 2L5 17.59V5h12.59zM6.41 19L19 6.41V19H6.41zM6 7h5v1.5H6zm10 5.5h-1.5v2h-2V16h2v2H16v-2h2v-1.5h-2z" />
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m-5.5-2.5 7.51-3.49L17.5 6.5 9.99 9.99zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1" />
     </svg>
   );
 };
@@ -937,7 +965,7 @@ export function getIconElement(iconId: string | undefined | null): React.ReactEl
   const foundIcon = resolvedIconId ? iconDefinitionById.get(resolvedIconId) : undefined;
 
   if (!foundIcon) {
-    return <img className="icon-retrospective-logo" src={retrospectiveLogoUrl} width="24" height="24" alt="" aria-hidden="true" />;
+    return <img className="icon-retrospective-logo" src={getRetrospectiveLogoUrl()} width="24" height="24" alt="" aria-hidden="true" />;
   }
 
   return foundIcon.icon;
