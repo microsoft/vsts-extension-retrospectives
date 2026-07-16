@@ -299,7 +299,7 @@ describe("boardColumnsHelper", () => {
         expect(result).toHaveLength(4);
         expect(result[0]).toEqual({
           accentColor: "#008000",
-          iconClass: "rocket-launch",
+          iconClass: "fan",
           id: "uuid-1",
           title: "Propellers",
           notes: "",
@@ -320,7 +320,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "thumb-down",
+          iconClass: "danger",
           id: "uuid-4",
           title: "Rocks",
           notes: "",

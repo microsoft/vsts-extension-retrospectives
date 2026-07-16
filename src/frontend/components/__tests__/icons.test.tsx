@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { fluentUiIcons, getIconElement, iconDefinitions, legacyIconMappings, selectionTrayIcons } from "../icons";
+import { getIconElement, iconDefinitions, legacyIconMappings, selectionTrayIcons } from "../icons";
 
 describe("icons", () => {
   it("renders every available icon", () => {
@@ -28,15 +28,6 @@ describe("icons", () => {
       expect(legacyContainer.innerHTML).toEqual(canonicalContainer.innerHTML);
       unmountLegacy();
       unmountCanonical();
-    }
-  });
-
-  it("renders every Fluent UI icon replacement", () => {
-    for (const [iconName, icon] of Object.entries(fluentUiIcons)) {
-      const { container, unmount } = render(React.cloneElement(icon, { "aria-label": iconName }));
-
-      expect(container.querySelector("svg")).toBeTruthy();
-      unmount();
     }
   });
 
@@ -75,6 +66,13 @@ describe("icons", () => {
       const { container } = render(icon);
 
       expect(container.querySelector(".icon-play-circle")).toBeTruthy();
+    });
+
+    it("returns FanIcon for fan legacy tags", () => {
+      const icon = getIconElement("fas fa-fan");
+      const { container } = render(icon);
+
+      expect(container.querySelector(".icon-fan")).toBeTruthy();
     });
 
     it("falls back to CommentsIcon for an unknown ID", () => {

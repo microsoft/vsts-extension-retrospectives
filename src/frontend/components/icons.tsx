@@ -498,6 +498,23 @@ export const CheckCircleIcon = () => {
   );
 };
 
+export const FanIcon = () => {
+  return (
+    <svg className="icon-fan" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <rect width="24" height="24" fill="none" />
+      <path d="M12 11a1 1 0 1 0 1 1 1 1 0 0 0-1-1m.5-9C17 2 17.1 5.57 14.73 6.75a3.36 3.36 0 0 0-1.62 2.47 3.17 3.17 0 0 1 1.23.91C18 8.13 22 8.92 22 12.5c0 4.5-3.58 4.6-4.75 2.23a3.44 3.44 0 0 0-2.5-1.62 3.24 3.24 0 0 1-.91 1.23c2 3.69 1.2 7.66-2.38 7.66C7 22 6.89 18.42 9.26 17.24a3.46 3.46 0 0 0 1.62-2.45 3 3 0 0 1-1.25-.92C5.94 15.85 2 15.07 2 11.5 2 7 5.54 6.89 6.72 9.26A3.39 3.39 0 0 0 9.2 10.87a2.91 2.91 0 0 1 .92-1.22C8.13 6 8.92 2 12.48 2Z" />
+    </svg>
+  );
+};
+
+export const DangerIcon = () => {
+  return (
+    <svg className="icon-danger" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27zM19 14.9 14.9 19H9.1L5 14.9V9.1L9.1 5h5.8L19 9.1zm-4.17-7.14L12 10.59 9.17 7.76 7.76 9.17 10.59 12l-2.83 2.83 1.41 1.41L12 13.41l2.83 2.83 1.41-1.41L13.41 12l2.83-2.83z" />
+    </svg>
+  );
+};
+
 export const ArrowCircleDownIcon = () => {
   return (
     <svg className="icon-arrow-circle-down" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -710,14 +727,14 @@ export interface IIconDefinition {
 }
 
 export const iconDefinitions: IIconDefinition[] = [
-  { id: "happy-face", name: "Smile", icon: <HappyFaceIcon />, trayOrder: 1, legacyAliases: ["fas fa-cart-plus", "far fa-smile"] },
+  { id: "happy-face", name: "Smile", icon: <HappyFaceIcon />, trayOrder: 1, legacyAliases: ["far fa-smile"] },
   { id: "sad-face", name: "Frown", icon: <SadFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown"] },
-  { id: "add-circle", name: "Add Circle", icon: <AddCircleIcon />, trayOrder: 3, legacyAliases: ["fa-plus", "fa-plus-circle"] },
+  { id: "add-circle", name: "Add Circle", icon: <AddCircleIcon />, trayOrder: 3, legacyAliases: ["fa-plus", "fa-plus-circle", "fas fa-cart-plus"] },
   { id: "check-circle", name: "Check", icon: <CheckCircleIcon />, trayOrder: 4, legacyAliases: ["fa-check-circle"] },
   { id: "help", name: "Question", icon: <HelpIcon />, trayOrder: 5, legacyAliases: ["fas fa-question", "far fa-question"] },
   { id: "exclamation", name: "Exclamation", icon: <ExclamationIcon />, trayOrder: 6, legacyAliases: ["fas fa-exclamation", "far fa-exclamation"] },
   { id: "thumb-up", name: "Thumb Up", icon: <ThumbUpIcon />, trayOrder: 7, legacyAliases: ["far fa-thumbs-up"] },
-  { id: "thumb-down", name: "Thumb Down", icon: <ThumbDownIcon />, trayOrder: 8, legacyAliases: ["fas fa-skull-crossbones", "far fa-thumbs-down"] },
+  { id: "thumb-down", name: "Thumb Down", icon: <ThumbDownIcon />, trayOrder: 8, legacyAliases: ["far fa-thumbs-down"] },
   { id: "forum", name: "Forum", icon: <ForumIcon />, trayOrder: 9 },
   { id: "star", name: "Star", icon: <StarIcon />, trayOrder: 10, legacyAliases: ["far fa-star", "fas fa-star"] },
   { id: "light-bulb", name: "Light Bulb", icon: <LightBulbIcon />, trayOrder: 11, legacyAliases: ["far fa-lightbulb"] },
@@ -739,10 +756,12 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 27, legacyAliases: ["fas fa-lock"] },
   { id: "balance", name: "Balance", icon: <BalanceIcon />, trayOrder: 28, legacyAliases: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"] },
   { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 29 },
-  { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 30, legacyAliases: ["fa-solid fa-square-poll-vertical"] },
+  { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 30 },
   { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
   { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
+  { id: "danger", name: "Danger", icon: <DangerIcon />, trayOrder: 0, legacyAliases: ["fas fa-skull-crossbones"] },
+  { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fan", "fas fa-fan"] },
   { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-dot"] },
   { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
   { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 0, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },
@@ -766,7 +785,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "person", name: "Person", icon: <PersonIcon />, trayOrder: 0 },
   { id: "people", name: "People", icon: <PeopleIcon />, trayOrder: 0 },
   { id: "insights", name: "Insights", icon: <InsightsIcon />, trayOrder: 0 },
-  { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0 },
+  { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0, legacyAliases: ["fa-solid fa-square-poll-vertical"] },
   { id: "chevron-up", name: "Chevron Up", icon: <ChevronUpIcon />, trayOrder: 0 },
   { id: "chevron-down", name: "Chevron Down", icon: <ChevronDownIcon />, trayOrder: 0 },
   { id: "chevron-left", name: "Chevron Left", icon: <ChevronLeftIcon />, trayOrder: 0 },
@@ -865,46 +884,3 @@ export function getIconElement(iconId: string | undefined | null): React.ReactEl
 
   return foundIcon.icon;
 }
-
-export const fluentUiIcons = {
-  Delete: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H576q-40 0-75-15t-61-41-41-61-15-75V384H256V256h512V128q0-27 10-50t27-40 41-28 50-10h256q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h512V128H768v128zm768 128H512v1472q0 26 19 45t45 19h896q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z" />
-    </svg>
-  ),
-  Move: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M2048 1024l-320 320-90-90 165-166h-523v523l166-165 90 90-320 320-320-320 90-90 166 165v-523H640v523l165-165 90 90-320 320-320-320 90-90 166 165v-523H0V896h511L346 731l90-90 320 320-320 320-90-90 165-166H0V896h511l-165-165 90-90 320 320-320 320-90-90 166-165v523H640V1024h523l-165-165 90-90 320 320z" />
-    </svg>
-  ),
-  RowsGroup: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M128 128h1792v1792H128V128zm1664 1664V640H256v1152h1536zM256 512h1536V256H256v256zm128 384h1280v128H384V896zm0 256h1280v128H384v-128zm0 256h1280v128H384v-128z" />
-    </svg>
-  ),
-  Remove: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1115 1024l690 691-90 90-691-690-691 690-90-90 690-691-690-691 90-90 691 690 691-690 90 90-690 691z" />
-    </svg>
-  ),
-  MoreVertical: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1024 640q-53 0-99-20t-82-55-55-81-20-100q0-53 20-99t55-82 81-55 100-20q53 0 99 20t82 55 55 81 20 100q0 53-20 99t-55 82-81 55-100 20zm0 512q-53 0-99-20t-82-55-55-81-20-100q0-53 20-99t55-82 81-55 100-20q53 0 99 20t82 55 55 81 20 100q0 53-20 99t-55 82-81 55-100 20zm0 512q-53 0-99-20t-82-55-55-81-20-100q0-53 20-99t55-82 81-55 100-20q53 0 99 20t82 55 55 81 20 100q0 53-20 99t-55 82-81 55-100 20z" />
-    </svg>
-  ),
-  Up: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1024 0l1024 1024-146 146-878-878-878 878L0 1024 1024 0z" />
-    </svg>
-  ),
-  Down: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M0 1024l1024 1024 1024-1024-146-146-878 878-878-878L0 1024z" />
-    </svg>
-  ),
-  Undo: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1536 640q133 0 249 50t204 137 137 203 50 250q0 133-50 249t-137 204-203 137-250 50h-384v-128h384q106 0 199-40t163-109 110-163 40-200q0-106-40-199t-109-163-163-110-200-40H452l402 403-90 90L128 626 764 0l90 90-403 403h1085v147z" />
-    </svg>
-  ),
-};
