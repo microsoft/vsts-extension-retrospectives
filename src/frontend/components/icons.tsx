@@ -523,6 +523,14 @@ export const DangerIcon = () => {
   );
 };
 
+export const LandscapeIcon = () => {
+  return (
+    <svg className="icon-landscape" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="m14 6-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22z" />
+    </svg>
+  );
+};
+
 export const ArrowCircleDownIcon = () => {
   return (
     <svg className="icon-arrow-circle-down" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -768,8 +776,8 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
   { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
-  { id: "danger", name: "Danger", icon: <DangerIcon />, trayOrder: 0, legacyAliases: ["fas fa-skull-crossbones"] },
   { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fan", "fas fa-fan"] },
+  { id: "landscape", name: "Landscape", icon: <LandscapeIcon />, trayOrder: 0, legacyAliases: ["fas fa-skull-crossbones"] },
   { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-dot"] },
   { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
   { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 0, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },

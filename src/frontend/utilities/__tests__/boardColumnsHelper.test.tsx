@@ -320,7 +320,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[3]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "danger",
+          iconClass: "landscape",
           id: "uuid-4",
           title: "Rocks",
           notes: "",
