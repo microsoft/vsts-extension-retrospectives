@@ -37,6 +37,7 @@ describe("icons", () => {
         ["assessment", ".icon-assessment"],
         ["pause-circle", ".icon-pause-circle"],
         ["person", ".icon-person"],
+        ["square-rounded", ".icon-square-rounded"],
         ["insights", ".icon-insights"],
       ] as const;
 

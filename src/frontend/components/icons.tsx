@@ -224,6 +224,14 @@ export const AddCircleIcon = () => {
   );
 };
 
+export const SquareRoundedIcon = () => {
+  return (
+    <svg className="icon-square-rounded" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2" />
+    </svg>
+  );
+};
+
 export const ContentCopyIcon = () => {
   return (
     <svg className="icon-content-copy" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -784,6 +792,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "arrow-circle-up", name: "Arrow Circle Up", icon: <ArrowCircleUpIcon />, trayOrder: 0 },
   { id: "person", name: "Person", icon: <PersonIcon />, trayOrder: 0 },
   { id: "people", name: "People", icon: <PeopleIcon />, trayOrder: 0 },
+  { id: "square-rounded", name: "Square Rounded", icon: <SquareRoundedIcon />, trayOrder: 0 },
   { id: "insights", name: "Insights", icon: <InsightsIcon />, trayOrder: 0 },
   { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0, legacyAliases: ["fa-solid fa-square-poll-vertical"] },
   { id: "chevron-up", name: "Chevron Up", icon: <ChevronUpIcon />, trayOrder: 0 },

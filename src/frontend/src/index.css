@@ -1641,6 +1641,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
     & :is(.feedback-column-card-icon-button, .feedback-column-card-accent-color-button) {
       @apply bg-transparent! m-2 border-none text-(--text-primary-color) cursor-pointer;
+
+      & svg {
+        @apply w-6 h-6;
+      }
     }
 
     & .editable-document-card-title {
@@ -1752,6 +1756,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .choose-feedback-column-accent-color-button {
   @apply text-3xl h-12 m-1;
+
+  & svg {
+    @apply w-8 h-8;
+  }
 }
 
 .choose-column-icon-dialog .choose-feedback-column-icon-button {
