@@ -162,7 +162,7 @@ export const CelebrationIcon = () => {
 export const NewReleasesOutlinedIcon = () => {
   return (
     <svg className="icon-new-releases" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M11 15h2v2h-2v-2zm0-8h2v6h-2V7zm11.45 5L20 14.8l.34 3.68-3.61.82-1.89 3.2-3.34-1.77-3.34 1.77-1.89-3.2-3.61-.82L3 14.8.55 12 3 9.2l-.34-3.68 3.61-.82 1.89-3.2 3.34 1.77 3.34-1.77 1.89 3.2 3.61.82L20 9.2 22.45 12zM18 9.55l.17-1.82-1.79-.4-.95-1.62-1.67.89-1.67-.89-.95 1.62-1.79.4.17 1.82L8.3 11l1.22 1.45-.17 1.82 1.79.4.95 1.62 1.67-.89 1.67.89.95-1.62 1.79-.4-.17-1.82L19.2 11 18 9.55z" />
+      <path d="m23 12-2.44-2.78.34-3.68-3.61-.82-1.89-3.18L12 3 8.6 1.54 6.71 4.72l-3.61.81.34 3.68L1 12l2.44 2.78-.34 3.69 3.61.82 1.89 3.18L12 21l3.4 1.46 1.89-3.18 3.61-.82-.34-3.68zm-4.51 2.11.26 2.79-2.74.62-1.43 2.41L12 18.82l-2.58 1.11-1.43-2.41-2.74-.62.26-2.8L3.66 12l1.85-2.12-.26-2.78 2.74-.61 1.43-2.41L12 5.18l2.58-1.11 1.43 2.41 2.74.62-.26 2.79L20.34 12zM11 15h2v2h-2zm0-8h2v6h-2z" />
     </svg>
   );
 };
@@ -769,10 +769,12 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "coffee", name: "Coffee", icon: <CoffeeIcon />, trayOrder: 24 },
   { id: "search", name: "Search", icon: <SearchIcon />, trayOrder: 25, legacyAliases: ["search", "fa-solid fa-magnifying-glass"] },
   { id: "electric-bolt", name: "Electric Bolt", icon: <ElectricBoltIcon />, trayOrder: 26, legacyAliases: ["electric-bolt", "fa-solid fa-bolt"] },
-  { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 27, legacyAliases: ["fas fa-lock"] },
+  { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 27, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },
   { id: "balance", name: "Balance", icon: <BalanceIcon />, trayOrder: 28, legacyAliases: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"] },
-  { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 29 },
-  { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 30 },
+  { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 29 },
+  { id: "gears", name: "Gears", icon: <GearsIcon />, trayOrder: 30, legacyAliases: ["gear-with-stars", "gears", "fa-solid fa-gears"] },
+  { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 0 },
+  { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 0, legacyAliases: ["fas fa-lock"] },
   { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
   { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
@@ -781,8 +783,6 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "landscape", name: "Landscape", icon: <LandscapeIcon />, trayOrder: 0, legacyAliases: ["fas fa-skull-crossbones"] },
   { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-dot"] },
   { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
-  { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 0, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },
-  { id: "gears", name: "Gears", icon: <GearsIcon />, trayOrder: 0, legacyAliases: ["gear-with-stars", "gears", "fa-solid fa-gears"] },
   { id: "list-all", name: "List All", icon: <ListAllIcon />, trayOrder: 0 },
   { id: "view-column", name: "View Column", icon: <ViewColumnIcon />, trayOrder: 0 },
   { id: "add", name: "Add", icon: <AddIcon />, trayOrder: 0 },
