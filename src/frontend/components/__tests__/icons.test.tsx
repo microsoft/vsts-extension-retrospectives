@@ -35,6 +35,7 @@ describe("icons", () => {
     it("returns specific non-tray icon components by ID", () => {
       const iconExpectations = [
         ["assessment", ".icon-assessment"],
+        ["new-releases", ".icon-new-releases"],
         ["pause-circle", ".icon-pause-circle"],
         ["person", ".icon-person"],
         ["square-rounded", ".icon-square-rounded"],

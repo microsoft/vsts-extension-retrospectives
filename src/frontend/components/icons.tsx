@@ -154,11 +154,15 @@ export const HelpIcon = () => {
 export const CelebrationIcon = () => {
   return (
     <svg className="icon-celebration" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <polygon points="2,22 16,17 7,8" />
-      <path d="M14.53,12.53l5.59-5.59c0.49-0.49,1.28-0.49,1.77,0l0.59,0.59l1.06-1.06l-0.59-0.59c-1.07-1.07-2.82-1.07-3.89,0 l-5.59,5.59L14.53,12.53z" />
-      <path d="M10.06,6.88L9.47,7.47l1.06,1.06l0.59-0.59c1.07-1.07,1.07-2.82,0-3.89l-0.59-0.59L9.47,4.53l0.59,0.59 C10.54,5.6,10.54,6.4,10.06,6.88z" />
-      <path d="M17.06,11.88l-1.59,1.59l1.06,1.06l1.59-1.59c0.49-0.49,1.28-0.49,1.77,0l1.61,1.61l1.06-1.06l-1.61-1.61 C19.87,10.81,18.13,10.81,17.06,11.88z" />
-      <path d="M15.06,5.88l-3.59,3.59l1.06,1.06l3.59-3.59c1.07-1.07,1.07-2.82,0-3.89l-1.59-1.59l-1.06,1.06l1.59,1.59 C15.54,4.6,15.54,5.4,15.06,5.88z" />
+      <path d="m2 22 14-5-9-9zm10.35-5.82L5.3 18.7l2.52-7.05zm2.18-3.65 5.59-5.59c.49-.49 1.28-.49 1.77 0l.59.59 1.06-1.06-.59-.59c-1.07-1.07-2.82-1.07-3.89 0l-5.59 5.59zm-4.47-5.65-.59.59 1.06 1.06.59-.59c1.07-1.07 1.07-2.82 0-3.89l-.59-.59-1.06 1.07.59.59c.48.48.48 1.28 0 1.76m7 5-1.59 1.59 1.06 1.06 1.59-1.59c.49-.49 1.28-.49 1.77 0l1.61 1.61 1.06-1.06-1.61-1.61c-1.08-1.07-2.82-1.07-3.89 0m-2-6-3.59 3.59 1.06 1.06 3.59-3.59c1.07-1.07 1.07-2.82 0-3.89l-1.59-1.59-1.06 1.06 1.59 1.59c.48.49.48 1.29 0 1.77" />
+    </svg>
+  );
+};
+
+export const NewReleasesOutlinedIcon = () => {
+  return (
+    <svg className="icon-new-releases" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M11 15h2v2h-2v-2zm0-8h2v6h-2V7zm11.45 5L20 14.8l.34 3.68-3.61.82-1.89 3.2-3.34-1.77-3.34 1.77-1.89-3.2-3.61-.82L3 14.8.55 12 3 9.2l-.34-3.68 3.61-.82 1.89-3.2 3.34 1.77 3.34-1.77 1.89 3.2 3.61.82L20 9.2 22.45 12zM18 9.55l.17-1.82-1.79-.4-.95-1.62-1.67.89-1.67-.89-.95 1.62-1.79.4.17 1.82L8.3 11l1.22 1.45-.17 1.82 1.79.4.95 1.62 1.67-.89 1.67.89.95-1.62 1.79-.4-.17-1.82L19.2 11 18 9.55z" />
     </svg>
   );
 };
@@ -166,7 +170,7 @@ export const CelebrationIcon = () => {
 export const KeyboardIcon = () => {
   return (
     <svg className="icon-keyboard" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z" />
+      <path d="M20 7v10H4V7zm0-2H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m-9 3h2v2h-2zm0 3h2v2h-2zM8 8h2v2H8zm0 3h2v2H8zm-3 0h2v2H5zm0-3h2v2H5zm3 6h8v2H8zm6-3h2v2h-2zm0-3h2v2h-2zm3 3h2v2h-2zm0-3h2v2h-2z" />
     </svg>
   );
 };
@@ -185,9 +189,7 @@ export const MenuBookIcon = () => {
 export const VolunteerActivismIcon = () => {
   return (
     <svg className="icon-volunteer-activism" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <rect height="11" width="4" x="1" y="11" />
-      <path d="M16,3.25C16.65,2.49,17.66,2,18.7,2C20.55,2,22,3.45,22,5.3c0,2.27-2.91,4.9-6,7.7c-3.09-2.81-6-5.44-6-7.7 C10,3.45,11.45,2,13.3,2C14.34,2,15.35,2.49,16,3.25z" />
-      <path d="M20,17h-7l-2.09-0.73l0.33-0.94L13,16h2.82c0.65,0,1.18-0.53,1.18-1.18v0c0-0.49-0.31-0.93-0.77-1.11L8.97,11H7v9.02 L14,22l8.01-3v0C22,17.9,21.11,17,20,17z" />
+      <path d="M16 13c3.09-2.81 6-5.44 6-7.7C22 3.45 20.55 2 18.7 2c-1.04 0-2.05.49-2.7 1.25C15.34 2.49 14.34 2 13.3 2 11.45 2 10 3.45 10 5.3c0 2.26 2.91 4.89 6 7.7m-2.7-9c.44 0 .89.21 1.18.55L16 6.34l1.52-1.79c.29-.34.74-.55 1.18-.55.74 0 1.3.56 1.3 1.3 0 1.12-2.04 3.17-4 4.99-1.96-1.82-4-3.88-4-4.99 0-.74.56-1.3 1.3-1.3M19 16h-2c0-1.2-.75-2.28-1.87-2.7L8.97 11H1v11h6v-1.44l7 1.94 8-2.5v-1c0-1.66-1.34-3-3-3M3 20v-7h2v7zm10.97.41L7 18.48V13h1.61l5.82 2.17c.34.13.57.46.57.83 0 0-1.99-.05-2.3-.15l-2.38-.79-.63 1.9 2.38.79c.51.17 1.04.26 1.58.26H19c.39 0 .74.23.9.56z" />
     </svg>
   );
 };
@@ -195,7 +197,7 @@ export const VolunteerActivismIcon = () => {
 export const ContactPhoneIcon = () => {
   return (
     <svg className="icon-contact-phone" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M22 3H2C.9 3 0 3.9 0 5v14c0 1.1.9 2 2 2h20c1.1 0 1.99-.9 1.99-2L24 5c0-1.1-.9-2-2-2zM8 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H2v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1zm3.85-4h1.64L21 16l-1.99 1.99c-1.31-.98-2.28-2.38-2.73-3.99-.18-.64-.28-1.31-.28-2s.1-1.36.28-2c.45-1.62 1.42-3.01 2.73-3.99L21 8l-1.51 2h-1.64c-.22.63-.35 1.3-.35 2s.13 1.37.35 2z" />
+      <path d="M22 3H2C.9 3 0 3.9 0 5v14c0 1.1.9 2 2 2h20c1.1 0 1.99-.9 1.99-2L24 5c0-1.1-.9-2-2-2m0 16H2V5h20zm-2.99-1.01L21 16l-1.51-2h-1.64c-.22-.63-.35-1.3-.35-2s.13-1.37.35-2h1.64L21 8l-1.99-1.99c-1.31.98-2.28 2.37-2.73 3.99-.18.64-.28 1.31-.28 2s.1 1.36.28 2c.45 1.61 1.42 3.01 2.73 3.99M9 12c1.65 0 3-1.35 3-3s-1.35-3-3-3-3 1.35-3 3 1.35 3 3 3m0-4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m6 8.59c0-2.5-3.97-3.58-6-3.58s-6 1.08-6 3.58V18h12zM5.48 16c.74-.5 2.22-1 3.52-1s2.77.49 3.52 1z" />
     </svg>
   );
 };
@@ -622,9 +624,7 @@ export const ElectricBoltIcon = () => {
 export const PsychologicalSafetyIcon = () => {
   return (
     <svg className="icon-psychological-safety" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M19.94,9.06C19.5,5.73,16.57,3,13,3C9.47,3,6.57,5.61,6.08,9l-1.93,3.48C3.74,13.14,4.22,14,5,14h1l0,2c0,1.1,0.9,2,2,2h1 v3h7l0-4.68C18.62,15.07,20.35,12.24,19.94,9.06z M14.89,14.63L14,15.05V19h-3v-3H8v-4H6.7l1.33-2.33C8.21,7.06,10.35,5,13,5 c2.76,0,5,2.24,5,5C18,12.09,16.71,13.88,14.89,14.63z" />
-      <path d="M12.5,12.54c-0.41,0-0.74,0.31-0.74,0.73c0,0.41,0.33,0.74,0.74,0.74c0.42,0,0.73-0.33,0.73-0.74 C13.23,12.85,12.92,12.54,12.5,12.54z" />
-      <path d="M12.5,7c-1.03,0-1.74,0.67-2,1.45l0.96,0.4c0.13-0.39,0.43-0.86,1.05-0.86c0.95,0,1.13,0.89,0.8,1.36 c-0.32,0.45-0.86,0.75-1.14,1.26c-0.23,0.4-0.18,0.87-0.18,1.16h1.06c0-0.55,0.04-0.65,0.13-0.82c0.23-0.42,0.65-0.62,1.09-1.27 c0.4-0.59,0.25-1.38-0.01-1.8C13.95,7.39,13.36,7,12.5,7z" />
+      <path d="M12.22 19.85c-.18.18-.5.21-.71 0-.18-.18-.21-.5 0-.71l3.39-3.39-1.41-1.41-3.39 3.39c-.19.2-.51.19-.71 0-.21-.21-.18-.53 0-.71l3.39-3.39-1.41-1.41-3.39 3.39c-.18.18-.5.21-.71 0-.19-.19-.19-.51 0-.71l3.39-3.39-1.42-1.41-3.39 3.39c-.18.18-.5.21-.71 0-.19-.2-.19-.51 0-.71L9.52 8.4l1.87 1.86c.95.95 2.59.94 3.54 0 .98-.98.98-2.56 0-3.54l-1.86-1.86.28-.28c.78-.78 2.05-.78 2.83 0l4.24 4.24c.78.78.78 2.05 0 2.83zm9.61-6.78c1.56-1.56 1.56-4.09 0-5.66l-4.24-4.24c-1.56-1.56-4.09-1.56-5.66 0l-.28.28-.28-.28c-1.56-1.56-4.09-1.56-5.66 0L2.17 6.71C.75 8.13.62 10.34 1.77 11.9l1.45-1.45c-.39-.75-.26-1.7.37-2.33l3.54-3.54c.78-.78 2.05-.78 2.83 0l3.56 3.56c.18.18.21.5 0 .71s-.53.18-.71 0L9.52 5.57l-5.8 5.79c-.98.97-.98 2.56 0 3.54.39.39.89.63 1.42.7.07.52.3 1.02.7 1.42s.9.63 1.42.7c.07.52.3 1.02.7 1.42s.9.63 1.42.7c.07.54.31 1.03.7 1.42.47.47 1.1.73 1.77.73s1.3-.26 1.77-.73z" />
     </svg>
   );
 };
@@ -645,10 +645,10 @@ export const GearIcon = () => {
   );
 };
 
-export const GearWithStarsIcon = () => {
+export const GearsIcon = () => {
   return (
-    <svg className="icon-gear-with-stars" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M10 13c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m0-2c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3m8.5-2 1.09-2.41L22 5.5l-2.41-1.09L18.5 2l-1.09 2.41L15 5.5l2.41 1.09zm2.78 3.72L20.5 11l-.78 1.72-1.72.78 1.72.78.78 1.72.78-1.72L23 13.5zM16.25 14c0-.12 0-.25-.01-.37l1.94-1.47-2.5-4.33-2.24.94c-.2-.13-.42-.26-.64-.37L12.5 6h-5l-.3 2.41c-.22.11-.43.24-.64.37l-2.24-.95-2.5 4.33 1.94 1.47c-.01.12-.01.25-.01.37s0 .25.01.37l-1.94 1.47 2.5 4.33 2.24-.94c.2.13.42.26.64.37l.3 2.4h5l.3-2.41c.22-.11.43-.23.64-.37l2.24.94 2.5-4.33-1.94-1.47c.01-.11.01-.24.01-.36m-1.42 3.64-1.73-.73c-.56.6-1.3 1.04-2.13 1.23L10.73 20H9.27l-.23-1.86c-.83-.19-1.57-.63-2.13-1.23l-1.73.73-.73-1.27 1.49-1.13q-.18-.585-.18-1.23t.18-1.23l-1.49-1.13.73-1.27 1.73.73c.56-.6 1.3-1.04 2.13-1.23L9.27 8h1.47l.23 1.86c.83.19 1.57.63 2.13 1.23l1.73-.73.73 1.27-1.49 1.13q.18.585.18 1.23t-.18 1.23l1.49 1.13z" />
+    <svg className="icon-gears" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="m14.17 13.71 1.4-2.42c.09-.15.05-.34-.08-.45l-1.48-1.16c.03-.22.05-.45.05-.68s-.02-.46-.05-.69l1.48-1.16c.13-.11.17-.3.08-.45l-1.4-2.42c-.09-.15-.27-.21-.43-.15l-1.74.7c-.36-.28-.75-.51-1.18-.69l-.26-1.85c-.03-.16-.18-.29-.35-.29h-2.8c-.17 0-.32.13-.35.3L6.8 4.15c-.42.18-.82.41-1.18.69l-1.74-.7c-.16-.06-.34 0-.43.15l-1.4 2.42c-.09.15-.05.34.08.45l1.48 1.16c-.03.22-.05.45-.05.68s.02.46.05.69l-1.48 1.16c-.13.11-.17.3-.08.45l1.4 2.42c.09.15.27.21.43.15l1.74-.7c.36.28.75.51 1.18.69l.26 1.85c.03.16.18.29.35.29h2.8c.17 0 .32-.13.35-.3l.26-1.85c.42-.18.82-.41 1.18-.69l1.74.7c.16.06.34 0 .43-.15M8.81 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2m13.11 7.67-.96-.74c.02-.14.04-.29.04-.44s-.01-.3-.04-.44l.95-.74c.08-.07.11-.19.05-.29l-.9-1.55c-.05-.1-.17-.13-.28-.1l-1.11.45c-.23-.18-.48-.33-.76-.44l-.17-1.18c-.01-.12-.11-.2-.21-.2h-1.79c-.11 0-.21.08-.22.19l-.17 1.18c-.27.12-.53.26-.76.44l-1.11-.45c-.1-.04-.22 0-.28.1l-.9 1.55c-.05.1-.04.22.05.29l.95.74c-.02.14-.03.29-.03.44s.01.3.03.44l-.95.74c-.08.07-.11.19-.05.29l.9 1.55c.05.1.17.13.28.1l1.11-.45c.23.18.48.33.76.44l.17 1.18c.02.11.11.19.22.19h1.79c.11 0 .21-.08.22-.19l.17-1.18c.27-.12.53-.26.75-.44l1.12.45c.1.04.22 0 .28-.1l.9-1.55c.06-.09.03-.21-.05-.28m-4.29.16c-.74 0-1.35-.6-1.35-1.35s.6-1.35 1.35-1.35 1.35.6 1.35 1.35-.61 1.35-1.35 1.35" />
     </svg>
   );
 };
@@ -753,20 +753,20 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "thumb-down", name: "Thumb Down", icon: <ThumbDownIcon />, trayOrder: 8, legacyAliases: ["far fa-thumbs-down"] },
   { id: "forum", name: "Forum", icon: <ForumIcon />, trayOrder: 9 },
   { id: "star", name: "Star", icon: <StarIcon />, trayOrder: 10, legacyAliases: ["far fa-star", "fas fa-star"] },
-  { id: "light-bulb", name: "Light Bulb", icon: <LightBulbIcon />, trayOrder: 11, legacyAliases: ["far fa-lightbulb"] },
-  { id: "coffee", name: "Coffee", icon: <CoffeeIcon />, trayOrder: 12 },
-  { id: "support", name: "Support", icon: <SupportIcon />, trayOrder: 13, legacyAliases: ["fas fa-life-ring"] },
+  { id: "celebration", name: "Celebration", icon: <CelebrationIcon />, trayOrder: 11 },
+  { id: "birthday-cake", name: "Birthday Cake", icon: <BirthdayCakeIcon />, trayOrder: 12, legacyAliases: ["fas fa-birthday-cake"] },
+  { id: "light-bulb", name: "Light Bulb", icon: <LightBulbIcon />, trayOrder: 13, legacyAliases: ["far fa-lightbulb"] },
   { id: "play-circle", name: "Play", icon: <PlayCircleIcon />, trayOrder: 14, legacyAliases: ["fa-play-circle", "far fa-circle-play"] },
   { id: "stop-circle", name: "Stop", icon: <StopCircleIcon />, trayOrder: 15, legacyAliases: ["fa-stop-circle", "far fa-circle-stop"] },
   { id: "bullseye", name: "Bullseye", icon: <BullseyeIcon />, trayOrder: 16, legacyAliases: ["fa-bullseye"] },
   { id: "explore", name: "Explore", icon: <ExploreIcon />, trayOrder: 17, legacyAliases: ["far fa-compass"] },
   { id: "eye", name: "Eye", icon: <EyeIcon />, trayOrder: 18, legacyAliases: ["far fa-eye"] },
-  { id: "menu-book", name: "Book", icon: <MenuBookIcon />, trayOrder: 19, legacyAliases: ["fas fa-book"] },
-  { id: "rocket-launch", name: "Rocket", icon: <RocketLaunchIcon />, trayOrder: 20, legacyAliases: ["fas fa-rocket"] },
-  { id: "tools", name: "Tools", icon: <ToolsIcon />, trayOrder: 21, legacyAliases: ["construction", "fas fa-construction"] },
-  { id: "laptop", name: "Laptop", icon: <LaptopIcon />, trayOrder: 22, legacyAliases: ["fas fa-chalkboard"] },
+  { id: "laptop", name: "Laptop", icon: <LaptopIcon />, trayOrder: 19, legacyAliases: ["fas fa-chalkboard"] },
+  { id: "menu-book", name: "Book", icon: <MenuBookIcon />, trayOrder: 20, legacyAliases: ["fas fa-book"] },
+  { id: "rocket-launch", name: "Rocket", icon: <RocketLaunchIcon />, trayOrder: 21, legacyAliases: ["fas fa-rocket"] },
+  { id: "tools", name: "Tools", icon: <ToolsIcon />, trayOrder: 22, legacyAliases: ["construction", "fas fa-construction"] },
   { id: "anchor", name: "Anchor", icon: <AnchorIcon />, trayOrder: 23, legacyAliases: ["fas fa-anchor"] },
-  { id: "birthday-cake", name: "Birthday Cake", icon: <BirthdayCakeIcon />, trayOrder: 24, legacyAliases: ["fas fa-birthday-cake"] },
+  { id: "coffee", name: "Coffee", icon: <CoffeeIcon />, trayOrder: 24 },
   { id: "search", name: "Search", icon: <SearchIcon />, trayOrder: 25, legacyAliases: ["search", "fa-solid fa-magnifying-glass"] },
   { id: "electric-bolt", name: "Electric Bolt", icon: <ElectricBoltIcon />, trayOrder: 26, legacyAliases: ["electric-bolt", "fa-solid fa-bolt"] },
   { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 27, legacyAliases: ["fas fa-lock"] },
@@ -777,11 +777,12 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
   { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
   { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fan", "fas fa-fan"] },
+  { id: "danger", name: "Danger", icon: <DangerIcon />, trayOrder: 0 },
   { id: "landscape", name: "Landscape", icon: <LandscapeIcon />, trayOrder: 0, legacyAliases: ["fas fa-skull-crossbones"] },
   { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-dot"] },
   { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
   { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 0, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },
-  { id: "gear-with-stars", name: "Gear With Stars", icon: <GearWithStarsIcon />, trayOrder: 0, legacyAliases: ["gears", "gear-with-stars", "fa-solid fa-gears"] },
+  { id: "gears", name: "Gears", icon: <GearsIcon />, trayOrder: 0, legacyAliases: ["gear-with-stars", "gears", "fa-solid fa-gears"] },
   { id: "list-all", name: "List All", icon: <ListAllIcon />, trayOrder: 0 },
   { id: "view-column", name: "View Column", icon: <ViewColumnIcon />, trayOrder: 0 },
   { id: "add", name: "Add", icon: <AddIcon />, trayOrder: 0 },
@@ -792,6 +793,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "hourglass-top", name: "Hourglass Top", icon: <HourglassTopIcon />, trayOrder: 0 },
   { id: "assignment-turned-in", name: "Assignment Turned In", icon: <AssignmentTurnedInIcon />, trayOrder: 0 },
   { id: "close", name: "Close", icon: <CloseIcon />, trayOrder: 0 },
+  { id: "new-releases", name: "New Releases", icon: <NewReleasesOutlinedIcon />, trayOrder: 0 },
   { id: "celebration", name: "Celebration", icon: <CelebrationIcon />, trayOrder: 0 },
   { id: "cloud", name: "Cloud", icon: <CloudIcon />, trayOrder: 0 },
   { id: "cloud-upload", name: "Cloud Upload", icon: <CloudUploadIcon />, trayOrder: 0 },
@@ -808,6 +810,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "chevron-left", name: "Chevron Left", icon: <ChevronLeftIcon />, trayOrder: 0 },
   { id: "chevron-right", name: "Chevron Right", icon: <ChevronRightIcon />, trayOrder: 0 },
   { id: "privacy-tip", name: "Privacy Tip", icon: <PrivacyTipIcon />, trayOrder: 0 },
+  { id: "support", name: "Support", icon: <SupportIcon />, trayOrder: 0, legacyAliases: ["fas fa-life-ring"] },
   { id: "keyboard", name: "Keyboard", icon: <KeyboardIcon />, trayOrder: 0 },
   { id: "volunteer-activism", name: "Volunteer Activism", icon: <VolunteerActivismIcon />, trayOrder: 0 },
   { id: "contact-phone", name: "Contact Phone", icon: <ContactPhoneIcon />, trayOrder: 0 },
@@ -837,7 +840,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "hourglass-top", name: "Hourglass Top", icon: <HourglassTopIcon />, trayOrder: 0 },
   { id: "assignment-turned-in", name: "Assignment Turned In", icon: <AssignmentTurnedInIcon />, trayOrder: 0 },
   { id: "close", name: "Close", icon: <CloseIcon />, trayOrder: 0 },
-  { id: "celebration", name: "Celebration", icon: <CelebrationIcon />, trayOrder: 0 },
+  { id: "new-releases", name: "New Releases", icon: <NewReleasesOutlinedIcon />, trayOrder: 0 },
   { id: "cloud", name: "Cloud", icon: <CloudIcon />, trayOrder: 0 },
   { id: "cloud-upload", name: "Cloud Upload", icon: <CloudUploadIcon />, trayOrder: 0 },
   { id: "cloud-download", name: "Cloud Download", icon: <CloudDownloadIcon />, trayOrder: 0 },

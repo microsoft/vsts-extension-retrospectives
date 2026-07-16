@@ -39,7 +39,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[2]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "adjust",
+          iconClass: "check-circle",
           id: "uuid-3",
           title: "Continue",
           notes: "",
@@ -248,7 +248,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[3]).toEqual({
           accentColor: "#cc293d",
-          iconClass: "exclamation",
+          iconClass: "danger",
           id: "uuid-4",
           title: "Impediments",
           notes: "",
