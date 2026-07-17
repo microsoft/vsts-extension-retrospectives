@@ -104,7 +104,7 @@ const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   return resetFocusForStateColumns;
 };
 
-export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, currentUserIsTeamAdmin = false, onVoteCasted, onColumnNotesChange, scrollMode = "column" }) => {
+const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, board, team, workflowPhase, nonHiddenWorkItemTypes, focusModeNonHiddenWorkItemTypes, allWorkItemTypes, isAnonymous, hideFeedbackItems, onFocusModeModelChange, userId, currentUserIsTeamAdmin = false, onVoteCasted, onColumnNotesChange, scrollMode = "column" }) => {
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoard");
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -770,5 +770,8 @@ export const FeedbackBoard: React.FC<FeedbackBoardProps> = ({ displayBoard, boar
     </div>
   );
 };
+
+export const FeedbackBoard = React.memo(FeedbackBoardComponent);
+FeedbackBoard.displayName = "FeedbackBoard";
 
 export default FeedbackBoard;

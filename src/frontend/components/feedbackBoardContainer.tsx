@@ -48,6 +48,7 @@ import { canCurrentUserManageBoard } from "../utilities/boardAccessHelper";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
+const BOARD_TIMER_DURATION_OPTIONS = Array.from({ length: 20 }, (_, index) => index + 1);
 
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
@@ -564,7 +565,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     if (!state.isBoardTimerRunning) {
       setContainerState(previousState => ({ ...previousState, isBoardTimerRunning: true }));
     }
-  }, [state, clearBoardTimerInterval]);
+  }, [state.countdownDurationMinutes, state.boardTimerSeconds, state.isBoardTimerRunning]);
 
   const pauseBoardTimer = React.useCallback(() => {
     const wasRunning = state.isBoardTimerRunning;
@@ -620,7 +621,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     [],
   );
 
-  const renderWorkflowTimerControls = React.useCallback(() => {
+  const workflowTimerControls = React.useMemo(() => {
     if (!state.currentBoard) {
       return null;
     }
@@ -636,7 +637,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         {!state.isBoardTimerRunning && state.boardTimerSeconds === 0 ? (
           <select value={state.countdownDurationMinutes} onChange={handleCountdownDurationChange} className="workflow-stage-timer-select" aria-label="Select countdown duration in minutes">
             <option value={0}>Stopwatch</option>
-            {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+            {BOARD_TIMER_DURATION_OPTIONS.map(num => (
               <option key={num} value={num}>
                 {num} min
               </option>
@@ -653,7 +654,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         </div>
       </div>
     );
-  }, [state, handleBoardTimerReset, handleBoardTimerToggle, handleCountdownDurationChange]);
+  }, [state.currentBoard, state.isBoardTimerRunning, state.boardTimerSeconds, state.countdownDurationMinutes, handleBoardTimerReset, handleBoardTimerToggle, handleCountdownDurationChange]);
 
   const updateUrlWithBoardAndTeamInformation = React.useCallback(async (teamId: string, boardId: string) => {
     try {
@@ -1262,15 +1263,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }));
   };
 
-  const isCurrentUserTeamAdmin = (): boolean => {
-    return state.allMembers?.some(m => m.identity.id === state.currentUserId && m.isTeamAdmin) ?? false;
-  };
+  const currentUserIsTeamAdmin = React.useMemo(() => state.allMembers?.some(member => member.identity.id === state.currentUserId && member.isTeamAdmin) ?? false, [state.allMembers, state.currentUserId]);
 
   const canManageBoard = state.currentBoard
     ? canCurrentUserManageBoard({
         boardOwnerId: state.currentBoard.createdBy?.id,
         currentUserId: state.currentUserId,
-        isTeamAdmin: isCurrentUserTeamAdmin(),
+        isTeamAdmin: currentUserIsTeamAdmin,
       })
     : false;
 
@@ -1395,9 +1394,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   };
 
-  const handleArchiveToggle = (): void => {
+  const handleArchiveToggle = React.useCallback((): void => {
     setContainerState(previousState => ({ ...previousState, hasToggledArchive: true }));
-  };
+  }, []);
 
   // Handle when "Board" tab is clicked
   const handlePivotClick = async (tabName: "Board" | "History"): Promise<void> => {
@@ -1921,6 +1920,26 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     downloadPdfBlob(pdfBlob, fileName);
   };
 
+  const permissionOptions = React.useMemo<FeedbackBoardPermissionOption[]>(
+    () => [
+      ...state.projectTeams.map(team => ({
+        id: team.id,
+        name: team.name,
+        uniqueName: team.projectName,
+        type: "team" as const,
+      })),
+      ...state.allMembers.map(member => ({
+        id: member.identity.id,
+        name: member.identity.displayName,
+        uniqueName: member.identity.uniqueName,
+        thumbnailUrl: member.identity.imageUrl,
+        type: "member" as const,
+        isTeamAdmin: member.isTeamAdmin,
+      })),
+    ],
+    [state.projectTeams, state.allMembers],
+  );
+
   const renderBoardUpdateMetadataFormDialog = (
     dialogRef: React.RefObject<HTMLDialogElement>,
     isNewBoardCreation: boolean,
@@ -1933,28 +1952,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     initialTitleOverride?: string,
     onDialogClose?: () => void,
   ) => {
-    const permissionOptions: FeedbackBoardPermissionOption[] = [];
-
-    for (const team of state.projectTeams) {
-      permissionOptions.push({
-        id: team.id,
-        name: team.name,
-        uniqueName: team.projectName,
-        type: "team",
-      });
-    }
-
-    for (const member of state.allMembers) {
-      permissionOptions.push({
-        id: member.identity.id,
-        name: member.identity.displayName,
-        uniqueName: member.identity.uniqueName,
-        thumbnailUrl: member.identity.imageUrl,
-        type: "member",
-        isTeamAdmin: member.isTeamAdmin,
-      });
-    }
-
     return (
       <dialog className="board-metadata-dialog dialog-width-lg" ref={dialogRef} role="dialog" aria-label={dialogTitle} onClose={onDialogClose}>
         <div className="header">
@@ -1969,14 +1966,20 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   };
 
   const updateCurrentVoteCount = React.useCallback(async () => {
-    const boardItem = await itemDataService.getBoardItem(state.currentTeam.id, state.currentBoard.id);
+    const teamId = state.currentTeam?.id;
+    const boardId = state.currentBoard?.id;
+    if (!teamId || !boardId) {
+      return;
+    }
+
+    const boardItem = await itemDataService.getBoardItem(teamId, boardId);
     if (!boardItem) {
       return;
     }
 
     const voteMetricsState = getVoteMetricsState(boardItem);
     setContainerState(previousState => ({ ...previousState, ...voteMetricsState }));
-  }, [getVoteMetricsState]);
+  }, [state.currentTeam?.id, state.currentBoard?.id, getVoteMetricsState]);
 
   const handleFocusModeModelChange = React.useCallback((focusModeModel: FocusModeModel) => {
     setContainerState(previousState => ({ ...previousState, focusModeModel }));
@@ -1994,32 +1997,37 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardMetadataUpdated, properties: { boardId: updatedBoard.id } });
   };
 
-  const persistColumnNotes = async (columnId: string, notes: string): Promise<void> => {
-    if (!state.currentTeam || !state.currentBoard) {
-      return;
-    }
-
-    const updatedColumns = state.currentBoard.columns.map(column => (column.id === columnId ? { ...column, notes } : column));
-
-    try {
-      const updatedBoard = await BoardDataService.updateBoardMetadata(state.currentTeam.id, state.currentBoard.id, state.currentBoard.maxVotesPerUser, state.currentBoard.title, updatedColumns, state.currentBoard.permissions);
-
-      if (!updatedBoard) {
-        throw new Error("Failed to update board with new column notes.");
+  const persistColumnNotes = React.useCallback(
+    async (columnId: string, notes: string): Promise<void> => {
+      const teamId = state.currentTeam?.id;
+      const board = state.currentBoard;
+      if (!teamId || !board) {
+        return;
       }
 
-      replaceBoard(updatedBoard);
-      reflectBackendService.broadcastUpdatedBoard(state.currentTeam.id, updatedBoard.id);
-    } catch (error) {
-      appInsights.trackException(error, {
-        action: "updateColumnNotes",
-        boardId: state.currentBoard?.id,
-        columnId,
-      });
+      const updatedColumns = board.columns.map(column => (column.id === columnId ? { ...column, notes } : column));
 
-      throw error;
-    }
-  };
+      try {
+        const updatedBoard = await BoardDataService.updateBoardMetadata(teamId, board.id, board.maxVotesPerUser, board.title, updatedColumns, board.permissions);
+
+        if (!updatedBoard) {
+          throw new Error("Failed to update board with new column notes.");
+        }
+
+        replaceBoard(updatedBoard);
+        reflectBackendService.broadcastUpdatedBoard(teamId, updatedBoard.id);
+      } catch (error) {
+        appInsights.trackException(error, {
+          action: "updateColumnNotes",
+          boardId: board.id,
+          columnId,
+        });
+
+        throw error;
+      }
+    },
+    [state.currentTeam?.id, state.currentBoard, replaceBoard],
+  );
 
   const showCarouselDialog = () => {
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemCarouselLaunched });
@@ -2110,6 +2118,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     ),
     [handleIncludeArchivedBoardsInSearchChange, includeArchivedBoardsInSearch],
   );
+
+  const recentTeamAssessmentHistoryData = React.useMemo(() => state.teamAssessmentHistoryData.slice(-13), [state.teamAssessmentHistoryData]);
 
   if (!state.isAppInitialized || !state.isTeamDataLoaded) {
     return (
@@ -2299,7 +2309,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         </div>
         <div className="flex-grow-spacer"></div>
         <div className="header-menu-with-timer">
-          {renderWorkflowTimerControls()}
+          {workflowTimerControls}
           <ExtensionSettingsMenu
             showAllTeams={showAllTeams}
             onShowAllTeamsChange={handleShowAllTeamsChange}
@@ -2308,7 +2318,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               setContainerState(previousState => ({ ...previousState, scrollMode }));
               void BoardDataService.saveSetting(SCROLL_MODE_SETTING_KEY, scrollMode).catch(error => appInsights.trackException(error, { action: "saveScrollModeSetting" }));
             }}
-            currentUserIsTeamAdmin={isCurrentUserTeamAdmin()}
+            currentUserIsTeamAdmin={currentUserIsTeamAdmin}
             allWorkItemTypes={state.availableActionItemWorkItemTypes}
             allowedActionItemWorkItemTypeNames={state.allowedActionItemWorkItemTypeNames}
             onSaveAllowedActionItemWorkItemTypes={saveAllowedActionItemWorkItemTypes}
@@ -2560,7 +2570,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           )}
           {state.currentBoard && state.activeTab === "History" && (
             <div className="flex-1 min-h-0 overflow-auto border-t-4 border-(--nav-header-active-item-background)">
-              <BoardSummaryTable teamId={state.currentTeam.id} currentUserId={state.currentUserId} currentUserIsTeamAdmin={isCurrentUserTeamAdmin()} supportedWorkItemTypes={state.allWorkItemTypes} onArchiveToggle={handleArchiveToggle} />
+              <BoardSummaryTable teamId={state.currentTeam.id} currentUserId={state.currentUserId} currentUserIsTeamAdmin={currentUserIsTeamAdmin} supportedWorkItemTypes={state.allWorkItemTypes} onArchiveToggle={handleArchiveToggle} />
             </div>
           )}
           {!state.currentBoard && (
@@ -2639,7 +2649,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
                     hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
                     userId={state.currentUserId}
-                    currentUserIsTeamAdmin={isCurrentUserTeamAdmin()}
+                    currentUserIsTeamAdmin={currentUserIsTeamAdmin}
                     onVoteCasted={updateCurrentVoteCount}
                     onColumnNotesChange={persistColumnNotes}
                     scrollMode={state.scrollMode}
@@ -2876,7 +2886,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             {getIconElement("close")}
           </button>
         </div>
-        {state.teamAssessmentHistoryData.slice(-13).length === 0 ? (
+        {recentTeamAssessmentHistoryData.length === 0 ? (
           <div className="subText">
             <p>{t("feedback_board_team_assessment_no_history")}</p>
             <p>{t("feedback_board_team_assessment_trends")}</p>
@@ -2885,11 +2895,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           <div className="subText">
             <p className="team-assessment-info-text">
               {t("feedback_board_team_assessment_showing_average_scores", {
-                count: state.teamAssessmentHistoryData.slice(-13).length,
-                suffix: state.teamAssessmentHistoryData.slice(-13).length !== 1 ? "s" : "",
+                count: recentTeamAssessmentHistoryData.length,
+                suffix: recentTeamAssessmentHistoryData.length !== 1 ? "s" : "",
               })}
             </p>
-            <TeamAssessmentHistoryChart historyData={state.teamAssessmentHistoryData.slice(-13)} numberFormatter={numberFormatter} />
+            <TeamAssessmentHistoryChart historyData={recentTeamAssessmentHistoryData} numberFormatter={numberFormatter} />
           </div>
         )}
       </dialog>}
