@@ -88,7 +88,7 @@ export const truncateText = (text: string, maxLength: number): string => {
   return text.substring(0, maxLength) + "...";
 };
 
-export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProps> = ({ historyData, numberFormatter = defaultNumberFormatter, width = 1100, height = 600, padding = { top: 40, right: 230, bottom: 80, left: 80 }, colors = {} }) => {
+const TeamAssessmentHistoryChartComponent: React.FC<TeamAssessmentHistoryChartProps> = ({ historyData, numberFormatter = defaultNumberFormatter, width = 1100, height = 600, padding = { top: 40, right: 230, bottom: 80, left: 80 }, colors = {} }) => {
   const chartColors: IChartColors = { ...defaultChartColors, ...colors };
   if (colors.lines) {
     chartColors.lines = colors.lines;
@@ -210,5 +210,8 @@ export const TeamAssessmentHistoryChart: React.FC<TeamAssessmentHistoryChartProp
     </svg>
   );
 };
+
+export const TeamAssessmentHistoryChart = React.memo(TeamAssessmentHistoryChartComponent);
+TeamAssessmentHistoryChart.displayName = "TeamAssessmentHistoryChart";
 
 export default TeamAssessmentHistoryChart;

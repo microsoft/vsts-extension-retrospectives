@@ -162,10 +162,10 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
   const orderedPermissionOptions = React.useCallback((options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
     const orderedPermissionOptions = options
-      .map(o => {
-        o.hasPermission = teamPermissions.includes(o.id) || memberPermissions.includes(o.id);
-        return o;
-      })
+      .map(option => ({
+        ...option,
+        hasPermission: teamPermissions.includes(option.id) || memberPermissions.includes(option.id),
+      }))
       .sort((a, b) => {
         // Step 1: Ensure the board owner appears first
         const isAOwner = a.id === boardOwnerId;

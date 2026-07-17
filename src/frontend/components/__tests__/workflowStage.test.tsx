@@ -126,19 +126,19 @@ describe("Workflow Stage", () => {
   });
 
   describe("Move everyone", () => {
-    it("renders above the active phase for board managers", async () => {
+    it("renders inside the active phase for board managers", async () => {
       const moveEveryoneCallback = jest.fn();
       const user = userEvent.setup();
       render(<WorkflowStage {...mockedProps} canManageBoard={true} moveEveryoneCallback={moveEveryoneCallback} />);
 
       const button = screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" });
       expect(button).toBeInTheDocument();
-      expect(button.parentElement).toHaveClass("workflow-stage-wrapper");
+      expect(button.parentElement).toHaveClass("workflow-stage-tab");
 
       await user.click(button);
 
       expect(moveEveryoneCallback).toHaveBeenCalledWith(WorkflowPhase.Collect);
-      expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
+      expect(mockedProps.clickEventCallback).toHaveBeenCalledWith(expect.anything(), WorkflowPhase.Collect);
     });
 
     it("handles activation when no move callback is provided", async () => {
@@ -147,14 +147,17 @@ describe("Workflow Stage", () => {
 
       await user.click(screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" }));
 
-      expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
+      expect(mockedProps.clickEventCallback).toHaveBeenCalledWith(expect.anything(), WorkflowPhase.Collect);
     });
 
-    it("localizes the visible text and accessible name", () => {
+    it("localizes the accessible name and tooltip", () => {
       setLocale("es-ES");
       render(<WorkflowStage {...mockedProps} canManageBoard={true} />);
 
-      expect(screen.getByRole("button", { name: "Mover a todos a Sample Workflow Stage Text" })).toHaveTextContent("Mover a todos");
+      const button = screen.getByRole("button", { name: "Mover a todos a Sample Workflow Stage Text" });
+      const tooltip = document.getElementById(button.getAttribute("aria-describedby")!);
+      expect(button).toHaveAttribute("aria-label", "Mover a todos a Sample Workflow Stage Text");
+      expect(tooltip).toHaveTextContent("Mover a todos a Sample Workflow Stage Text");
     });
 
     it("does not render for non-managers or inactive phases", () => {

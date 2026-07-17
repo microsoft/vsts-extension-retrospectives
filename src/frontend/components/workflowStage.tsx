@@ -55,7 +55,7 @@ const WorkflowStage: React.FC<IWorkflowStageProps> = ({ display, value, isActive
     <div className="workflow-stage-wrapper">
       <div className={`workflow-stage-tab${isActive ? " workflow-stage-tab--active" : ""}`} aria-setsize={4} aria-posinset={ariaPosInSet} aria-label={display} aria-selected={isActive} role="tab" onClick={handleClick} onKeyDown={combinedKeyDown} onMouseMove={trackActivity} onTouchStart={trackActivity} tabIndex={0}>
         <p className="stage-text">{display}</p>
-        {canManageBoard && isActive && (
+        {canManageBoard && isActive ? (
           <>
             <button type="button" className="workflow-stage-move-everyone" aria-label={moveEveryoneLabel} aria-describedby={moveEveryoneTooltipId} aria-busy={isMoveEveryonePending} disabled={isMoveEveryonePending || !isLiveSyncAvailable} onClick={handleMoveEveryone} interestFor={moveEveryoneTooltipId}>
               {getIconElement("people-forward")}
@@ -64,8 +64,7 @@ const WorkflowStage: React.FC<IWorkflowStageProps> = ({ display, value, isActive
               {moveEveryoneTooltip}
             </div>
           </>
-        )}
-        {(!canManageBoard || !isActive) && (
+        ) : (
           <button type="button" style={{ opacity: 0 }} aria-hidden="true" tabIndex={-1} disabled>
             {getIconElement("people-forward")}
           </button>

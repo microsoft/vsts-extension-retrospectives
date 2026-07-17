@@ -1934,7 +1934,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .workflow-stage-move-everyone {
-    @apply items-center px-1 border border-(--nav-header-active-item-background);
+    @apply items-center px-1 border border-(--nav-header-active-item-background) text-(--text-primary-color);
 
     &:focus-visible {
       @apply outline-2 outline-primary outline-offset-2;
