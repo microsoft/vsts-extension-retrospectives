@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { mocked } from "jest-mock";
 import WorkflowStage from "../../components/workflowStage";
 import { WorkflowPhase } from "../../interfaces/workItem";
+import { setLocale } from "../../utilities/localization";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
@@ -30,6 +31,10 @@ const mockedProps = mocked({
 describe("Workflow Stage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    setLocale("en-US");
   });
 
   it("renders as active when isActive is true", () => {
@@ -118,6 +123,77 @@ describe("Workflow Stage", () => {
 
     // Should return early without calling callback
     expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
+  });
+
+  describe("Move everyone", () => {
+    it("renders above the active phase for board managers", async () => {
+      const moveEveryoneCallback = jest.fn();
+      const user = userEvent.setup();
+      render(<WorkflowStage {...mockedProps} canManageBoard={true} moveEveryoneCallback={moveEveryoneCallback} />);
+
+      const button = screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" });
+      expect(button).toBeInTheDocument();
+      expect(button.parentElement).toHaveClass("workflow-stage-wrapper");
+
+      await user.click(button);
+
+      expect(moveEveryoneCallback).toHaveBeenCalledWith(WorkflowPhase.Collect);
+      expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
+    });
+
+    it("handles activation when no move callback is provided", async () => {
+      const user = userEvent.setup();
+      render(<WorkflowStage {...mockedProps} canManageBoard={true} />);
+
+      await user.click(screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" }));
+
+      expect(mockedProps.clickEventCallback).not.toHaveBeenCalled();
+    });
+
+    it("localizes the visible text and accessible name", () => {
+      setLocale("es-ES");
+      render(<WorkflowStage {...mockedProps} canManageBoard={true} />);
+
+      expect(screen.getByRole("button", { name: "Mover a todos a Sample Workflow Stage Text" })).toHaveTextContent("Mover a todos");
+    });
+
+    it("does not render for non-managers or inactive phases", () => {
+      const { rerender } = render(<WorkflowStage {...mockedProps} canManageBoard={false} />);
+      expect(screen.queryByRole("button", { name: /Move everyone/ })).not.toBeInTheDocument();
+
+      rerender(<WorkflowStage {...mockedProps} canManageBoard={true} isActive={false} />);
+      expect(screen.queryByRole("button", { name: /Move everyone/ })).not.toBeInTheDocument();
+    });
+
+    it("renders the invisible placeholder only when the move button is absent", () => {
+      const { container, rerender } = render(<WorkflowStage {...mockedProps} canManageBoard={true} />);
+
+      expect(screen.getByRole("button", { name: /Move everyone/ })).toBeInTheDocument();
+      expect(container.querySelector('button[aria-hidden="true"]')).not.toBeInTheDocument();
+
+      rerender(<WorkflowStage {...mockedProps} canManageBoard={false} />);
+
+      expect(screen.queryByRole("button", { name: /Move everyone/ })).not.toBeInTheDocument();
+      expect(container.querySelector('button[aria-hidden="true"]')).toHaveStyle({ opacity: "0" });
+    });
+
+    it("disables the button while a move is pending", () => {
+      render(<WorkflowStage {...mockedProps} canManageBoard={true} isMoveEveryonePending={true} />);
+
+      const button = screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" });
+      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute("aria-busy", "true");
+    });
+
+    it("disables the button and explains when live sync is unavailable", () => {
+      render(<WorkflowStage {...mockedProps} canManageBoard={true} isLiveSyncAvailable={false} />);
+
+      const button = screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" });
+      const tooltip = document.getElementById(button.getAttribute("aria-describedby")!);
+      expect(button).toBeDisabled();
+      expect(tooltip).toHaveTextContent("Live sync is unavailable.");
+      expect(tooltip).toHaveAttribute("popover", "hint");
+    });
   });
 
   describe("Accessibility - Issue #1319", () => {

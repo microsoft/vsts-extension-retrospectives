@@ -44,6 +44,7 @@ import { formatBoardTimer } from "../utilities/useBoardTimer";
 import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
 import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
+import { canCurrentUserManageBoard } from "../utilities/boardAccessHelper";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
@@ -238,6 +239,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const [isSearchingAllBoardFeedback, setIsSearchingAllBoardFeedback] = React.useState(false);
   const [includeArchivedBoardsInSearch, setIncludeArchivedBoardsInSearch] = React.useState(false);
   const [showAllTeams, setShowAllTeams] = React.useState(false);
+  const [isMovingEveryone, setIsMovingEveryone] = React.useState(false);
 
   const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
   const connectionWatchdogIntervalIdRef = React.useRef<number | undefined>(undefined);
@@ -338,6 +340,18 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           detailsElement.removeAttribute("open");
         }
       }
+    }
+  }, []);
+
+  const handleBoardActionsMenuKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    const detailsElement = event.currentTarget.closest("details");
+    if (detailsElement) {
+      detailsElement.open = !detailsElement.open;
     }
   }, []);
 
@@ -1252,6 +1266,14 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     return state.allMembers?.some(m => m.identity.id === state.currentUserId && m.isTeamAdmin) ?? false;
   };
 
+  const canManageBoard = state.currentBoard
+    ? canCurrentUserManageBoard({
+        boardOwnerId: state.currentBoard.createdBy?.id,
+        currentUserId: state.currentUserId,
+        isTeamAdmin: isCurrentUserTeamAdmin(),
+      })
+    : false;
+
   /**
    * @description Load the last team and board that this user visited, if such records exist.
    * @returns An object to update the state with recently visited or default team and board data.
@@ -1617,6 +1639,32 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     });
   };
 
+  const moveEveryoneToSelectedPhase = async (newPhase: WorkflowPhase): Promise<void> => {
+    if (!state.currentBoard || !state.currentTeam || !canManageBoard || !state.isBackendServiceConnected || isMovingEveryone) {
+      return;
+    }
+
+    const boardId = state.currentBoard.id;
+    setIsMovingEveryone(true);
+
+    try {
+      const updatedBoard = await BoardDataService.updateActivePhase(state.currentTeam.id, boardId, newPhase);
+      if (!updatedBoard) {
+        throw new Error(`Could not update the active phase for board ${boardId}.`);
+      }
+
+      replaceBoard(updatedBoard);
+      reflectBackendService.broadcastUpdatedBoard(state.currentTeam.id, updatedBoard.id);
+      toast(t("workflow_move_everyone_to_phase_success", { phase: newPhase }), { intent: "success" });
+      appInsights.trackEvent({ name: TelemetryEvents.WorkflowPhaseBroadcast, properties: { boardId, newWorkflowPhase: newPhase } });
+    } catch (error) {
+      appInsights.trackException(error, { action: "moveEveryoneToSelectedPhase", boardId, newWorkflowPhase: newPhase });
+      toast(t("workflow_move_everyone_to_phase_error", { phase: newPhase }), { intent: "error" });
+    } finally {
+      setIsMovingEveryone(false);
+    }
+  };
+
   const createBoard = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => {
     const createdBoard = await BoardDataService.createBoardForTeam(
       state.currentTeam.id,
@@ -1929,6 +1977,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     const voteMetricsState = getVoteMetricsState(boardItem);
     setContainerState(previousState => ({ ...previousState, ...voteMetricsState }));
   }, [getVoteMetricsState]);
+
+  const handleFocusModeModelChange = React.useCallback((focusModeModel: FocusModeModel) => {
+    setContainerState(previousState => ({ ...previousState, focusModeModel }));
+  }, []);
 
   const updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
     if (!updatedBoard) {
@@ -2266,14 +2318,14 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       <div className="flex items-center justify-start shrink-0">
         <div className="w-full">
           {state.currentBoard && (
-            <div className="flex items-center justify-start mt-2 ml-4 h-10">
-              <div className="header-tabs">
-                <div className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} onClick={() => handlePivotClick("Board")}>
+            <div className="flex items-center justify-start mt-2 ml-4 min-h-10">
+              <div className="header-tabs" role="tablist" aria-label="Retrospective views">
+                <button className={`pivot-tab board ${state.activeTab === "Board" ? "active" : ""}`} type="button" role="tab" aria-selected={state.activeTab === "Board"} onClick={() => handlePivotClick("Board")}>
                   Board
-                </div>
-                <div className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} onClick={() => handlePivotClick("History")}>
+                </button>
+                <button className={`pivot-tab history ${state.activeTab === "History" ? "active" : ""}`} type="button" role="tab" aria-selected={state.activeTab === "History"} onClick={() => handlePivotClick("History")}>
                   History
-                </div>
+                </button>
               </div>
               {state.activeTab === "Board" && (
                 <>
@@ -2292,7 +2344,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     </div>
                     <div className="board-actions-menu" ref={boardActionsMenuRootRef}>
                       <details className="flex items-center relative">
-                        <summary aria-label="Board Actions Menu" className="contextual-menu-button">
+                        <summary aria-label="Board Actions Menu" className="contextual-menu-button" tabIndex={0} onKeyDown={handleBoardActionsMenuKeyDown}>
                           {getIconElement("more-horizontal")}
                         </summary>
                         <div className="callout-menu left" role="menu" aria-label="Board Actions">
@@ -2441,10 +2493,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                         </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
-                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} />
-                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} />
-                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} />
-                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} />
+                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} isLiveSyncAvailable={state.isBackendServiceConnected} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
+                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} isLiveSyncAvailable={state.isBackendServiceConnected} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
+                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} isLiveSyncAvailable={state.isBackendServiceConnected} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
+                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} isLiveSyncAvailable={state.isBackendServiceConnected} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
                       </div>
                       {state.currentBoard.activePhase === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
@@ -2583,9 +2635,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
                     focusModeNonHiddenWorkItemTypes={state.focusModeNonHiddenWorkItemTypes}
                     allWorkItemTypes={state.allWorkItemTypes}
-                    onFocusModeModelChange={focusModeModel => {
-                      setContainerState(previousState => ({ ...previousState, focusModeModel }));
-                    }}
+                    onFocusModeModelChange={handleFocusModeModelChange}
                     isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
                     hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
                     userId={state.currentUserId}

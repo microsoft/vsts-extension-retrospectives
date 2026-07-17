@@ -3,6 +3,7 @@ import { createDocument, deleteDocument, readDocument, readDocuments, updateDocu
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import { appInsights } from "../../utilities/telemetryClient";
+import { WorkflowPhase } from "../../interfaces/workItem";
 
 jest.mock("../../utilities/telemetryClient", () => ({
   appInsights: {
@@ -242,6 +243,53 @@ describe("BoardDataService - updateBoardMetadata", () => {
     );
 
     expect(result.isPublic).toBe(false);
+  });
+});
+
+describe("BoardDataService - updateActivePhase", () => {
+  const modifiedDate = new Date("2026-01-01T00:00:00Z");
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (readDocument as jest.Mock).mockResolvedValue({ ...mockBoard, activePhase: WorkflowPhase.Collect, modifiedDate });
+    (updateDocument as jest.Mock).mockImplementation(async (_teamId, board) => board);
+  });
+
+  it("updates only the active phase", async () => {
+    const result = await BoardDataService.updateActivePhase("team-123", "board-1", WorkflowPhase.Vote);
+
+    expect(result.activePhase).toBe(WorkflowPhase.Vote);
+    expect(result.modifiedDate).toBe(modifiedDate);
+    expect(updateDocument).toHaveBeenCalledWith(
+      "team-123",
+      expect.objectContaining({
+        id: "board-1",
+        activePhase: WorkflowPhase.Vote,
+        modifiedDate,
+      }),
+    );
+  });
+
+  it("writes the board when the active phase is unchanged", async () => {
+    await BoardDataService.updateActivePhase("team-123", "board-1", WorkflowPhase.Collect);
+
+    expect(updateDocument).toHaveBeenCalledWith("team-123", expect.objectContaining({ activePhase: WorkflowPhase.Collect }));
+  });
+
+  it("returns undefined when the board does not exist", async () => {
+    (readDocument as jest.Mock).mockResolvedValue(undefined);
+
+    const result = await BoardDataService.updateActivePhase("team-123", "board-1", WorkflowPhase.Act);
+
+    expect(result).toBeUndefined();
+    expect(updateDocument).not.toHaveBeenCalled();
+  });
+
+  it("rejects unsupported phases", async () => {
+    await expect(BoardDataService.updateActivePhase("team-123", "board-1", WorkflowPhase.Discuss)).rejects.toThrow("Unsupported workflow phase: Discuss");
+
+    expect(readDocument).not.toHaveBeenCalled();
+    expect(updateDocument).not.toHaveBeenCalled();
   });
 });
 

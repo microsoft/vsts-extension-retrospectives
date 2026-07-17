@@ -1232,7 +1232,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .team-assessment-button {
-  @apply flex items-center gap-1 bg-transparent cursor-pointer text-sm py-2 px-4 hover:bg-transparent focus:outline-none border border-solid border-(--nav-header-active-item-background) rounded-lg;
+  @apply flex items-center gap-1 bg-transparent cursor-pointer text-sm py-2 px-4 hover:bg-transparent border border-solid border-(--nav-header-active-item-background) rounded-lg;
 
   &:hover {
     @apply border border-solid text-primary;
@@ -1874,7 +1874,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply mx-2;
 
   & summary {
-    @apply contents list-none cursor-pointer;
+    @apply inline-flex items-center list-none cursor-pointer;
 
     & svg {
       @apply w-4 h-4;
@@ -1914,8 +1914,12 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply flex items-center gap-3 flex-nowrap;
 }
 
+.workflow-stage-wrapper {
+  @apply relative flex flex-col items-center;
+}
+
 .workflow-stage-tab {
-  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
+  @apply flex gap-3 h-9 px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
 
   &:hover {
     @apply text-primary;
@@ -1923,6 +1927,30 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   &:focus-visible {
     @apply outline-2 outline-primary outline-offset-2;
+  }
+
+  & .stage-text {
+    @apply flex items-center;
+  }
+
+  & .workflow-stage-move-everyone {
+    @apply items-center px-1 border border-(--nav-header-active-item-background);
+
+    &:focus-visible {
+      @apply outline-2 outline-primary outline-offset-2;
+    }
+
+    &:disabled {
+      @apply cursor-default opacity-60;
+    }
+
+    & svg {
+      @apply w-4 h-4;
+    }
+
+    & span {
+      @apply text-xs;
+    }
   }
 }
 

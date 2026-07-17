@@ -119,6 +119,16 @@ export const PeopleIcon = () => {
   );
 };
 
+export const PeopleForwardIcon = () => {
+  return (
+    <svg className="icon-people-forward" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.5 15H7a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="m11.5 15 4.2 2.8-4.2 2.8zm4.3 0 4.2 2.8-4.2 2.8z" />
+    </svg>
+  );
+};
+
 export const CloudIcon = () => {
   return (
     <svg className="icon-cloud" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -833,6 +843,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "person", name: "Person", icon: <PersonIcon />, trayOrder: 0 },
   { id: "people", name: "People", icon: <PeopleIcon />, trayOrder: 0 },
   { id: "square-rounded", name: "Square Rounded", icon: <SquareRoundedIcon />, trayOrder: 0 },
+  { id: "people-forward", name: "People Forward", icon: <PeopleForwardIcon />, trayOrder: 0 },
   { id: "insights", name: "Insights", icon: <InsightsIcon />, trayOrder: 0 },
   { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0, legacyAliases: ["fa-solid fa-square-poll-vertical"] },
   { id: "chevron-up", name: "Chevron Up", icon: <ChevronUpIcon />, trayOrder: 0 },
