@@ -140,6 +140,21 @@ class BoardDataService {
     return await this.updateBoard(teamId, board);
   };
 
+  public updateActivePhase = async (teamId: string, boardId: string, activePhase: WorkflowPhase): Promise<IFeedbackBoardDocument> => {
+    const supportedPhases: WorkflowPhase[] = [WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act];
+    if (!supportedPhases.includes(activePhase)) {
+      throw new Error(`Unsupported workflow phase: ${activePhase}`);
+    }
+
+    const board = await this.getBoardForTeamById(teamId, boardId);
+    if (!board) {
+      return undefined;
+    }
+
+    board.activePhase = activePhase;
+    return await this.updateBoard(teamId, board);
+  };
+
   // Update the board document.
   private updateBoard = async (teamId: string, board: IFeedbackBoardDocument): Promise<IFeedbackBoardDocument> => {
     return await updateDocument<IFeedbackBoardDocument>(teamId, board);

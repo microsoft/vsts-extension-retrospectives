@@ -19,6 +19,7 @@ import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { copyToClipboard } from "../../utilities/clipboardHelper";
 import { setLocale } from "../../utilities/localization";
+import { reflectBackendService } from "../../dal/reflectBackendService";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -92,6 +93,7 @@ jest.mock("../../utilities/telemetryClient", () => ({
     TeamSelectionChanged: "TeamSelectionChanged",
     FeedbackBoardSelectionChanged: "FeedbackBoardSelectionChanged",
     TeamAssessmentHistoryViewed: "TeamAssessmentHistoryViewed",
+    WorkflowPhaseBroadcast: "WorkflowPhaseBroadcast",
   },
   TelemetryExceptions: {},
 }));
@@ -462,6 +464,42 @@ describe("FeedbackBoardContainer integration", () => {
     await user.keyboard(" ");
     expect(boardTab).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("feedback-board")).toBeInTheDocument();
+  });
+
+  it("lets the board owner move everyone to the selected phase", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const ownerBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      createdBy: { ...mockIdentity, id: mockUserIdentity.id },
+    };
+    const groupBoard = { ...ownerBoard, activePhase: WorkflowPhase.Group };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(reflectBackendService.startConnection).mockResolvedValue(true);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([ownerBoard]);
+    mocked(BoardDataService.updateActivePhase).mockResolvedValue(groupBoard);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(ownerBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Group" }));
+
+    const moveEveryoneButton = screen.getByRole("button", { name: "Move everyone to Group" });
+    expect(moveEveryoneButton).toBeEnabled();
+    fireEvent.click(moveEveryoneButton);
+
+    await waitFor(() => expect(BoardDataService.updateActivePhase).toHaveBeenCalledWith("t1", "b1", WorkflowPhase.Group));
+    expect(reflectBackendService.broadcastUpdatedBoard).toHaveBeenCalledWith("t1", "b1");
+    expect(await screen.findByText("Everyone was moved to Group.")).toBeInTheDocument();
   });
 
   it("searches feedback in all boards from the Board Actions menu", async () => {
