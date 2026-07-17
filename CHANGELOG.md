@@ -2,6 +2,16 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.60
+
+* Added a "Move Everyone" control so board managers can move all participants to the selected retrospective phase. From [GitHub PR #1836](https://github.com/microsoft/vsts-extension-retrospectives/pull/1836)
+* Expanded feedback search to include archived boards. From [GitHub PR #1834](https://github.com/microsoft/vsts-extension-retrospectives/pull/1834)
+* Improved keyboard navigation and accessibility for retrospective phase tabs. From [GitHub PR #1837](https://github.com/microsoft/vsts-extension-retrospectives/pull/1837)
+* Fixed a Focus Mode render loop that could cause constant CPU usage. From [GitHub PR #1838](https://github.com/microsoft/vsts-extension-retrospectives/pull/1838)
+* Optimized board, permission, workflow-stage, and Team Assessment History rendering to reduce unnecessary updates. From [GitHub PR #1840](https://github.com/microsoft/vsts-extension-retrospectives/pull/1840)
+* Improved the board settings dialog layout and accessibility, including dialog sizing and tab structure. From [GitHub PR #1833](https://github.com/microsoft/vsts-extension-retrospectives/pull/1833)
+* Refined board settings inputs, selector options, and tooltip positioning for a more consistent interface. From [GitHub PR #1841](https://github.com/microsoft/vsts-extension-retrospectives/pull/1841)
+
 ## v1.92.59
 
 * Addressed legacy icon mapping gaps or misalignment and replaced remaining Font Awesome icons.
