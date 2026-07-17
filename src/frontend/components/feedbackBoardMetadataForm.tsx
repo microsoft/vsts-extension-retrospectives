@@ -265,7 +265,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
     setMaxVotesPerUser(Number((event.target as HTMLInputElement | HTMLTextAreaElement).value));
   }, []);
 
-  const retrospectiveNameInput = React.useMemo(() => <input ref={retrospectiveNameInputRef} aria-label="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} aria-describedby="retrospective-name-label" className="title-input-container" id="retrospective-title-input" value={title} maxLength={100} onChange={handleInputChange} />, [handleInputChange, placeholderText, title]);
+  const retrospectiveNameInput = React.useMemo(() => <input className="title-input-container" id="retrospective-title-input" ref={retrospectiveNameInputRef} aria-label="Please enter new retrospective title" aria-required={true} placeholder={placeholderText} aria-describedby="retrospective-name-label" value={title} maxLength={100} onChange={handleInputChange} />, [handleInputChange, placeholderText, title]);
 
   const maxVotesPerUserInput = React.useMemo(() => <input className="title-input-container" id="max-vote-counter" type="number" min="1" max="12" value={String(maxVotesPerUser)} onChange={handleMaxVotePerUserChange} />, [handleMaxVotePerUserChange, maxVotesPerUser]);
 
@@ -404,7 +404,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Changing template after feedback entered may result in loss of feedback!</div>}
               <div className="board-metadata-form-section-subheader">
                 <label htmlFor="column-template-dropdown">Apply template:</label>
-                <select onChange={handleColumnsTemplateChange} id="column-template-dropdown" className="title-input-container column-template-dropdown">
+                <select onChange={handleColumnsTemplateChange} id="column-template-dropdown" className="selector-option">
                   <option value="">Select a template</option>
                   <option disabled>─────────────</option>
                   <option value="start-stop-continue">Start-Stop-Continue</option>
