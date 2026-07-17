@@ -17,6 +17,16 @@ From [GitHub PR #1835](https://github.com/microsoft/vsts-extension-retrospective
 
 From [GitHub PR #1832](https://github.com/microsoft/vsts-extension-retrospectives/pull/1832)
 
+## v1.92.58
+
+* Improved team and board loading error handling, including default-team lookup and recovery when browser local-network access restrictions blocked team configuration. From [GitHub PR #1817](https://github.com/microsoft/vsts-extension-retrospectives/pull/1817), [GitHub PR #1818](https://github.com/microsoft/vsts-extension-retrospectives/pull/1818), and [GitHub PR #1826](https://github.com/microsoft/vsts-extension-retrospectives/pull/1826)
+* Fixed retrospective board links for Azure DevOps organizations in the Pakistan region. From [GitHub PR #1819](https://github.com/microsoft/vsts-extension-retrospectives/pull/1819)
+* Increased the allowed length of retrospective column titles. From [GitHub PR #1820](https://github.com/microsoft/vsts-extension-retrospectives/pull/1820)
+* Added sort-direction icons to sortable Board Summary table headers. From [GitHub PR #1822](https://github.com/microsoft/vsts-extension-retrospectives/pull/1822)
+* Reorganized board settings and permissions into tabs. From [GitHub PR #1813](https://github.com/microsoft/vsts-extension-retrospectives/pull/1813)
+* Added contextual tooltips for column names and notes, team selection, timer controls, Focus Mode, settings, and Team Assessment History. From [GitHub PR #1825](https://github.com/microsoft/vsts-extension-retrospectives/pull/1825)
+* Improved board permission management with team search and select-all controls. From [GitHub PR #1825](https://github.com/microsoft/vsts-extension-retrospectives/pull/1825)
+
 ## v1.92.57
 
 * Fixed double scrollbar behavior in the Create email summary dialog at higher zoom levels. From [GitHub PR #1816](https://github.com/microsoft/vsts-extension-retrospectives/pull/1816)
