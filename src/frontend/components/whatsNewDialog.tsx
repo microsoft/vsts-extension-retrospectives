@@ -6,9 +6,15 @@ interface IWhatsNewDialogProps {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
 }
 
-const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.59, v1.92.58, and v1.92.57 include:";
+const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.60, v1.92.59, v1.92.58, and v1.92.57 include:";
 
 const WHATS_NEW_ITEMS = [
+  "Added a Move Everyone control so board managers can move all participants to the selected retrospective phase.",
+  "Expanded feedback search to include archived boards.",
+  "Improved keyboard navigation and accessibility for retrospective phase tabs.",
+  "Fixed a Focus Mode render loop that could cause constant CPU usage.",
+  "Optimized board and Team Assessment History rendering to reduce unnecessary updates.",
+  "Improved board settings layout, controls, and tooltip positioning.",
   "Updated legacy icon mappings and curated the icon selection tray.",
   "Improved team and board loading, including default-team lookup and recovery from local-network access restrictions.",
   "Fixed retrospective board links for Azure DevOps organizations in the Pakistan region.",
