@@ -233,11 +233,3 @@ jobs:
           AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
         run: >
           npm run publish:d
-
-      - if: steps.changes.outputs.src == 'true'
-        name: "Upload extension package"
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: retrospectives-extension-dev
-          path: src/frontend/dist/*.vsix
-          if-no-files-found: error
