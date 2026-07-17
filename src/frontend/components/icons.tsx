@@ -393,9 +393,20 @@ export const HappyFaceIcon = () => {
   );
 };
 
-export const SadFaceIcon = () => {
+export const SmileFaceIcon = () => {
   return (
-    <svg className="icon-sad-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-smile-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <circle cx="15.5" cy="9.5" r="1.5" />
+      <circle cx="8.5" cy="9.5" r="1.5" />
+      <path d="M8.55 14.5c.69 1.19 1.97 2 3.45 2s2.76-.81 3.45-2" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" />
+    </svg>
+  );
+};
+
+export const FrownFaceIcon = () => {
+  return (
+    <svg className="icon-frown-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <circle cx="15.5" cy="9.5" r="1.5" />
       <circle cx="8.5" cy="9.5" r="1.5" />
       <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-6c-2.33 0-4.32 1.45-5.12 3.5h1.67c.69-1.19 1.97-2 3.45-2s2.75.81 3.45 2h1.67c-.8-2.05-2.79-3.5-5.12-3.5z" />
@@ -403,10 +414,27 @@ export const SadFaceIcon = () => {
   );
 };
 
+export const SadFaceIcon = () => {
+  return (
+    <svg className="icon-sad-face" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <circle cx="15.5" cy="9.5" r="1.5" />
+      <circle cx="8.5" cy="9.5" r="1.5" />
+      <path d="M16.5 13 c0-.7-.5-1.2-.9-1.7 -.4.5-.9 1-.9 1.7 0 .5.4.9.9.9 s.9-.4.9-.9z" />
+      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-6c-2.33 0-4.32 1.45-5.12 3.5h1.67c.69-1.19 1.97-2 3.45-2s2.75.81 3.45 2h1.67c-.8-2.05-2.79-3.5-5.12-3.5z" />
+    </svg>
+  );
+};
+
 export const AngryFaceIcon = () => {
   return (
-    <svg className="icon-angry-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M12 13.5c-2.33 0-4.31 1.46-5.11 3.5h10.22c-.8-2.04-2.78-3.5-5.11-3.5zM7.82 12l1.06-1.06L9.94 12 11 10.94 9.94 9.88 11 8.82 9.94 7.76 8.88 8.82 7.82 7.76 6.76 8.82l1.06 1.06-1.06 1.06zm4.17-10C6.47 2 2 6.47 2 12s4.47 10 9.99 10S22 17.53 22 12 17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm4.18-12.24l-1.06 1.06-1.06-1.06L13 8.82l1.06 1.06L13 10.94 14.06 12l1.06-1.06L16.18 12l1.06-1.06-1.06-1.06 1.06-1.06z" />
+    <svg className="icon-angry-face" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M12 13.5c-2.33 0-4.31 1.46-5.11 3.5h10.22c-.8-2.04-2.78-3.5-5.11-3.5zM7.82 12l1.06 1.06zm4.17-10C6.47 2 2 6.47 2 12s4.47 10 9.99 10S22 17.53 22 12 17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm4.18-12.24l-1.06" />
+      <path d="M7 7.8L9.6 8.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+      <path d="M17 7.8L14.4 8.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+      <circle cx="15.5" cy="10" r="1.5" />
+      <circle cx="8.5" cy="10" r="1.5" />
     </svg>
   );
 };
@@ -743,8 +771,9 @@ export interface IIconDefinition {
 }
 
 export const iconDefinitions: IIconDefinition[] = [
-  { id: "happy-face", name: "Smile", icon: <HappyFaceIcon />, trayOrder: 1, legacyAliases: ["far fa-smile"] },
-  { id: "sad-face", name: "Frown", icon: <SadFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown"] },
+  { id: "smile-face", name: "Smile", icon: <SmileFaceIcon />, trayOrder: 1, legacyAliases: ["far fa-smile"] },
+  { id: "frown-face", name: "Frown", icon: <FrownFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown"] },
+  { id: "happy-face", name: "Happy Face", icon: <HappyFaceIcon />, trayOrder: 0 },
   { id: "add-circle", name: "Add Circle", icon: <AddCircleIcon />, trayOrder: 3, legacyAliases: ["fa-plus", "fa-plus-circle", "fas fa-cart-plus"] },
   { id: "check-circle", name: "Check", icon: <CheckCircleIcon />, trayOrder: 4, legacyAliases: ["fa-check-circle"] },
   { id: "help", name: "Question", icon: <HelpIcon />, trayOrder: 5, legacyAliases: ["fas fa-question", "far fa-question"] },
@@ -776,6 +805,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 0 },
   { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 0, legacyAliases: ["fas fa-lock"] },
   { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
+  { id: "sad-face", name: "Sad", icon: <SadFaceIcon />, trayOrder: 0 },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
   { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
   { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fan", "fas fa-fan"] },

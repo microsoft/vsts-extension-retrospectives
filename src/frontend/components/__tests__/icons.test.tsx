@@ -13,6 +13,11 @@ describe("icons", () => {
     }
   });
 
+  it("keeps the simple smile in the tray and the broad happy face outside it", () => {
+    expect(selectionTrayIcons.map(iconDefinition => iconDefinition.id)).toEqual(expect.arrayContaining(["smile-face", "frown-face"]));
+    expect(selectionTrayIcons.map(iconDefinition => iconDefinition.id)).not.toContain("happy-face");
+  });
+
   it("does not allow duplicate non-zero trayOrder values", () => {
     const nonZeroTrayOrders = iconDefinitions.map(iconDefinition => iconDefinition.trayOrder).filter(trayOrder => trayOrder > 0);
     const uniqueTrayOrders = new Set(nonZeroTrayOrders);
@@ -34,6 +39,7 @@ describe("icons", () => {
   describe("getIconElement", () => {
     it("returns specific non-tray icon components by ID", () => {
       const iconExpectations = [
+        ["happy-face", ".icon-happy-face"],
         ["assessment", ".icon-assessment"],
         ["new-releases", ".icon-new-releases"],
         ["pause-circle", ".icon-pause-circle"],
@@ -68,6 +74,13 @@ describe("icons", () => {
       const { container } = render(icon);
 
       expect(container.querySelector(".icon-play-circle")).toBeTruthy();
+    });
+
+    it("returns SmileFaceIcon for the legacy smile tag", () => {
+      const icon = getIconElement("far fa-smile");
+      const { container } = render(icon);
+
+      expect(container.querySelector(".icon-smile-face")).toBeTruthy();
     });
 
     it("returns FanIcon for fan legacy tags", () => {
