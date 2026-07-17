@@ -11,7 +11,19 @@ permissions:
   contents: read
 
 jobs:
+  ci_cd_frontend:
+    name: "Run frontend CI/CD"
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+      statuses: write
+      checks: write
+    uses: ./.github/workflows/ci_cd_frontend.yml
+    secrets: inherit
+
   publish:
+    needs: ci_cd_frontend
     runs-on: ubuntu-latest
 
     steps:
@@ -61,12 +73,18 @@ jobs:
 
           npm run pack:p
 
-          npx tfx extension publish --manifests vss-extension-prod.json --vsix ./dist/*.vsix --token "${{ secrets.AZURE_DEVOPS_TOKEN }}"
-
           ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
           VERSION=$(jq -r '.versions[0].version' <<< "$ext_info")
 
           echo "EXTENSION_VERSION=${VERSION}" >> $GITHUB_OUTPUT
+
+      - if: steps.changes.outputs.src == 'true'
+        name: "Upload extension package"
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: retrospectives-extension-dev
+          path: src/frontend/dist/*.vsix
+          if-no-files-found: error
 
       - name: Create the tag for the extension release
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0

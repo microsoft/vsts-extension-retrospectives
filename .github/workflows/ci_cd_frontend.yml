@@ -1,6 +1,7 @@
 name: "CI and CD for Frontend"
 
 on:
+  workflow_call:
   workflow_dispatch:
   pull_request:
     branches:
@@ -22,7 +23,6 @@ permissions:
 jobs:
   build:
     name: "Build, Test and Publish"
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/trigger pipeline'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -233,3 +233,11 @@ jobs:
           AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
         run: >
           npm run publish:d
+
+      - if: steps.changes.outputs.src == 'true'
+        name: "Upload extension package"
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: retrospectives-extension-dev
+          path: src/frontend/dist/*.vsix
+          if-no-files-found: error
