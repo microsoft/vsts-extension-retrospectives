@@ -1942,6 +1942,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     setContainerState(previousState => ({ ...previousState, ...voteMetricsState }));
   }, [getVoteMetricsState]);
 
+  const handleFocusModeModelChange = React.useCallback((focusModeModel: FocusModeModel) => {
+    setContainerState(previousState => ({ ...previousState, focusModeModel }));
+  }, []);
+
   const updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
     if (!updatedBoard) {
       void handleBoardDeleted(state.currentTeam.id, state.currentBoard.id);
@@ -2595,9 +2599,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                     nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
                     focusModeNonHiddenWorkItemTypes={state.focusModeNonHiddenWorkItemTypes}
                     allWorkItemTypes={state.allWorkItemTypes}
-                    onFocusModeModelChange={focusModeModel => {
-                      setContainerState(previousState => ({ ...previousState, focusModeModel }));
-                    }}
+                    onFocusModeModelChange={handleFocusModeModelChange}
                     isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
                     hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
                     userId={state.currentUserId}
