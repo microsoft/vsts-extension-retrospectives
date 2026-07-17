@@ -3,7 +3,7 @@ import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../in
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { canCurrentUserManageBoard, isCurrentUserTeamAdmin } from "../utilities/boardAccessHelper";
-import { getIconElement } from "./icons";
+import { getIconElement, PeopleIcon } from "./icons";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
@@ -217,7 +217,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
 
   const PermissionImage = (props: { option: FeedbackBoardPermissionOption }) => {
     if (props.option.type === "team") {
-      return <i className="permission-image fa-solid fa-users h-11 w-11"></i>;
+      return <PeopleIcon />;
     }
 
     return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission for ${props.option.name}`} />;

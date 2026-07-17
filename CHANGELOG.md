@@ -4,6 +4,13 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.59
 
+* Addressed legacy icon mapping gaps or misalignment and replaced remaining Font Awesome icons.
+* Replaced filled icons with outlined versions for the help menu.
+* Added new icons for the Speedboat template and swapped several icons used in other templates.
+* Replaced and rearranged icons available in the "Choose icon" selection tray.
+
+From [GitHub PR #1835](https://github.com/microsoft/vsts-extension-retrospectives/pull/1835)
+
 * Refactored icon definitions separating legacy alias resolution from selection tray behavior.
 * Edited icon selection tray adjusting display order and removing 7 lower value icons.
 * Closed test code coverage gaps.

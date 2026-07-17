@@ -294,7 +294,7 @@ export const ExtensionSettingsMenu: React.FC<ExtensionSettingsMenuProps> = ({ sh
               whatsNewDialogRef.current!.showModal();
             }}
           >
-            {getIconElement("celebration")}
+            {getIconElement("new-releases")}
             {t("whats_new")}
           </button>
           <button

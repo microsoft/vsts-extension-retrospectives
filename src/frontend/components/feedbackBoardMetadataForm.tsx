@@ -10,7 +10,7 @@ import { reactPlugin } from "../utilities/telemetryClient";
 import { getColumnsByTemplateId } from "../utilities/boardColumnsHelper";
 import FeedbackBoardMetadataFormPermissions, { FeedbackBoardPermissionOption, FeedbackBoardPermissionState } from "./feedbackBoardMetadataFormPermissions";
 import { generateUUID } from "../utilities/random";
-import { getIconElement, selectionTrayIcons } from "./icons";
+import { getIconElement, selectionTrayIcons, SquareRoundedIcon } from "./icons";
 import { questions } from "../utilities/effectivenessMeasurementQuestionHelper";
 
 export interface IFeedbackBoardMetadataFormProps {
@@ -448,12 +448,13 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                           aria-label="Change column color"
                           title="Change column color"
                           disabled={columnCard.markedForDeletion}
+                          style={{ color: columnCard.column.accentColor }}
                           onClick={() => {
                             setColumnCardBeingEdited(columnCard);
                             setIsChooseColumnAccentColorDialogHidden(false);
                           }}
                         >
-                          <i className="feedback-column-card-accent-color fas fa-square" style={{ color: columnCard.column.accentColor }} />
+                          <SquareRoundedIcon />
                         </button>
                         <EditableDocumentCardTitle
                           isDisabled={columnCard.markedForDeletion}
@@ -642,6 +643,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                         aria-label={"Choose the color " + accentColor.friendlyName}
                         title={"Choose the color " + accentColor.friendlyName}
                         className="choose-feedback-column-accent-color-button"
+                        style={{ color: accentColor.colorCode }}
                         onClick={() => {
                           columnCardBeingEdited.column.accentColor = accentColor.colorCode;
                           setIsChooseColumnAccentColorDialogHidden(true);
@@ -650,12 +652,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                           chooseColumnAccentColorDialogRef.current?.close();
                         }}
                       >
-                        <i
-                          className={"fas fa-square"}
-                          style={{
-                            color: accentColor.colorCode,
-                          }}
-                        />
+                        <SquareRoundedIcon />
                       </button>
                     );
                   })}

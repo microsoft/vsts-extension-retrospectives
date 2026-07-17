@@ -866,7 +866,7 @@ describe("Board Metadata Form Permissions", () => {
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const teamIcon = container.querySelector(".fa-users");
+      const teamIcon = container.querySelector(".icon-people");
 
       expect(teamIcon).toBeInTheDocument();
     });

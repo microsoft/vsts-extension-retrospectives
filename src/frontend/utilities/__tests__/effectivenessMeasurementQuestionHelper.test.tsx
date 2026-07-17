@@ -108,7 +108,7 @@ describe("normalizeTeamAssessmentQuestions", () => {
   it("uses the current default icon for saved default questions", () => {
     const savedQuestion = { ...questions[5], iconClassName: "legacy-gear" };
 
-    expect(normalizeTeamAssessmentQuestions([savedQuestion])).toEqual([{ ...savedQuestion, iconClassName: "gear-with-stars" }]);
+    expect(normalizeTeamAssessmentQuestions([savedQuestion])).toEqual([{ ...savedQuestion, iconClassName: "gears" }]);
   });
 
   it("preserves custom questions", () => {

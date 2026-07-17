@@ -164,11 +164,15 @@ export const HelpIcon = () => {
 export const CelebrationIcon = () => {
   return (
     <svg className="icon-celebration" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <polygon points="2,22 16,17 7,8" />
-      <path d="M14.53,12.53l5.59-5.59c0.49-0.49,1.28-0.49,1.77,0l0.59,0.59l1.06-1.06l-0.59-0.59c-1.07-1.07-2.82-1.07-3.89,0 l-5.59,5.59L14.53,12.53z" />
-      <path d="M10.06,6.88L9.47,7.47l1.06,1.06l0.59-0.59c1.07-1.07,1.07-2.82,0-3.89l-0.59-0.59L9.47,4.53l0.59,0.59 C10.54,5.6,10.54,6.4,10.06,6.88z" />
-      <path d="M17.06,11.88l-1.59,1.59l1.06,1.06l1.59-1.59c0.49-0.49,1.28-0.49,1.77,0l1.61,1.61l1.06-1.06l-1.61-1.61 C19.87,10.81,18.13,10.81,17.06,11.88z" />
-      <path d="M15.06,5.88l-3.59,3.59l1.06,1.06l3.59-3.59c1.07-1.07,1.07-2.82,0-3.89l-1.59-1.59l-1.06,1.06l1.59,1.59 C15.54,4.6,15.54,5.4,15.06,5.88z" />
+      <path d="m2 22 14-5-9-9zm10.35-5.82L5.3 18.7l2.52-7.05zm2.18-3.65 5.59-5.59c.49-.49 1.28-.49 1.77 0l.59.59 1.06-1.06-.59-.59c-1.07-1.07-2.82-1.07-3.89 0l-5.59 5.59zm-4.47-5.65-.59.59 1.06 1.06.59-.59c1.07-1.07 1.07-2.82 0-3.89l-.59-.59-1.06 1.07.59.59c.48.48.48 1.28 0 1.76m7 5-1.59 1.59 1.06 1.06 1.59-1.59c.49-.49 1.28-.49 1.77 0l1.61 1.61 1.06-1.06-1.61-1.61c-1.08-1.07-2.82-1.07-3.89 0m-2-6-3.59 3.59 1.06 1.06 3.59-3.59c1.07-1.07 1.07-2.82 0-3.89l-1.59-1.59-1.06 1.06 1.59 1.59c.48.49.48 1.29 0 1.77" />
+    </svg>
+  );
+};
+
+export const NewReleasesOutlinedIcon = () => {
+  return (
+    <svg className="icon-new-releases" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="m23 12-2.44-2.78.34-3.68-3.61-.82-1.89-3.18L12 3 8.6 1.54 6.71 4.72l-3.61.81.34 3.68L1 12l2.44 2.78-.34 3.69 3.61.82 1.89 3.18L12 21l3.4 1.46 1.89-3.18 3.61-.82-.34-3.68zm-4.51 2.11.26 2.79-2.74.62-1.43 2.41L12 18.82l-2.58 1.11-1.43-2.41-2.74-.62.26-2.8L3.66 12l1.85-2.12-.26-2.78 2.74-.61 1.43-2.41L12 5.18l2.58-1.11 1.43 2.41 2.74.62-.26 2.79L20.34 12zM11 15h2v2h-2zm0-8h2v6h-2z" />
     </svg>
   );
 };
@@ -176,7 +180,7 @@ export const CelebrationIcon = () => {
 export const KeyboardIcon = () => {
   return (
     <svg className="icon-keyboard" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z" />
+      <path d="M20 7v10H4V7zm0-2H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m-9 3h2v2h-2zm0 3h2v2h-2zM8 8h2v2H8zm0 3h2v2H8zm-3 0h2v2H5zm0-3h2v2H5zm3 6h8v2H8zm6-3h2v2h-2zm0-3h2v2h-2zm3 3h2v2h-2zm0-3h2v2h-2z" />
     </svg>
   );
 };
@@ -195,9 +199,7 @@ export const MenuBookIcon = () => {
 export const VolunteerActivismIcon = () => {
   return (
     <svg className="icon-volunteer-activism" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <rect height="11" width="4" x="1" y="11" />
-      <path d="M16,3.25C16.65,2.49,17.66,2,18.7,2C20.55,2,22,3.45,22,5.3c0,2.27-2.91,4.9-6,7.7c-3.09-2.81-6-5.44-6-7.7 C10,3.45,11.45,2,13.3,2C14.34,2,15.35,2.49,16,3.25z" />
-      <path d="M20,17h-7l-2.09-0.73l0.33-0.94L13,16h2.82c0.65,0,1.18-0.53,1.18-1.18v0c0-0.49-0.31-0.93-0.77-1.11L8.97,11H7v9.02 L14,22l8.01-3v0C22,17.9,21.11,17,20,17z" />
+      <path d="M16 13c3.09-2.81 6-5.44 6-7.7C22 3.45 20.55 2 18.7 2c-1.04 0-2.05.49-2.7 1.25C15.34 2.49 14.34 2 13.3 2 11.45 2 10 3.45 10 5.3c0 2.26 2.91 4.89 6 7.7m-2.7-9c.44 0 .89.21 1.18.55L16 6.34l1.52-1.79c.29-.34.74-.55 1.18-.55.74 0 1.3.56 1.3 1.3 0 1.12-2.04 3.17-4 4.99-1.96-1.82-4-3.88-4-4.99 0-.74.56-1.3 1.3-1.3M19 16h-2c0-1.2-.75-2.28-1.87-2.7L8.97 11H1v11h6v-1.44l7 1.94 8-2.5v-1c0-1.66-1.34-3-3-3M3 20v-7h2v7zm10.97.41L7 18.48V13h1.61l5.82 2.17c.34.13.57.46.57.83 0 0-1.99-.05-2.3-.15l-2.38-.79-.63 1.9 2.38.79c.51.17 1.04.26 1.58.26H19c.39 0 .74.23.9.56z" />
     </svg>
   );
 };
@@ -205,7 +207,7 @@ export const VolunteerActivismIcon = () => {
 export const ContactPhoneIcon = () => {
   return (
     <svg className="icon-contact-phone" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M22 3H2C.9 3 0 3.9 0 5v14c0 1.1.9 2 2 2h20c1.1 0 1.99-.9 1.99-2L24 5c0-1.1-.9-2-2-2zM8 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H2v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1zm3.85-4h1.64L21 16l-1.99 1.99c-1.31-.98-2.28-2.38-2.73-3.99-.18-.64-.28-1.31-.28-2s.1-1.36.28-2c.45-1.62 1.42-3.01 2.73-3.99L21 8l-1.51 2h-1.64c-.22.63-.35 1.3-.35 2s.13 1.37.35 2z" />
+      <path d="M22 3H2C.9 3 0 3.9 0 5v14c0 1.1.9 2 2 2h20c1.1 0 1.99-.9 1.99-2L24 5c0-1.1-.9-2-2-2m0 16H2V5h20zm-2.99-1.01L21 16l-1.51-2h-1.64c-.22-.63-.35-1.3-.35-2s.13-1.37.35-2h1.64L21 8l-1.99-1.99c-1.31.98-2.28 2.37-2.73 3.99-.18.64-.28 1.31-.28 2s.1 1.36.28 2c.45 1.61 1.42 3.01 2.73 3.99M9 12c1.65 0 3-1.35 3-3s-1.35-3-3-3-3 1.35-3 3 1.35 3 3 3m0-4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m6 8.59c0-2.5-3.97-3.58-6-3.58s-6 1.08-6 3.58V18h12zM5.48 16c.74-.5 2.22-1 3.52-1s2.77.49 3.52 1z" />
     </svg>
   );
 };
@@ -230,6 +232,14 @@ export const AddCircleIcon = () => {
   return (
     <svg className="icon-add-circle" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+    </svg>
+  );
+};
+
+export const SquareRoundedIcon = () => {
+  return (
+    <svg className="icon-square-rounded" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2" />
     </svg>
   );
 };
@@ -338,9 +348,9 @@ export const AssignmentTurnedInIcon = () => {
   );
 };
 
-export const ReviewsIcon = () => {
+export const CommentsIcon = () => {
   return (
-    <svg className="icon-reviews" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-comments" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M8,11a1,1,0,1,0,1,1A1,1,0,0,0,8,11Zm4,0a1,1,0,1,0,1,1A1,1,0,0,0,12,11Zm4,0a1,1,0,1,0,1,1A1,1,0,0,0,16,11ZM12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.26,6.33l-2,2a1,1,0,0,0-.21,1.09A1,1,0,0,0,3,22h9A10,10,0,0,0,12,2Zm0,18H5.41l.93-.93a1,1,0,0,0,.3-.71,1,1,0,0,0-.3-.7A8,8,0,1,1,12,20Z" />
     </svg>
   );
@@ -358,6 +368,19 @@ export const AdjustIcon = () => {
   return (
     <svg className="icon-adjust" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm7 3c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm7-11h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4z" />
+    </svg>
+  );
+};
+
+export const BullseyeIcon = () => {
+  return (
+    <svg className="icon-target icon-bullseye" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="8" fill="var(--background-color, #fff)" />
+      <circle cx="12" cy="12" r="6" fill="currentColor" />
+      <circle cx="12" cy="12" r="4" fill="var(--background-color, #fff)" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
     </svg>
   );
 };
@@ -380,9 +403,20 @@ export const HappyFaceIcon = () => {
   );
 };
 
-export const SadFaceIcon = () => {
+export const SmileFaceIcon = () => {
   return (
-    <svg className="icon-sad-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-smile-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <circle cx="15.5" cy="9.5" r="1.5" />
+      <circle cx="8.5" cy="9.5" r="1.5" />
+      <path d="M8.55 14.5c.69 1.19 1.97 2 3.45 2s2.76-.81 3.45-2" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" />
+    </svg>
+  );
+};
+
+export const FrownFaceIcon = () => {
+  return (
+    <svg className="icon-frown-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <circle cx="15.5" cy="9.5" r="1.5" />
       <circle cx="8.5" cy="9.5" r="1.5" />
       <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-6c-2.33 0-4.32 1.45-5.12 3.5h1.67c.69-1.19 1.97-2 3.45-2s2.75.81 3.45 2h1.67c-.8-2.05-2.79-3.5-5.12-3.5z" />
@@ -390,10 +424,27 @@ export const SadFaceIcon = () => {
   );
 };
 
+export const SadFaceIcon = () => {
+  return (
+    <svg className="icon-sad-face" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <circle cx="15.5" cy="9.5" r="1.5" />
+      <circle cx="8.5" cy="9.5" r="1.5" />
+      <path d="M16.5 13 c0-.7-.5-1.2-.9-1.7 -.4.5-.9 1-.9 1.7 0 .5.4.9.9.9 s.9-.4.9-.9z" />
+      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-6c-2.33 0-4.32 1.45-5.12 3.5h1.67c.69-1.19 1.97-2 3.45-2s2.75.81 3.45 2h1.67c-.8-2.05-2.79-3.5-5.12-3.5z" />
+    </svg>
+  );
+};
+
 export const AngryFaceIcon = () => {
   return (
-    <svg className="icon-angry-face" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M12 13.5c-2.33 0-4.31 1.46-5.11 3.5h10.22c-.8-2.04-2.78-3.5-5.11-3.5zM7.82 12l1.06-1.06L9.94 12 11 10.94 9.94 9.88 11 8.82 9.94 7.76 8.88 8.82 7.82 7.76 6.76 8.82l1.06 1.06-1.06 1.06zm4.17-10C6.47 2 2 6.47 2 12s4.47 10 9.99 10S22 17.53 22 12 17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm4.18-12.24l-1.06 1.06-1.06-1.06L13 8.82l1.06 1.06L13 10.94 14.06 12l1.06-1.06L16.18 12l1.06-1.06-1.06-1.06 1.06-1.06z" />
+    <svg className="icon-angry-face" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 0h24v24H0V0z" fill="none" />
+      <path d="M12 13.5c-2.33 0-4.31 1.46-5.11 3.5h10.22c-.8-2.04-2.78-3.5-5.11-3.5zM7.82 12l1.06 1.06zm4.17-10C6.47 2 2 6.47 2 12s4.47 10 9.99 10S22 17.53 22 12 17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm4.18-12.24l-1.06" />
+      <path d="M7 7.8L9.6 8.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+      <path d="M17 7.8L14.4 8.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+      <circle cx="15.5" cy="10" r="1.5" />
+      <circle cx="8.5" cy="10" r="1.5" />
     </svg>
   );
 };
@@ -454,21 +505,19 @@ export const BirthdayCakeIcon = () => {
   );
 };
 
-export const ConstructionIcon = () => {
+export const LaptopIcon = () => {
   return (
-    <svg className="icon-construction" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <rect height="8.48" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -6.8717 17.6255)" width="3" x="16.34" y="12.87" />
-      <path d="M17.5,10c1.93,0,3.5-1.57,3.5-3.5c0-0.58-0.16-1.12-0.41-1.6l-2.7,2.7L16.4,6.11l2.7-2.7C18.62,3.16,18.08,3,17.5,3 C15.57,3,14,4.57,14,6.5c0,0.41,0.08,0.8,0.21,1.16l-1.85,1.85l-1.78-1.78l0.71-0.71L9.88,5.61L12,3.49 c-1.17-1.17-3.07-1.17-4.24,0L4.22,7.03l1.41,1.41H2.81L2.1,9.15l3.54,3.54l0.71-0.71V9.15l1.41,1.41l0.71-0.71l1.78,1.78 l-7.41,7.41l2.12,2.12L16.34,9.79C16.7,9.92,17.09,10,17.5,10z" />
+    <svg className="icon-laptop" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2zM4 6h16v10H4z" />
     </svg>
   );
 };
 
-export const PlumbingIcon = () => {
+export const ToolsIcon = () => {
   return (
-    <svg className="icon-plumbing" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M19.28,4.93l-2.12-2.12c-0.78-0.78-2.05-0.78-2.83,0L11.5,5.64l2.12,2.12l2.12-2.12l3.54,3.54 C20.45,8,20.45,6.1,19.28,4.93z" />
-      <path d="M5.49,13.77c0.59,0.59,1.54,0.59,2.12,0l2.47-2.47L7.96,9.17l-2.47,2.47C4.9,12.23,4.9,13.18,5.49,13.77L5.49,13.77z" />
-      <path d="M15.04,7.76l-0.71,0.71l-0.71,0.71l-3.18-3.18C9.85,5.4,8.9,5.4,8.32,5.99c-0.59,0.59-0.59,1.54,0,2.12l3.18,3.18 L10.79,12l-6.36,6.36c-0.78,0.78-0.78,2.05,0,2.83c0.78,0.78,2.05,0.78,2.83,0L16.45,12c0.39,0.39,1.02,0.39,1.41,0 c0.39-0.39,0.39-1.02,0-1.41L15.04,7.76z" />
+    <svg className="icon-tools icon-plumbing" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <rect height="8.48" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -6.8717 17.6255)" width="3" x="16.34" y="12.87" />
+      <path d="M17.5,10c1.93,0,3.5-1.57,3.5-3.5c0-0.58-0.16-1.12-0.41-1.6l-2.7,2.7L16.4,6.11l2.7-2.7C18.62,3.16,18.08,3,17.5,3 C15.57,3,14,4.57,14,6.5c0,0.41,0.08,0.8,0.21,1.16l-1.85,1.85l-1.78-1.78l0.71-0.71L9.88,5.61L12,3.49 c-1.17-1.17-3.07-1.17-4.24,0L4.22,7.03l1.41,1.41H2.81L2.1,9.15l3.54,3.54l0.71-0.71V9.15l1.41,1.41l0.71-0.71l1.78,1.78 l-7.41,7.41l2.12,2.12L16.34,9.79C16.7,9.92,17.09,10,17.5,10z" />
     </svg>
   );
 };
@@ -476,7 +525,7 @@ export const PlumbingIcon = () => {
 export const ExploreIcon = () => {
   return (
     <svg className="icon-explore" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1.41 2L5 17.59V5h12.59zM6.41 19L19 6.41V19H6.41zM6 7h5v1.5H6zm10 5.5h-1.5v2h-2V16h2v2H16v-2h2v-1.5h-2z" />
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m-5.5-2.5 7.51-3.49L17.5 6.5 9.99 9.99zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1" />
     </svg>
   );
 };
@@ -493,6 +542,31 @@ export const CheckCircleIcon = () => {
   return (
     <svg className="icon-check-circle" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M16.59 7.58L10 14.17l-3.59-3.58L5 12l5 5 8-8zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" />
+    </svg>
+  );
+};
+
+export const FanIcon = () => {
+  return (
+    <svg className="icon-fan" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <rect width="24" height="24" fill="none" />
+      <path d="M12 11a1 1 0 1 0 1 1 1 1 0 0 0-1-1m.5-9C17 2 17.1 5.57 14.73 6.75a3.36 3.36 0 0 0-1.62 2.47 3.17 3.17 0 0 1 1.23.91C18 8.13 22 8.92 22 12.5c0 4.5-3.58 4.6-4.75 2.23a3.44 3.44 0 0 0-2.5-1.62 3.24 3.24 0 0 1-.91 1.23c2 3.69 1.2 7.66-2.38 7.66C7 22 6.89 18.42 9.26 17.24a3.46 3.46 0 0 0 1.62-2.45 3 3 0 0 1-1.25-.92C5.94 15.85 2 15.07 2 11.5 2 7 5.54 6.89 6.72 9.26A3.39 3.39 0 0 0 9.2 10.87a2.91 2.91 0 0 1 .92-1.22C8.13 6 8.92 2 12.48 2Z" />
+    </svg>
+  );
+};
+
+export const DangerIcon = () => {
+  return (
+    <svg className="icon-danger" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27zM19 14.9 14.9 19H9.1L5 14.9V9.1L9.1 5h5.8L19 9.1zm-4.17-7.14L12 10.59 9.17 7.76 7.76 9.17 10.59 12l-2.83 2.83 1.41 1.41L12 13.41l2.83 2.83 1.41-1.41L13.41 12l2.83-2.83z" />
+    </svg>
+  );
+};
+
+export const LandscapeIcon = () => {
+  return (
+    <svg className="icon-landscape" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="m14 6-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22z" />
     </svg>
   );
 };
@@ -588,9 +662,7 @@ export const ElectricBoltIcon = () => {
 export const PsychologicalSafetyIcon = () => {
   return (
     <svg className="icon-psychological-safety" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M19.94,9.06C19.5,5.73,16.57,3,13,3C9.47,3,6.57,5.61,6.08,9l-1.93,3.48C3.74,13.14,4.22,14,5,14h1l0,2c0,1.1,0.9,2,2,2h1 v3h7l0-4.68C18.62,15.07,20.35,12.24,19.94,9.06z M14.89,14.63L14,15.05V19h-3v-3H8v-4H6.7l1.33-2.33C8.21,7.06,10.35,5,13,5 c2.76,0,5,2.24,5,5C18,12.09,16.71,13.88,14.89,14.63z" />
-      <path d="M12.5,12.54c-0.41,0-0.74,0.31-0.74,0.73c0,0.41,0.33,0.74,0.74,0.74c0.42,0,0.73-0.33,0.73-0.74 C13.23,12.85,12.92,12.54,12.5,12.54z" />
-      <path d="M12.5,7c-1.03,0-1.74,0.67-2,1.45l0.96,0.4c0.13-0.39,0.43-0.86,1.05-0.86c0.95,0,1.13,0.89,0.8,1.36 c-0.32,0.45-0.86,0.75-1.14,1.26c-0.23,0.4-0.18,0.87-0.18,1.16h1.06c0-0.55,0.04-0.65,0.13-0.82c0.23-0.42,0.65-0.62,1.09-1.27 c0.4-0.59,0.25-1.38-0.01-1.8C13.95,7.39,13.36,7,12.5,7z" />
+      <path d="M12.22 19.85c-.18.18-.5.21-.71 0-.18-.18-.21-.5 0-.71l3.39-3.39-1.41-1.41-3.39 3.39c-.19.2-.51.19-.71 0-.21-.21-.18-.53 0-.71l3.39-3.39-1.41-1.41-3.39 3.39c-.18.18-.5.21-.71 0-.19-.19-.19-.51 0-.71l3.39-3.39-1.42-1.41-3.39 3.39c-.18.18-.5.21-.71 0-.19-.2-.19-.51 0-.71L9.52 8.4l1.87 1.86c.95.95 2.59.94 3.54 0 .98-.98.98-2.56 0-3.54l-1.86-1.86.28-.28c.78-.78 2.05-.78 2.83 0l4.24 4.24c.78.78.78 2.05 0 2.83zm9.61-6.78c1.56-1.56 1.56-4.09 0-5.66l-4.24-4.24c-1.56-1.56-4.09-1.56-5.66 0l-.28.28-.28-.28c-1.56-1.56-4.09-1.56-5.66 0L2.17 6.71C.75 8.13.62 10.34 1.77 11.9l1.45-1.45c-.39-.75-.26-1.7.37-2.33l3.54-3.54c.78-.78 2.05-.78 2.83 0l3.56 3.56c.18.18.21.5 0 .71s-.53.18-.71 0L9.52 5.57l-5.8 5.79c-.98.97-.98 2.56 0 3.54.39.39.89.63 1.42.7.07.52.3 1.02.7 1.42s.9.63 1.42.7c.07.52.3 1.02.7 1.42s.9.63 1.42.7c.07.54.31 1.03.7 1.42.47.47 1.1.73 1.77.73s1.3-.26 1.77-.73z" />
     </svg>
   );
 };
@@ -611,10 +683,10 @@ export const GearIcon = () => {
   );
 };
 
-export const GearWithStarsIcon = () => {
+export const GearsIcon = () => {
   return (
-    <svg className="icon-gear-with-stars" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M10 13c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m0-2c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3m8.5-2 1.09-2.41L22 5.5l-2.41-1.09L18.5 2l-1.09 2.41L15 5.5l2.41 1.09zm2.78 3.72L20.5 11l-.78 1.72-1.72.78 1.72.78.78 1.72.78-1.72L23 13.5zM16.25 14c0-.12 0-.25-.01-.37l1.94-1.47-2.5-4.33-2.24.94c-.2-.13-.42-.26-.64-.37L12.5 6h-5l-.3 2.41c-.22.11-.43.24-.64.37l-2.24-.95-2.5 4.33 1.94 1.47c-.01.12-.01.25-.01.37s0 .25.01.37l-1.94 1.47 2.5 4.33 2.24-.94c.2.13.42.26.64.37l.3 2.4h5l.3-2.41c.22-.11.43-.23.64-.37l2.24.94 2.5-4.33-1.94-1.47c.01-.11.01-.24.01-.36m-1.42 3.64-1.73-.73c-.56.6-1.3 1.04-2.13 1.23L10.73 20H9.27l-.23-1.86c-.83-.19-1.57-.63-2.13-1.23l-1.73.73-.73-1.27 1.49-1.13q-.18-.585-.18-1.23t.18-1.23l-1.49-1.13.73-1.27 1.73.73c.56-.6 1.3-1.04 2.13-1.23L9.27 8h1.47l.23 1.86c.83.19 1.57.63 2.13 1.23l1.73-.73.73 1.27-1.49 1.13q.18.585.18 1.23t-.18 1.23l1.49 1.13z" />
+    <svg className="icon-gears" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="m14.17 13.71 1.4-2.42c.09-.15.05-.34-.08-.45l-1.48-1.16c.03-.22.05-.45.05-.68s-.02-.46-.05-.69l1.48-1.16c.13-.11.17-.3.08-.45l-1.4-2.42c-.09-.15-.27-.21-.43-.15l-1.74.7c-.36-.28-.75-.51-1.18-.69l-.26-1.85c-.03-.16-.18-.29-.35-.29h-2.8c-.17 0-.32.13-.35.3L6.8 4.15c-.42.18-.82.41-1.18.69l-1.74-.7c-.16-.06-.34 0-.43.15l-1.4 2.42c-.09.15-.05.34.08.45l1.48 1.16c-.03.22-.05.45-.05.68s.02.46.05.69l-1.48 1.16c-.13.11-.17.3-.08.45l1.4 2.42c.09.15.27.21.43.15l1.74-.7c.36.28.75.51 1.18.69l.26 1.85c.03.16.18.29.35.29h2.8c.17 0 .32-.13.35-.3l.26-1.85c.42-.18.82-.41 1.18-.69l1.74.7c.16.06.34 0 .43-.15M8.81 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2m13.11 7.67-.96-.74c.02-.14.04-.29.04-.44s-.01-.3-.04-.44l.95-.74c.08-.07.11-.19.05-.29l-.9-1.55c-.05-.1-.17-.13-.28-.1l-1.11.45c-.23-.18-.48-.33-.76-.44l-.17-1.18c-.01-.12-.11-.2-.21-.2h-1.79c-.11 0-.21.08-.22.19l-.17 1.18c-.27.12-.53.26-.76.44l-1.11-.45c-.1-.04-.22 0-.28.1l-.9 1.55c-.05.1-.04.22.05.29l.95.74c-.02.14-.03.29-.03.44s.01.3.03.44l-.95.74c-.08.07-.11.19-.05.29l.9 1.55c.05.1.17.13.28.1l1.11-.45c.23.18.48.33.76.44l.17 1.18c.02.11.11.19.22.19h1.79c.11 0 .21-.08.22-.19l.17-1.18c.27-.12.53-.26.75-.44l1.12.45c.1.04.22 0 .28-.1l.9-1.55c.06-.09.03-.21-.05-.28m-4.29.16c-.74 0-1.35-.6-1.35-1.35s.6-1.35 1.35-1.35 1.35.6 1.35 1.35-.61 1.35-1.35 1.35" />
     </svg>
   );
 };
@@ -709,42 +781,48 @@ export interface IIconDefinition {
 }
 
 export const iconDefinitions: IIconDefinition[] = [
-  { id: "happy-face", name: "Smile", icon: <HappyFaceIcon />, trayOrder: 1, legacyAliases: ["fas fa-cart-plus", "far fa-smile"] },
-  { id: "sad-face", name: "Frown", icon: <SadFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown"] },
-  { id: "add-circle", name: "Add Circle", icon: <AddCircleIcon />, trayOrder: 3, legacyAliases: ["fa-plus", "fa-plus-circle", "far fa-square-plus"] },
-  { id: "check-circle", name: "Check", icon: <CheckCircleIcon />, trayOrder: 4, legacyAliases: ["fa-check-circle", "far fa-square-check"] },
+  { id: "smile-face", name: "Smile", icon: <SmileFaceIcon />, trayOrder: 1, legacyAliases: ["far fa-smile"] },
+  { id: "frown-face", name: "Frown", icon: <FrownFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown"] },
+  { id: "happy-face", name: "Happy Face", icon: <HappyFaceIcon />, trayOrder: 0 },
+  { id: "add-circle", name: "Add Circle", icon: <AddCircleIcon />, trayOrder: 3, legacyAliases: ["fa-plus", "fa-plus-circle", "fas fa-cart-plus"] },
+  { id: "check-circle", name: "Check", icon: <CheckCircleIcon />, trayOrder: 4, legacyAliases: ["fa-check-circle"] },
   { id: "help", name: "Question", icon: <HelpIcon />, trayOrder: 5, legacyAliases: ["fas fa-question", "far fa-question"] },
-  { id: "exclamation", name: "Exclamation", icon: <ExclamationIcon />, trayOrder: 6, legacyAliases: ["fas fa-exclamation", "fas fa-exclamation-triangle", "far fa-exclamation"] },
+  { id: "exclamation", name: "Exclamation", icon: <ExclamationIcon />, trayOrder: 6, legacyAliases: ["fas fa-exclamation", "far fa-exclamation"] },
   { id: "thumb-up", name: "Thumb Up", icon: <ThumbUpIcon />, trayOrder: 7, legacyAliases: ["far fa-thumbs-up"] },
-  { id: "thumb-down", name: "Thumb Down", icon: <ThumbDownIcon />, trayOrder: 8, legacyAliases: ["fas fa-skull-crossbones", "far fa-thumbs-down"] },
-  { id: "reviews", name: "Reviews", icon: <ReviewsIcon />, trayOrder: 9 },
-  { id: "forum", name: "Forum", icon: <ForumIcon />, trayOrder: 10, legacyAliases: ["far fa-comments"] },
-  { id: "star", name: "Star", icon: <StarIcon />, trayOrder: 11, legacyAliases: ["far fa-star", "fas fa-star"] },
-  { id: "light-bulb", name: "Light Bulb", icon: <LightBulbIcon />, trayOrder: 12, legacyAliases: ["far fa-lightbulb"] },
-  { id: "coffee", name: "Coffee", icon: <CoffeeIcon />, trayOrder: 13, legacyAliases: ["fas fa-coffee"] },
-  { id: "birthday-cake", name: "Birthday Cake", icon: <BirthdayCakeIcon />, trayOrder: 14, legacyAliases: ["fas fa-birthday-cake"] },
-  { id: "play-circle", name: "Play", icon: <PlayCircleIcon />, trayOrder: 15, legacyAliases: ["far fa-circle-play"] },
-  { id: "stop-circle", name: "Stop", icon: <StopCircleIcon />, trayOrder: 16, legacyAliases: ["far fa-circle-stop"] },
-  { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 17, legacyAliases: ["far fa-circle-dot", "fa-bullseye"] },
-  { id: "eye", name: "Eye", icon: <EyeIcon />, trayOrder: 18, legacyAliases: ["eye", "far fa-eye"] },
-  { id: "menu-book", name: "Book", icon: <MenuBookIcon />, trayOrder: 19, legacyAliases: ["fas fa-book"] },
-  { id: "rocket-launch", name: "Rocket", icon: <RocketLaunchIcon />, trayOrder: 20, legacyAliases: ["fas fa-rocket", "fas fa-fan"] },
-  { id: "plumbing", name: "Plumbing", icon: <PlumbingIcon />, trayOrder: 21, legacyAliases: ["far fa-plumbing", "far fa-wrench", "fas fa-wrench"] },
-  { id: "construction", name: "Construction", icon: <ConstructionIcon />, trayOrder: 22, legacyAliases: ["fas fa-chalkboard", "fas fa-construction"] },
+  { id: "thumb-down", name: "Thumb Down", icon: <ThumbDownIcon />, trayOrder: 8, legacyAliases: ["far fa-thumbs-down"] },
+  { id: "forum", name: "Forum", icon: <ForumIcon />, trayOrder: 9 },
+  { id: "star", name: "Star", icon: <StarIcon />, trayOrder: 10, legacyAliases: ["far fa-star", "fas fa-star"] },
+  { id: "celebration", name: "Celebration", icon: <CelebrationIcon />, trayOrder: 11 },
+  { id: "birthday-cake", name: "Birthday Cake", icon: <BirthdayCakeIcon />, trayOrder: 12, legacyAliases: ["fas fa-birthday-cake"] },
+  { id: "light-bulb", name: "Light Bulb", icon: <LightBulbIcon />, trayOrder: 13, legacyAliases: ["far fa-lightbulb"] },
+  { id: "play-circle", name: "Play", icon: <PlayCircleIcon />, trayOrder: 14, legacyAliases: ["fa-play-circle", "far fa-circle-play"] },
+  { id: "stop-circle", name: "Stop", icon: <StopCircleIcon />, trayOrder: 15, legacyAliases: ["fa-stop-circle", "far fa-circle-stop"] },
+  { id: "bullseye", name: "Bullseye", icon: <BullseyeIcon />, trayOrder: 16, legacyAliases: ["fa-bullseye"] },
+  { id: "explore", name: "Explore", icon: <ExploreIcon />, trayOrder: 17, legacyAliases: ["far fa-compass"] },
+  { id: "eye", name: "Eye", icon: <EyeIcon />, trayOrder: 18, legacyAliases: ["far fa-eye"] },
+  { id: "laptop", name: "Laptop", icon: <LaptopIcon />, trayOrder: 19, legacyAliases: ["fas fa-chalkboard"] },
+  { id: "menu-book", name: "Book", icon: <MenuBookIcon />, trayOrder: 20, legacyAliases: ["fas fa-book"] },
+  { id: "rocket-launch", name: "Rocket", icon: <RocketLaunchIcon />, trayOrder: 21, legacyAliases: ["fas fa-rocket"] },
+  { id: "tools", name: "Tools", icon: <ToolsIcon />, trayOrder: 22, legacyAliases: ["construction", "fas fa-construction"] },
   { id: "anchor", name: "Anchor", icon: <AnchorIcon />, trayOrder: 23, legacyAliases: ["fas fa-anchor"] },
-  { id: "support", name: "Support", icon: <SupportIcon />, trayOrder: 24, legacyAliases: ["fas fa-life-ring"] },
+  { id: "coffee", name: "Coffee", icon: <CoffeeIcon />, trayOrder: 24 },
   { id: "search", name: "Search", icon: <SearchIcon />, trayOrder: 25, legacyAliases: ["search", "fa-solid fa-magnifying-glass"] },
   { id: "electric-bolt", name: "Electric Bolt", icon: <ElectricBoltIcon />, trayOrder: 26, legacyAliases: ["electric-bolt", "fa-solid fa-bolt"] },
-  { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 27, legacyAliases: ["fas fa-lock"] },
+  { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 27, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },
   { id: "balance", name: "Balance", icon: <BalanceIcon />, trayOrder: 28, legacyAliases: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"] },
-  { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 29, legacyAliases: ["gear"] },
-  { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 30, legacyAliases: ["fa-solid fa-square-poll-vertical"] },
+  { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 29 },
+  { id: "gears", name: "Gears", icon: <GearsIcon />, trayOrder: 30, legacyAliases: ["gear-with-stars", "gears", "fa-solid fa-gears"] },
+  { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 0 },
+  { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 0, legacyAliases: ["fas fa-lock"] },
+  { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
+  { id: "sad-face", name: "Sad", icon: <SadFaceIcon />, trayOrder: 0 },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
   { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
-  { id: "explore", name: "Explore", icon: <ExploreIcon />, trayOrder: 0, legacyAliases: ["far fa-compass"] },
+  { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fan", "fas fa-fan"] },
+  { id: "danger", name: "Danger", icon: <DangerIcon />, trayOrder: 0 },
+  { id: "landscape", name: "Landscape", icon: <LandscapeIcon />, trayOrder: 0, legacyAliases: ["fas fa-skull-crossbones"] },
+  { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-dot"] },
   { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
-  { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 0, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },
-  { id: "gear-with-stars", name: "Gear With Stars", icon: <GearWithStarsIcon />, trayOrder: 0, legacyAliases: ["gears", "gear-with-stars", "fa-solid fa-gears"] },
   { id: "list-all", name: "List All", icon: <ListAllIcon />, trayOrder: 0 },
   { id: "view-column", name: "View Column", icon: <ViewColumnIcon />, trayOrder: 0 },
   { id: "add", name: "Add", icon: <AddIcon />, trayOrder: 0 },
@@ -755,6 +833,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "hourglass-top", name: "Hourglass Top", icon: <HourglassTopIcon />, trayOrder: 0 },
   { id: "assignment-turned-in", name: "Assignment Turned In", icon: <AssignmentTurnedInIcon />, trayOrder: 0 },
   { id: "close", name: "Close", icon: <CloseIcon />, trayOrder: 0 },
+  { id: "new-releases", name: "New Releases", icon: <NewReleasesOutlinedIcon />, trayOrder: 0 },
   { id: "celebration", name: "Celebration", icon: <CelebrationIcon />, trayOrder: 0 },
   { id: "cloud", name: "Cloud", icon: <CloudIcon />, trayOrder: 0 },
   { id: "cloud-upload", name: "Cloud Upload", icon: <CloudUploadIcon />, trayOrder: 0 },
@@ -763,14 +842,16 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "arrow-circle-up", name: "Arrow Circle Up", icon: <ArrowCircleUpIcon />, trayOrder: 0 },
   { id: "person", name: "Person", icon: <PersonIcon />, trayOrder: 0 },
   { id: "people", name: "People", icon: <PeopleIcon />, trayOrder: 0 },
+  { id: "square-rounded", name: "Square Rounded", icon: <SquareRoundedIcon />, trayOrder: 0 },
   { id: "people-forward", name: "People Forward", icon: <PeopleForwardIcon />, trayOrder: 0 },
   { id: "insights", name: "Insights", icon: <InsightsIcon />, trayOrder: 0 },
-  { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0 },
+  { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0, legacyAliases: ["fa-solid fa-square-poll-vertical"] },
   { id: "chevron-up", name: "Chevron Up", icon: <ChevronUpIcon />, trayOrder: 0 },
   { id: "chevron-down", name: "Chevron Down", icon: <ChevronDownIcon />, trayOrder: 0 },
   { id: "chevron-left", name: "Chevron Left", icon: <ChevronLeftIcon />, trayOrder: 0 },
   { id: "chevron-right", name: "Chevron Right", icon: <ChevronRightIcon />, trayOrder: 0 },
   { id: "privacy-tip", name: "Privacy Tip", icon: <PrivacyTipIcon />, trayOrder: 0 },
+  { id: "support", name: "Support", icon: <SupportIcon />, trayOrder: 0, legacyAliases: ["fas fa-life-ring"] },
   { id: "keyboard", name: "Keyboard", icon: <KeyboardIcon />, trayOrder: 0 },
   { id: "volunteer-activism", name: "Volunteer Activism", icon: <VolunteerActivismIcon />, trayOrder: 0 },
   { id: "contact-phone", name: "Contact Phone", icon: <ContactPhoneIcon />, trayOrder: 0 },
@@ -800,7 +881,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "hourglass-top", name: "Hourglass Top", icon: <HourglassTopIcon />, trayOrder: 0 },
   { id: "assignment-turned-in", name: "Assignment Turned In", icon: <AssignmentTurnedInIcon />, trayOrder: 0 },
   { id: "close", name: "Close", icon: <CloseIcon />, trayOrder: 0 },
-  { id: "celebration", name: "Celebration", icon: <CelebrationIcon />, trayOrder: 0 },
+  { id: "new-releases", name: "New Releases", icon: <NewReleasesOutlinedIcon />, trayOrder: 0 },
   { id: "cloud", name: "Cloud", icon: <CloudIcon />, trayOrder: 0 },
   { id: "cloud-upload", name: "Cloud Upload", icon: <CloudUploadIcon />, trayOrder: 0 },
   { id: "cloud-download", name: "Cloud Download", icon: <CloudDownloadIcon />, trayOrder: 0 },
@@ -859,51 +940,8 @@ export function getIconElement(iconId: string | undefined | null): React.ReactEl
   const foundIcon = resolvedIconId ? iconDefinitionById.get(resolvedIconId) : undefined;
 
   if (!foundIcon) {
-    return <PlayCircleIcon />;
+    return <CommentsIcon />;
   }
 
   return foundIcon.icon;
 }
-
-export const fluentUiIcons = {
-  Delete: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H576q-40 0-75-15t-61-41-41-61-15-75V384H256V256h512V128q0-27 10-50t27-40 41-28 50-10h256q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h512V128H768v128zm768 128H512v1472q0 26 19 45t45 19h896q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z" />
-    </svg>
-  ),
-  Move: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M2048 1024l-320 320-90-90 165-166h-523v523l166-165 90 90-320 320-320-320 90-90 166 165v-523H640v523l165-165 90 90-320 320-320-320 90-90 166 165v-523H0V896h511L346 731l90-90 320 320-320 320-90-90 165-166H0V896h511l-165-165 90-90 320 320-320 320-90-90 166-165v523H640V1024h523l-165-165 90-90 320 320z" />
-    </svg>
-  ),
-  RowsGroup: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M128 128h1792v1792H128V128zm1664 1664V640H256v1152h1536zM256 512h1536V256H256v256zm128 384h1280v128H384V896zm0 256h1280v128H384v-128zm0 256h1280v128H384v-128z" />
-    </svg>
-  ),
-  Remove: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1115 1024l690 691-90 90-691-690-691 690-90-90 690-691-690-691 90-90 691 690 691-690 90 90-690 691z" />
-    </svg>
-  ),
-  MoreVertical: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1024 640q-53 0-99-20t-82-55-55-81-20-100q0-53 20-99t55-82 81-55 100-20q53 0 99 20t82 55 55 81 20 100q0 53-20 99t-55 82-81 55-100 20zm0 512q-53 0-99-20t-82-55-55-81-20-100q0-53 20-99t55-82 81-55 100-20q53 0 99 20t82 55 55 81 20 100q0 53-20 99t-55 82-81 55-100 20zm0 512q-53 0-99-20t-82-55-55-81-20-100q0-53 20-99t55-82 81-55 100-20q53 0 99 20t82 55 55 81 20 100q0 53-20 99t-55 82-81 55-100 20z" />
-    </svg>
-  ),
-  Up: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1024 0l1024 1024-146 146-878-878-878 878L0 1024 1024 0z" />
-    </svg>
-  ),
-  Down: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M0 1024l1024 1024 1024-1024-146-146-878 878-878-878L0 1024z" />
-    </svg>
-  ),
-  Undo: (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-      <path d="M1536 640q133 0 249 50t204 137 137 203 50 250q0 133-50 249t-137 204-203 137-250 50h-384v-128h384q106 0 199-40t163-109 110-163 40-200q0-106-40-199t-109-163-163-110-200-40H452l402 403-90 90L128 626 764 0l90 90-403 403h1085v147z" />
-    </svg>
-  ),
-};
