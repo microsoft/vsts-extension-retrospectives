@@ -95,7 +95,7 @@ body {
 
 .tooltip {
   @apply px-4 py-3 rounded-sm text-(--text-primary-color) bg-[rgb(var(--palette-neutral-0))] border-2 border-(--nav-header-active-item-background) text-sm shadow-lg max-w-md whitespace-normal wrap-break-word pointer-events-none;
-  position-area: bottom;
+  position-area: top;
   position-try-fallbacks: flip-block, flip-inline;
 }
 
@@ -814,11 +814,34 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
+.selector-option,
+.selector-option::picker(select) {
+  appearance: base-select;
+}
+
 .selector-option {
-  @apply w-60 text-ellipsis whitespace-nowrap text-sm h-8 px-2 cursor-pointer bg-(--callout-background-color) text-(--text-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+  @apply flex items-center min-w-60 h-8 text-ellipsis whitespace-nowrap text-sm px-2 cursor-pointer bg-(--callout-background-color) text-(--text-primary-color) border border-(--border-subtle-color) rounded-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+
+  &:open {
+    @apply border-primary;
+  }
+  &::picker-icon {
+    @apply transition-transform duration-100 ease-in rotate-0;
+  }
+  &:open::picker-icon {
+    @apply rotate-180;
+  }
 
   & option {
     @apply text-sm px-2 bg-(--callout-background-color) text-(--text-primary-color);
+
+    &:hover, &:focus {
+      @apply outline-none bg-[color-mix(in_srgb,var(--color-primary)_12%,var(--callout-background-color))];
+    }
+
+    &:checked {
+      @apply bg-[color-mix(in_srgb,var(--color-primary)_18%,var(--callout-background-color))];
+    }
   }
 }
 
@@ -1514,7 +1537,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .feedback-board-metadata-form > #board-metadata-general-panel {
-  @apply min-h-0 overflow-auto;
+  @apply min-h-0 pr-2 overflow-auto;
 }
 
 .feedback-board-metadata-form > #board-metadata-permissions-panel {
@@ -1701,7 +1724,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 
   & .title-input-container {
-    @apply text-base font-semibold flex flex-col items-center p-1 flex-1 border border-(--text-primary-color) text-left placeholder:text-left;
+    @apply flex items-center p-1 border border-(--border-subtle-color) rounded-xs placeholder:text-left;
 
     &:invalid {
       @apply border-error;
@@ -1712,14 +1735,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
   }
 
-  & select.title-input-container {
-    @apply text-left;
-  }
-
-  & .title-input-container.column-template-dropdown {
-    @apply bg-(--background-color) font-normal;
-  }
-
   & #max-vote-counter {
     appearance: auto;
   }
@@ -1727,30 +1742,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & #max-vote-counter::-webkit-outer-spin-button,
   & #max-vote-counter::-webkit-inner-spin-button {
     opacity: 1;
-  }
-
-  & .title-input-container.max-vote-counter .ms-TextField-wrapper .ms-TextField-fieldGroup {
-    @apply w-full;
-  }
-
-  & .title-input-container .ms-TextField-wrapper {
-    @apply flex items-center w-full;
-  }
-
-  & .title-input-container .ms-TextField-wrapper .ms-Label {
-    @apply w-12;
-  }
-
-  & .title-input-container .ms-TextField-wrapper .ms-TextField-fieldGroup {
-    @apply w-full max-w-full;
-  }
-
-  & .title-input-container .ms-TextField-wrapper .ms-TextField-fieldGroup #retrospective-title-input {
-    @apply w-full;
-  }
-
-  & .title-input-container .ms-TextField-errorMessage {
-    @apply -ml-20;
   }
 }
 
