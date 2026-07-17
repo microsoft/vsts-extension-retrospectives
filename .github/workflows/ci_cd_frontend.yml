@@ -1,6 +1,7 @@
 name: "CI and CD for Frontend"
 
 on:
+  workflow_call:
   workflow_dispatch:
   pull_request:
     branches:
@@ -22,7 +23,6 @@ permissions:
 jobs:
   build:
     name: "Build, Test and Publish"
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/trigger pipeline'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
