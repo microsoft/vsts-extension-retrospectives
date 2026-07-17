@@ -1910,28 +1910,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply relative flex flex-col items-center;
 }
 
-.workflow-stage-move-everyone {
-  @apply absolute -top-10 left-1/2 -translate-x-1/2 flex items-center justify-center w-30 h-8 p-1 border border-(--nav-header-active-item-background) cursor-pointer z-10;
-
-  &:focus-visible {
-    @apply outline-2 outline-primary outline-offset-2;
-  }
-
-  &:disabled {
-    @apply cursor-default opacity-60;
-  }
-
-  & svg {
-    @apply w-4 h-4;
-  }
-
-  & span {
-    @apply text-xs;
-  }
-}
-
 .workflow-stage-tab {
-  @apply px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
+  @apply flex gap-3 h-9 px-3 py-1.5 text-sm text-(--text-primary-color) bg-(--background-color) font-medium cursor-pointer border-b-2 border-transparent transition-colors duration-150 leading-none;
 
   &:hover {
     @apply text-primary;
@@ -1939,6 +1919,30 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   &:focus-visible {
     @apply outline-2 outline-primary outline-offset-2;
+  }
+
+  & .stage-text {
+    @apply flex items-center;
+  }
+
+  & .workflow-stage-move-everyone {
+    @apply items-center px-1 border border-(--nav-header-active-item-background);
+
+    &:focus-visible {
+      @apply outline-2 outline-primary outline-offset-2;
+    }
+
+    &:disabled {
+      @apply cursor-default opacity-60;
+    }
+
+    & svg {
+      @apply w-4 h-4;
+    }
+
+    & span {
+      @apply text-xs;
+    }
   }
 }
 

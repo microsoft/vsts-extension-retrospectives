@@ -165,6 +165,18 @@ describe("Workflow Stage", () => {
       expect(screen.queryByRole("button", { name: /Move everyone/ })).not.toBeInTheDocument();
     });
 
+    it("renders the invisible placeholder only when the move button is absent", () => {
+      const { container, rerender } = render(<WorkflowStage {...mockedProps} canManageBoard={true} />);
+
+      expect(screen.getByRole("button", { name: /Move everyone/ })).toBeInTheDocument();
+      expect(container.querySelector('button[aria-hidden="true"]')).not.toBeInTheDocument();
+
+      rerender(<WorkflowStage {...mockedProps} canManageBoard={false} />);
+
+      expect(screen.queryByRole("button", { name: /Move everyone/ })).not.toBeInTheDocument();
+      expect(container.querySelector('button[aria-hidden="true"]')).toHaveStyle({ opacity: "0" });
+    });
+
     it("disables the button while a move is pending", () => {
       render(<WorkflowStage {...mockedProps} canManageBoard={true} isMoveEveryonePending={true} />);
 

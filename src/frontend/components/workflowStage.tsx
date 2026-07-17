@@ -53,19 +53,23 @@ const WorkflowStage: React.FC<IWorkflowStageProps> = ({ display, value, isActive
 
   return (
     <div className="workflow-stage-wrapper">
-      {canManageBoard && isActive && (
-        <>
-          <button type="button" className="workflow-stage-move-everyone" aria-label={moveEveryoneLabel} aria-describedby={moveEveryoneTooltipId} aria-busy={isMoveEveryonePending} disabled={isMoveEveryonePending || !isLiveSyncAvailable} onClick={handleMoveEveryone} interestFor={moveEveryoneTooltipId}>
-            {getIconElement("people-forward")}
-            <span>{t("workflow_move_everyone")}</span>
-          </button>
-          <div id={moveEveryoneTooltipId} className="tooltip" popover="hint" role="tooltip">
-            {moveEveryoneTooltip}
-          </div>
-        </>
-      )}
       <div className={`workflow-stage-tab${isActive ? " workflow-stage-tab--active" : ""}`} aria-setsize={4} aria-posinset={ariaPosInSet} aria-label={display} aria-selected={isActive} role="tab" onClick={handleClick} onKeyDown={combinedKeyDown} onMouseMove={trackActivity} onTouchStart={trackActivity} tabIndex={0}>
         <p className="stage-text">{display}</p>
+        {canManageBoard && isActive && (
+          <>
+            <button type="button" className="workflow-stage-move-everyone" aria-label={moveEveryoneLabel} aria-describedby={moveEveryoneTooltipId} aria-busy={isMoveEveryonePending} disabled={isMoveEveryonePending || !isLiveSyncAvailable} onClick={handleMoveEveryone} interestFor={moveEveryoneTooltipId}>
+              {getIconElement("people-forward")}
+            </button>
+            <div id={moveEveryoneTooltipId} className="tooltip" popover="hint" role="tooltip">
+              {moveEveryoneTooltip}
+            </div>
+          </>
+        )}
+        {(!canManageBoard || !isActive) && (
+          <button type="button" style={{ opacity: 0 }} aria-hidden="true" tabIndex={-1} disabled>
+            {getIconElement("people-forward")}
+          </button>
+        )}
       </div>
     </div>
   );
