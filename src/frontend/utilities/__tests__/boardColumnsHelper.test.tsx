@@ -97,7 +97,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[1]).toEqual({
           accentColor: "#f6af08",
-          iconClass: "sad-face",
+          iconClass: "tear-face",
           id: "uuid-2",
           title: "Sad",
           notes: "",
