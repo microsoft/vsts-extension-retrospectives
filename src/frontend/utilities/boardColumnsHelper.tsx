@@ -71,7 +71,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#f6af08", //yellow
-          iconClass: "sad-face",
+          iconClass: "tear-face",
           id: generateUUID(),
           title: "Sad",
           notes: "",
