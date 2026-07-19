@@ -2041,7 +2041,7 @@ describe("FeedbackBoardMetadataForm - Template Selection Extended", () => {
 
     const templateDropdown = screen.getByLabelText(/apply template/i) as HTMLSelectElement;
 
-    const templates = ["start-stop-continue", "good-improve-ideas-thanks", "mad-sad-glad", "4ls", "daki", "kalm", "wlai", "1to1", "speedboat", "clarity", "energy", "psy-safety", "wlb", "confidence", "efficiency"];
+    const templates = ["start-stop-continue", "good-improve-ideas-thanks", "mad-sad-glad", "4ls", "daki", "kalm", "wlai", "speedboat", "clarity", "energy", "psy-safety", "wlb", "confidence", "efficiency"];
 
     for (const template of templates) {
       await user.selectOptions(templateDropdown, template);

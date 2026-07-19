@@ -208,37 +208,6 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
           notes: "",
         },
       ];
-    case "1to1": // 1-to-1 - Good, So-so, Not-so-good, Done
-      return [
-        {
-          accentColor: "#008000", //green
-          iconClass: "thumb-up",
-          id: generateUUID(),
-          title: "Good",
-          notes: "",
-        },
-        {
-          accentColor: "#f6af08", //yellow
-          iconClass: "thumb-up-down",
-          id: generateUUID(),
-          title: "So-so",
-          notes: "",
-        },
-        {
-          accentColor: "#cc293d", //red
-          iconClass: "thumb-down",
-          id: generateUUID(),
-          title: "Not-so-good",
-          notes: "",
-        },
-        {
-          accentColor: "#8063bf", //purple
-          iconClass: "check-circle",
-          id: generateUUID(),
-          title: "Done",
-          notes: "",
-        },
-      ];
     case "speedboat": // Speedboat retrospective - Propellers, Life Preserver, Anchors, Rocks
       return [
         {

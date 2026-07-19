@@ -256,42 +256,6 @@ describe("boardColumnsHelper", () => {
       });
     });
 
-    describe("1to1 template", () => {
-      it("should return correct columns for 1to1 template (1-to-1 feedback)", () => {
-        const result = getColumnsByTemplateId("1to1");
-
-        expect(result).toHaveLength(4);
-        expect(result[0]).toEqual({
-          accentColor: "#008000",
-          iconClass: "thumb-up",
-          id: "uuid-1",
-          title: "Good",
-          notes: "",
-        });
-        expect(result[1]).toEqual({
-          accentColor: "#f6af08",
-          iconClass: "thumb-up-down",
-          id: "uuid-2",
-          title: "So-so",
-          notes: "",
-        });
-        expect(result[2]).toEqual({
-          accentColor: "#cc293d",
-          iconClass: "thumb-down",
-          id: "uuid-3",
-          title: "Not-so-good",
-          notes: "",
-        });
-        expect(result[3]).toEqual({
-          accentColor: "#8063bf",
-          iconClass: "check-circle",
-          id: "uuid-4",
-          title: "Done",
-          notes: "",
-        });
-      });
-    });
-
     describe("speedboat template", () => {
       it("should return correct columns for speedboat template (Propellors, Lifesavers, Anchors, Rocks)", () => {
         const result = getColumnsByTemplateId("speedboat");
@@ -588,7 +552,7 @@ describe("boardColumnsHelper", () => {
 
     describe("column structure validation", () => {
       it("should ensure all columns have required IFeedbackColumn properties", () => {
-        const templateIds = ["start-stop-continue", "good-improve-ideas-thanks", "mad-sad-glad", "4ls", "daki", "kalm", "wlai", "1to1", "speedboat", "clarity", "energy", "psy-safety", "wlb", "confidence", "efficiency", "unknown-template"];
+        const templateIds = ["start-stop-continue", "good-improve-ideas-thanks", "mad-sad-glad", "4ls", "daki", "kalm", "wlai", "speedboat", "clarity", "energy", "psy-safety", "wlb", "confidence", "efficiency", "unknown-template"];
 
         templateIds.forEach(templateId => {
           // Reset mock for each iteration
@@ -654,7 +618,7 @@ describe("boardColumnsHelper", () => {
 
     describe("icon validation", () => {
       it("should provide a valid React icon element", () => {
-        const allTemplates = ["start-stop-continue", "good-improve-ideas-thanks", "mad-sad-glad", "4ls", "daki", "kalm", "wlai", "1to1", "speedboat"];
+        const allTemplates = ["start-stop-continue", "good-improve-ideas-thanks", "mad-sad-glad", "4ls", "daki", "kalm", "wlai", "speedboat"];
 
         allTemplates.forEach(templateId => {
           const result = getColumnsByTemplateId(templateId);

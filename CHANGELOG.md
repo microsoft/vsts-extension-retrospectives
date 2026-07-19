@@ -17,6 +17,8 @@ From [GitHub PR #1835](https://github.com/microsoft/vsts-extension-retrospective
 
 From [GitHub PR #1832](https://github.com/microsoft/vsts-extension-retrospectives/pull/1832)
 
+* Removed rarely used Good-to-Done retrospective template. From [GitHub PR #1845](https://github.com/microsoft/vsts-extension-retrospectives/pull/1845)
+
 ## v1.92.57
 
 * Fixed double scrollbar behavior in the Create email summary dialog at higher zoom levels. From [GitHub PR #1816](https://github.com/microsoft/vsts-extension-retrospectives/pull/1816)
