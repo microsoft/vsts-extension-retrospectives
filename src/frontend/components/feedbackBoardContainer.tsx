@@ -2523,10 +2523,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                               </div>
                             </dialog>
                           )}
-                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} aria-label="Team Assessment" type="button">
+                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} aria-label="Team Assessment" aria-describedby="team-assessment-tooltip" interestFor="team-assessment-tooltip" type="button">
                             {getIconElement("assessment")}
                             <span className="hidden lg:inline">Team Assessment</span>
                           </button>
+                          <div id="team-assessment-tooltip" className="tooltip" popover="hint" role="tooltip">
+                            Team Assessment
+                          </div>
                         </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">

@@ -706,6 +706,34 @@ describe("FeedbackBoardContainer integration", () => {
     expect(await screen.findByRole("option", { name: "Other Team" })).toBeInTheDocument();
   });
 
+  it("configures a custom tooltip for Team Assessment", async () => {
+    const assessmentBoard = { ...mockBoard, isIncludeTeamEffectivenessMeasurement: true };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([assessmentBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(assessmentBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    const teamAssessmentButton = await screen.findByRole("button", { name: "Team Assessment" });
+    const tooltipId = teamAssessmentButton.getAttribute("aria-describedby");
+    const tooltip = document.getElementById(tooltipId!)!;
+
+    expect(tooltipId).toBe("team-assessment-tooltip");
+    expect(teamAssessmentButton).toHaveAttribute("interestFor", tooltipId);
+    expect(tooltip).toHaveAttribute("popover", "hint");
+    expect(tooltip).toHaveClass("tooltip");
+    expect(tooltip).toHaveTextContent("Team Assessment");
+  });
+
   it("configures a custom tooltip for Focus Mode", async () => {
     const actBoard = { ...mockBoard, activePhase: WorkflowPhase.Act };
 
