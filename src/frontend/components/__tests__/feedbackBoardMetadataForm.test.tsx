@@ -485,6 +485,21 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
 
     expect(mockOnFormCancel).toHaveBeenCalledTimes(1);
   });
+
+  it("should render read-only settings when user cannot manage board", () => {
+    mockedProps.isNewBoardCreation = false;
+    mockedProps.currentBoard = testExistingBoard;
+
+    render(<FeedbackBoardMetadataForm {...mockedProps} canManageBoard={false} />);
+
+    expect(screen.queryByRole("button", { name: /save/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /close/i })).toBeInTheDocument();
+
+    expect(screen.getByLabelText(/please enter new retrospective title/i)).toBeDisabled();
+    expect(screen.getByLabelText(/max votes per user/i)).toBeDisabled();
+    expect(screen.getByLabelText(/apply template/i)).toBeDisabled();
+    expect(screen.getByRole("button", { name: /add new column/i })).toBeDisabled();
+  });
 });
 
 describe("FeedbackBoardMetadataForm - Column Management", () => {

@@ -11,6 +11,7 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   permissionOptions: FeedbackBoardPermissionOption[];
   currentUserId: string;
   isNewBoardCreation: boolean;
+  canManageBoard?: boolean;
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -108,12 +109,13 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [searchTerm, setSearchTerm] = React.useState<string>("");
   const boardOwnerId = props.isNewBoardCreation ? props.currentUserId : props.board?.createdBy?.id;
 
-  const canManageBoard = canCurrentUserManageBoard({
+  const computedCanManageBoard = canCurrentUserManageBoard({
     boardOwnerId: props.board?.createdBy?.id,
     currentUserId: props.currentUserId,
     isTeamAdmin: isCurrentUserTeamAdmin(props.currentUserId, props.permissionOptions),
     isNewBoardCreation: props.isNewBoardCreation,
   });
+  const canManageBoard = props.canManageBoard ?? computedCanManageBoard;
 
   const cleanPermissionOptions = React.useMemo(() => props.permissionOptions.filter(option => !isGroupOption(option)), [props.permissionOptions]); // removes groups
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
