@@ -61,6 +61,17 @@ describe("localization", () => {
     expect(t("feedback_board_focus_mode_tooltip")).toBe(expectedTooltip);
   });
 
+  it.each([
+    ["en-US", "Team Assessment"],
+    ["es-ES", "Evaluacion del equipo"],
+    ["de-DE", "Team-Bewertung"],
+    ["fr-FR", "Evaluation d'equipe"],
+  ])("translates Team Assessment for %s", (locale, expectedLabel) => {
+    initializeLocale(locale);
+
+    expect(t("feedback_board_team_assessment")).toBe(expectedLabel);
+  });
+
   it("falls back to English strings for unsupported locales", () => {
     initializeLocale("it-IT");
 

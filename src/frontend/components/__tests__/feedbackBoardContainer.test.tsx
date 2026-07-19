@@ -675,8 +675,20 @@ describe("FeedbackBoardContainer integration", () => {
       jest.advanceTimersByTime(1);
       expect(showPopover).toHaveBeenCalledWith({ source: teamSelector });
 
-      fireEvent.pointerLeave(teamSelector);
+      fireEvent.pointerDown(teamSelector);
       expect(hidePopover).toHaveBeenCalledTimes(1);
+
+      fireEvent.focus(teamSelector);
+      fireEvent.click(teamSelector);
+      jest.advanceTimersByTime(500);
+      expect(showPopover).toHaveBeenCalledTimes(1);
+
+      fireEvent.pointerEnter(teamSelector);
+      jest.advanceTimersByTime(500);
+      expect(showPopover).toHaveBeenCalledTimes(2);
+
+      fireEvent.keyDown(teamSelector, { key: "ArrowDown" });
+      expect(hidePopover).toHaveBeenCalledTimes(2);
     } finally {
       jest.useRealTimers();
       matchesSpy.mockRestore();
@@ -692,6 +704,40 @@ describe("FeedbackBoardContainer integration", () => {
 
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
     expect(await screen.findByRole("option", { name: "Other Team" })).toBeInTheDocument();
+  });
+
+  it("configures a custom tooltip for Team Assessment", async () => {
+    const assessmentBoard = { ...mockBoard, isIncludeTeamEffectivenessMeasurement: true };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([assessmentBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(assessmentBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    setLocale("es-ES");
+    const { unmount } = render(<FeedbackBoardContainer {...props} />);
+
+    try {
+      const teamAssessmentButton = await screen.findByRole("button", { name: "Evaluacion del equipo" });
+      const tooltipId = teamAssessmentButton.getAttribute("aria-describedby");
+      const tooltip = document.getElementById(tooltipId!)!;
+
+      expect(tooltipId).toBe("team-assessment-tooltip");
+      expect(teamAssessmentButton).toHaveAttribute("interestFor", tooltipId);
+      expect(tooltip).toHaveAttribute("popover", "hint");
+      expect(tooltip).toHaveClass("tooltip");
+      expect(tooltip).toHaveTextContent("Evaluacion del equipo");
+    } finally {
+      unmount();
+      setLocale("en-US");
+    }
   });
 
   it("configures a custom tooltip for Focus Mode", async () => {

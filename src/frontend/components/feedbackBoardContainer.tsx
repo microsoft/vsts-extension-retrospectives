@@ -252,6 +252,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const boardActionsMenuRootRef = React.useRef<HTMLDivElement | null>(null);
   const { triggerRef: teamSelectorRef, tooltipRef: teamSelectorTooltipRef, showTooltip: showTeamSelectorTooltip, hideTooltip: hideTeamSelectorTooltip } = useDelayedTooltip<HTMLSelectElement>();
+  const isTeamSelectorPointerDownRef = React.useRef(false);
 
   const carouselDialogRef = React.useRef<HTMLDialogElement | null>(null);
   const previewEmailDialogRef = React.useRef<HTMLDialogElement | null>(null);
@@ -2172,6 +2173,26 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   };
 
+  const handleTeamSelectorPointerDown = () => {
+    isTeamSelectorPointerDownRef.current = true;
+    hideTeamSelectorTooltip();
+  };
+
+  const handleTeamSelectorPointerUp = () => {
+    isTeamSelectorPointerDownRef.current = false;
+  };
+
+  const handleTeamSelectorFocus = () => {
+    if (!isTeamSelectorPointerDownRef.current) {
+      showTeamSelectorTooltip();
+    }
+  };
+
+  const handleTeamSelectorBlur = () => {
+    isTeamSelectorPointerDownRef.current = false;
+    hideTeamSelectorTooltip();
+  };
+
   const handleBoardSelectionChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedBoardId = event.target.value;
     const selectedBoard = state.boards.find(board => board.id === selectedBoardId);
@@ -2302,7 +2323,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           <label htmlFor="team-selector" className="sr-only">
             Team
           </label>
-          <select ref={teamSelectorRef} id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} onPointerEnter={showTeamSelectorTooltip} onFocus={showTeamSelectorTooltip} onPointerLeave={hideTeamSelectorTooltip} onBlur={hideTeamSelectorTooltip} aria-label="Team" aria-describedby="team-selector-tooltip" interestFor="team-selector-tooltip">
+          <select ref={teamSelectorRef} id="team-selector" className="selector-option" value={state.currentTeam?.id || ""} onChange={handleTeamSelectionChange} onPointerEnter={showTeamSelectorTooltip} onPointerDown={handleTeamSelectorPointerDown} onPointerUp={handleTeamSelectorPointerUp} onPointerCancel={handleTeamSelectorPointerUp} onClick={hideTeamSelectorTooltip} onKeyDown={hideTeamSelectorTooltip} onFocus={handleTeamSelectorFocus} onPointerLeave={hideTeamSelectorTooltip} onBlur={handleTeamSelectorBlur} aria-label="Team" aria-describedby="team-selector-tooltip" interestFor="team-selector-tooltip">
             {selectableTeams.map(team => (
               <option key={team.id} value={team.id}>
                 {team.name}
@@ -2417,9 +2438,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                         <>
                           {visibleDialogs.isTeamEffectivenessDialogVisible && (
-                            <dialog ref={teamEffectivenessDialogRef} className="team-effectiveness-dialog dialog-width-lg" role="dialog" aria-label="Team Assessment" onClose={() => setDialogVisible("isTeamEffectivenessDialogVisible", false)}>
+                            <dialog ref={teamEffectivenessDialogRef} className="team-effectiveness-dialog dialog-width-lg" role="dialog" aria-label={t("feedback_board_team_assessment")} onClose={() => setDialogVisible("isTeamEffectivenessDialogVisible", false)}>
                               <div className="header">
-                                <h2 className="title">Team Assessment</h2>
+                                <h2 className="title">{t("feedback_board_team_assessment")}</h2>
                                 <button type="button" onClick={hideTeamEffectivenessDialog} aria-label="Close">
                                   {getIconElement("close")}
                                 </button>
@@ -2502,10 +2523,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                               </div>
                             </dialog>
                           )}
-                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} aria-label="Team Assessment" type="button">
+                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} aria-label={t("feedback_board_team_assessment")} aria-describedby="team-assessment-tooltip" interestFor="team-assessment-tooltip" type="button">
                             {getIconElement("assessment")}
-                            <span className="hidden lg:inline">Team Assessment</span>
+                            <span className="hidden lg:inline">{t("feedback_board_team_assessment")}</span>
                           </button>
+                          <div id="team-assessment-tooltip" className="tooltip" popover="hint" role="tooltip">
+                            {t("feedback_board_team_assessment")}
+                          </div>
                         </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
@@ -2814,7 +2838,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             </section>
             {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
               <section className="retro-summary-section">
-                <div className="retro-summary-section-header">Team Assessment</div>
+                <div className="retro-summary-section-header">{t("feedback_board_team_assessment")}</div>
                 <div>
                   Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
                   <div className="retro-summary-effectiveness-scores">
