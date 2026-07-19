@@ -231,26 +231,5 @@ jobs:
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          # Build/package once, then retry only the publish call for transient marketplace errors (e.g. HTTP 503).
-          npm run pack:d
-
-          echo "Publish attempt 1/2"
-          if npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token "${AZURE_DEVOPS_TOKEN}"; then
-            echo "Extension publish succeeded on attempt 1."
-            exit 0
-          fi
-
-          echo "Publish failed. Retrying in 15s..."
-          sleep 15
-
-          echo "Publish attempt 2/2"
-          if npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token "${AZURE_DEVOPS_TOKEN}"; then
-            echo "Extension publish succeeded on attempt 2."
-            exit 0
-          fi
-
-          echo "Extension publish failed after 2 attempts."
-          exit 1
+        run: >
+          npm run publish:d
