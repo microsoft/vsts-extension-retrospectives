@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
-import { canCurrentUserManageBoard, isCurrentUserTeamAdmin } from "../utilities/boardAccessHelper";
 import { getIconElement, PeopleIcon } from "./icons";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
@@ -11,6 +10,7 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   permissionOptions: FeedbackBoardPermissionOption[];
   currentUserId: string;
   isNewBoardCreation: boolean;
+  canManageBoard: boolean;
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -32,6 +32,7 @@ interface PermissionOptionInputProps {
   optionId: string;
   optionType: FeedbackBoardPermissionOption["type"];
   isBoardOwner: boolean;
+  canManageBoard: boolean;
   isChecked: boolean;
   isIndeterminate: boolean;
   onPermissionClicked: (optionId: string, optionType: FeedbackBoardPermissionOption["type"], hasPermission: boolean) => void;
@@ -84,7 +85,7 @@ const PermissionOptionInput = React.memo(function PermissionOptionInput(props: P
       className="my-2"
       id={`permission-option-${props.optionId}`}
       aria-label="Add permission to every team or member in the table"
-      disabled={props.isBoardOwner}
+      disabled={props.isBoardOwner || !props.canManageBoard}
       checked={props.isChecked}
       onChange={event => {
         props.onPermissionClicked(props.optionId, props.optionType, event.target.checked);
@@ -107,20 +108,12 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
   const boardOwnerId = props.isNewBoardCreation ? props.currentUserId : props.board?.createdBy?.id;
-
-  const canManageBoard = canCurrentUserManageBoard({
-    boardOwnerId: props.board?.createdBy?.id,
-    currentUserId: props.currentUserId,
-    isTeamAdmin: isCurrentUserTeamAdmin(props.currentUserId, props.permissionOptions),
-    isNewBoardCreation: props.isNewBoardCreation,
-  });
+  const { canManageBoard } = props;
 
   const cleanPermissionOptions = React.useMemo(() => props.permissionOptions.filter(option => !isGroupOption(option)), [props.permissionOptions]); // removes groups
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
   const handlePermissionClicked = React.useCallback((optionId: string, optionType: FeedbackBoardPermissionOption["type"], hasPermission: boolean) => {
-    if (!canManageBoard) return;
-
     const setPermissionList = optionType === "team" ? setTeamPermissions : setMemberPermissions;
     setPermissionList(permissionList => {
       if (hasPermission) {
@@ -223,13 +216,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission for ${props.option.name}`} />;
   };
 
-  const PermissionEditWarning = () => {
-    if (!canManageBoard) {
-      return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the Board Owner or a Team Admin can edit permissions</div>;
-    }
-    return null;
-  };
-
   useEffect(() => {
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
@@ -271,6 +257,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                         optionId={option.id}
                         optionType={option.type}
                         isBoardOwner={isBoardOwner}
+                        canManageBoard={canManageBoard}
                         isChecked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
                         isIndeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner}
                         onPermissionClicked={handlePermissionClicked}
@@ -297,7 +284,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           </table>
         </div>
       </section>
-      <PermissionEditWarning />
     </div>
   );
 }

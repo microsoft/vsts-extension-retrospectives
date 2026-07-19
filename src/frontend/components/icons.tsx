@@ -424,9 +424,9 @@ export const FrownFaceIcon = () => {
   );
 };
 
-export const SadFaceIcon = () => {
+export const TearFaceIcon = () => {
   return (
-    <svg className="icon-sad-face" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+    <svg className="icon-tear-face" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
       <path d="M0 0h24v24H0V0z" fill="none" />
       <circle cx="15.5" cy="9.5" r="1.5" />
       <circle cx="8.5" cy="9.5" r="1.5" />
@@ -782,8 +782,7 @@ export interface IIconDefinition {
 
 export const iconDefinitions: IIconDefinition[] = [
   { id: "smile-face", name: "Smile", icon: <SmileFaceIcon />, trayOrder: 1, legacyAliases: ["far fa-smile"] },
-  { id: "frown-face", name: "Frown", icon: <FrownFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown"] },
-  { id: "happy-face", name: "Happy Face", icon: <HappyFaceIcon />, trayOrder: 0 },
+  { id: "frown-face", name: "Frown", icon: <FrownFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown", "sad-face"] },
   { id: "add-circle", name: "Add Circle", icon: <AddCircleIcon />, trayOrder: 3, legacyAliases: ["fa-plus", "fa-plus-circle", "fas fa-cart-plus"] },
   { id: "check-circle", name: "Check", icon: <CheckCircleIcon />, trayOrder: 4, legacyAliases: ["fa-check-circle"] },
   { id: "help", name: "Question", icon: <HelpIcon />, trayOrder: 5, legacyAliases: ["fas fa-question", "far fa-question"] },
@@ -815,7 +814,8 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 0 },
   { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 0, legacyAliases: ["fas fa-lock"] },
   { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
-  { id: "sad-face", name: "Sad", icon: <SadFaceIcon />, trayOrder: 0 },
+  { id: "happy-face", name: "Happy Face", icon: <HappyFaceIcon />, trayOrder: 0 },
+  { id: "tear-face", name: "Tear", icon: <TearFaceIcon />, trayOrder: 0 },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
   { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
   { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fan", "fas fa-fan"] },
