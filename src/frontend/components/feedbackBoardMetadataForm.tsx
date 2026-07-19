@@ -349,9 +349,9 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             {t("feedback_board_permissions")}
           </button>
         </div>
-        {!canManageBoard && <div className="board-metadata-form-section-information">{getIconElement("info")} {t("feedback_board_view_only_message")}</div>}
         {activeMetadataTab === "General" && (
           <div id="board-metadata-general-panel" className="board-metadata-form" role="tabpanel" aria-labelledby="board-metadata-general-tab">
+            {!canManageBoard && <div className="board-metadata-form-section-information board-metadata-read-only-banner">{getIconElement("exclamation")} {t("feedback_board_view_only_message")}</div>}
             <section className="board-metadata-edit-column-settings board-metadata-board-settings-section">
               <h2 className="board-metadata-form-section-header">Board Settings</h2>
               <div className="board-metadata-form-section-subheader board-metadata-title-row">
@@ -671,7 +671,8 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
           </div>
         )}
         {activeMetadataTab === "Permissions" && (
-          <div id="board-metadata-permissions-panel" role="tabpanel" aria-labelledby="board-metadata-permissions-tab">
+          <div id="board-metadata-permissions-panel" className="board-metadata-form" role="tabpanel" aria-labelledby="board-metadata-permissions-tab">
+            {!canManageBoard && <div className="board-metadata-form-section-information board-metadata-read-only-banner">{getIconElement("exclamation")} {t("feedback_board_view_only_message")}</div>}
             <FeedbackBoardMetadataFormPermissions board={currentBoard} permissions={permissions} permissionOptions={availablePermissionOptions} currentUserId={currentUserId} isNewBoardCreation={isNewBoardCreation} canManageBoard={canManageBoard} onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)} />
           </div>
         )}
