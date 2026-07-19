@@ -2438,9 +2438,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
                         <>
                           {visibleDialogs.isTeamEffectivenessDialogVisible && (
-                            <dialog ref={teamEffectivenessDialogRef} className="team-effectiveness-dialog dialog-width-lg" role="dialog" aria-label="Team Assessment" onClose={() => setDialogVisible("isTeamEffectivenessDialogVisible", false)}>
+                            <dialog ref={teamEffectivenessDialogRef} className="team-effectiveness-dialog dialog-width-lg" role="dialog" aria-label={t("feedback_board_team_assessment")} onClose={() => setDialogVisible("isTeamEffectivenessDialogVisible", false)}>
                               <div className="header">
-                                <h2 className="title">Team Assessment</h2>
+                                <h2 className="title">{t("feedback_board_team_assessment")}</h2>
                                 <button type="button" onClick={hideTeamEffectivenessDialog} aria-label="Close">
                                   {getIconElement("close")}
                                 </button>
@@ -2523,12 +2523,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                               </div>
                             </dialog>
                           )}
-                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} aria-label="Team Assessment" aria-describedby="team-assessment-tooltip" interestFor="team-assessment-tooltip" type="button">
+                          <button className="team-assessment-button" onClick={showTeamEffectivenessDialog} aria-label={t("feedback_board_team_assessment")} aria-describedby="team-assessment-tooltip" interestFor="team-assessment-tooltip" type="button">
                             {getIconElement("assessment")}
-                            <span className="hidden lg:inline">Team Assessment</span>
+                            <span className="hidden lg:inline">{t("feedback_board_team_assessment")}</span>
                           </button>
                           <div id="team-assessment-tooltip" className="tooltip" popover="hint" role="tooltip">
-                            Team Assessment
+                            {t("feedback_board_team_assessment")}
                           </div>
                         </>
                       )}
@@ -2838,7 +2838,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             </section>
             {state.currentBoard.isIncludeTeamEffectivenessMeasurement && (
               <section className="retro-summary-section">
-                <div className="retro-summary-section-header">Team Assessment</div>
+                <div className="retro-summary-section-header">{t("feedback_board_team_assessment")}</div>
                 <div>
                   Assessment with favorability percentages and average score <br />({teamEffectivenessResponseCount} {teamEffectivenessResponseCount == 1 ? "person" : "people"} responded)
                   <div className="retro-summary-effectiveness-scores">

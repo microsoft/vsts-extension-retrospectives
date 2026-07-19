@@ -721,17 +721,23 @@ describe("FeedbackBoardContainer integration", () => {
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
     mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
 
-    render(<FeedbackBoardContainer {...props} />);
+    setLocale("es-ES");
+    const { unmount } = render(<FeedbackBoardContainer {...props} />);
 
-    const teamAssessmentButton = await screen.findByRole("button", { name: "Team Assessment" });
-    const tooltipId = teamAssessmentButton.getAttribute("aria-describedby");
-    const tooltip = document.getElementById(tooltipId!)!;
+    try {
+      const teamAssessmentButton = await screen.findByRole("button", { name: "Evaluacion del equipo" });
+      const tooltipId = teamAssessmentButton.getAttribute("aria-describedby");
+      const tooltip = document.getElementById(tooltipId!)!;
 
-    expect(tooltipId).toBe("team-assessment-tooltip");
-    expect(teamAssessmentButton).toHaveAttribute("interestFor", tooltipId);
-    expect(tooltip).toHaveAttribute("popover", "hint");
-    expect(tooltip).toHaveClass("tooltip");
-    expect(tooltip).toHaveTextContent("Team Assessment");
+      expect(tooltipId).toBe("team-assessment-tooltip");
+      expect(teamAssessmentButton).toHaveAttribute("interestFor", tooltipId);
+      expect(tooltip).toHaveAttribute("popover", "hint");
+      expect(tooltip).toHaveClass("tooltip");
+      expect(tooltip).toHaveTextContent("Evaluacion del equipo");
+    } finally {
+      unmount();
+      setLocale("en-US");
+    }
   });
 
   it("configures a custom tooltip for Focus Mode", async () => {
