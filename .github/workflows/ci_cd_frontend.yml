@@ -237,25 +237,20 @@ jobs:
           # Build/package once, then retry only the publish call for transient marketplace errors (e.g. HTTP 503).
           npm run pack:d
 
-          max_attempts=4
-          attempt=1
+          echo "Publish attempt 1/2"
+          if npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token "${AZURE_DEVOPS_TOKEN}"; then
+            echo "Extension publish succeeded on attempt 1."
+            exit 0
+          fi
 
-          until [ "$attempt" -gt "$max_attempts" ]; do
-            echo "Publish attempt ${attempt}/${max_attempts}"
+          echo "Publish failed. Retrying in 15s..."
+          sleep 15
 
-            if npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token "${AZURE_DEVOPS_TOKEN}"; then
-              echo "Extension publish succeeded on attempt ${attempt}."
-              break
-            fi
+          echo "Publish attempt 2/2"
+          if npx tfx extension publish --manifests vss-extension-dev.json --vsix ./dist/*.vsix --token "${AZURE_DEVOPS_TOKEN}"; then
+            echo "Extension publish succeeded on attempt 2."
+            exit 0
+          fi
 
-            if [ "$attempt" -eq "$max_attempts" ]; then
-              echo "Extension publish failed after ${max_attempts} attempts."
-              exit 1
-            fi
-
-            sleep_seconds=$((15 * attempt))
-            echo "Publish failed. Retrying in ${sleep_seconds}s..."
-            sleep "${sleep_seconds}"
-
-            attempt=$((attempt + 1))
-          done
+          echo "Extension publish failed after 2 attempts."
+          exit 1
