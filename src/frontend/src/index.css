@@ -1561,6 +1561,10 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
   }
 
+  & .board-metadata-read-only-banner {
+    @apply whitespace-nowrap overflow-hidden text-ellipsis;
+  }
+
   & .search-bar {
     @apply mb-3;
 

@@ -3,12 +3,13 @@
  */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from "react";
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mockUuid } from "../__mocks__/uuid/v4";
 import FeedbackBoardMetadataForm, { IFeedbackBoardMetadataFormProps } from "../feedbackBoardMetadataForm";
 import { testExistingBoard, testTeamId } from "../__mocks__/mocked_components/mockedBoardMetadataForm";
+import BoardDataService from "../../dal/boardDataService";
 
 // Mock HTMLDialogElement for JSDOM
 beforeAll(() => {
@@ -485,6 +486,68 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
 
     expect(mockOnFormCancel).toHaveBeenCalledTimes(1);
   });
+
+  it("should submit when saving from Permissions tab", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    await user.type(screen.getByLabelText(/please enter new retrospective title/i), "Permissions Save Test");
+    await user.click(screen.getByRole("tab", { name: /permissions/i }));
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    expect(mockOnFormSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it("should switch to General tab when saving from Permissions tab with empty title", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    await user.click(screen.getByRole("tab", { name: /permissions/i }));
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole("tab", { name: /general/i })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText(/field 'retrospective name' cannot be empty\./i)).toBeInTheDocument();
+  });
+
+  it("should switch to General tab when duplicate title is detected from Permissions tab", async () => {
+    const user = userEvent.setup();
+    mockedProps.isNewBoardCreation = false;
+    mockedProps.currentBoard = testExistingBoard;
+
+    jest.mocked(BoardDataService.checkIfBoardNameIsTaken).mockResolvedValueOnce(true);
+
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const titleInput = screen.getByLabelText(/please enter new retrospective title/i) as HTMLInputElement;
+    await user.clear(titleInput);
+    await user.type(titleInput, `${testExistingBoard.title} duplicate`);
+    await user.click(screen.getByRole("tab", { name: /permissions/i }));
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    expect(mockOnFormSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole("tab", { name: /general/i })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText(/field 'retrospective name' must be unique\./i)).toBeInTheDocument();
+  });
+
+  it("should render read-only settings when user cannot manage board", () => {
+    mockedProps.isNewBoardCreation = false;
+    mockedProps.currentBoard = testExistingBoard;
+
+    render(<FeedbackBoardMetadataForm {...mockedProps} canManageBoard={false} />);
+
+    expect(screen.queryByRole("button", { name: /save/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /close/i })).toBeInTheDocument();
+
+    expect(screen.getByLabelText(/please enter new retrospective title/i)).toBeDisabled();
+    expect(screen.getByLabelText(/max votes per user/i)).toBeDisabled();
+    expect(screen.getByLabelText(/apply template/i)).toBeDisabled();
+    expect(screen.getByRole("button", { name: /add new column/i })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("tab", { name: /permissions/i }));
+    expect(screen.getByText(/only the board owner or a team admin can edit retrospective settings\./i)).toBeInTheDocument();
+  });
+
 });
 
 describe("FeedbackBoardMetadataForm - Column Management", () => {

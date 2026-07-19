@@ -4,6 +4,13 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.59
 
+* Restricted editing of retrospective settings to the Board Owner or a Team Admin.
+* Added a view-only retrospective settings experience for other users, including updated board menu text, dialog messaging, and disabled editing controls.
+* Fixed bug that prevented saving retrospective settings from the Permissions tab.
+* Hardened frontend CI/CD pipeline by retrying publish once on transient failure.
+
+From [GitHub PR #1846](https://github.com/microsoft/vsts-extension-retrospectives/pull/1846)
+
 * Addressed legacy icon mapping gaps or misalignment and replaced remaining Font Awesome icons.
 * Replaced filled icons with outlined versions for the help menu.
 * Added new icons for the Speedboat template and swapped several icons used in other templates.

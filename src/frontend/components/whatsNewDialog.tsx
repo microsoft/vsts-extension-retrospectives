@@ -9,6 +9,7 @@ interface IWhatsNewDialogProps {
 const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.59, v1.92.57, and v1.92.56 include:";
 
 const WHATS_NEW_ITEMS = [
+  "Restricted editing of retrospective settings to the Board Owner and Team Admin.",
   "Addressed legacy icon mapping gaps and updated icons used in templates, team assessment, and help menu.",
   "Streamlined the icon selection tray from 37 to 30 curated icons.",
   "Fixed the email summary Copy to clipboard action so it works reliably from the preview dialog.",

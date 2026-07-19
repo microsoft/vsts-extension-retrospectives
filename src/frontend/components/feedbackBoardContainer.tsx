@@ -1844,6 +1844,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   };
 
   const updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, _teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => {
+    if (!canManageBoard) {
+      toast(t("feedback_board_view_only_message"));
+      return;
+    }
+
     const updatedBoard = await BoardDataService.updateBoardMetadata(state.currentTeam.id, state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
     updateBoardAndBroadcast(updatedBoard);
@@ -1949,6 +1954,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     placeholderText: string,
     onSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void,
     onCancel: () => void,
+    canManageCurrentBoard: boolean,
     initialTitleOverride?: string,
     onDialogClose?: () => void,
   ) => {
@@ -1960,7 +1966,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             {getIconElement("close")}
           </button>
         </div>
-        <FeedbackBoardMetadataForm isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} initialTitleOverride={initialTitleOverride} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
+        <FeedbackBoardMetadataForm isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} initialTitleOverride={initialTitleOverride} canManageBoard={canManageCurrentBoard} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
       </dialog>
     );
   };
@@ -2371,8 +2377,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                             {t("feedback_board_create_copy")}
                           </button>
                           <button key="editBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
-                            {getIconElement("edit")}
-                            {t("feedback_board_edit")}
+                            {getIconElement(canManageBoard ? "edit" : "eye")}
+                            {canManageBoard ? t("feedback_board_edit") : t("feedback_board_view_settings")}
                           </button>
                           <button key="searchAllBoards" type="button" onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
                             {getIconElement("search")}
@@ -2689,14 +2695,15 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         t("feedback_board_create_example", { date: formatDate(new Date(), { year: "numeric", month: "long" }) }),
         createBoard,
         hideBoardCreationDialog,
+        true,
         boardCreationInitialTitleOverride,
         () => {
           setBoardCreationInitialTitleOverride(undefined);
           setDialogVisible("isBoardCreationDialogVisible", false);
         },
       )}
-      {state.currentBoard && visibleDialogs.isBoardDuplicateDialogVisible && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog, undefined, () => setDialogVisible("isBoardDuplicateDialogVisible", false))}
-      {state.currentBoard && visibleDialogs.isBoardUpdateDialogVisible && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, t("feedback_board_edit"), "", updateBoardMetadata, hideBoardUpdateDialog, undefined, () => setDialogVisible("isBoardUpdateDialogVisible", false))}
+      {state.currentBoard && visibleDialogs.isBoardDuplicateDialogVisible && renderBoardUpdateMetadataFormDialog(boardDuplicateDialogRef, true, true, hideBoardDuplicateDialog, t("feedback_board_create_copy"), "", createBoard, hideBoardDuplicateDialog, true, undefined, () => setDialogVisible("isBoardDuplicateDialogVisible", false))}
+      {state.currentBoard && visibleDialogs.isBoardUpdateDialogVisible && renderBoardUpdateMetadataFormDialog(boardUpdateDialogRef, false, false, hideBoardUpdateDialog, canManageBoard ? t("feedback_board_edit") : t("feedback_board_view_settings"), "", updateBoardMetadata, hideBoardUpdateDialog, canManageBoard, undefined, () => setDialogVisible("isBoardUpdateDialogVisible", false))}
       {state.currentBoard && visibleDialogs.isPreviewEmailDialogVisible && (
         <dialog ref={previewEmailDialogRef} className="preview-email-dialog dialog-width-md" aria-label={t("feedback_board_email_summary")} role="dialog" onClose={() => setDialogVisible("isPreviewEmailDialogVisible", false)}>
           <div className="header">

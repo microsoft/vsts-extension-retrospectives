@@ -45,6 +45,7 @@ const mockedProps: IFeedbackBoardMetadataFormPermissionsProps = {
   permissionOptions: [],
   currentUserId: testUserId,
   isNewBoardCreation: false,
+  canManageBoard: true,
   onPermissionChanged: jest.fn(),
 };
 
@@ -92,6 +93,7 @@ describe("Board Metadata Form Permissions", () => {
       permissions: { Teams: [], Members: [] },
       currentUserId: testUserId,
       isNewBoardCreation: false,
+      canManageBoard: true,
       permissionOptions: [],
       onPermissionChanged: jest.fn(),
     };
@@ -112,6 +114,7 @@ describe("Board Metadata Form Permissions", () => {
       permissions: { Teams: [], Members: [] },
       currentUserId: testUserId,
       isNewBoardCreation: false,
+      canManageBoard: true,
       permissionOptions: [groupOption],
       onPermissionChanged: jest.fn(),
     };
@@ -129,6 +132,7 @@ describe("Board Metadata Form Permissions", () => {
         permissions: { Teams: [], Members: [] },
         currentUserId: testUserId,
         isNewBoardCreation: false,
+        canManageBoard: true,
         permissionOptions: [],
         onPermissionChanged: jest.fn(),
       };
@@ -143,6 +147,7 @@ describe("Board Metadata Form Permissions", () => {
         permissions: { Teams: ["team1"], Members: [] },
         currentUserId: testUserId,
         isNewBoardCreation: false,
+        canManageBoard: true,
         permissionOptions: [],
         onPermissionChanged: jest.fn(),
       };
@@ -157,49 +162,13 @@ describe("Board Metadata Form Permissions", () => {
         permissions: { Teams: [], Members: ["user1"] },
         currentUserId: testUserId,
         isNewBoardCreation: false,
+        canManageBoard: true,
         permissionOptions: [],
         onPermissionChanged: jest.fn(),
       };
 
       const { queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       expect(queryByText("This board is visible to every member in the project.")).not.toBeInTheDocument();
-    });
-  });
-
-  describe("Permission Edit Warning", () => {
-    const permissionEditWarningText = "Only the Board Owner or a Team Admin can edit permissions.";
-
-    it("should show when user is neither board owner nor team admin", () => {
-      const props = makeProps({
-        currentUserId: "not-owner-id",
-        permissions: { Teams: [], Members: [] },
-      });
-
-      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-
-      expect(container.firstChild).toBeTruthy();
-    });
-
-    it("should hide when user is board owner", () => {
-      const props = makeProps({
-        currentUserId: testUserId,
-        permissions: { Teams: [], Members: [] },
-      });
-
-      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-
-      expect(container.firstChild).toBeTruthy();
-    });
-
-    it("should hide when user is a team admin", () => {
-      const props = makeProps({
-        currentUserId: "team-admin-id",
-        permissions: { Teams: [], Members: [] },
-      });
-
-      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-
-      expect(container.firstChild).toBeTruthy();
     });
   });
 
@@ -599,6 +568,7 @@ describe("Board Metadata Form Permissions", () => {
         },
         currentUserId: "different-user-id",
         isNewBoardCreation: false,
+        canManageBoard: false,
         permissions: { Teams: [], Members: [] },
         permissionOptions: [{ id: "team1", name: "Team Alpha", uniqueName: "team-alpha", type: "team" }],
         onPermissionChanged,
@@ -928,6 +898,7 @@ describe("Board Metadata Form Permissions", () => {
         },
         currentUserId: "non-owner-id",
         isNewBoardCreation: false,
+        canManageBoard: false,
         permissions: { Teams: [], Members: [] },
         permissionOptions: [{ id: "team1", name: "Team Alpha", uniqueName: "team-alpha", type: "team" }],
         onPermissionChanged,
@@ -1093,6 +1064,7 @@ describe("Board Metadata Form Permissions", () => {
         },
         currentUserId: "some-user-id",
         isNewBoardCreation: false,
+        canManageBoard: false,
         permissions: { Teams: [], Members: [] },
         permissionOptions: [
           { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
@@ -1115,6 +1087,7 @@ describe("Board Metadata Form Permissions", () => {
         board: undefined as unknown as any,
         currentUserId: "some-user-id",
         isNewBoardCreation: false,
+        canManageBoard: false,
         permissions: { Teams: [], Members: [] },
         permissionOptions: [
           { id: "team1", name: "Team One", uniqueName: "team-one", type: "team" },
