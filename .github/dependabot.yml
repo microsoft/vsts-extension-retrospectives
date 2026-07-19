@@ -5,31 +5,49 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
+    labels:
+      - "dependencies"
+      - "docs not needed"
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "sunday"
+    labels:
+      - "dependencies"
+      - "docs not needed"
   - package-ecosystem: "docker"
     directory: "/src/frontend"
     schedule:
       interval: "weekly"
       day: "sunday"
+    labels:
+      - "dependencies"
+      - "docs not needed"
   - package-ecosystem: "docker"
     directory: "/src/backend"
     schedule:
       interval: "weekly"
       day: "sunday"
+    labels:
+      - "dependencies"
+      - "docs not needed"
   - package-ecosystem: "docker"
     directory: "/src/backend.tests"
     schedule:
       interval: "weekly"
       day: "sunday"
+    labels:
+      - "dependencies"
+      - "docs not needed"
   - package-ecosystem: "npm"
     directory: "/src/frontend"
     schedule:
       interval: "weekly"
       day: "sunday"
+    labels:
+      - "dependencies"
+      - "docs not needed"
     ignore:
       - dependency-name: "azure-devops-extension-api"
       - dependency-name: "azure-devops-extension-sdk"
@@ -38,8 +56,14 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
+    labels:
+      - "dependencies"
+      - "docs not needed"
   - package-ecosystem: "nuget"
     directory: "/src/backend.tests"
     schedule:
       interval: "weekly"
       day: "sunday"
+    labels:
+      - "dependencies"
+      - "docs not needed"
