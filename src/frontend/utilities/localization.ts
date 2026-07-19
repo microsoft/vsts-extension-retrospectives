@@ -74,7 +74,7 @@ const translations = {
     feedback_board_create_copy: "Create copy of retrospective",
     feedback_board_edit: "Edit retrospective settings",
     feedback_board_view_settings: "View retrospective settings",
-    feedback_board_view_only_message: "Read-only. Board Owner or Team Admin required to edit settings.",
+    feedback_board_view_only_message: "Only the Board Owner or a Team Admin can edit retrospective settings.",
     feedback_board_search_all_boards: "Search all boards",
     feedback_board_export_csv_content: "Export CSV content",
     feedback_board_create_example: "Example: {{date}} Retrospective",
