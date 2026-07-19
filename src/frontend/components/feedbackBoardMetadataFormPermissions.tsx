@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../interfaces/feedback";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
-import { canCurrentUserManageBoard, isCurrentUserTeamAdmin } from "../utilities/boardAccessHelper";
 import { getIconElement, PeopleIcon } from "./icons";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
@@ -11,7 +10,7 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   permissionOptions: FeedbackBoardPermissionOption[];
   currentUserId: string;
   isNewBoardCreation: boolean;
-  canManageBoard?: boolean;
+  canManageBoard: boolean;
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -108,14 +107,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [selectAllChecked, setSelectAllChecked] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
   const boardOwnerId = props.isNewBoardCreation ? props.currentUserId : props.board?.createdBy?.id;
-
-  const computedCanManageBoard = canCurrentUserManageBoard({
-    boardOwnerId: props.board?.createdBy?.id,
-    currentUserId: props.currentUserId,
-    isTeamAdmin: isCurrentUserTeamAdmin(props.currentUserId, props.permissionOptions),
-    isNewBoardCreation: props.isNewBoardCreation,
-  });
-  const canManageBoard = props.canManageBoard ?? computedCanManageBoard;
+  const { canManageBoard } = props;
 
   const cleanPermissionOptions = React.useMemo(() => props.permissionOptions.filter(option => !isGroupOption(option)), [props.permissionOptions]); // removes groups
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
@@ -225,13 +217,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission for ${props.option.name}`} />;
   };
 
-  const PermissionEditWarning = () => {
-    if (!canManageBoard && props.canManageBoard === undefined) {
-      return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the Board Owner or a Team Admin can edit permissions</div>;
-    }
-    return null;
-  };
-
   useEffect(() => {
     setSelectAllState();
     setFilteredPermissionOptions(orderedPermissionOptions(filteredPermissionOptions));
@@ -299,7 +284,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
           </table>
         </div>
       </section>
-      <PermissionEditWarning />
     </div>
   );
 }

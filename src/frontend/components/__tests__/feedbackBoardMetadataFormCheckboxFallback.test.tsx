@@ -51,7 +51,7 @@ describe("FeedbackBoardMetadataFormPermissions checkbox fallback", () => {
     const user = userEvent.setup();
     const onPermissionChanged = jest.fn();
 
-    render(<FeedbackBoardMetadataFormPermissions board={null} permissions={{ Teams: [], Members: [] }} permissionOptions={[{ id: "team-1", name: "Team One", uniqueName: "Team One", type: "team" }]} currentUserId="user-1" isNewBoardCreation={true} onPermissionChanged={onPermissionChanged} />);
+    render(<FeedbackBoardMetadataFormPermissions board={null} permissions={{ Teams: [], Members: [] }} permissionOptions={[{ id: "team-1", name: "Team One", uniqueName: "Team One", type: "team" }]} currentUserId="user-1" isNewBoardCreation={true} canManageBoard={true} onPermissionChanged={onPermissionChanged} />);
 
     const checkbox = screen.getByRole("checkbox", { name: /add permission to every team or member in the table$/i });
     await user.click(checkbox);
