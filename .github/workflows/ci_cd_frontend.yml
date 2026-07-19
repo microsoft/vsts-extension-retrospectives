@@ -166,8 +166,10 @@ jobs:
           echo "scrollbar" >> base.txt
           echo "SDK" >> base.txt
           echo "SignalR" >> base.txt
+          echo "sortable" >> base.txt
           echo "timebox" >> base.txt
           echo "tooltip" >> base.txt
+          echo "tooltips" >> base.txt
           echo "unaggregated" >> base.txt
           echo "uncast" >> base.txt
           echo "uncheck" >> base.txt

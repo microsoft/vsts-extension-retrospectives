@@ -118,6 +118,8 @@ Use the **Settings** menu in the header to adjust how teams and boards are displ
 
 The number of columns in each retrospective is determined by the selection made when making the new board. Regardless of the template, they still follow the same sequence of phases.
 
+Board managers can select a phase and use **Move Everyone** to move all participants to that phase.
+
 #### The Prime Directive
 
 Begin by reminding participants that the retrospective is a safe space and that the issues raised are meant to address process problems, not people problems. Optionally, display the 'Retrospective Prime Directive' by clicking the Directive icon in the upper-right Retrospectives Extension menu. Read the Prime Directive aloud for everyone to hear, and allow space for participants to voice any concerns.

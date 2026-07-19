@@ -2,6 +2,16 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.60
+
+* Added a "Move Everyone" control so board managers can move all participants to the selected retrospective phase. From [GitHub PR #1836](https://github.com/microsoft/vsts-extension-retrospectives/pull/1836)
+* Expanded feedback search to include archived boards. From [GitHub PR #1834](https://github.com/microsoft/vsts-extension-retrospectives/pull/1834)
+* Improved keyboard navigation and accessibility for retrospective phase tabs. From [GitHub PR #1837](https://github.com/microsoft/vsts-extension-retrospectives/pull/1837)
+* Fixed a Focus Mode render loop that could cause constant CPU usage. From [GitHub PR #1838](https://github.com/microsoft/vsts-extension-retrospectives/pull/1838)
+* Optimized board, permission, workflow-stage, and Team Assessment History rendering to reduce unnecessary updates. From [GitHub PR #1840](https://github.com/microsoft/vsts-extension-retrospectives/pull/1840)
+* Improved the board settings dialog layout and accessibility, including dialog sizing and tab structure. From [GitHub PR #1833](https://github.com/microsoft/vsts-extension-retrospectives/pull/1833)
+* Refined board settings inputs, selector options, and tooltip positioning for a more consistent interface. From [GitHub PR #1841](https://github.com/microsoft/vsts-extension-retrospectives/pull/1841)
+
 ## v1.92.59
 
 * Restricted editing of retrospective settings to the Board Owner or a Team Admin.
@@ -24,6 +34,15 @@ From [GitHub PR #1835](https://github.com/microsoft/vsts-extension-retrospective
 
 From [GitHub PR #1832](https://github.com/microsoft/vsts-extension-retrospectives/pull/1832)
 
+## v1.92.58
+
+* Improved team and board loading error handling, including default-team lookup and recovery when browser local-network access restrictions blocked team configuration. From [GitHub PR #1817](https://github.com/microsoft/vsts-extension-retrospectives/pull/1817), [GitHub PR #1818](https://github.com/microsoft/vsts-extension-retrospectives/pull/1818), and [GitHub PR #1826](https://github.com/microsoft/vsts-extension-retrospectives/pull/1826)
+* Fixed retrospective board links for Azure DevOps organizations in the Pakistan region. From [GitHub PR #1819](https://github.com/microsoft/vsts-extension-retrospectives/pull/1819)
+* Increased the allowed length of retrospective column titles. From [GitHub PR #1820](https://github.com/microsoft/vsts-extension-retrospectives/pull/1820)
+* Added sort-direction icons to sortable Board Summary table headers. From [GitHub PR #1822](https://github.com/microsoft/vsts-extension-retrospectives/pull/1822)
+* Reorganized board settings and permissions into tabs. From [GitHub PR #1813](https://github.com/microsoft/vsts-extension-retrospectives/pull/1813)
+* Added contextual tooltips for column names and notes, team selection, timer controls, Focus Mode, settings, and Team Assessment History. From [GitHub PR #1825](https://github.com/microsoft/vsts-extension-retrospectives/pull/1825)
+* Improved board permission management with team search and select-all controls. From [GitHub PR #1825](https://github.com/microsoft/vsts-extension-retrospectives/pull/1825)
 * Removed rarely used Good-to-Done retrospective template. From [GitHub PR #1845](https://github.com/microsoft/vsts-extension-retrospectives/pull/1845)
 
 ## v1.92.57
