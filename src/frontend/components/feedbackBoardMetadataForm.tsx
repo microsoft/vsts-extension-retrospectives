@@ -687,14 +687,18 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
           <button
             className="metadata-form-save-button"
             onClick={async event => {
-              const titleInput = retrospectiveNameInputRef.current!;
-              titleInput.setCustomValidity("");
+              const titleInput = retrospectiveNameInputRef.current;
+              titleInput?.setCustomValidity("");
 
               if (title.trim().length === 0) {
                 const errorMessage = "Field 'Retrospective Name' cannot be empty.";
                 setError(errorMessage);
-                titleInput.setCustomValidity(errorMessage);
-                titleInput.focus();
+                titleInput?.setCustomValidity(errorMessage);
+                if (titleInput) {
+                  titleInput.focus();
+                } else {
+                  setActiveMetadataTab("General");
+                }
                 return;
               }
               const activeColumnCards = columnCards.filter(columnCard => !columnCard.markedForDeletion);
@@ -711,8 +715,12 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
               if (isDuplicateBoardName && !isExistingBoardNameUnchanged) {
                 const errorMessage = "Field 'Retrospective Name' must be unique.";
                 setError(errorMessage);
-                titleInput.setCustomValidity(errorMessage);
-                titleInput.focus();
+                titleInput?.setCustomValidity(errorMessage);
+                if (titleInput) {
+                  titleInput.focus();
+                } else {
+                  setActiveMetadataTab("General");
+                }
                 return;
               }
               setError("");

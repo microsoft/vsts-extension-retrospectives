@@ -486,6 +486,17 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
     expect(mockOnFormCancel).toHaveBeenCalledTimes(1);
   });
 
+  it("should submit when saving from Permissions tab", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    await user.type(screen.getByLabelText(/please enter new retrospective title/i), "Permissions Save Test");
+    await user.click(screen.getByRole("tab", { name: /permissions/i }));
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    expect(mockOnFormSubmit).toHaveBeenCalledTimes(1);
+  });
+
   it("should render read-only settings when user cannot manage board", () => {
     mockedProps.isNewBoardCreation = false;
     mockedProps.currentBoard = testExistingBoard;
