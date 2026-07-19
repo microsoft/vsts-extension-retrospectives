@@ -675,8 +675,20 @@ describe("FeedbackBoardContainer integration", () => {
       jest.advanceTimersByTime(1);
       expect(showPopover).toHaveBeenCalledWith({ source: teamSelector });
 
-      fireEvent.pointerLeave(teamSelector);
+      fireEvent.pointerDown(teamSelector);
       expect(hidePopover).toHaveBeenCalledTimes(1);
+
+      fireEvent.focus(teamSelector);
+      fireEvent.click(teamSelector);
+      jest.advanceTimersByTime(500);
+      expect(showPopover).toHaveBeenCalledTimes(1);
+
+      fireEvent.pointerEnter(teamSelector);
+      jest.advanceTimersByTime(500);
+      expect(showPopover).toHaveBeenCalledTimes(2);
+
+      fireEvent.keyDown(teamSelector, { key: "ArrowDown" });
+      expect(hidePopover).toHaveBeenCalledTimes(2);
     } finally {
       jest.useRealTimers();
       matchesSpy.mockRestore();
