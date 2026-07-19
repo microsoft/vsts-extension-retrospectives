@@ -32,6 +32,7 @@ interface PermissionOptionInputProps {
   optionId: string;
   optionType: FeedbackBoardPermissionOption["type"];
   isBoardOwner: boolean;
+  canManageBoard: boolean;
   isChecked: boolean;
   isIndeterminate: boolean;
   onPermissionClicked: (optionId: string, optionType: FeedbackBoardPermissionOption["type"], hasPermission: boolean) => void;
@@ -84,7 +85,7 @@ const PermissionOptionInput = React.memo(function PermissionOptionInput(props: P
       className="my-2"
       id={`permission-option-${props.optionId}`}
       aria-label="Add permission to every team or member in the table"
-      disabled={props.isBoardOwner}
+      disabled={props.isBoardOwner || !props.canManageBoard}
       checked={props.isChecked}
       onChange={event => {
         props.onPermissionClicked(props.optionId, props.optionType, event.target.checked);
@@ -113,8 +114,6 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   const [filteredPermissionOptions, setFilteredPermissionOptions] = React.useState<FeedbackBoardPermissionOption[]>(cleanPermissionOptions);
 
   const handlePermissionClicked = React.useCallback((optionId: string, optionType: FeedbackBoardPermissionOption["type"], hasPermission: boolean) => {
-    if (!canManageBoard) return;
-
     const setPermissionList = optionType === "team" ? setTeamPermissions : setMemberPermissions;
     setPermissionList(permissionList => {
       if (hasPermission) {
@@ -258,6 +257,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
                         optionId={option.id}
                         optionType={option.type}
                         isBoardOwner={isBoardOwner}
+                        canManageBoard={canManageBoard}
                         isChecked={isBoardOwner || teamPermissions.includes(option.id) || memberPermissions.includes(option.id)}
                         isIndeterminate={teamPermissions.length === 0 && memberPermissions.length === 0 && isBoardOwner}
                         onPermissionClicked={handlePermissionClicked}

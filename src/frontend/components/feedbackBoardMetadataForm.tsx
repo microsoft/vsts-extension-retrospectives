@@ -599,11 +599,9 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                           key={iconOption.id}
                           type="button"
                           onClick={() => {
-                            if (canManageBoard) {
-                              columnCardBeingEdited.column.iconClass = iconOption.id;
-                              setColumnCards([...columnCards]);
-                              chooseColumnIconDialogRef.current!.close();
-                            }
+                            columnCardBeingEdited.column.iconClass = iconOption.id;
+                            setColumnCards([...columnCards]);
+                            chooseColumnIconDialogRef.current!.close();
                           }}
                         >
                           {getIconElement(iconOption.id)}
@@ -652,13 +650,11 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                         className="choose-feedback-column-accent-color-button"
                         style={{ color: accentColor.colorCode }}
                         onClick={() => {
-                          if (canManageBoard) {
-                            columnCardBeingEdited.column.accentColor = accentColor.colorCode;
-                            setIsChooseColumnAccentColorDialogHidden(true);
-                            setColumnCardBeingEdited(null);
-                            setColumnCards([...columnCards]);
-                            chooseColumnAccentColorDialogRef.current?.close();
-                          }
+                          columnCardBeingEdited.column.accentColor = accentColor.colorCode;
+                          setIsChooseColumnAccentColorDialogHidden(true);
+                          setColumnCardBeingEdited(null);
+                          setColumnCards([...columnCards]);
+                          chooseColumnAccentColorDialogRef.current?.close();
                         }}
                       >
                         <SquareRoundedIcon />
