@@ -226,7 +226,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   };
 
   const PermissionEditWarning = () => {
-    if (!canManageBoard) {
+    if (!canManageBoard && props.canManageBoard === undefined) {
       return <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the Board Owner or a Team Admin can edit permissions</div>;
     }
     return null;

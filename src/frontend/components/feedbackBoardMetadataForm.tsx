@@ -349,6 +349,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             {t("feedback_board_permissions")}
           </button>
         </div>
+        {!canManageBoard && <div className="board-metadata-form-section-information">{getIconElement("info")} {t("feedback_board_view_only_message")}</div>}
         {activeMetadataTab === "General" && (
           <div id="board-metadata-general-panel" className="board-metadata-form" role="tabpanel" aria-labelledby="board-metadata-general-tab">
             <section className="board-metadata-edit-column-settings board-metadata-board-settings-section">
@@ -365,7 +366,7 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                 </label>
                 {maxVotesPerUserInput}
               </div>
-              <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation.</div>
+              {canManageBoard && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} These settings cannot be modified after board creation.</div>}
               <div className="board-metadata-form-section-subheader board-metadata-form-option-row">
                 <label className="flex items-center gap-2" htmlFor="obscure-feedback-checkbox">
                   {shouldShowFeedbackAfterCollectInput}
@@ -400,10 +401,12 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
             )}
             <section className="board-metadata-edit-column-settings">
               <h2 className="board-metadata-form-section-header">Column Settings</h2>
-              <div className="board-metadata-form-section-information">
-                {getIconElement("exclamation")} You can create a maximum of {maxColumnCount} columns in a retrospective.
-              </div>
-              {!isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Changing template after feedback entered may result in loss of feedback!</div>}
+              {canManageBoard && (
+                <div className="board-metadata-form-section-information">
+                  {getIconElement("exclamation")} You can create a maximum of {maxColumnCount} columns in a retrospective.
+                </div>
+              )}
+              {canManageBoard && !isNewBoardCreation && <div className="board-metadata-form-section-information warning-information">{getIconElement("report-problem")}Changing template after feedback entered may result in loss of feedback!</div>}
               <div className="board-metadata-form-section-subheader">
                 <label htmlFor="column-template-dropdown">Apply template:</label>
                 <select onChange={handleColumnsTemplateChange} id="column-template-dropdown" className="selector-option" disabled={!canManageBoard}>
@@ -674,7 +677,6 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         )}
       </div>
       <div className="inner">
-        {!canManageBoard && <span className="input-validation-message">{getIconElement("report")} Only the Board Owner or a Team Admin can edit retrospective settings.</span>}
         {error && (
           <span className="input-validation-message">
             {getIconElement("report")} {error}

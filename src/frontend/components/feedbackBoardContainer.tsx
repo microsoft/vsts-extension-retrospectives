@@ -1845,7 +1845,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const updateBoardMetadata = async (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, _teamAssessmentQuestions?: ITeamAssessmentQuestion[]) => {
     if (!canManageBoard) {
-      toast("Only the Board Owner or a Team Admin can edit retrospective settings.");
+      toast(t("feedback_board_view_only_message"));
       return;
     }
 
