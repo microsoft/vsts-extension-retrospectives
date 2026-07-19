@@ -9,8 +9,9 @@
     "ghcr.io/devcontainers/features/github-cli:1.1.0": {},
     "ghcr.io/devcontainers/features/node:2.1.0": {},
     "ghcr.io/devcontainers-extra/features/apt-packages": {
-      "packages": "pre-commit,shellcheck"
-    }
+      "packages": "shellcheck"
+    },
+    "ghcr.io/devcontainers-extra/features/pre-commit:2": {}
   },
   "customizations": {
     "vscode": {
