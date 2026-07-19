@@ -2377,7 +2377,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                             {t("feedback_board_create_copy")}
                           </button>
                           <button key="editBoard" type="button" onClick={event => handleBoardActionMenuItemClick(showBoardUpdateDialog, event)}>
-                            {getIconElement("edit")}
+                            {getIconElement(canManageBoard ? "edit" : "eye")}
                             {canManageBoard ? t("feedback_board_edit") : t("feedback_board_view_settings")}
                           </button>
                           <button key="searchAllBoards" type="button" onClick={event => handleBoardActionMenuItemClick(showAllBoardFeedbackSearchDialog, event)}>
