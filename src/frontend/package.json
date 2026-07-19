@@ -64,7 +64,7 @@
     "tfx-cli": "0.23.4",
     "ts-jest": "29.4.11",
     "ts-loader": "9.6.2",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "webpack": "5.108.4",
     "webpack-bundle-analyzer": "5.3.0",
     "webpack-cli": "7.2.1"
