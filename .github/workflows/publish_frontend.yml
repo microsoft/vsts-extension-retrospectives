@@ -1,4 +1,4 @@
-name: "Publish to Production"
+name: "Package for Production"
 
 on:
   workflow_dispatch:
@@ -6,9 +6,6 @@ on:
       version:
         description: "The version to use"
         required: false
-
-permissions:
-  contents: read
 
 jobs:
   ci_cd_frontend:
@@ -22,9 +19,12 @@ jobs:
     uses: ./.github/workflows/ci_cd_frontend.yml
     secrets: inherit
 
-  publish:
+  package:
     needs: ci_cd_frontend
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: write
 
     steps:
       - name: Harden Runner
@@ -35,33 +35,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Check if the invoker is a member of the admin team
-        run: |
-          echo ${{ secrets.GH_CLI_LOGIN_TOKEN }} | gh auth login --with-token
-
-          team_members=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/organizations/6154722/team/9355952/members)
-
-          # Extract usernames from the API response
-          usernames=$(echo "$team_members" | jq -r '.[].login')
-
-          # Check if github.actor is in the list
-          if [[ "$usernames" != *"${{ github.actor }}"* ]]; then
-            echo "${{ github.actor }} you shall not pass!"
-            exit 1
-          fi
-
-      - name: Publish extension package
-        id: publish_extension_package
+      - name: Package extension
+        id: package_extension
         working-directory: 'src/frontend'
         env:
+          AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
-          INPUT_VERSION: ${{ github.event.inputs.version }}
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
           npm ci
 
           if [ -z "${INPUT_VERSION}" ]; then
-            ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
+            ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token "${AZURE_DEVOPS_TOKEN}")
             VERSION=$(jq -r '.versions[0].version' <<< "$ext_info")
           else
             VERSION="${INPUT_VERSION}"
@@ -73,27 +59,24 @@ jobs:
 
           npm run pack:p
 
-          ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token ${{ secrets.AZURE_DEVOPS_TOKEN }})
-          VERSION=$(jq -r '.versions[0].version' <<< "$ext_info")
+          VERSION=$(jq -r '.version' vss-extension-prod.json)
+          echo "extension_version=${VERSION}" >> "$GITHUB_OUTPUT"
 
-          echo "EXTENSION_VERSION=${VERSION}" >> $GITHUB_OUTPUT
-
-      - if: steps.changes.outputs.src == 'true'
-        name: "Upload extension package"
+      - name: "Upload extension package"
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: retrospectives-extension-dev
+          name: retrospectives-extension-prod
           path: src/frontend/dist/*.vsix
           if-no-files-found: error
 
       - name: Create the tag for the extension release
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
-          github-token: ${{ secrets.GH_CLI_LOGIN_TOKEN }}
+          github-token: ${{ github.token }}
           script: |
             await github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `refs/tags/v${{steps.publish_extension_package.outputs.EXTENSION_VERSION}}`,
+              ref: `refs/tags/v${{ steps.package_extension.outputs.extension_version }}`,
               sha: context.sha
             });
