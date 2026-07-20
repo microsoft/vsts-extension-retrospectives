@@ -57,6 +57,8 @@ jobs:
           jq ".version = \"${VERSION}\"" vss-extension-prod.json > "$tmp_versioned"
           mv "$tmp_versioned" vss-extension-prod.json
 
+          cp ../../LICENSE ./assets/LICENSE.md
+
           npm run pack:p
 
           VERSION=$(jq -r '.version' vss-extension-prod.json)
