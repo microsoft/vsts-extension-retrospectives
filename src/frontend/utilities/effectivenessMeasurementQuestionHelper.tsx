@@ -106,7 +106,7 @@ export const getQuestionTooltip = (questionId: number): string => {
 /**
  * @param questionId Id of the question
  *
- * @returns associated fontaswesome icon of the question
+ * @returns associated icon identifier of the question
  */
 export const getQuestionIconClassName = (questionId: number): string => {
   const question = questions.find(q => q.id === questionId);
