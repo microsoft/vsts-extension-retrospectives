@@ -190,6 +190,18 @@ describe("Board Metadata Form Permissions", () => {
 
       expect(getByText("Only the first 5 teams are shown.")).toBeInTheDocument();
     });
+
+    it("should show a combined limit banner when both caps are reached", () => {
+      const props = makeProps({
+        permissionLimitReached: { users: true, teams: true },
+      });
+
+      const { getByText, queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      expect(getByText("Only the first 5 users and 5 teams are shown.")).toBeInTheDocument();
+      expect(queryByText("Only the first 5 users are shown.")).not.toBeInTheDocument();
+      expect(queryByText("Only the first 5 teams are shown.")).not.toBeInTheDocument();
+    });
   });
 
   describe("Permission Table", () => {

@@ -226,12 +226,32 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     emitChangeEvent();
   }, [teamPermissions, memberPermissions]);
 
+  const permissionLimitMessage = React.useMemo(() => {
+    const hasUserLimit = props.permissionLimitReached?.users;
+    const hasTeamLimit = props.permissionLimitReached?.teams;
+
+    if (hasUserLimit && hasTeamLimit) {
+      return "Only the first 5 users and 5 teams are shown.";
+    }
+
+    if (hasUserLimit) {
+      return "Only the first 5 users are shown.";
+    }
+
+    if (hasTeamLimit) {
+      return "Only the first 5 teams are shown.";
+    }
+
+    return null;
+  }, [props.permissionLimitReached?.teams, props.permissionLimitReached?.users]);
+
   return (
     <div className="board-metadata-form board-metadata-form-permissions" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
-        <PublicWarningBanner isVisible={teamPermissions.length === 0 && memberPermissions.length === 0} />
-        {props.permissionLimitReached?.users && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the first 5 users are shown.</div>}
-        {props.permissionLimitReached?.teams && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the first 5 teams are shown.</div>}
+        <div className="permission-info-messages">
+          <PublicWarningBanner isVisible={teamPermissions.length === 0 && memberPermissions.length === 0} />
+          {permissionLimitMessage && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} {permissionLimitMessage}</div>}
+        </div>
 
         <div className="search-bar">
           <PermissionSearchInput searchTerm={searchTerm} onSearchTermChanged={handleSearchTermChanged} />

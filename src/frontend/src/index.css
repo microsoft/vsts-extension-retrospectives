@@ -1545,6 +1545,14 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 }
 
 .board-metadata-form {
+  &.board-metadata-form-permissions .permission-info-messages {
+    @apply grid gap-3 mb-3;
+
+    & .board-metadata-form-section-information {
+      @apply my-0;
+    }
+  }
+
   & hr {
     @apply border border-primary;
   }
