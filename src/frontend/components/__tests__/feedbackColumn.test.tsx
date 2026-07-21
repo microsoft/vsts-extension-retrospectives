@@ -1942,6 +1942,29 @@ describe("Feedback Column ", () => {
         expect(addFeedbackItems).toHaveBeenCalled();
       }
     });
+
+    test("does not create an empty feedback item when a card is double clicked", () => {
+      const addFeedbackItems = jest.fn();
+      const props = {
+        ...testColumnProps,
+        workflowPhase: WorkflowPhase.Collect,
+        addFeedbackItems,
+        columnItems: [] as IColumnItem[],
+      };
+
+      const { container } = render(<FeedbackColumn {...props} />);
+      const column = container.querySelector(".feedback-column") as HTMLElement;
+      const feedbackCard = document.createElement("div");
+      const editor = document.createElement("textarea");
+
+      feedbackCard.dataset.feedbackItemId = "existing-feedback-item";
+      feedbackCard.appendChild(editor);
+      column.appendChild(feedbackCard);
+
+      fireEvent.doubleClick(editor);
+
+      expect(addFeedbackItems).not.toHaveBeenCalled();
+    });
   });
 
   describe("ComponentWillUnmount cleanup", () => {

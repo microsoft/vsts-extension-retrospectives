@@ -303,6 +303,17 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
     addFeedbackItems(columnId, [feedbackItem], /*shouldBroadcast*/ false, /*newlyCreated*/ true, /*showAddedAnimation*/ false, /*shouldHaveFocus*/ false, /*hideFeedbackItems*/ false);
   }, [workflowPhase, currentColumnItems, boardId, columnId, isBoardAnonymous, addFeedbackItems]);
 
+  const handleColumnDoubleClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if ((event.target as HTMLElement).closest("[data-feedback-item-id]")) {
+        return;
+      }
+
+      createEmptyFeedbackItem();
+    },
+    [createEmptyFeedbackItem],
+  );
+
   const openEditDialog = useCallback(() => {
     setColumnNotesDraft(columnNotes);
     editColumnNotesDialogRef.current!.showModal();
@@ -449,7 +460,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
   }, [currentColumnItems, getNavigableColumnItems, props, workflowPhase]);
 
   return (
-    <div ref={columnRef} className="feedback-column" role="region" aria-label={`${columnName} column with ${currentColumnItems.length} feedback items`} tabIndex={0} onDoubleClick={createEmptyFeedbackItem} onDrop={handleDropFeedbackItemOnColumnSpace} onDragOver={dragFeedbackItemOverColumn}>
+    <div ref={columnRef} className="feedback-column" role="region" aria-label={`${columnName} column with ${currentColumnItems.length} feedback items`} tabIndex={0} onDoubleClick={handleColumnDoubleClick} onDrop={handleDropFeedbackItemOnColumnSpace} onDragOver={dragFeedbackItemOverColumn}>
       <div className="feedback-column-header">
         <div className="feedback-column-title" aria-label={`${columnName} (${currentColumnItems.length} feedback items)`}>
           <div className="feedback-column-icon">{icon}</div>
