@@ -178,7 +178,7 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("All current team users are shown. Additional users from other teams are limited to 10.")).toBeInTheDocument();
+      expect(getByText("Only the first 500 users are shown.")).toBeInTheDocument();
     });
 
     it("should show a team limit banner when the team cap is reached", () => {
@@ -188,7 +188,7 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("Only the first 10 teams are shown.")).toBeInTheDocument();
+      expect(getByText("Only the first 100 teams are shown.")).toBeInTheDocument();
     });
 
     it("should show a combined limit banner when both caps are reached", () => {
@@ -198,9 +198,9 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText, queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("All current team users are shown. Additional users and teams are limited to 10.")).toBeInTheDocument();
-      expect(queryByText("All current team users are shown. Additional users from other teams are limited to 10.")).not.toBeInTheDocument();
-      expect(queryByText("Only the first 10 teams are shown.")).not.toBeInTheDocument();
+      expect(getByText("Only the first 500 users and 100 teams are shown.")).toBeInTheDocument();
+      expect(queryByText("Only the first 500 users are shown.")).not.toBeInTheDocument();
+      expect(queryByText("Only the first 100 teams are shown.")).not.toBeInTheDocument();
     });
   });
 
