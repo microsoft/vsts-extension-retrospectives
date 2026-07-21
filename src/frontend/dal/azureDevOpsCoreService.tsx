@@ -3,6 +3,9 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import { getClient } from "azure-devops-extension-api/Common";
 
+const MEMBERS_PAGE_SIZE = 5;
+const TEAMS_PAGE_SIZE = 5;
+
 class AzureDevOpsCoreService {
   private _httpCoreClient: CoreRestClient;
 
@@ -48,14 +51,14 @@ class AzureDevOpsCoreService {
       const allMembers: TeamMember[] = [];
 
       const getMemberBatch = async (skip: number): Promise<void> => {
-        const memberBatch: TeamMember[] = await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, skip);
+        const memberBatch: TeamMember[] = await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, MEMBERS_PAGE_SIZE, skip);
 
         if (memberBatch.length > 0) {
           allMembers.push(...memberBatch);
         }
 
-        if (memberBatch.length === 100) {
-          await getMemberBatch(skip + 100);
+        if (memberBatch.length === MEMBERS_PAGE_SIZE) {
+          await getMemberBatch(skip + MEMBERS_PAGE_SIZE);
         }
       };
 
@@ -77,14 +80,14 @@ class AzureDevOpsCoreService {
     const _httpCoreClient: CoreRestClient = getClient(CoreRestClient);
 
     const getTeamBatch = async (skip: number) => {
-      const teamBatch: WebApiTeam[] = await _httpCoreClient.getTeams(projectId, forCurrentUserOnly, 100, skip);
+      const teamBatch: WebApiTeam[] = await _httpCoreClient.getTeams(projectId, forCurrentUserOnly, TEAMS_PAGE_SIZE, skip);
 
       if (teamBatch.length > 0) {
         allTeams.push(...teamBatch);
       }
 
-      if (teamBatch.length === 100) {
-        await getTeamBatch(skip + 100);
+      if (teamBatch.length === TEAMS_PAGE_SIZE) {
+        await getTeamBatch(skip + TEAMS_PAGE_SIZE);
       }
       return;
     };
