@@ -205,6 +205,20 @@ describe("AzureDevOpsCoreService", () => {
 
       expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenCalledWith("project-abc", "team-xyz", 100, 0);
     });
+
+    it("should fetch additional pages when the first page is full", async () => {
+      const firstPage: TeamMember[] = Array.from({ length: 100 }, (_, index) => ({ identity: { displayName: `User ${index + 1}` } } as any));
+      const secondPage: TeamMember[] = [{ identity: { displayName: "User 101" } } as any];
+      mockGetTeamMembersWithExtendedProperties
+        .mockResolvedValueOnce(firstPage)
+        .mockResolvedValueOnce(secondPage);
+
+      const result = await azureDevOpsCoreService.getMembers("project-abc", "team-xyz");
+
+      expect(result).toHaveLength(101);
+      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenNthCalledWith(1, "project-abc", "team-xyz", 100, 0);
+      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenNthCalledWith(2, "project-abc", "team-xyz", 100, 100);
+    });
   });
 
   describe("getAllTeams", () => {

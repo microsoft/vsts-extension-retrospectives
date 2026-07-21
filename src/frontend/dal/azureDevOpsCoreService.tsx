@@ -45,7 +45,22 @@ class AzureDevOpsCoreService {
    */
   public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
     try {
-      return await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
+      const allMembers: TeamMember[] = [];
+
+      const getMemberBatch = async (skip: number): Promise<void> => {
+        const memberBatch: TeamMember[] = await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, skip);
+
+        if (memberBatch.length > 0) {
+          allMembers.push(...memberBatch);
+        }
+
+        if (memberBatch.length === 100) {
+          await getMemberBatch(skip + 100);
+        }
+      };
+
+      await getMemberBatch(0);
+      return allMembers;
     } catch {
       return null;
     }

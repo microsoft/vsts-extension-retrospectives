@@ -5,7 +5,7 @@ import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
-import { FeedbackBoardContainer, deduplicateTeamMembers } from "../feedbackBoardContainer";
+import { FeedbackBoardContainer, buildPermissionOptions, deduplicateTeamMembers } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -335,6 +335,40 @@ describe("deduplicateTeamMembers", () => {
   it("handles empty array", () => {
     const deduped = deduplicateTeamMembers([]);
     expect(deduped).toHaveLength(0);
+  });
+});
+
+describe("buildPermissionOptions", () => {
+  it("includes the current team and board owner", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const currentUserIdentity = mockUserIdentity as unknown as IdentityRef;
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: currentUserIdentity,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: currentUserIdentity.id,
+      isNewBoardCreation: true,
+      currentTeam,
+      projectTeams: [currentTeam],
+      allMembers: [],
+    });
+
+    expect(result.permissionOptions.some(option => option.id === currentTeam.id && option.type === "team")).toBe(true);
+    expect(result.permissionOptions.some(option => option.id === currentUserIdentity.id && option.type === "member")).toBe(true);
   });
 });
 

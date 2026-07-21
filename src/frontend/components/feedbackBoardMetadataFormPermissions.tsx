@@ -11,6 +11,10 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   currentUserId: string;
   isNewBoardCreation: boolean;
   canManageBoard: boolean;
+  permissionLimitReached?: {
+    users: boolean;
+    teams: boolean;
+  };
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -226,6 +230,8 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     <div className="board-metadata-form board-metadata-form-permissions" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
         <PublicWarningBanner isVisible={teamPermissions.length === 0 && memberPermissions.length === 0} />
+        {props.permissionLimitReached?.users && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the first 500 users are shown.</div>}
+        {props.permissionLimitReached?.teams && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} Only the first 100 teams are shown.</div>}
 
         <div className="search-bar">
           <PermissionSearchInput searchTerm={searchTerm} onSearchTermChanged={handleSearchTermChanged} />
