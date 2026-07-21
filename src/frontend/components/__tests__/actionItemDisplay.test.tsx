@@ -416,6 +416,30 @@ describe("Action Item Display component", () => {
     });
   });
 
+  it("omits empty area and iteration defaults when creating a work item", async () => {
+    const propsWithEmptyDefaults = {
+      ...defaultTestProps,
+      defaultAreaPath: "",
+      defaultIteration: "",
+      allowAddNewActionItem: true,
+      nonHiddenWorkItemTypes: [{ name: "Bug", referenceName: "Microsoft.VSTS.WorkItemTypes.Bug", icon: { url: "bug-icon.png" }, _links: {} } as any],
+    };
+
+    mockOpenNewWorkItem.mockResolvedValue(null);
+
+    const { container, getByText } = render(<ActionItemDisplay {...propsWithEmptyDefaults} />);
+
+    fireEvent.click(container.querySelector(".add-action-item-button")!);
+    await waitFor(() => expect(getByText("Bug")).toBeTruthy());
+    fireEvent.click(getByText("Bug").closest("button")!);
+
+    await waitFor(() => expect(mockOpenNewWorkItem).toHaveBeenCalled());
+
+    const initialValues = mockOpenNewWorkItem.mock.calls[mockOpenNewWorkItem.mock.calls.length - 1][1];
+    expect(initialValues).not.toHaveProperty("System.AreaPath");
+    expect(initialValues).not.toHaveProperty("System.IterationPath");
+  });
+
   it("opens link existing work item dialog", async () => {
     const propsWithAdd = {
       ...defaultTestProps,
