@@ -178,7 +178,7 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("Only the first 5 users are shown.")).toBeInTheDocument();
+      expect(getByText("All current team users are shown. Additional users from other teams are limited to 5.")).toBeInTheDocument();
     });
 
     it("should show a team limit banner when the team cap is reached", () => {
@@ -198,8 +198,8 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText, queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("Only the first 5 users and 5 teams are shown.")).toBeInTheDocument();
-      expect(queryByText("Only the first 5 users are shown.")).not.toBeInTheDocument();
+      expect(getByText("All current team users are shown. Additional users and teams are limited to 5.")).toBeInTheDocument();
+      expect(queryByText("All current team users are shown. Additional users from other teams are limited to 5.")).not.toBeInTheDocument();
       expect(queryByText("Only the first 5 teams are shown.")).not.toBeInTheDocument();
     });
   });
