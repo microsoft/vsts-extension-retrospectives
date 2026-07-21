@@ -93,8 +93,8 @@ export const ActionItemDisplay: React.FC<ActionItemDisplayProps> = ({ feedbackIt
         "Description": `${feedbackItemTitle}`,
         "priority": 2,
         "System.History": `Created by Retrospectives |` + ` Team [ ${team.name} ] Retrospective [ ${boardTitle} ] Item [ ${feedbackItemTitle} ]` + ` Link [ ${boardUrl} ]`,
-        "System.AreaPath": defaultAreaPath,
-        "System.IterationPath": defaultIteration,
+        ...(defaultAreaPath ? { "System.AreaPath": defaultAreaPath } : {}),
+        ...(defaultIteration ? { "System.IterationPath": defaultIteration } : {}),
       });
 
       if (workItem) {
