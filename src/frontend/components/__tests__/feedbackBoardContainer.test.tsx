@@ -410,7 +410,7 @@ describe("buildPermissionOptions", () => {
     });
 
     const memberOptions = result.permissionOptions.filter(option => option.type === "member");
-    expect(memberOptions).toHaveLength(6);
+    expect(memberOptions).toHaveLength(7);
     expect(memberOptions.some(option => option.id === "group-1")).toBe(false);
     expect(result.hasReachedUserLimit).toBe(true);
   });
@@ -459,10 +459,10 @@ describe("buildPermissionOptions", () => {
     });
 
     const memberOptions = result.permissionOptions.filter(option => option.type === "member");
-    expect(memberOptions).toHaveLength(7);
-    expect(memberOptions.some(option => option.id === "other-1")).toBe(false);
-    expect(memberOptions.some(option => option.id === "other-2")).toBe(false);
-    expect(result.hasReachedUserLimit).toBe(true);
+    expect(memberOptions).toHaveLength(9);
+    expect(memberOptions.some(option => option.id === "other-1")).toBe(true);
+    expect(memberOptions.some(option => option.id === "other-2")).toBe(true);
+    expect(result.hasReachedUserLimit).toBe(false);
   });
 });
 
