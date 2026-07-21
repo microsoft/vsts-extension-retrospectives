@@ -130,6 +130,15 @@ Begin by reminding participants that the retrospective is a safe space and that 
 
 In this phase feedback is collected from all participants. Users can add feedback under any of the columns using the 'Add new card' button or by double clicking the empty space of the column's background.
 
+Feedback cards support the following Markdown formatting:
+
+- **Bold**: `**text**` or `__text__`
+- **Italic**: `*text*` or `_text_`
+- **Link**: `[link text](https://example.com)`
+- **Image or animated GIF**: `![alt text](https://example.com/image.gif)`
+
+Links and images must use URLs that begin with `http://` or `https://`.
+
 A feedback card can only be edited or deleted by the participant who created it. The board owner can also edit or delete any card to help facilitate the retrospective. Everyone can still vote on, group, and move all cards regardless of who created them.
 
 ![A screenshot of an example retrospective board column, showing the example user Avery Axolotl writing in a feedback item that says 'Accidentally deleted my branch on remote. Dang!'](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/write-new-feedback-item.png)
