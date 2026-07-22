@@ -1464,9 +1464,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     });
   };
 
-  const initializeProjectTeams = (defaultTeam: WebApiTeam, userTeams: WebApiTeam[]) => {
+  const initializeProjectTeams = (defaultTeam: WebApiTeam | null | undefined, userTeams: WebApiTeam[]) => {
     const projectTeams = uniqueItemsById([defaultTeam, ...(userTeams ?? [])]);
-    const memberTeams = projectTeams.filter(team => team.id !== defaultTeam.id);
+    const defaultTeamId = defaultTeam?.id;
+    const memberTeams = defaultTeamId ? projectTeams.filter(team => team.id !== defaultTeamId) : projectTeams;
 
     setContainerState(previousState => ({
       ...previousState,
