@@ -268,7 +268,7 @@ describe("AzureDevOpsCoreService", () => {
         name: `Team ${TEAMS_PAGE_SIZE + i}`,
       })) as any;
 
-      const thirdBatch: WebApiTeam[] = [{ id: "team-10", name: "Team 10" } as any];
+      const thirdBatch: WebApiTeam[] = [{ id: `team-${TEAMS_PAGE_SIZE * 2}`, name: `Team ${TEAMS_PAGE_SIZE * 2}` } as any];
 
       mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch).mockResolvedValueOnce(thirdBatch);
 
