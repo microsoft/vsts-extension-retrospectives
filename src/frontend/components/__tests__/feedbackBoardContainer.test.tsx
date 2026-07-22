@@ -961,6 +961,34 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
   });
 
+  it("keeps the active URL team visible in the selector when the user is not a member", async () => {
+    const otherTeam = { ...mockTeam, id: "t2", name: "Alternate" };
+    const otherTeamBoard = { ...mockBoard, teamId: "t2" };
+
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=t2&boardId=b1&phase=Collect"), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getTeam).mockResolvedValue(otherTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([otherTeamBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(otherTeamBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+
+    const teamSelector = screen.getByRole("combobox", { name: "Team" }) as HTMLSelectElement;
+    expect(teamSelector.value).toBe("t2");
+    expect(screen.getByRole("option", { name: "Alternate" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
+  });
+
   it("loads a board from the URL team when browser local-network restrictions block team REST lookups", async () => {
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=t1&boardId=b1&phase=Collect"), setHash: jest.fn() } as any);
     mocked(azureDevOpsCoreService.getAllTeams).mockRejectedValue(new Error("Permission was denied for this request to access the local address space"));
