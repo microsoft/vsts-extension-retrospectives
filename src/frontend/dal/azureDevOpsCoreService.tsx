@@ -46,7 +46,7 @@ class AzureDevOpsCoreService {
    * @param projectId The project ID.
    * @param teamId The team ID.
    */
-  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
+  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[] | null> {
     try {
       const allMembers: TeamMember[] = [];
 
