@@ -298,7 +298,7 @@ export function buildPermissionOptions(args: {
   const additionalMemberAllowance = Math.max(PERMISSION_USER_LIMIT - currentTeamMemberIds.size, 0);
   const additionalMemberCandidates = deduplicateTeamMembers(args.allMembers).filter(member => {
     const memberId = member?.identity?.id;
-    return !!memberId && !currentTeamMemberIds.has(memberId);
+    return !!memberId && !currentTeamMemberIds.has(memberId) && !isGroupIdentity(member.identity);
   });
 
   let additionalMemberCount = 0;

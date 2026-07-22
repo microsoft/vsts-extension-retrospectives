@@ -466,6 +466,55 @@ describe("buildPermissionOptions", () => {
     expect(result.hasReachedUserLimit).toBe(true);
   });
 
+  it("does not flag user limit when only group identities exceed additional candidate count", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "user-1", displayName: "User 1", uniqueName: "user1@example.com" } as IdentityRef;
+
+    const currentTeamMembers: TeamMember[] = Array.from({ length: 7 }, (_, index) => ({
+      identity: {
+        id: `user-${index + 1}`,
+        displayName: `User ${index + 1}`,
+        uniqueName: `user${index + 1}@example.com`,
+      } as IdentityRef,
+    })) as TeamMember[];
+
+    const additionalGroupMembers: TeamMember[] = Array.from({ length: 150 }, (_, index) => ({
+      identity: {
+        id: `group-${index + 1}`,
+        displayName: `[Project]\\Team ${index + 1}`,
+        uniqueName: `[Project]\\Team ${index + 1}`,
+      } as IdentityRef,
+    })) as TeamMember[];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: boardOwner.id,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: Array.from({ length: 101 }, (_, index) => ({ id: `team-${index + 1}`, name: `Team ${index + 1}`, projectName: "Project" } as WebApiTeam)),
+      currentTeamMembers,
+      allMembers: [...currentTeamMembers, ...additionalGroupMembers],
+    });
+
+    expect(result.hasReachedTeamLimit).toBe(true);
+    expect(result.hasReachedUserLimit).toBe(false);
+  });
+
   it("includes the current user when they are not the owner and not a team member", () => {
     const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
     const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
