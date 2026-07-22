@@ -498,6 +498,53 @@ describe("buildPermissionOptions", () => {
     expect(memberOptions.some(option => option.id === "admin-user")).toBe(true);
     expect(memberOptions.some(option => option.id === "owner-1")).toBe(true);
   });
+
+  it("marks injected current user as team admin when admin metadata is available", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+
+    const allMembers: TeamMember[] = [
+      {
+        identity: {
+          id: "admin-user",
+          displayName: "Admin User",
+          uniqueName: "admin@example.com",
+          imageUrl: "https://example.com/admin.png",
+        } as IdentityRef,
+        isTeamAdmin: true,
+      } as TeamMember,
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: "admin-user",
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam],
+      currentTeamMembers: [],
+      allMembers,
+    });
+
+    const currentUserOption = result.permissionOptions.find(option => option.type === "member" && option.id === "admin-user");
+    expect(currentUserOption).toBeDefined();
+    expect(currentUserOption?.isTeamAdmin).toBe(true);
+    expect(currentUserOption?.thumbnailUrl).toBe("https://example.com/admin.png");
+  });
 });
 
 describe("FeedbackBoardContainer integration", () => {

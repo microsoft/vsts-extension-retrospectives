@@ -253,7 +253,20 @@ export function buildPermissionOptions(args: {
 
   const memberOptions: FeedbackBoardPermissionOption[] = [];
   const addMemberOption = (memberIdentity: TeamMember["identity"] | null | undefined, isTeamAdmin?: boolean): boolean => {
-    if (!memberIdentity?.id || memberOptions.some(option => option.id === memberIdentity.id)) {
+    if (!memberIdentity?.id) {
+      return false;
+    }
+
+    const existingOption = memberOptions.find(option => option.id === memberIdentity.id);
+    if (existingOption) {
+      if (isTeamAdmin && !existingOption.isTeamAdmin) {
+        existingOption.isTeamAdmin = true;
+      }
+
+      if (!existingOption.thumbnailUrl && memberIdentity.imageUrl) {
+        existingOption.thumbnailUrl = memberIdentity.imageUrl;
+      }
+
       return false;
     }
 
