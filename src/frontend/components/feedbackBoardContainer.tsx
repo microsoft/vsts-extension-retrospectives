@@ -211,6 +211,7 @@ export interface PermissionOptionsBuildResult {
 export function buildPermissionOptions(args: {
   board: IFeedbackBoardDocument | null | undefined;
   currentUserId: string;
+  currentUserIsTeamAdmin?: boolean;
   isNewBoardCreation: boolean;
   currentTeam: WebApiTeam | null | undefined;
   projectTeams: WebApiTeam[];
@@ -279,7 +280,7 @@ export function buildPermissionOptions(args: {
     return true;
   };
 
-  addMemberOption(currentUserIdentity);
+  addMemberOption(currentUserIdentity, args.currentUserIsTeamAdmin);
   addMemberOption(ownerIdentity);
   for (const permissionMemberId of permissionMembers) {
     const resolvedMember = memberLookup.get(permissionMemberId);
@@ -2151,6 +2152,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     const permissionOptionsBuildResult = buildPermissionOptions({
       board: state.currentBoard,
       currentUserId: state.currentUserId,
+      currentUserIsTeamAdmin,
       isNewBoardCreation,
       currentTeam: state.currentTeam,
       projectTeams: showAllTeams ? state.projectTeams : state.userTeams,

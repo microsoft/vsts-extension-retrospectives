@@ -545,6 +545,62 @@ describe("buildPermissionOptions", () => {
     expect(currentUserOption?.isTeamAdmin).toBe(true);
     expect(currentUserOption?.thumbnailUrl).toBe("https://example.com/admin.png");
   });
+
+  it("marks current user as team admin even when additional member allowance is exhausted", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+
+    const currentTeamMembers: TeamMember[] = Array.from({ length: 5 }, (_, index) => ({
+      identity: {
+        id: `member-${index + 1}`,
+        displayName: `Member ${index + 1}`,
+        uniqueName: `member${index + 1}@example.com`,
+      } as IdentityRef,
+      isTeamAdmin: false,
+    })) as TeamMember[];
+
+    const allMembers: TeamMember[] = [
+      ...currentTeamMembers,
+      {
+        identity: {
+          id: "admin-user",
+          displayName: "Admin User",
+          uniqueName: "admin@example.com",
+        } as IdentityRef,
+        isTeamAdmin: true,
+      } as TeamMember,
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: "admin-user",
+      currentUserIsTeamAdmin: true,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam],
+      currentTeamMembers,
+      allMembers,
+    });
+
+    const currentUserOption = result.permissionOptions.find(option => option.type === "member" && option.id === "admin-user");
+    expect(currentUserOption).toBeDefined();
+    expect(currentUserOption?.isTeamAdmin).toBe(true);
+  });
 });
 
 describe("FeedbackBoardContainer integration", () => {
