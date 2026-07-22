@@ -1425,7 +1425,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const loadAllProjectTeams = async (): Promise<void> => {
     const allTeams = sortTeamsByName(await azureDevOpsCoreService.getAllTeams(projectId, false));
-    const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams]).slice(0, PERMISSION_TEAM_LIMIT);
+    const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams]);
     const memberTeams = uniqueItemsById([state.currentTeam, ...projectTeams]);
     const [allMembers, currentTeamMembers] = await Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(state.currentTeam)]);
 

@@ -832,7 +832,7 @@ describe("FeedbackBoardContainer integration", () => {
 
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
     expect(await screen.findByRole("option", { name: "Other Team 2" })).toBeInTheDocument();
-    expect(screen.queryByRole("option", { name: "Other Team 6" })).not.toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Other Team 6" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
     fireEvent.click(screen.getByRole("button", { name: "Show my teams" }));
