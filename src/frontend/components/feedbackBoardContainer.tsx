@@ -302,8 +302,10 @@ export function buildPermissionOptions(args: {
   });
 
   let additionalMemberCount = 0;
+  let hasReachedUserLimit = false;
   for (const member of additionalMemberCandidates) {
     if (additionalMemberCount >= additionalMemberAllowance) {
+      hasReachedUserLimit = true;
       break;
     }
 
@@ -313,8 +315,6 @@ export function buildPermissionOptions(args: {
   }
 
   const hasReachedTeamLimit = teamOptions.length > PERMISSION_TEAM_LIMIT;
-  const hasReachedUserLimit = additionalMemberCandidates.length > additionalMemberCount;
-
   return {
     permissionOptions: [...teamOptions.slice(0, PERMISSION_TEAM_LIMIT), ...memberOptions],
     hasReachedTeamLimit,
