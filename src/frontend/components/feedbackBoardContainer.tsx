@@ -1460,7 +1460,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     const allTeams = sortTeamsByName(await azureDevOpsCoreService.getAllTeams(projectId, false));
     const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams]);
     const memberTeams = uniqueItemsById([state.currentTeam, ...projectTeams]);
-    const [allMembers, currentTeamMembers] = await Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(state.currentTeam)]);
+    const otherTeams = memberTeams.filter(t => t.id !== state.currentTeam?.id);
+    const [otherMembers, currentTeamMembers] = await Promise.all([loadMembersForTeams(otherTeams), loadMembersForTeam(state.currentTeam)]);
+    const allMembers = deduplicateTeamMembers([...currentTeamMembers, ...otherMembers]);
 
     setContainerState(previousState => ({
       ...previousState,
