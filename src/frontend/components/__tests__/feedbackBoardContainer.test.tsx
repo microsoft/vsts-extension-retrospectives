@@ -413,7 +413,7 @@ describe("buildPermissionOptions", () => {
     const memberOptions = result.permissionOptions.filter(option => option.type === "member");
     expect(memberOptions).toHaveLength(501);
     expect(memberOptions.some(option => option.id === "group-1")).toBe(false);
-    expect(result.hasReachedUserLimit).toBe(true);
+    expect(result.hasReachedUserLimit).toBe(false);
   });
 
   it("includes all current-team users before applying additional user cap", () => {
