@@ -1441,7 +1441,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       const batchResults = await Promise.all(batch.map(team => azureDevOpsCoreService.getMembers(projectId, team.id)));
       accumulated.push(...batchResults.flatMap(members => members ?? []));
 
-      if (deduplicateTeamMembers(accumulated).length >= PERMISSION_USER_LIMIT) {
+      const uniqueNonGroupCount = deduplicateTeamMembers(accumulated).filter(member => !isGroupIdentity(member.identity)).length;
+      if (uniqueNonGroupCount >= PERMISSION_USER_LIMIT) {
         break;
       }
     }
