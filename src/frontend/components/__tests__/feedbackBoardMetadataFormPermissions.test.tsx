@@ -178,7 +178,7 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("Only the first 500 users are shown.")).toBeInTheDocument();
+      expect(getByText("Additional results are capped at 500 users.")).toBeInTheDocument();
     });
 
     it("should show a team limit banner when the team cap is reached", () => {
