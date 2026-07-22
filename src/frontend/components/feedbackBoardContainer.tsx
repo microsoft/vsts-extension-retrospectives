@@ -96,6 +96,7 @@ export interface FeedbackBoardContainerState {
   actionItemIds: number[];
   allMembers: TeamMember[];
   currentTeamMembers: TeamMember[];
+  hasReachedAdditionalMemberLoadLimit: boolean;
   castedVoteCount: number;
   currentVoteCount: string;
   teamVoteCapacity: number;
@@ -375,6 +376,7 @@ const initialState: FeedbackBoardContainerState = {
   actionItemIds: [],
   allMembers: [],
   currentTeamMembers: [],
+  hasReachedAdditionalMemberLoadLimit: false,
   castedVoteCount: 0,
   currentVoteCount: "0",
   teamVoteCapacity: 0,
@@ -1433,8 +1435,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   };
 
-  const loadMembersForTeams = async (teams: WebApiTeam[]): Promise<TeamMember[]> => {
+  const loadMembersForTeams = async (teams: WebApiTeam[]): Promise<{ members: TeamMember[]; didHitLimit: boolean }> => {
     const accumulated: TeamMember[] = [];
+    let didHitLimit = false;
 
     for (let i = 0; i < teams.length; i += MEMBER_LOAD_CONCURRENCY) {
       const batch = teams.slice(i, i + MEMBER_LOAD_CONCURRENCY);
@@ -1443,11 +1446,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
       const uniqueNonGroupCount = deduplicateTeamMembers(accumulated).filter(member => !isGroupIdentity(member.identity)).length;
       if (uniqueNonGroupCount >= PERMISSION_USER_LIMIT) {
+        didHitLimit = true;
         break;
       }
     }
 
-    return deduplicateTeamMembers(accumulated);
+    return { members: deduplicateTeamMembers(accumulated), didHitLimit };
   };
 
   const loadMembersForTeam = async (team: WebApiTeam | null | undefined): Promise<TeamMember[]> => {
@@ -1478,11 +1482,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }));
 
     Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(defaultTeam)])
-      .then(([additionalMembers, currentTeamMembers]) =>
+      .then(([additionalMembersResult, currentTeamMembers]) =>
         setContainerState(previousState => ({
           ...previousState,
-          allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembers]),
+          allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembersResult.members]),
           currentTeamMembers,
+          hasReachedAdditionalMemberLoadLimit: additionalMembersResult.didHitLimit,
         })),
       )
       .catch(error => appInsights.trackException(error, { action: "initializeProjectTeamMembers" }));
@@ -1492,12 +1497,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     const allTeams = sortTeamsByName(await azureDevOpsCoreService.getAllTeams(projectId, false));
     const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams]);
     const memberTeams = projectTeams.filter(team => team.id !== state.currentTeam?.id);
-    const [additionalMembers, currentTeamMembers] = await Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(state.currentTeam)]);
+    const [additionalMembersResult, currentTeamMembers] = await Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(state.currentTeam)]);
 
     setContainerState(previousState => ({
       ...previousState,
-      allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembers]),
+      allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembersResult.members]),
       currentTeamMembers,
+      hasReachedAdditionalMemberLoadLimit: additionalMembersResult.didHitLimit,
       projectTeams,
       filteredProjectTeams: projectTeams,
       isAllTeamsLoaded: true,
@@ -2211,7 +2217,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           placeholderText={placeholderText}
           availablePermissionOptions={permissionOptionsBuildResult.permissionOptions}
           currentUserId={state.currentUserId}
-          permissionLimitReached={{ users: permissionOptionsBuildResult.hasReachedUserLimit, teams: permissionOptionsBuildResult.hasReachedTeamLimit }}
+          permissionLimitReached={{
+            users: permissionOptionsBuildResult.hasReachedUserLimit || state.hasReachedAdditionalMemberLoadLimit,
+            teams: permissionOptionsBuildResult.hasReachedTeamLimit,
+          }}
           onFormSubmit={onSubmit}
           onFormCancel={onCancel}
         />
