@@ -185,6 +185,23 @@ function getOwnerIdentity(board: IFeedbackBoardDocument | null | undefined, isNe
   return board?.createdBy ?? null;
 }
 
+function getCurrentUserPermissionIdentity(currentUserId: string): TeamMember["identity"] | null {
+  if (!currentUserId) {
+    return null;
+  }
+
+  const currentUser = getUserIdentity();
+  if (currentUser?.id === currentUserId) {
+    return currentUser;
+  }
+
+  return {
+    id: currentUserId,
+    displayName: currentUserId,
+    uniqueName: currentUserId,
+  } as TeamMember["identity"];
+}
+
 export interface PermissionOptionsBuildResult {
   permissionOptions: FeedbackBoardPermissionOption[];
   hasReachedTeamLimit: boolean;
@@ -201,6 +218,7 @@ export function buildPermissionOptions(args: {
   allMembers: TeamMember[];
 }): PermissionOptionsBuildResult {
   const ownerIdentity = getOwnerIdentity(args.board, args.isNewBoardCreation, args.currentUserId);
+  const currentUserIdentity = getCurrentUserPermissionIdentity(args.currentUserId);
   const permissionTeams = args.board?.permissions?.Teams ?? [];
   const permissionMembers = args.board?.permissions?.Members ?? [];
 
@@ -248,6 +266,7 @@ export function buildPermissionOptions(args: {
     return true;
   };
 
+  addMemberOption(currentUserIdentity);
   addMemberOption(ownerIdentity);
   for (const permissionMemberId of permissionMembers) {
     const resolvedMember = memberLookup.get(permissionMemberId);

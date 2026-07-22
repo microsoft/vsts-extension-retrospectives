@@ -464,6 +464,40 @@ describe("buildPermissionOptions", () => {
     expect(memberOptions.some(option => option.id === "other-2")).toBe(false);
     expect(result.hasReachedUserLimit).toBe(true);
   });
+
+  it("includes the current user when they are not the owner and not a team member", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: "admin-user",
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam],
+      currentTeamMembers: [],
+      allMembers: [],
+    });
+
+    const memberOptions = result.permissionOptions.filter(option => option.type === "member");
+    expect(memberOptions.some(option => option.id === "admin-user")).toBe(true);
+    expect(memberOptions.some(option => option.id === "owner-1")).toBe(true);
+  });
 });
 
 describe("FeedbackBoardContainer integration", () => {
