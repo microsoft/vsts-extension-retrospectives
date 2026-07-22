@@ -178,7 +178,7 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("Additional results are capped at 500 users.")).toBeInTheDocument();
+      expect(getByText("Reached 500 user retrieval limit.")).toBeInTheDocument();
     });
 
     it("should show a team limit banner when the team cap is reached", () => {
@@ -188,7 +188,7 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("Only the first 100 teams are shown.")).toBeInTheDocument();
+      expect(getByText("Reached 100 team retrieval limit.")).toBeInTheDocument();
     });
 
     it("should show a combined limit banner when both caps are reached", () => {
@@ -198,9 +198,9 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText, queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("Only the first 500 users and 100 teams are shown.")).toBeInTheDocument();
-      expect(queryByText("Only the first 500 users are shown.")).not.toBeInTheDocument();
-      expect(queryByText("Only the first 100 teams are shown.")).not.toBeInTheDocument();
+      expect(getByText("Reached 500 user or 100 team retrieval limit.")).toBeInTheDocument();
+      expect(queryByText("Reached 500 user retrieval limit.")).not.toBeInTheDocument();
+      expect(queryByText("Reached 100 team retrieval limit.")).not.toBeInTheDocument();
     });
   });
 
