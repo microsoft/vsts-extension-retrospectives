@@ -210,8 +210,7 @@ describe("AzureDevOpsCoreService", () => {
 
     it("should fetch additional pages when the first page is full", async () => {
       const firstPage: TeamMember[] = Array.from({ length: MEMBERS_PAGE_SIZE }, (_, index) => ({ identity: { displayName: `User ${index + 1}` } } as any));
-      const secondPage: TeamMember[] = [{ identity: { displayName: "User 6" } } as any];
-      mockGetTeamMembersWithExtendedProperties
+      const secondPage: TeamMember[] = [{ identity: { displayName: "User 101" } } as any];
         .mockResolvedValueOnce(firstPage)
         .mockResolvedValueOnce(secondPage);
 
