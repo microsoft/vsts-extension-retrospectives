@@ -128,8 +128,8 @@ export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember
   });
 }
 
-const PERMISSION_TEAM_LIMIT = 100;
-const PERMISSION_USER_LIMIT = 500;
+const PERMISSION_TEAM_LIMIT = 5;
+const PERMISSION_USER_LIMIT = 5;
 
 function uniqueItemsById<T extends { id?: string }>(items: Array<T | null | undefined>): T[] {
   const seenIds = new Set<string>();
@@ -1425,7 +1425,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const loadAllProjectTeams = async (): Promise<void> => {
     const allTeams = sortTeamsByName(await azureDevOpsCoreService.getAllTeams(projectId, false));
-    const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams, ...(state.userTeams ?? [])]);
+    const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams]).slice(0, PERMISSION_TEAM_LIMIT);
     const memberTeams = uniqueItemsById([state.currentTeam, ...projectTeams]);
     const [allMembers, currentTeamMembers] = await Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(state.currentTeam)]);
 
@@ -2121,9 +2121,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       currentUserId: state.currentUserId,
       isNewBoardCreation,
       currentTeam: state.currentTeam,
-      projectTeams: state.projectTeams,
+      projectTeams: showAllTeams ? state.projectTeams : state.userTeams,
       currentTeamMembers: state.currentTeamMembers,
-      allMembers: state.allMembers,
+      allMembers: showAllTeams ? state.allMembers : state.currentTeamMembers,
     });
 
     return (

@@ -410,7 +410,7 @@ describe("buildPermissionOptions", () => {
     });
 
     const memberOptions = result.permissionOptions.filter(option => option.type === "member");
-    expect(memberOptions).toHaveLength(7);
+    expect(memberOptions).toHaveLength(6);
     expect(memberOptions.some(option => option.id === "group-1")).toBe(false);
     expect(result.hasReachedUserLimit).toBe(true);
   });
@@ -459,10 +459,10 @@ describe("buildPermissionOptions", () => {
     });
 
     const memberOptions = result.permissionOptions.filter(option => option.type === "member");
-    expect(memberOptions).toHaveLength(9);
-    expect(memberOptions.some(option => option.id === "other-1")).toBe(true);
-    expect(memberOptions.some(option => option.id === "other-2")).toBe(true);
-    expect(result.hasReachedUserLimit).toBe(false);
+    expect(memberOptions).toHaveLength(7);
+    expect(memberOptions.some(option => option.id === "other-1")).toBe(false);
+    expect(memberOptions.some(option => option.id === "other-2")).toBe(false);
+    expect(result.hasReachedUserLimit).toBe(true);
   });
 });
 
@@ -751,11 +751,11 @@ describe("FeedbackBoardContainer integration", () => {
   });
 
   it("shows all project teams in the team selector when enabled from settings", async () => {
-    const otherTeam = { ...mockTeam, id: "t2", name: "Other Team" };
+    const otherTeams = Array.from({ length: 8 }, (_, index) => ({ ...mockTeam, id: `t${index + 2}`, name: `Other Team ${index + 2}` }));
 
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
     mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
-      forCurrentUserOnly ? [mockTeam as WebApiTeam] : [mockTeam as WebApiTeam, otherTeam as WebApiTeam],
+      forCurrentUserOnly ? [mockTeam as WebApiTeam] : ([mockTeam as WebApiTeam, ...otherTeams] as WebApiTeam[]),
     );
     mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
@@ -831,7 +831,16 @@ describe("FeedbackBoardContainer integration", () => {
     fireEvent.click(screen.getByRole("button", { name: "Show all teams" }));
 
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
-    expect(await screen.findByRole("option", { name: "Other Team" })).toBeInTheDocument();
+    expect(await screen.findByRole("option", { name: "Other Team 2" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Other Team 6" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show my teams" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Other Team 2" })).not.toBeInTheDocument();
+    });
   });
 
   it("configures a custom tooltip for Team Assessment", async () => {
