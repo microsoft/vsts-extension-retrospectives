@@ -128,8 +128,8 @@ export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember
   });
 }
 
-const PERMISSION_TEAM_LIMIT = 5;
-const PERMISSION_USER_LIMIT = 5;
+const PERMISSION_TEAM_LIMIT = 100;
+const PERMISSION_USER_LIMIT = 500;
 
 function uniqueItemsById<T extends { id?: string }>(items: Array<T | null | undefined>): T[] {
   const seenIds = new Set<string>();

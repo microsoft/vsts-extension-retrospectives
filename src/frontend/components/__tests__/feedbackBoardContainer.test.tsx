@@ -377,12 +377,13 @@ describe("buildPermissionOptions", () => {
 
     const allMembers: TeamMember[] = [
       { identity: { id: "group-1", displayName: "[Project]\\Contributors", uniqueName: "[Project]\\Contributors" } as IdentityRef } as TeamMember,
-      { identity: { id: "user-1", displayName: "User 1", uniqueName: "user1@example.com" } as IdentityRef } as TeamMember,
-      { identity: { id: "user-2", displayName: "User 2", uniqueName: "user2@example.com" } as IdentityRef } as TeamMember,
-      { identity: { id: "user-3", displayName: "User 3", uniqueName: "user3@example.com" } as IdentityRef } as TeamMember,
-      { identity: { id: "user-4", displayName: "User 4", uniqueName: "user4@example.com" } as IdentityRef } as TeamMember,
-      { identity: { id: "user-5", displayName: "User 5", uniqueName: "user5@example.com" } as IdentityRef } as TeamMember,
-      { identity: { id: "user-6", displayName: "User 6", uniqueName: "user6@example.com" } as IdentityRef } as TeamMember,
+      ...Array.from({ length: 501 }, (_, index) => ({
+        identity: {
+          id: `user-${index + 1}`,
+          displayName: `User ${index + 1}`,
+          uniqueName: `user${index + 1}@example.com`,
+        } as IdentityRef,
+      })) as TeamMember[],
     ];
 
     const result = buildPermissionOptions({
@@ -410,7 +411,7 @@ describe("buildPermissionOptions", () => {
     });
 
     const memberOptions = result.permissionOptions.filter(option => option.type === "member");
-    expect(memberOptions).toHaveLength(6);
+    expect(memberOptions).toHaveLength(501);
     expect(memberOptions.some(option => option.id === "group-1")).toBe(false);
     expect(result.hasReachedUserLimit).toBe(true);
   });
@@ -419,7 +420,7 @@ describe("buildPermissionOptions", () => {
     const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
     const boardOwner = { id: "user-1", displayName: "User 1", uniqueName: "user1@example.com" } as IdentityRef;
 
-    const currentTeamMembers: TeamMember[] = Array.from({ length: 7 }, (_, index) => ({
+    const currentTeamMembers: TeamMember[] = Array.from({ length: 501 }, (_, index) => ({
       identity: {
         id: `user-${index + 1}`,
         displayName: `User ${index + 1}`,
@@ -459,7 +460,7 @@ describe("buildPermissionOptions", () => {
     });
 
     const memberOptions = result.permissionOptions.filter(option => option.type === "member");
-    expect(memberOptions).toHaveLength(7);
+    expect(memberOptions).toHaveLength(501);
     expect(memberOptions.some(option => option.id === "other-1")).toBe(false);
     expect(memberOptions.some(option => option.id === "other-2")).toBe(false);
     expect(result.hasReachedUserLimit).toBe(true);
@@ -550,7 +551,7 @@ describe("buildPermissionOptions", () => {
     const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
     const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
 
-    const currentTeamMembers: TeamMember[] = Array.from({ length: 5 }, (_, index) => ({
+    const currentTeamMembers: TeamMember[] = Array.from({ length: 500 }, (_, index) => ({
       identity: {
         id: `member-${index + 1}`,
         displayName: `Member ${index + 1}`,

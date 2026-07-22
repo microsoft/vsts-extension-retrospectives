@@ -14,8 +14,8 @@ jest.mock("azure-devops-extension-api/Common", () => ({
 }));
 
 describe("AzureDevOpsCoreService", () => {
-  const MEMBERS_PAGE_SIZE = 5;
-  const TEAMS_PAGE_SIZE = 5;
+  const MEMBERS_PAGE_SIZE = 100;
+  const TEAMS_PAGE_SIZE = 100;
   let azureDevOpsCoreService: any;
 
   beforeEach(() => {
@@ -314,9 +314,9 @@ describe("AzureDevOpsCoreService", () => {
 
       expect(result).toHaveLength(TEAMS_PAGE_SIZE + 3);
       expect(result[0].id).toBe("team-0");
-      expect(result[TEAMS_PAGE_SIZE - 1].id).toBe("team-4");
-      expect(result[TEAMS_PAGE_SIZE].id).toBe("team-5");
-      expect(result[TEAMS_PAGE_SIZE + 2].id).toBe("team-7");
+      expect(result[TEAMS_PAGE_SIZE - 1].id).toBe(`team-${TEAMS_PAGE_SIZE - 1}`);
+      expect(result[TEAMS_PAGE_SIZE].id).toBe(`team-${TEAMS_PAGE_SIZE}`);
+      expect(result[TEAMS_PAGE_SIZE + 2].id).toBe(`team-${TEAMS_PAGE_SIZE + 2}`);
     });
 
     it("should handle different project ids in pagination", async () => {
