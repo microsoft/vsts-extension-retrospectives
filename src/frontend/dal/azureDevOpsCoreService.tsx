@@ -50,19 +50,18 @@ class AzureDevOpsCoreService {
     try {
       const allMembers: TeamMember[] = [];
 
-      const getMemberBatch = async (skip: number): Promise<void> => {
+      for (let skip = 0; ; skip += MEMBERS_PAGE_SIZE) {
         const memberBatch: TeamMember[] = await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, MEMBERS_PAGE_SIZE, skip);
 
         if (memberBatch.length > 0) {
           allMembers.push(...memberBatch);
         }
 
-        if (memberBatch.length === MEMBERS_PAGE_SIZE) {
-          await getMemberBatch(skip + MEMBERS_PAGE_SIZE);
+        if (memberBatch.length < MEMBERS_PAGE_SIZE) {
+          break;
         }
-      };
+      }
 
-      await getMemberBatch(0);
       return allMembers;
     } catch {
       return null;
@@ -79,20 +78,17 @@ class AzureDevOpsCoreService {
 
     const _httpCoreClient: CoreRestClient = getClient(CoreRestClient);
 
-    const getTeamBatch = async (skip: number) => {
+    for (let skip = 0; ; skip += TEAMS_PAGE_SIZE) {
       const teamBatch: WebApiTeam[] = await _httpCoreClient.getTeams(projectId, forCurrentUserOnly, TEAMS_PAGE_SIZE, skip);
 
       if (teamBatch.length > 0) {
         allTeams.push(...teamBatch);
       }
 
-      if (teamBatch.length === TEAMS_PAGE_SIZE) {
-        await getTeamBatch(skip + TEAMS_PAGE_SIZE);
+      if (teamBatch.length < TEAMS_PAGE_SIZE) {
+        break;
       }
-      return;
-    };
-
-    await getTeamBatch(0);
+    }
 
     return allTeams;
   }

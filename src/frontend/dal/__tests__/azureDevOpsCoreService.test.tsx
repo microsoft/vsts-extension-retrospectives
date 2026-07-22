@@ -210,7 +210,8 @@ describe("AzureDevOpsCoreService", () => {
 
     it("should fetch additional pages when the first page is full", async () => {
       const firstPage: TeamMember[] = Array.from({ length: MEMBERS_PAGE_SIZE }, (_, index) => ({ identity: { displayName: `User ${index + 1}` } } as any));
-      const secondPage: TeamMember[] = [{ identity: { displayName: "User 101" } } as any];
+      const secondPage: TeamMember[] = [{ identity: { displayName: `User ${MEMBERS_PAGE_SIZE + 1}` } } as any];
+      mockGetTeamMembersWithExtendedProperties
         .mockResolvedValueOnce(firstPage)
         .mockResolvedValueOnce(secondPage);
 
@@ -327,9 +328,7 @@ describe("AzureDevOpsCoreService", () => {
         name: `Team ${i}`,
       })) as any;
 
-      const secondBatch: WebApiTeam[] = [
-        { id: `team-${TEAMS_PAGE_SIZE}`, name: `Team ${TEAMS_PAGE_SIZE}` } as any,
-      ];
+      const secondBatch: WebApiTeam[] = [{ id: `team-${TEAMS_PAGE_SIZE}`, name: `Team ${TEAMS_PAGE_SIZE}` } as any];
 
       mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch);
 

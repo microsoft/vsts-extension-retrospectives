@@ -515,6 +515,90 @@ describe("buildPermissionOptions", () => {
     expect(result.hasReachedUserLimit).toBe(false);
   });
 
+  it("includes my-team members beyond the current team in the additional user pool", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const myOtherTeam = { id: "my-other-team", name: "My Other Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+
+    const currentTeamMembers: TeamMember[] = [
+      { identity: { ...baseIdentity, id: "current-1", displayName: "Current 1", uniqueName: "current1@example.com" } as IdentityRef } as TeamMember,
+    ];
+
+    const allMembers: TeamMember[] = [
+      ...currentTeamMembers,
+      { identity: { ...baseIdentity, id: "my-team-1", displayName: "My Team 1", uniqueName: "myteam1@example.com" } as IdentityRef } as TeamMember,
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: boardOwner.id,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam, myOtherTeam],
+      currentTeamMembers,
+      allMembers,
+    });
+
+    expect(result.permissionOptions.some(option => option.id === "my-team-1" && option.type === "member")).toBe(true);
+    expect(result.hasReachedUserLimit).toBe(false);
+  });
+
+  it("always includes permission-checked teams before capping additional teams", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+    const permissionTeamIds = Array.from({ length: 105 }, (_, index) => `required-team-${index + 1}`);
+    const projectTeams = [
+      currentTeam,
+      ...permissionTeamIds.map((id, index) => ({ id, name: `Required Team ${index + 1}`, projectName: "Project" } as WebApiTeam)),
+      ...Array.from({ length: 10 }, (_, index) => ({ id: `optional-team-${index + 1}`, name: `Optional Team ${index + 1}`, projectName: "Project" } as WebApiTeam)),
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: permissionTeamIds, Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: boardOwner.id,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams,
+      currentTeamMembers: [],
+      allMembers: [],
+    });
+
+    const teamOptionIds = result.permissionOptions.filter(option => option.type === "team").map(option => option.id);
+    expect(permissionTeamIds.every(teamId => teamOptionIds.includes(teamId))).toBe(true);
+    expect(teamOptionIds.includes("optional-team-1")).toBe(false);
+    expect(result.hasReachedTeamLimit).toBe(true);
+  });
+
   it("includes the current user when they are not the owner and not a team member", () => {
     const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
     const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;

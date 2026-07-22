@@ -219,8 +219,6 @@ export function buildPermissionOptions(args: {
   currentTeamMembers?: TeamMember[];
   allMembers: TeamMember[];
 }): PermissionOptionsBuildResult {
-  const ownerIdentity = getOwnerIdentity(args.board, args.isNewBoardCreation, args.currentUserId);
-  const currentUserIdentity = getCurrentUserPermissionIdentity(args.currentUserId);
   const permissionTeams = args.board?.permissions?.Teams ?? [];
   const permissionMembers = args.board?.permissions?.Members ?? [];
 
@@ -236,21 +234,31 @@ export function buildPermissionOptions(args: {
     }
   }
 
-  const teamOptions: FeedbackBoardPermissionOption[] = [];
-  const addTeamOption = (team: WebApiTeam | null | undefined): void => {
-    if (!team?.id || teamOptions.some(option => option.id === team.id)) {
+  const ownerIdentity = getOwnerIdentity(args.board, args.isNewBoardCreation, args.currentUserId);
+  const currentUserIdentity = getCurrentUserPermissionIdentity(args.currentUserId);
+  const resolvedOwner = ownerIdentity?.id ? memberLookup.get(ownerIdentity.id) : undefined;
+  const resolvedCurrentUser = currentUserIdentity?.id ? memberLookup.get(currentUserIdentity.id) : undefined;
+
+  const requiredTeamOptions: FeedbackBoardPermissionOption[] = [];
+  const additionalTeamOptions: FeedbackBoardPermissionOption[] = [];
+  const teamOptionIds = new Set<string>();
+  const addTeamOption = (team: WebApiTeam | null | undefined, isRequired: boolean): void => {
+    if (!team?.id || teamOptionIds.has(team.id)) {
       return;
     }
 
-    teamOptions.push(toTeamPermissionOption(team));
+    teamOptionIds.add(team.id);
+
+    const targetCollection = isRequired ? requiredTeamOptions : additionalTeamOptions;
+    targetCollection.push(toTeamPermissionOption(team));
   };
 
-  addTeamOption(args.currentTeam);
+  addTeamOption(args.currentTeam, true);
   for (const permissionTeamId of permissionTeams) {
-    addTeamOption(teamLookup.get(permissionTeamId) ?? ({ id: permissionTeamId, name: permissionTeamId, projectName: permissionTeamId } as WebApiTeam));
+    addTeamOption(teamLookup.get(permissionTeamId) ?? ({ id: permissionTeamId, name: permissionTeamId, projectName: permissionTeamId } as WebApiTeam), true);
   }
   for (const projectTeam of args.projectTeams) {
-    addTeamOption(projectTeam);
+    addTeamOption(projectTeam, false);
   }
 
   const memberOptions: FeedbackBoardPermissionOption[] = [];
@@ -281,8 +289,8 @@ export function buildPermissionOptions(args: {
     return true;
   };
 
-  addMemberOption(currentUserIdentity, args.currentUserIsTeamAdmin);
-  addMemberOption(ownerIdentity);
+  addMemberOption(resolvedCurrentUser?.identity ?? currentUserIdentity, args.currentUserIsTeamAdmin ?? resolvedCurrentUser?.isTeamAdmin);
+  addMemberOption(resolvedOwner?.identity ?? ownerIdentity, resolvedOwner?.isTeamAdmin);
   for (const permissionMemberId of permissionMembers) {
     const resolvedMember = memberLookup.get(permissionMemberId);
     addMemberOption(resolvedMember?.identity ?? ({ id: permissionMemberId, displayName: permissionMemberId, uniqueName: permissionMemberId } as TeamMember["identity"]), resolvedMember?.isTeamAdmin);
@@ -297,9 +305,10 @@ export function buildPermissionOptions(args: {
   }
 
   const additionalMemberAllowance = Math.max(PERMISSION_USER_LIMIT - currentTeamMemberIds.size, 0);
+  const requiredMemberIds = new Set(memberOptions.map(option => option.id));
   const additionalMemberCandidates = deduplicateTeamMembers(args.allMembers).filter(member => {
     const memberId = member?.identity?.id;
-    return !!memberId && !currentTeamMemberIds.has(memberId) && !isGroupIdentity(member.identity);
+    return !!memberId && !currentTeamMemberIds.has(memberId) && !requiredMemberIds.has(memberId) && !isGroupIdentity(member.identity);
   });
 
   let additionalMemberCount = 0;
@@ -315,9 +324,12 @@ export function buildPermissionOptions(args: {
     }
   }
 
-  const hasReachedTeamLimit = teamOptions.length > PERMISSION_TEAM_LIMIT;
+  const additionalTeamAllowance = Math.max(PERMISSION_TEAM_LIMIT - requiredTeamOptions.length, 0);
+  const visibleAdditionalTeamOptions = additionalTeamOptions.slice(0, additionalTeamAllowance);
+  const hasReachedTeamLimit = additionalTeamOptions.length > visibleAdditionalTeamOptions.length;
+
   return {
-    permissionOptions: [...teamOptions.slice(0, PERMISSION_TEAM_LIMIT), ...memberOptions],
+    permissionOptions: [...requiredTeamOptions, ...visibleAdditionalTeamOptions, ...memberOptions],
     hasReachedTeamLimit,
     hasReachedUserLimit,
   };
@@ -1454,7 +1466,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const initializeProjectTeams = (defaultTeam: WebApiTeam, userTeams: WebApiTeam[]) => {
     const projectTeams = uniqueItemsById([defaultTeam, ...(userTeams ?? [])]);
-    const memberTeams = uniqueItemsById([defaultTeam, ...projectTeams]);
+    const memberTeams = projectTeams.filter(team => team.id !== defaultTeam.id);
 
     setContainerState(previousState => ({
       ...previousState,
@@ -1464,21 +1476,25 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }));
 
     Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(defaultTeam)])
-      .then(([allMembers, currentTeamMembers]) => setContainerState(previousState => ({ ...previousState, allMembers, currentTeamMembers })))
+      .then(([additionalMembers, currentTeamMembers]) =>
+        setContainerState(previousState => ({
+          ...previousState,
+          allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembers]),
+          currentTeamMembers,
+        })),
+      )
       .catch(error => appInsights.trackException(error, { action: "initializeProjectTeamMembers" }));
   };
 
   const loadAllProjectTeams = async (): Promise<void> => {
     const allTeams = sortTeamsByName(await azureDevOpsCoreService.getAllTeams(projectId, false));
     const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams]);
-    const memberTeams = uniqueItemsById([state.currentTeam, ...projectTeams]);
-    const otherTeams = memberTeams.filter(t => t.id !== state.currentTeam?.id);
-    const [otherMembers, currentTeamMembers] = await Promise.all([loadMembersForTeams(otherTeams), loadMembersForTeam(state.currentTeam)]);
-    const allMembers = deduplicateTeamMembers([...currentTeamMembers, ...otherMembers]);
+    const memberTeams = projectTeams.filter(team => team.id !== state.currentTeam?.id);
+    const [additionalMembers, currentTeamMembers] = await Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(state.currentTeam)]);
 
     setContainerState(previousState => ({
       ...previousState,
-      allMembers,
+      allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembers]),
       currentTeamMembers,
       projectTeams,
       filteredProjectTeams: projectTeams,
@@ -2171,7 +2187,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       currentTeam: state.currentTeam,
       projectTeams: showAllTeams ? state.projectTeams : state.userTeams,
       currentTeamMembers: state.currentTeamMembers,
-      allMembers: showAllTeams ? state.allMembers : state.currentTeamMembers,
+      allMembers: state.allMembers,
     });
 
     return (
