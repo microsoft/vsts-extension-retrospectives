@@ -14,6 +14,8 @@ jest.mock("azure-devops-extension-api/Common", () => ({
 }));
 
 describe("AzureDevOpsCoreService", () => {
+  const MEMBERS_PAGE_SIZE = 5;
+  const TEAMS_PAGE_SIZE = 5;
   let azureDevOpsCoreService: any;
 
   beforeEach(() => {
@@ -169,7 +171,7 @@ describe("AzureDevOpsCoreService", () => {
 
       expect(result).toEqual(mockMembers);
       expect(result).toHaveLength(2);
-      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenCalledWith("project-123", "team-123", 100, 0);
+      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenCalledWith("project-123", "team-123", MEMBERS_PAGE_SIZE, 0);
     });
 
     it("should return null when members cannot be retrieved", async () => {
@@ -203,26 +205,26 @@ describe("AzureDevOpsCoreService", () => {
 
       await azureDevOpsCoreService.getMembers("project-abc", "team-xyz");
 
-      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenCalledWith("project-abc", "team-xyz", 100, 0);
+      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenCalledWith("project-abc", "team-xyz", MEMBERS_PAGE_SIZE, 0);
     });
 
     it("should fetch additional pages when the first page is full", async () => {
-      const firstPage: TeamMember[] = Array.from({ length: 100 }, (_, index) => ({ identity: { displayName: `User ${index + 1}` } } as any));
-      const secondPage: TeamMember[] = [{ identity: { displayName: "User 101" } } as any];
+      const firstPage: TeamMember[] = Array.from({ length: MEMBERS_PAGE_SIZE }, (_, index) => ({ identity: { displayName: `User ${index + 1}` } } as any));
+      const secondPage: TeamMember[] = [{ identity: { displayName: "User 6" } } as any];
       mockGetTeamMembersWithExtendedProperties
         .mockResolvedValueOnce(firstPage)
         .mockResolvedValueOnce(secondPage);
 
       const result = await azureDevOpsCoreService.getMembers("project-abc", "team-xyz");
 
-      expect(result).toHaveLength(101);
-      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenNthCalledWith(1, "project-abc", "team-xyz", 100, 0);
-      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenNthCalledWith(2, "project-abc", "team-xyz", 100, 100);
+      expect(result).toHaveLength(MEMBERS_PAGE_SIZE + 1);
+      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenNthCalledWith(1, "project-abc", "team-xyz", MEMBERS_PAGE_SIZE, 0);
+      expect(mockGetTeamMembersWithExtendedProperties).toHaveBeenNthCalledWith(2, "project-abc", "team-xyz", MEMBERS_PAGE_SIZE, MEMBERS_PAGE_SIZE);
     });
   });
 
   describe("getAllTeams", () => {
-    it("should return all teams when less than 100 teams", async () => {
+    it("should return all teams when less than a full page", async () => {
       const mockTeams: WebApiTeam[] = [{ id: "team-1", name: "Team 1" } as any, { id: "team-2", name: "Team 2" } as any, { id: "team-3", name: "Team 3" } as any];
 
       mockGetTeams.mockResolvedValue(mockTeams);
@@ -231,48 +233,48 @@ describe("AzureDevOpsCoreService", () => {
 
       expect(result).toEqual(mockTeams);
       expect(result).toHaveLength(3);
-      expect(mockGetTeams).toHaveBeenCalledWith("project-123", false, 100, 0);
+      expect(mockGetTeams).toHaveBeenCalledWith("project-123", false, TEAMS_PAGE_SIZE, 0);
       expect(mockGetTeams).toHaveBeenCalledTimes(1);
     });
 
-    it("should paginate when there are exactly 100 teams", async () => {
-      const firstBatch: WebApiTeam[] = Array.from({ length: 100 }, (_, i) => ({
+    it("should paginate when there are exactly TEAMS_PAGE_SIZE teams", async () => {
+      const firstBatch: WebApiTeam[] = Array.from({ length: TEAMS_PAGE_SIZE }, (_, i) => ({
         id: `team-${i}`,
         name: `Team ${i}`,
       })) as any;
 
-      const secondBatch: WebApiTeam[] = [{ id: "team-100", name: "Team 100" } as any, { id: "team-101", name: "Team 101" } as any];
+      const secondBatch: WebApiTeam[] = [{ id: "team-5", name: "Team 5" } as any, { id: "team-6", name: "Team 6" } as any];
 
       mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch);
 
       const result = await azureDevOpsCoreService.getAllTeams("project-123", false);
 
-      expect(result).toHaveLength(102);
+      expect(result).toHaveLength(TEAMS_PAGE_SIZE + 2);
       expect(mockGetTeams).toHaveBeenCalledTimes(2);
-      expect(mockGetTeams).toHaveBeenNthCalledWith(1, "project-123", false, 100, 0);
-      expect(mockGetTeams).toHaveBeenNthCalledWith(2, "project-123", false, 100, 100);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(1, "project-123", false, TEAMS_PAGE_SIZE, 0);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(2, "project-123", false, TEAMS_PAGE_SIZE, TEAMS_PAGE_SIZE);
     });
 
     it("should handle multiple pagination rounds", async () => {
-      const firstBatch: WebApiTeam[] = Array.from({ length: 100 }, (_, i) => ({
+      const firstBatch: WebApiTeam[] = Array.from({ length: TEAMS_PAGE_SIZE }, (_, i) => ({
         id: `team-${i}`,
         name: `Team ${i}`,
       })) as any;
 
-      const secondBatch: WebApiTeam[] = Array.from({ length: 100 }, (_, i) => ({
-        id: `team-${100 + i}`,
-        name: `Team ${100 + i}`,
+      const secondBatch: WebApiTeam[] = Array.from({ length: TEAMS_PAGE_SIZE }, (_, i) => ({
+        id: `team-${TEAMS_PAGE_SIZE + i}`,
+        name: `Team ${TEAMS_PAGE_SIZE + i}`,
       })) as any;
 
-      const thirdBatch: WebApiTeam[] = [{ id: "team-200", name: "Team 200" } as any];
+      const thirdBatch: WebApiTeam[] = [{ id: "team-10", name: "Team 10" } as any];
 
       mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch).mockResolvedValueOnce(thirdBatch);
 
       const result = await azureDevOpsCoreService.getAllTeams("project-123", false);
 
-      expect(result).toHaveLength(201);
+      expect(result).toHaveLength(TEAMS_PAGE_SIZE * 2 + 1);
       expect(mockGetTeams).toHaveBeenCalledTimes(3);
-      expect(mockGetTeams).toHaveBeenNthCalledWith(3, "project-123", false, 100, 200);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(3, "project-123", false, TEAMS_PAGE_SIZE, TEAMS_PAGE_SIZE * 2);
     });
 
     it("should respect forCurrentUserOnly parameter", async () => {
@@ -282,7 +284,7 @@ describe("AzureDevOpsCoreService", () => {
 
       await azureDevOpsCoreService.getAllTeams("project-456", true);
 
-      expect(mockGetTeams).toHaveBeenCalledWith("project-456", true, 100, 0);
+      expect(mockGetTeams).toHaveBeenCalledWith("project-456", true, TEAMS_PAGE_SIZE, 0);
     });
 
     it("should handle empty teams list", async () => {
@@ -296,41 +298,41 @@ describe("AzureDevOpsCoreService", () => {
     });
 
     it("should accumulate teams across multiple pages", async () => {
-      const firstBatch: WebApiTeam[] = Array.from({ length: 100 }, (_, i) => ({
+      const firstBatch: WebApiTeam[] = Array.from({ length: TEAMS_PAGE_SIZE }, (_, i) => ({
         id: `team-${i}`,
         name: `Team ${i}`,
       })) as any;
 
       const secondBatch: WebApiTeam[] = Array.from({ length: 3 }, (_, i) => ({
-        id: `team-${100 + i}`,
-        name: `Team ${100 + i}`,
+        id: `team-${TEAMS_PAGE_SIZE + i}`,
+        name: `Team ${TEAMS_PAGE_SIZE + i}`,
       })) as any;
 
       mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch);
 
       const result = await azureDevOpsCoreService.getAllTeams("project-123", false);
 
-      expect(result).toHaveLength(103);
+      expect(result).toHaveLength(TEAMS_PAGE_SIZE + 3);
       expect(result[0].id).toBe("team-0");
-      expect(result[99].id).toBe("team-99");
-      expect(result[100].id).toBe("team-100");
-      expect(result[102].id).toBe("team-102");
+      expect(result[TEAMS_PAGE_SIZE - 1].id).toBe("team-4");
+      expect(result[TEAMS_PAGE_SIZE].id).toBe("team-5");
+      expect(result[TEAMS_PAGE_SIZE + 2].id).toBe("team-7");
     });
 
     it("should handle different project ids in pagination", async () => {
-      const firstBatch: WebApiTeam[] = Array.from({ length: 100 }, (_, i) => ({
+      const firstBatch: WebApiTeam[] = Array.from({ length: TEAMS_PAGE_SIZE }, (_, i) => ({
         id: `team-${i}`,
         name: `Team ${i}`,
       })) as any;
 
-      const secondBatch: WebApiTeam[] = [{ id: "team-100", name: "Team 100" } as any];
+      const secondBatch: WebApiTeam[] = [{ id: "team-5", name: "Team 5" } as any];
 
       mockGetTeams.mockResolvedValueOnce(firstBatch).mockResolvedValueOnce(secondBatch);
 
       await azureDevOpsCoreService.getAllTeams("project-xyz", true);
 
-      expect(mockGetTeams).toHaveBeenNthCalledWith(1, "project-xyz", true, 100, 0);
-      expect(mockGetTeams).toHaveBeenNthCalledWith(2, "project-xyz", true, 100, 100);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(1, "project-xyz", true, TEAMS_PAGE_SIZE, 0);
+      expect(mockGetTeams).toHaveBeenNthCalledWith(2, "project-xyz", true, TEAMS_PAGE_SIZE, TEAMS_PAGE_SIZE);
     });
   });
 });

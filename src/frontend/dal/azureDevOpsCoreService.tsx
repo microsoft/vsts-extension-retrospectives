@@ -3,8 +3,8 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import { getClient } from "azure-devops-extension-api/Common";
 
-const MEMBERS_PAGE_SIZE = 100;
-const TEAMS_PAGE_SIZE = 100;
+const MEMBERS_PAGE_SIZE = 5;
+const TEAMS_PAGE_SIZE = 5;
 
 class AzureDevOpsCoreService {
   private _httpCoreClient: CoreRestClient;
