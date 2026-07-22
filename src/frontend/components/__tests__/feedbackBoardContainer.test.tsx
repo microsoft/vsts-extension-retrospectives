@@ -377,7 +377,7 @@ describe("buildPermissionOptions", () => {
 
     const allMembers: TeamMember[] = [
       { identity: { id: "group-1", displayName: "[Project]\\Contributors", uniqueName: "[Project]\\Contributors" } as IdentityRef } as TeamMember,
-      ...Array.from({ length: 501 }, (_, index) => ({
+      ...Array.from({ length: 500 }, (_, index) => ({
         identity: {
           id: `user-${index + 1}`,
           displayName: `User ${index + 1}`,
