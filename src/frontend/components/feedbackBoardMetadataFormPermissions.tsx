@@ -231,7 +231,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     const hasTeamLimit = props.permissionLimitReached?.teams;
 
     if (hasUserLimit && hasTeamLimit) {
-      return "Reached 500 user or 100 team retrieval limit.";
+      return "Reached 500 user and 100 team retrieval limit.";
     }
 
     if (hasUserLimit) {

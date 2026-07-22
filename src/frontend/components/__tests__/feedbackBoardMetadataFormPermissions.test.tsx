@@ -198,7 +198,7 @@ describe("Board Metadata Form Permissions", () => {
 
       const { getByText, queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
 
-      expect(getByText("Reached 500 user or 100 team retrieval limit.")).toBeInTheDocument();
+      expect(getByText("Reached 500 user and 100 team retrieval limit.")).toBeInTheDocument();
       expect(queryByText("Reached 500 user retrieval limit.")).not.toBeInTheDocument();
       expect(queryByText("Reached 100 team retrieval limit.")).not.toBeInTheDocument();
     });
