@@ -2,10 +2,10 @@ name: "Package for Production"
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "The version to use"
-        required: false
+
+concurrency:
+  group: production-frontend-release
+  cancel-in-progress: false
 
 jobs:
   ci_cd_frontend:
@@ -34,41 +34,120 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
 
-      - name: Package extension
-        id: package_extension
-        working-directory: 'src/frontend'
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Validate release
+        id: release
         env:
-          AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
-          REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
-          REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
-          INPUT_VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
         run: |
-          npm ci
+          set -euo pipefail
 
-          if [ -z "${INPUT_VERSION}" ]; then
-            ext_info=$(npx tfx extension show --no-prompt --json --publisher "ms-devlabs" --extensionId "team-retrospectives" --token "${AZURE_DEVOPS_TOKEN}")
-            VERSION=$(jq -r '.versions[0].version' <<< "$ext_info")
-          else
-            VERSION="${INPUT_VERSION}"
+          latest_tag=$(gh release list --repo "${REPOSITORY}" --limit 100 \
+            --json tagName,isDraft,isPrerelease \
+            --jq '.[] | select(.isDraft == false and .isPrerelease == false) | .tagName' |
+            grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' |
+            sort -V |
+            tail -1 || true)
+
+          if [[ -z "${latest_tag}" ]]; then
+            echo "::error::No stable semantic-version GitHub release was found."
+            exit 1
           fi
 
+          latest_version=${latest_tag#v}
+          IFS='.' read -r major minor patch <<< "${latest_version}"
+          version="${major}.${minor}.$((patch + 1))"
+          tag="v${version}"
+
+          echo "Latest stable release: ${latest_tag}"
+          echo "Next production release: ${tag}"
+
+          changelog_version=$(awk '/^## v[0-9]+\.[0-9]+\.[0-9]+$/{print $2; exit}' CHANGELOG.md)
+          if [[ "${changelog_version}" != "${tag}" ]]; then
+            echo "::error::The first version in CHANGELOG.md must be ${tag}; found ${changelog_version:-none}."
+            exit 1
+          fi
+
+          if gh api "repos/${REPOSITORY}/git/ref/tags/${tag}" >/dev/null 2>&1; then
+            echo "::error::Tag ${tag} already exists."
+            exit 1
+          fi
+
+          if gh api "repos/${REPOSITORY}/releases/tags/${tag}" >/dev/null 2>&1; then
+            echo "::error::Release ${tag} already exists."
+            exit 1
+          fi
+
+          awk -v heading="## ${tag}" '
+            $0 == heading { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "::error::CHANGELOG.md section ${tag} has no release notes."
+            exit 1
+          fi
+
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+          echo "asset_name=retrospectives-${tag}.vsix" >> "${GITHUB_OUTPUT}"
+
+      - name: Package exact extension version
+        id: package_extension
+        env:
+          REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
+          REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
+          VERSION: ${{ steps.release.outputs.version }}
+          ASSET_NAME: ${{ steps.release.outputs.asset_name }}
+        run: |
+          set -euo pipefail
+          cd src/frontend
+
           tmp_versioned=$(mktemp)
-          jq ".version = \"${VERSION}\"" vss-extension-prod.json > "$tmp_versioned"
-          mv "$tmp_versioned" vss-extension-prod.json
+          jq --arg version "${VERSION}" '.version = $version' vss-extension-prod.json > "${tmp_versioned}"
+          mv "${tmp_versioned}" vss-extension-prod.json
 
           cp ../../LICENSE ./assets/LICENSE.md
 
-          npm run pack:p
+          npm ci
+          npm run build
+          npx tfx extension create --manifests vss-extension-prod.json --output-path dist --no-prompt
 
-          VERSION=$(jq -r '.version' vss-extension-prod.json)
-          echo "extension_version=${VERSION}" >> "$GITHUB_OUTPUT"
+          mapfile -t packages < <(find dist -maxdepth 1 -type f -name '*.vsix' -print)
+          if [[ ${#packages[@]} -ne 1 ]]; then
+            echo "::error::Expected one VSIX package; found ${#packages[@]}."
+            exit 1
+          fi
+
+          mv "${packages[0]}" "dist/${ASSET_NAME}"
+
+          embedded_version=$(unzip -p "dist/${ASSET_NAME}" extension.vsixmanifest |
+            sed -n 's/.*<Identity[^>]*Version="\([^"]*\)".*/\1/p' |
+            head -1)
+          if [[ "${embedded_version}" != "${VERSION}" ]]; then
+            echo "::error::VSIX version ${embedded_version:-none} does not match ${VERSION}."
+            exit 1
+          fi
+
+          asset_size=$(stat -c '%s' "dist/${ASSET_NAME}")
+          echo "asset_size=${asset_size}" >> "${GITHUB_OUTPUT}"
 
       - name: "Upload extension package"
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: retrospectives-extension-prod
-          path: src/frontend/dist/*.vsix
+          name: ${{ steps.release.outputs.asset_name }}
+          path: src/frontend/dist/${{ steps.release.outputs.asset_name }}
           if-no-files-found: error
 
       - name: Create the tag for the extension release
@@ -79,6 +158,63 @@ jobs:
             await github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `refs/tags/v${{ steps.package_extension.outputs.extension_version }}`,
+              ref: `refs/tags/${{ steps.release.outputs.tag }}`,
               sha: context.sha
             });
+
+      - name: Create draft GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TAG: ${{ steps.release.outputs.tag }}
+          ASSET_NAME: ${{ steps.release.outputs.asset_name }}
+          ASSET_SIZE: ${{ steps.package_extension.outputs.asset_size }}
+        run: |
+          set -euo pipefail
+          gh release create "${TAG}" "src/frontend/dist/${ASSET_NAME}" \
+            --repo "${REPOSITORY}" \
+            --verify-tag \
+            --draft \
+            --title "${TAG}" \
+            --notes-file release-notes.md
+
+          release=$(gh release view "${TAG}" --repo "${REPOSITORY}" \
+            --json tagName,isDraft,isPrerelease,body,assets)
+
+          [[ "$(jq -r '.tagName' <<< "${release}")" == "${TAG}" ]]
+          [[ "$(jq -r '.isDraft' <<< "${release}")" == "true" ]]
+          [[ "$(jq -r '.isPrerelease' <<< "${release}")" == "false" ]]
+          [[ "$(jq -r '.body' <<< "${release}")" == "$(cat release-notes.md)" ]]
+          [[ "$(jq -r '.assets | length' <<< "${release}")" -eq 1 ]]
+          [[ "$(jq -r '.assets[0].name' <<< "${release}")" == "${ASSET_NAME}" ]]
+          [[ -z "$(jq -r '.assets[0].label // ""' <<< "${release}")" ]]
+          [[ "$(jq -r '.assets[0].size' <<< "${release}")" -eq "${ASSET_SIZE}" ]]
+
+      - name: Publish and verify GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TAG: ${{ steps.release.outputs.tag }}
+          ASSET_NAME: ${{ steps.release.outputs.asset_name }}
+          ASSET_SIZE: ${{ steps.package_extension.outputs.asset_size }}
+        run: |
+          set -euo pipefail
+
+          gh release edit "${TAG}" --repo "${REPOSITORY}" --draft=false --latest
+
+          release=$(gh release view "${TAG}" --repo "${REPOSITORY}" \
+            --json tagName,isDraft,isPrerelease,body,assets,url)
+
+          [[ "$(jq -r '.tagName' <<< "${release}")" == "${TAG}" ]]
+          [[ "$(jq -r '.isDraft' <<< "${release}")" == "false" ]]
+          [[ "$(jq -r '.isPrerelease' <<< "${release}")" == "false" ]]
+          [[ "$(jq -r '.body' <<< "${release}")" == "$(cat release-notes.md)" ]]
+          [[ "$(jq -r '.assets | length' <<< "${release}")" -eq 1 ]]
+          [[ "$(jq -r '.assets[0].name' <<< "${release}")" == "${ASSET_NAME}" ]]
+          [[ -z "$(jq -r '.assets[0].label // ""' <<< "${release}")" ]]
+          [[ "$(jq -r '.assets[0].size' <<< "${release}")" -eq "${ASSET_SIZE}" ]]
+
+          remote_sha=$(gh api "repos/${REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha')
+          [[ "${remote_sha}" == "${GITHUB_SHA}" ]]
+
+          echo "Verified $(jq -r '.url' <<< "${release}")"
