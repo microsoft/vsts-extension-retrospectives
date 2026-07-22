@@ -130,6 +130,7 @@ export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember
 
 const PERMISSION_TEAM_LIMIT = 100;
 const PERMISSION_USER_LIMIT = 500;
+const MEMBER_LOAD_CONCURRENCY = 5;
 
 function uniqueItemsById<T extends { id?: string }>(items: Array<T | null | undefined>): T[] {
   const seenIds = new Set<string>();
@@ -1421,8 +1422,19 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   };
 
   const loadMembersForTeams = async (teams: WebApiTeam[]): Promise<TeamMember[]> => {
-    const memberLists = await Promise.all(teams.map(team => azureDevOpsCoreService.getMembers(projectId, team.id)));
-    return deduplicateTeamMembers(memberLists.flatMap(members => members ?? []));
+    const accumulated: TeamMember[] = [];
+
+    for (let i = 0; i < teams.length; i += MEMBER_LOAD_CONCURRENCY) {
+      const batch = teams.slice(i, i + MEMBER_LOAD_CONCURRENCY);
+      const batchResults = await Promise.all(batch.map(team => azureDevOpsCoreService.getMembers(projectId, team.id)));
+      accumulated.push(...batchResults.flatMap(members => members ?? []));
+
+      if (deduplicateTeamMembers(accumulated).length >= PERMISSION_USER_LIMIT) {
+        break;
+      }
+    }
+
+    return deduplicateTeamMembers(accumulated);
   };
 
   const loadMembersForTeam = async (team: WebApiTeam | null | undefined): Promise<TeamMember[]> => {
