@@ -95,6 +95,8 @@ export interface FeedbackBoardContainerState {
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
   actionItemIds: number[];
   allMembers: TeamMember[];
+  currentTeamMembers: TeamMember[];
+  hasReachedAdditionalMemberLoadLimit: boolean;
   castedVoteCount: number;
   currentVoteCount: string;
   teamVoteCapacity: number;
@@ -125,6 +127,217 @@ export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember
     const admin = members.find(m => m.isTeamAdmin);
     return admin || members[0];
   });
+}
+
+const PERMISSION_TEAM_LIMIT = 100;
+const PERMISSION_USER_LIMIT = 500;
+const MEMBER_LOAD_CONCURRENCY = 5;
+
+function uniqueItemsById<T extends { id?: string }>(items: Array<T | null | undefined>): T[] {
+  const seenIds = new Set<string>();
+  const uniqueItems: T[] = [];
+
+  for (const item of items) {
+    if (!item?.id || seenIds.has(item.id)) {
+      continue;
+    }
+
+    seenIds.add(item.id);
+    uniqueItems.push(item);
+  }
+
+  return uniqueItems;
+}
+
+function toTeamPermissionOption(team: WebApiTeam): FeedbackBoardPermissionOption {
+  return {
+    id: team.id,
+    name: team.name || team.id,
+    uniqueName: team.projectName || team.name || team.id,
+    type: "team",
+  };
+}
+
+function toMemberPermissionOption(member: TeamMember["identity"], isTeamAdmin?: boolean): FeedbackBoardPermissionOption {
+  return {
+    id: member.id,
+    name: member.displayName || member.uniqueName || member.id,
+    uniqueName: member.uniqueName || member.id,
+    thumbnailUrl: member.imageUrl,
+    type: "member",
+    isTeamAdmin,
+  };
+}
+
+function isGroupIdentity(memberIdentity: TeamMember["identity"] | null | undefined): boolean {
+  const identityName = memberIdentity?.displayName || memberIdentity?.uniqueName || "";
+  return /^\[[^\]]+\]\\/.test(identityName);
+}
+
+function getUniqueNonGroupMemberCount(members: TeamMember[]): number {
+  return deduplicateTeamMembers(members).filter(member => member?.identity?.id && !isGroupIdentity(member.identity)).length;
+}
+
+function getOwnerIdentity(board: IFeedbackBoardDocument | null | undefined, isNewBoardCreation: boolean, currentUserId: string): TeamMember["identity"] | null {
+  if (isNewBoardCreation) {
+    const currentUser = getUserIdentity();
+    if (currentUser?.id) {
+      return currentUser;
+    }
+
+    return currentUserId ? ({ id: currentUserId, displayName: currentUserId, uniqueName: currentUserId } as TeamMember["identity"]) : null;
+  }
+
+  return board?.createdBy ?? null;
+}
+
+function getCurrentUserPermissionIdentity(currentUserId: string): TeamMember["identity"] | null {
+  if (!currentUserId) {
+    return null;
+  }
+
+  const currentUser = getUserIdentity();
+  if (currentUser?.id === currentUserId) {
+    return currentUser;
+  }
+
+  return {
+    id: currentUserId,
+    displayName: currentUserId,
+    uniqueName: currentUserId,
+  } as TeamMember["identity"];
+}
+
+export interface PermissionOptionsBuildResult {
+  permissionOptions: FeedbackBoardPermissionOption[];
+  hasReachedTeamLimit: boolean;
+  hasReachedUserLimit: boolean;
+}
+
+export function buildPermissionOptions(args: {
+  board: IFeedbackBoardDocument | null | undefined;
+  currentUserId: string;
+  currentUserIsTeamAdmin?: boolean;
+  isNewBoardCreation: boolean;
+  currentTeam: WebApiTeam | null | undefined;
+  projectTeams: WebApiTeam[];
+  currentTeamMembers?: TeamMember[];
+  allMembers: TeamMember[];
+}): PermissionOptionsBuildResult {
+  const permissionTeams = args.board?.permissions?.Teams ?? [];
+  const permissionMembers = args.board?.permissions?.Members ?? [];
+
+  const teamLookup = new Map<string, WebApiTeam>();
+  for (const team of uniqueItemsById([args.currentTeam, ...args.projectTeams])) {
+    teamLookup.set(team.id, team);
+  }
+
+  const memberLookup = new Map<string, TeamMember>();
+  for (const member of [...(args.currentTeamMembers ?? []), ...args.allMembers]) {
+    if (member?.identity?.id) {
+      memberLookup.set(member.identity.id, member);
+    }
+  }
+
+  const ownerIdentity = getOwnerIdentity(args.board, args.isNewBoardCreation, args.currentUserId);
+  const currentUserIdentity = getCurrentUserPermissionIdentity(args.currentUserId);
+  const resolvedOwner = ownerIdentity?.id ? memberLookup.get(ownerIdentity.id) : undefined;
+  const resolvedCurrentUser = currentUserIdentity?.id ? memberLookup.get(currentUserIdentity.id) : undefined;
+
+  const requiredTeamOptions: FeedbackBoardPermissionOption[] = [];
+  const additionalTeamOptions: FeedbackBoardPermissionOption[] = [];
+  const teamOptionIds = new Set<string>();
+  const addTeamOption = (team: WebApiTeam | null | undefined, isRequired: boolean): void => {
+    if (!team?.id || teamOptionIds.has(team.id)) {
+      return;
+    }
+
+    teamOptionIds.add(team.id);
+
+    const targetCollection = isRequired ? requiredTeamOptions : additionalTeamOptions;
+    targetCollection.push(toTeamPermissionOption(team));
+  };
+
+  addTeamOption(args.currentTeam, true);
+  for (const permissionTeamId of permissionTeams) {
+    addTeamOption(teamLookup.get(permissionTeamId) ?? ({ id: permissionTeamId, name: permissionTeamId, projectName: permissionTeamId } as WebApiTeam), true);
+  }
+  for (const projectTeam of args.projectTeams) {
+    addTeamOption(projectTeam, false);
+  }
+
+  const memberOptions: FeedbackBoardPermissionOption[] = [];
+  const addMemberOption = (memberIdentity: TeamMember["identity"] | null | undefined, isTeamAdmin?: boolean): boolean => {
+    if (!memberIdentity?.id) {
+      return false;
+    }
+
+    const existingOption = memberOptions.find(option => option.id === memberIdentity.id);
+    if (existingOption) {
+      if (isTeamAdmin && !existingOption.isTeamAdmin) {
+        existingOption.isTeamAdmin = true;
+      }
+
+      if (!existingOption.thumbnailUrl && memberIdentity.imageUrl) {
+        existingOption.thumbnailUrl = memberIdentity.imageUrl;
+      }
+
+      return false;
+    }
+
+    // Keep group-style identities out of the capped member list so they don't consume user slots.
+    if (isGroupIdentity(memberIdentity)) {
+      return false;
+    }
+
+    memberOptions.push(toMemberPermissionOption(memberIdentity, isTeamAdmin));
+    return true;
+  };
+
+  addMemberOption(resolvedCurrentUser?.identity ?? currentUserIdentity, args.currentUserIsTeamAdmin ?? resolvedCurrentUser?.isTeamAdmin);
+  addMemberOption(resolvedOwner?.identity ?? ownerIdentity, resolvedOwner?.isTeamAdmin);
+  for (const permissionMemberId of permissionMembers) {
+    const resolvedMember = memberLookup.get(permissionMemberId);
+    addMemberOption(resolvedMember?.identity ?? ({ id: permissionMemberId, displayName: permissionMemberId, uniqueName: permissionMemberId } as TeamMember["identity"]), resolvedMember?.isTeamAdmin);
+  }
+  const currentTeamMembers = deduplicateTeamMembers(args.currentTeamMembers ?? []);
+  const currentTeamMemberIds = new Set<string>();
+  for (const member of currentTeamMembers) {
+    if (member?.identity?.id && !isGroupIdentity(member.identity)) {
+      currentTeamMemberIds.add(member.identity.id);
+    }
+    addMemberOption(member.identity, member.isTeamAdmin);
+  }
+
+  const additionalMemberAllowance = Math.max(PERMISSION_USER_LIMIT - currentTeamMemberIds.size, 0);
+  const requiredMemberIds = new Set(memberOptions.map(option => option.id));
+  const additionalMemberCandidates = deduplicateTeamMembers(args.allMembers).filter(member => {
+    const memberId = member?.identity?.id;
+    return !!memberId && !currentTeamMemberIds.has(memberId) && !requiredMemberIds.has(memberId) && !isGroupIdentity(member.identity);
+  });
+
+  let additionalMemberCount = 0;
+  let hasReachedUserLimit = false;
+  for (const member of additionalMemberCandidates) {
+    if (additionalMemberCount >= additionalMemberAllowance) {
+      hasReachedUserLimit = true;
+      break;
+    }
+
+    if (addMemberOption(member.identity, member.isTeamAdmin)) {
+      additionalMemberCount += 1;
+    }
+  }
+
+  const additionalTeamAllowance = Math.max(PERMISSION_TEAM_LIMIT - requiredTeamOptions.length, 0);
+  const visibleAdditionalTeamOptions = additionalTeamOptions.slice(0, additionalTeamAllowance);
+  const hasReachedTeamLimit = additionalTeamOptions.length > visibleAdditionalTeamOptions.length;
+
+  return {
+    permissionOptions: [...requiredTeamOptions, ...visibleAdditionalTeamOptions, ...memberOptions],
+    hasReachedTeamLimit,
+    hasReachedUserLimit,
+  };
 }
 
 const initialState: FeedbackBoardContainerState = {
@@ -166,6 +379,8 @@ const initialState: FeedbackBoardContainerState = {
   teamEffectivenessMeasurementAverageVisibilityClassName: "hidden",
   actionItemIds: [],
   allMembers: [],
+  currentTeamMembers: [],
+  hasReachedAdditionalMemberLoadLimit: false,
   castedVoteCount: 0,
   currentVoteCount: "0",
   teamVoteCapacity: 0,
@@ -1224,9 +1439,35 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   };
 
-  const loadMembersForTeams = async (teams: WebApiTeam[]): Promise<TeamMember[]> => {
-    const memberLists = await Promise.all(teams.map(team => azureDevOpsCoreService.getMembers(projectId, team.id)));
-    return deduplicateTeamMembers(memberLists.flat());
+  const loadMembersForTeams = async (teams: WebApiTeam[], additionalMemberAllowance: number): Promise<{ members: TeamMember[]; didHitLimit: boolean }> => {
+    if (additionalMemberAllowance <= 0) {
+      return { members: [], didHitLimit: false };
+    }
+
+    const accumulated: TeamMember[] = [];
+    let didHitLimit = false;
+
+    for (let i = 0; i < teams.length; i += MEMBER_LOAD_CONCURRENCY) {
+      const batch = teams.slice(i, i + MEMBER_LOAD_CONCURRENCY);
+      const batchResults = await Promise.all(batch.map(team => azureDevOpsCoreService.getMembers(projectId, team.id)));
+      accumulated.push(...batchResults.flatMap(members => members ?? []));
+
+      if (getUniqueNonGroupMemberCount(accumulated) >= additionalMemberAllowance) {
+        didHitLimit = true;
+        break;
+      }
+    }
+
+    return { members: deduplicateTeamMembers(accumulated), didHitLimit };
+  };
+
+  const loadMembersForTeam = async (team: WebApiTeam | null | undefined): Promise<TeamMember[]> => {
+    if (!team?.id) {
+      return [];
+    }
+
+    const members = await azureDevOpsCoreService.getMembers(projectId, team.id);
+    return deduplicateTeamMembers(members ?? []);
   };
 
   const sortTeamsByName = (teams: WebApiTeam[]): WebApiTeam[] => {
@@ -1235,8 +1476,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     });
   };
 
-  const initializeProjectTeams = (defaultTeam: WebApiTeam, userTeams: WebApiTeam[]) => {
-    const projectTeams = userTeams?.length > 0 ? userTeams : defaultTeam ? [defaultTeam] : [];
+  const initializeProjectTeams = (defaultTeam: WebApiTeam | null | undefined, userTeams: WebApiTeam[]) => {
+    const projectTeams = uniqueItemsById([defaultTeam, ...(userTeams ?? [])]);
+    const defaultTeamId = defaultTeam?.id;
+    const memberTeams = defaultTeamId ? projectTeams.filter(team => team.id !== defaultTeamId) : projectTeams;
 
     setContainerState(previousState => ({
       ...previousState,
@@ -1245,19 +1488,34 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       isAllTeamsLoaded: false,
     }));
 
-    loadMembersForTeams(projectTeams)
-      .then(allMembers => setContainerState(previousState => ({ ...previousState, allMembers })))
+    loadMembersForTeam(defaultTeam)
+      .then(async currentTeamMembers => {
+        const additionalMemberAllowance = Math.max(PERMISSION_USER_LIMIT - getUniqueNonGroupMemberCount(currentTeamMembers), 0);
+        const additionalMembersResult = await loadMembersForTeams(memberTeams, additionalMemberAllowance);
+
+        setContainerState(previousState => ({
+          ...previousState,
+          allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembersResult.members]),
+          currentTeamMembers,
+          hasReachedAdditionalMemberLoadLimit: additionalMembersResult.didHitLimit,
+        }));
+      })
       .catch(error => appInsights.trackException(error, { action: "initializeProjectTeamMembers" }));
   };
 
   const loadAllProjectTeams = async (): Promise<void> => {
     const allTeams = sortTeamsByName(await azureDevOpsCoreService.getAllTeams(projectId, false));
-    const projectTeams = allTeams.length ? allTeams : state.userTeams.length ? state.userTeams : state.currentTeam ? [state.currentTeam] : [];
-    const allMembers = await loadMembersForTeams(projectTeams);
+    const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams]);
+    const memberTeams = projectTeams.filter(team => team.id !== state.currentTeam?.id);
+    const currentTeamMembers = await loadMembersForTeam(state.currentTeam);
+    const additionalMemberAllowance = Math.max(PERMISSION_USER_LIMIT - getUniqueNonGroupMemberCount(currentTeamMembers), 0);
+    const additionalMembersResult = await loadMembersForTeams(memberTeams, additionalMemberAllowance);
 
     setContainerState(previousState => ({
       ...previousState,
-      allMembers,
+      allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembersResult.members]),
+      currentTeamMembers,
+      hasReachedAdditionalMemberLoadLimit: additionalMembersResult.didHitLimit,
       projectTeams,
       filteredProjectTeams: projectTeams,
       isAllTeamsLoaded: true,
@@ -1359,6 +1617,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
       if (matchedTeam) {
         let boardsForTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
+        const currentTeamMembers = await loadMembersForTeam(matchedTeam);
         if (boardsForTeam?.length) {
           boardsForTeam = boardsForTeam
             .filter((board: IFeedbackBoardDocument) =>
@@ -1378,6 +1637,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               boards: boardsForTeam?.length ? boardsForTeam : [],
               currentBoard: boardsForTeam?.length ? boardsForTeam[0] : null,
               currentTeam: matchedTeam,
+              currentTeamMembers,
               isTeamDataLoaded: true,
             };
           }
@@ -1926,26 +2186,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     downloadPdfBlob(pdfBlob, fileName);
   };
 
-  const permissionOptions = React.useMemo<FeedbackBoardPermissionOption[]>(
-    () => [
-      ...state.projectTeams.map(team => ({
-        id: team.id,
-        name: team.name,
-        uniqueName: team.projectName,
-        type: "team" as const,
-      })),
-      ...state.allMembers.map(member => ({
-        id: member.identity.id,
-        name: member.identity.displayName,
-        uniqueName: member.identity.uniqueName,
-        thumbnailUrl: member.identity.imageUrl,
-        type: "member" as const,
-        isTeamAdmin: member.isTeamAdmin,
-      })),
-    ],
-    [state.projectTeams, state.allMembers],
-  );
-
   const renderBoardUpdateMetadataFormDialog = (
     dialogRef: React.RefObject<HTMLDialogElement>,
     isNewBoardCreation: boolean,
@@ -1959,6 +2199,17 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     initialTitleOverride?: string,
     onDialogClose?: () => void,
   ) => {
+    const permissionOptionsBuildResult = buildPermissionOptions({
+      board: state.currentBoard,
+      currentUserId: state.currentUserId,
+      currentUserIsTeamAdmin,
+      isNewBoardCreation,
+      currentTeam: state.currentTeam,
+      projectTeams: showAllTeams ? state.projectTeams : state.userTeams,
+      currentTeamMembers: state.currentTeamMembers,
+      allMembers: state.allMembers,
+    });
+
     return (
       <dialog className="board-metadata-dialog dialog-width-lg" ref={dialogRef} role="dialog" aria-label={dialogTitle} onClose={onDialogClose}>
         <div className="header">
@@ -1967,7 +2218,24 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             {getIconElement("close")}
           </button>
         </div>
-        <FeedbackBoardMetadataForm isNewBoardCreation={isNewBoardCreation} isDuplicatingBoard={isDuplicatingBoard} currentBoard={state.currentBoard} initialTitleOverride={initialTitleOverride} canManageBoard={canManageCurrentBoard} teamId={state.currentTeam.id} maxVotesPerUser={state.maxVotesPerUser} placeholderText={placeholderText} availablePermissionOptions={permissionOptions} currentUserId={state.currentUserId} onFormSubmit={onSubmit} onFormCancel={onCancel} />
+        <FeedbackBoardMetadataForm
+          isNewBoardCreation={isNewBoardCreation}
+          isDuplicatingBoard={isDuplicatingBoard}
+          currentBoard={state.currentBoard}
+          initialTitleOverride={initialTitleOverride}
+          canManageBoard={canManageCurrentBoard}
+          teamId={state.currentTeam.id}
+          maxVotesPerUser={state.maxVotesPerUser}
+          placeholderText={placeholderText}
+          availablePermissionOptions={permissionOptionsBuildResult.permissionOptions}
+          currentUserId={state.currentUserId}
+          permissionLimitReached={{
+            users: permissionOptionsBuildResult.hasReachedUserLimit || state.hasReachedAdditionalMemberLoadLimit,
+            teams: permissionOptionsBuildResult.hasReachedTeamLimit,
+          }}
+          onFormSubmit={onSubmit}
+          onFormCancel={onCancel}
+        />
       </dialog>
     );
   };
@@ -2141,7 +2409,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     return <div>{t("feedback_board_team_list_error")}</div>;
   }
 
-  const selectableTeams = showAllTeams && state.projectTeams.length ? state.projectTeams : state.userTeams.length ? state.userTeams : [state.currentTeam];
+  const selectableTeams = showAllTeams && state.projectTeams.length ? state.projectTeams : uniqueItemsById([state.currentTeam, ...(state.userTeams.length ? state.userTeams : [state.currentTeam])]);
 
   const handleShowAllTeamsChange = async (shouldShowAllTeams: boolean): Promise<void> => {
     if (!shouldShowAllTeams) {

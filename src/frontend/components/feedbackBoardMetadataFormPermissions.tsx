@@ -11,6 +11,10 @@ export interface IFeedbackBoardMetadataFormPermissionsProps {
   currentUserId: string;
   isNewBoardCreation: boolean;
   canManageBoard: boolean;
+  permissionLimitReached?: {
+    users: boolean;
+    teams: boolean;
+  };
   onPermissionChanged: (state: FeedbackBoardPermissionState) => void;
 }
 
@@ -222,10 +226,32 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     emitChangeEvent();
   }, [teamPermissions, memberPermissions]);
 
+  const permissionLimitMessage = React.useMemo(() => {
+    const hasUserLimit = props.permissionLimitReached?.users;
+    const hasTeamLimit = props.permissionLimitReached?.teams;
+
+    if (hasUserLimit && hasTeamLimit) {
+      return "Showing up to 500 additional users and 100 additional teams.";
+    }
+
+    if (hasUserLimit) {
+      return "Showing up to 500 additional users.";
+    }
+
+    if (hasTeamLimit) {
+      return "Showing up to 100 additional teams.";
+    }
+
+    return null;
+  }, [props.permissionLimitReached?.teams, props.permissionLimitReached?.users]);
+
   return (
     <div className="board-metadata-form board-metadata-form-permissions" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
       <section className="board-metadata-form-board-settings board-metadata-form-board-settings--no-padding">
-        <PublicWarningBanner isVisible={teamPermissions.length === 0 && memberPermissions.length === 0} />
+        <div className="permission-info-messages">
+          <PublicWarningBanner isVisible={teamPermissions.length === 0 && memberPermissions.length === 0} />
+          {permissionLimitMessage && <div className="board-metadata-form-section-information">{getIconElement("exclamation")} {permissionLimitMessage}</div>}
+        </div>
 
         <div className="search-bar">
           <PermissionSearchInput searchTerm={searchTerm} onSearchTermChanged={handleSearchTermChanged} />

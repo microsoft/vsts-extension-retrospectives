@@ -3,6 +3,9 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import { getClient } from "azure-devops-extension-api/Common";
 
+const MEMBERS_PAGE_SIZE = 100;
+const TEAMS_PAGE_SIZE = 100;
+
 class AzureDevOpsCoreService {
   private _httpCoreClient: CoreRestClient;
 
@@ -43,9 +46,23 @@ class AzureDevOpsCoreService {
    * @param projectId The project ID.
    * @param teamId The team ID.
    */
-  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[]> {
+  public async getMembers(projectId: string, teamId: string): Promise<TeamMember[] | null> {
     try {
-      return await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, 100, 0);
+      const allMembers: TeamMember[] = [];
+
+      for (let skip = 0; ; skip += MEMBERS_PAGE_SIZE) {
+        const memberBatch: TeamMember[] = await this._httpCoreClient.getTeamMembersWithExtendedProperties(projectId, teamId, MEMBERS_PAGE_SIZE, skip);
+
+        if (memberBatch.length > 0) {
+          allMembers.push(...memberBatch);
+        }
+
+        if (memberBatch.length < MEMBERS_PAGE_SIZE) {
+          break;
+        }
+      }
+
+      return allMembers;
     } catch {
       return null;
     }
@@ -59,22 +76,17 @@ class AzureDevOpsCoreService {
   public async getAllTeams(projectId: string, forCurrentUserOnly: boolean): Promise<WebApiTeam[]> {
     const allTeams: WebApiTeam[] = [];
 
-    const _httpCoreClient: CoreRestClient = getClient(CoreRestClient);
-
-    const getTeamBatch = async (skip: number) => {
-      const teamBatch: WebApiTeam[] = await _httpCoreClient.getTeams(projectId, forCurrentUserOnly, 100, skip);
+    for (let skip = 0; ; skip += TEAMS_PAGE_SIZE) {
+      const teamBatch: WebApiTeam[] = await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, TEAMS_PAGE_SIZE, skip);
 
       if (teamBatch.length > 0) {
         allTeams.push(...teamBatch);
       }
 
-      if (teamBatch.length === 100) {
-        await getTeamBatch(skip + 100);
+      if (teamBatch.length < TEAMS_PAGE_SIZE) {
+        break;
       }
-      return;
-    };
-
-    await getTeamBatch(0);
+    }
 
     return allTeams;
   }

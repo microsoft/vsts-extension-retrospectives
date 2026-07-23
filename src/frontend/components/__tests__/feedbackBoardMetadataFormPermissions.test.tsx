@@ -170,6 +170,38 @@ describe("Board Metadata Form Permissions", () => {
       const { queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
       expect(queryByText("This board is visible to every member in the project.")).not.toBeInTheDocument();
     });
+
+    it("should show a user limit banner when the user cap is reached", () => {
+      const props = makeProps({
+        permissionLimitReached: { users: true, teams: false },
+      });
+
+      const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      expect(getByText("Showing up to 500 additional users.")).toBeInTheDocument();
+    });
+
+    it("should show a team limit banner when the team cap is reached", () => {
+      const props = makeProps({
+        permissionLimitReached: { users: false, teams: true },
+      });
+
+      const { getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      expect(getByText("Showing up to 100 additional teams.")).toBeInTheDocument();
+    });
+
+    it("should show a combined limit banner when both caps are reached", () => {
+      const props = makeProps({
+        permissionLimitReached: { users: true, teams: true },
+      });
+
+      const { getByText, queryByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      expect(getByText("Showing up to 500 additional users and 100 additional teams.")).toBeInTheDocument();
+      expect(queryByText("Showing up to 500 additional users.")).not.toBeInTheDocument();
+      expect(queryByText("Showing up to 100 additional teams.")).not.toBeInTheDocument();
+    });
   });
 
   describe("Permission Table", () => {

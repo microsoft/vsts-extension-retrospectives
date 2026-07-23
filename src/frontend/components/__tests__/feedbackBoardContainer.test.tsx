@@ -5,7 +5,7 @@ import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
-import { FeedbackBoardContainer, deduplicateTeamMembers } from "../feedbackBoardContainer";
+import { FeedbackBoardContainer, buildPermissionOptions, deduplicateTeamMembers } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -338,6 +338,405 @@ describe("deduplicateTeamMembers", () => {
   });
 });
 
+describe("buildPermissionOptions", () => {
+  it("includes the current team and board owner", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const currentUserIdentity = mockUserIdentity as unknown as IdentityRef;
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: currentUserIdentity,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: currentUserIdentity.id,
+      isNewBoardCreation: true,
+      currentTeam,
+      projectTeams: [currentTeam],
+      allMembers: [],
+    });
+
+    expect(result.permissionOptions.some(option => option.id === currentTeam.id && option.type === "team")).toBe(true);
+    expect(result.permissionOptions.some(option => option.id === currentUserIdentity.id && option.type === "member")).toBe(true);
+  });
+
+  it("does not let group identities consume user cap slots", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const currentUserIdentity = mockUserIdentity as unknown as IdentityRef;
+
+    const allMembers: TeamMember[] = [
+      { identity: { id: "group-1", displayName: "[Project]\\Contributors", uniqueName: "[Project]\\Contributors" } as IdentityRef } as TeamMember,
+      ...Array.from({ length: 500 }, (_, index) => ({
+        identity: {
+          id: `user-${index + 1}`,
+          displayName: `User ${index + 1}`,
+          uniqueName: `user${index + 1}@example.com`,
+        } as IdentityRef,
+      })) as TeamMember[],
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: currentUserIdentity,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: currentUserIdentity.id,
+      isNewBoardCreation: true,
+      currentTeam,
+      projectTeams: [currentTeam],
+      allMembers,
+    });
+
+    const memberOptions = result.permissionOptions.filter(option => option.type === "member");
+    expect(memberOptions).toHaveLength(501);
+    expect(memberOptions.some(option => option.id === "group-1")).toBe(false);
+    expect(result.hasReachedUserLimit).toBe(false);
+  });
+
+  it("includes all current-team users before applying additional user cap", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "user-1", displayName: "User 1", uniqueName: "user1@example.com" } as IdentityRef;
+
+    const currentTeamMembers: TeamMember[] = Array.from({ length: 501 }, (_, index) => ({
+      identity: {
+        id: `user-${index + 1}`,
+        displayName: `User ${index + 1}`,
+        uniqueName: `user${index + 1}@example.com`,
+      } as IdentityRef,
+    })) as TeamMember[];
+
+    const allMembers: TeamMember[] = [
+      ...currentTeamMembers,
+      { identity: { id: "other-1", displayName: "Other 1", uniqueName: "other1@example.com" } as IdentityRef } as TeamMember,
+      { identity: { id: "other-2", displayName: "Other 2", uniqueName: "other2@example.com" } as IdentityRef } as TeamMember,
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: boardOwner.id,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam],
+      currentTeamMembers,
+      allMembers,
+    });
+
+    const memberOptions = result.permissionOptions.filter(option => option.type === "member");
+    expect(memberOptions).toHaveLength(501);
+    expect(memberOptions.some(option => option.id === "other-1")).toBe(false);
+    expect(memberOptions.some(option => option.id === "other-2")).toBe(false);
+    expect(result.hasReachedUserLimit).toBe(true);
+  });
+
+  it("does not flag user limit when only group identities exceed additional candidate count", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "user-1", displayName: "User 1", uniqueName: "user1@example.com" } as IdentityRef;
+
+    const currentTeamMembers: TeamMember[] = Array.from({ length: 7 }, (_, index) => ({
+      identity: {
+        id: `user-${index + 1}`,
+        displayName: `User ${index + 1}`,
+        uniqueName: `user${index + 1}@example.com`,
+      } as IdentityRef,
+    })) as TeamMember[];
+
+    const additionalGroupMembers: TeamMember[] = Array.from({ length: 150 }, (_, index) => ({
+      identity: {
+        id: `group-${index + 1}`,
+        displayName: `[Project]\\Team ${index + 1}`,
+        uniqueName: `[Project]\\Team ${index + 1}`,
+      } as IdentityRef,
+    })) as TeamMember[];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: boardOwner.id,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: Array.from({ length: 101 }, (_, index) => ({ id: `team-${index + 1}`, name: `Team ${index + 1}`, projectName: "Project" } as WebApiTeam)),
+      currentTeamMembers,
+      allMembers: [...currentTeamMembers, ...additionalGroupMembers],
+    });
+
+    expect(result.hasReachedTeamLimit).toBe(true);
+    expect(result.hasReachedUserLimit).toBe(false);
+  });
+
+  it("includes my-team members beyond the current team in the additional user pool", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const myOtherTeam = { id: "my-other-team", name: "My Other Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+
+    const currentTeamMembers: TeamMember[] = [
+      { identity: { ...baseIdentity, id: "current-1", displayName: "Current 1", uniqueName: "current1@example.com" } as IdentityRef } as TeamMember,
+    ];
+
+    const allMembers: TeamMember[] = [
+      ...currentTeamMembers,
+      { identity: { ...baseIdentity, id: "my-team-1", displayName: "My Team 1", uniqueName: "myteam1@example.com" } as IdentityRef } as TeamMember,
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: boardOwner.id,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam, myOtherTeam],
+      currentTeamMembers,
+      allMembers,
+    });
+
+    expect(result.permissionOptions.some(option => option.id === "my-team-1" && option.type === "member")).toBe(true);
+    expect(result.hasReachedUserLimit).toBe(false);
+  });
+
+  it("always includes permission-checked teams before capping additional teams", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+    const permissionTeamIds = Array.from({ length: 105 }, (_, index) => `required-team-${index + 1}`);
+    const projectTeams = [
+      currentTeam,
+      ...permissionTeamIds.map((id, index) => ({ id, name: `Required Team ${index + 1}`, projectName: "Project" } as WebApiTeam)),
+      ...Array.from({ length: 10 }, (_, index) => ({ id: `optional-team-${index + 1}`, name: `Optional Team ${index + 1}`, projectName: "Project" } as WebApiTeam)),
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: permissionTeamIds, Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: boardOwner.id,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams,
+      currentTeamMembers: [],
+      allMembers: [],
+    });
+
+    const teamOptionIds = result.permissionOptions.filter(option => option.type === "team").map(option => option.id);
+    expect(permissionTeamIds.every(teamId => teamOptionIds.includes(teamId))).toBe(true);
+    expect(teamOptionIds.includes("optional-team-1")).toBe(false);
+    expect(result.hasReachedTeamLimit).toBe(true);
+  });
+
+  it("includes the current user when they are not the owner and not a team member", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: "admin-user",
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam],
+      currentTeamMembers: [],
+      allMembers: [],
+    });
+
+    const memberOptions = result.permissionOptions.filter(option => option.type === "member");
+    expect(memberOptions.some(option => option.id === "admin-user")).toBe(true);
+    expect(memberOptions.some(option => option.id === "owner-1")).toBe(true);
+  });
+
+  it("marks injected current user as team admin when admin metadata is available", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+
+    const allMembers: TeamMember[] = [
+      {
+        identity: {
+          id: "admin-user",
+          displayName: "Admin User",
+          uniqueName: "admin@example.com",
+          imageUrl: "https://example.com/admin.png",
+        } as IdentityRef,
+        isTeamAdmin: true,
+      } as TeamMember,
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: "admin-user",
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam],
+      currentTeamMembers: [],
+      allMembers,
+    });
+
+    const currentUserOption = result.permissionOptions.find(option => option.type === "member" && option.id === "admin-user");
+    expect(currentUserOption).toBeDefined();
+    expect(currentUserOption?.isTeamAdmin).toBe(true);
+    expect(currentUserOption?.thumbnailUrl).toBe("https://example.com/admin.png");
+  });
+
+  it("marks current user as team admin even when additional member allowance is exhausted", () => {
+    const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
+    const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
+
+    const currentTeamMembers: TeamMember[] = Array.from({ length: 500 }, (_, index) => ({
+      identity: {
+        id: `member-${index + 1}`,
+        displayName: `Member ${index + 1}`,
+        uniqueName: `member${index + 1}@example.com`,
+      } as IdentityRef,
+      isTeamAdmin: false,
+    })) as TeamMember[];
+
+    const allMembers: TeamMember[] = [
+      ...currentTeamMembers,
+      {
+        identity: {
+          id: "admin-user",
+          displayName: "Admin User",
+          uniqueName: "admin@example.com",
+        } as IdentityRef,
+        isTeamAdmin: true,
+      } as TeamMember,
+    ];
+
+    const result = buildPermissionOptions({
+      board: {
+        id: "b1",
+        title: "Board 1",
+        createdDate: new Date(),
+        createdBy: boardOwner,
+        permissions: { Teams: [], Members: [] },
+        boardVoteCollection: {},
+        isIncludeTeamEffectivenessMeasurement: false,
+        shouldShowFeedbackAfterCollect: false,
+        isAnonymous: false,
+        activePhase: WorkflowPhase.Collect,
+        teamId: "t1",
+        maxVotesPerUser: 5,
+        teamEffectivenessMeasurementVoteCollection: [],
+        columns: [],
+      },
+      currentUserId: "admin-user",
+      currentUserIsTeamAdmin: true,
+      isNewBoardCreation: false,
+      currentTeam,
+      projectTeams: [currentTeam],
+      currentTeamMembers,
+      allMembers,
+    });
+
+    const currentUserOption = result.permissionOptions.find(option => option.type === "member" && option.id === "admin-user");
+    expect(currentUserOption).toBeDefined();
+    expect(currentUserOption?.isTeamAdmin).toBe(true);
+  });
+});
+
 describe("FeedbackBoardContainer integration", () => {
   let props: FeedbackBoardContainerTestProps;
 
@@ -623,11 +1022,11 @@ describe("FeedbackBoardContainer integration", () => {
   });
 
   it("shows all project teams in the team selector when enabled from settings", async () => {
-    const otherTeam = { ...mockTeam, id: "t2", name: "Other Team" };
+    const otherTeams = Array.from({ length: 8 }, (_, index) => ({ ...mockTeam, id: `t${index + 2}`, name: `Other Team ${index + 2}` }));
 
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
     mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
-      forCurrentUserOnly ? [mockTeam as WebApiTeam] : [mockTeam as WebApiTeam, otherTeam as WebApiTeam],
+      forCurrentUserOnly ? [mockTeam as WebApiTeam] : ([mockTeam as WebApiTeam, ...otherTeams] as WebApiTeam[]),
     );
     mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
@@ -703,7 +1102,16 @@ describe("FeedbackBoardContainer integration", () => {
     fireEvent.click(screen.getByRole("button", { name: "Show all teams" }));
 
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", false);
-    expect(await screen.findByRole("option", { name: "Other Team" })).toBeInTheDocument();
+    expect(await screen.findByRole("option", { name: "Other Team 2" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Other Team 6" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show my teams" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Other Team 2" })).not.toBeInTheDocument();
+    });
   });
 
   it("configures a custom tooltip for Team Assessment", async () => {
@@ -822,6 +1230,34 @@ describe("FeedbackBoardContainer integration", () => {
     expect(azureDevOpsCoreService.getAllTeams).toHaveBeenCalledWith("1", true);
     expect(azureDevOpsCoreService.getTeam).toHaveBeenCalledWith("1", "t1");
     expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
+  });
+
+  it("keeps the active URL team visible in the selector when the user is not a member", async () => {
+    const otherTeam = { ...mockTeam, id: "t2", name: "Alternate" };
+    const otherTeamBoard = { ...mockBoard, teamId: "t2" };
+
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=t2&boardId=b1&phase=Collect"), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getTeam).mockResolvedValue(otherTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([otherTeamBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(otherTeamBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+
+    const teamSelector = screen.getByRole("combobox", { name: "Team" }) as HTMLSelectElement;
+    expect(teamSelector.value).toBe("t2");
+    expect(screen.getByRole("option", { name: "Alternate" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
   });
 
   it("loads a board from the URL team when browser local-network restrictions block team REST lookups", async () => {
