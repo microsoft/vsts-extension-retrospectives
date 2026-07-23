@@ -174,6 +174,10 @@ function isGroupIdentity(memberIdentity: TeamMember["identity"] | null | undefin
   return /^\[[^\]]+\]\\/.test(identityName);
 }
 
+function getUniqueNonGroupMemberCount(members: TeamMember[]): number {
+  return deduplicateTeamMembers(members).filter(member => member?.identity?.id && !isGroupIdentity(member.identity)).length;
+}
+
 function getOwnerIdentity(board: IFeedbackBoardDocument | null | undefined, isNewBoardCreation: boolean, currentUserId: string): TeamMember["identity"] | null {
   if (isNewBoardCreation) {
     const currentUser = getUserIdentity();
@@ -1435,7 +1439,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   };
 
-  const loadMembersForTeams = async (teams: WebApiTeam[]): Promise<{ members: TeamMember[]; didHitLimit: boolean }> => {
+  const loadMembersForTeams = async (teams: WebApiTeam[], additionalMemberAllowance: number): Promise<{ members: TeamMember[]; didHitLimit: boolean }> => {
+    if (additionalMemberAllowance <= 0) {
+      return { members: [], didHitLimit: false };
+    }
+
     const accumulated: TeamMember[] = [];
     let didHitLimit = false;
 
@@ -1444,8 +1452,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       const batchResults = await Promise.all(batch.map(team => azureDevOpsCoreService.getMembers(projectId, team.id)));
       accumulated.push(...batchResults.flatMap(members => members ?? []));
 
-      const uniqueNonGroupCount = deduplicateTeamMembers(accumulated).filter(member => !isGroupIdentity(member.identity)).length;
-      if (uniqueNonGroupCount >= PERMISSION_USER_LIMIT) {
+      if (getUniqueNonGroupMemberCount(accumulated) >= additionalMemberAllowance) {
         didHitLimit = true;
         break;
       }
@@ -1481,15 +1488,18 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       isAllTeamsLoaded: false,
     }));
 
-    Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(defaultTeam)])
-      .then(([additionalMembersResult, currentTeamMembers]) =>
+    loadMembersForTeam(defaultTeam)
+      .then(async currentTeamMembers => {
+        const additionalMemberAllowance = Math.max(PERMISSION_USER_LIMIT - getUniqueNonGroupMemberCount(currentTeamMembers), 0);
+        const additionalMembersResult = await loadMembersForTeams(memberTeams, additionalMemberAllowance);
+
         setContainerState(previousState => ({
           ...previousState,
           allMembers: deduplicateTeamMembers([...currentTeamMembers, ...additionalMembersResult.members]),
           currentTeamMembers,
           hasReachedAdditionalMemberLoadLimit: additionalMembersResult.didHitLimit,
-        })),
-      )
+        }));
+      })
       .catch(error => appInsights.trackException(error, { action: "initializeProjectTeamMembers" }));
   };
 
@@ -1497,7 +1507,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     const allTeams = sortTeamsByName(await azureDevOpsCoreService.getAllTeams(projectId, false));
     const projectTeams = uniqueItemsById([state.currentTeam, ...allTeams]);
     const memberTeams = projectTeams.filter(team => team.id !== state.currentTeam?.id);
-    const [additionalMembersResult, currentTeamMembers] = await Promise.all([loadMembersForTeams(memberTeams), loadMembersForTeam(state.currentTeam)]);
+    const currentTeamMembers = await loadMembersForTeam(state.currentTeam);
+    const additionalMemberAllowance = Math.max(PERMISSION_USER_LIMIT - getUniqueNonGroupMemberCount(currentTeamMembers), 0);
+    const additionalMembersResult = await loadMembersForTeams(memberTeams, additionalMemberAllowance);
 
     setContainerState(previousState => ({
       ...previousState,

@@ -76,10 +76,8 @@ class AzureDevOpsCoreService {
   public async getAllTeams(projectId: string, forCurrentUserOnly: boolean): Promise<WebApiTeam[]> {
     const allTeams: WebApiTeam[] = [];
 
-    const _httpCoreClient: CoreRestClient = getClient(CoreRestClient);
-
     for (let skip = 0; ; skip += TEAMS_PAGE_SIZE) {
-      const teamBatch: WebApiTeam[] = await _httpCoreClient.getTeams(projectId, forCurrentUserOnly, TEAMS_PAGE_SIZE, skip);
+      const teamBatch: WebApiTeam[] = await this._httpCoreClient.getTeams(projectId, forCurrentUserOnly, TEAMS_PAGE_SIZE, skip);
 
       if (teamBatch.length > 0) {
         allTeams.push(...teamBatch);
