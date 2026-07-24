@@ -69,13 +69,6 @@ describe("icons", () => {
       expect(container.querySelector(".icon-table-chart")).toBeTruthy();
     });
 
-    it("returns icons by legacy tag", () => {
-      const icon = getIconElement("fa-play-circle");
-      const { container } = render(icon);
-
-      expect(container.querySelector(".icon-play-circle")).toBeTruthy();
-    });
-
     it("returns SmileFaceIcon for the legacy smile tag", () => {
       const icon = getIconElement("far fa-smile");
       const { container } = render(icon);

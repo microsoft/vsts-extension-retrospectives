@@ -2560,7 +2560,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       {state.currentBoard.activePhase === WorkflowPhase.Act && (
                         <>
                           <button className="focus-mode-button" onClick={showCarouselDialog} aria-label={t("feedback_board_focus_mode")} aria-describedby="focus-mode-tooltip" interestFor="focus-mode-tooltip" type="button">
-                            {getIconElement("adjust")}
+                            {getIconElement("focus")}
                             <span>{t("feedback_board_focus_mode")}</span>
                           </button>
                           <div id="focus-mode-tooltip" className="tooltip" popover="hint" role="tooltip">

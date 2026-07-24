@@ -195,7 +195,7 @@ export const getColumnsByTemplateId = (templateId: string): IFeedbackColumn[] =>
         },
         {
           accentColor: "#0078d4", //blue
-          iconClass: "rocket-launch",
+          iconClass: "rocket",
           id: generateUUID(),
           title: "Accelerators",
           notes: "",
