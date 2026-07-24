@@ -374,7 +374,7 @@ export const DeleteIcon = () => {
 
 export const FocusIcon = () => {
   return (
-    <svg className="icon-adjust" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-focus" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm7 3c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm7-11h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4z" />
     </svg>
   );
@@ -801,7 +801,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "eye", name: "Eye", icon: <EyeIcon />, trayOrder: 18, legacyAliases: ["far fa-eye"] },
   { id: "laptop", name: "Laptop", icon: <LaptopIcon />, trayOrder: 19, legacyAliases: ["fas fa-chalkboard"] },
   { id: "menu-book", name: "Book", icon: <MenuBookIcon />, trayOrder: 20, legacyAliases: ["fas fa-book"] },
-  { id: "rocket", name: "Rocket", icon: <RocketIcon />, trayOrder: 21, legacyAliases: ["fas fa-rocket"] },
+  { id: "rocket", name: "Rocket", icon: <RocketIcon />, trayOrder: 21, legacyAliases: ["rocket-launch", "fas fa-rocket"] },
   { id: "tools", name: "Tools", icon: <ToolsIcon />, trayOrder: 22, legacyAliases: ["construction", "fas fa-construction", "fas fa-wrench"] },
   { id: "anchor", name: "Anchor", icon: <AnchorIcon />, trayOrder: 23, legacyAliases: ["fas fa-anchor"] },
   { id: "coffee", name: "Coffee", icon: <CoffeeIcon />, trayOrder: 24 },
@@ -812,9 +812,8 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 29, legacyAliases: ["speed", "fa-solid fa-square-poll-vertical"] },
   { id: "gears", name: "Gears", icon: <GearsIcon />, trayOrder: 30, legacyAliases: ["gear-with-stars", "gears", "fa-solid fa-gears"] },
   { id: "add", name: "Add", icon: <AddIcon />, trayOrder: 0 },
-  { id: "adjust", name: "Target", icon: <FocusIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-dot"] },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
-  { id: "arrow-circle-down", name: "Arrow Circle Down", icon: <ArrowCircleDownIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-down "] },
+  { id: "arrow-circle-down", name: "Arrow Circle Down", icon: <ArrowCircleDownIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-down"] },
   { id: "arrow-circle-up", name: "Arrow Circle Up", icon: <ArrowCircleUpIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-up"] },
   { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0 },
   { id: "assignment-turned-in", name: "Assignment Turned In", icon: <AssignmentTurnedInIcon />, trayOrder: 0 },
@@ -833,6 +832,7 @@ export const iconDefinitions: IIconDefinition[] = [
   { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
   { id: "edit", name: "Edit", icon: <EditIcon />, trayOrder: 0 },
   { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fas fa-fan"] },
+  { id: "focus", name: "Target", icon: <FocusIcon />, trayOrder: 0, legacyAliases: ["adjust", "far fa-circle-dot"] },
   { id: "forward-to-inbox", name: "Forward To Inbox", icon: <ForwardToInboxIcon />, trayOrder: 0 },
   { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 0 },
   { id: "group-work", name: "Group Work", icon: <GroupWorkIcon />, trayOrder: 0 },
