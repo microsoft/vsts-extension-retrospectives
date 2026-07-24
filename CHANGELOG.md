@@ -2,6 +2,10 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.60
+
+* Removed 45 redundant icon definitions, added missing mapping for 8 legacy icons, and updated internal names for 4 icons. From [GitHub PR TBD](https://github.com/microsoft/vsts-extension-retrospectives/pull/TBD)
+
 ## v1.92.59
 
 * Added a "Move Everyone" control so board managers can move all participants to the selected retrospective phase. From [GitHub PR #1836](https://github.com/microsoft/vsts-extension-retrospectives/pull/1836)

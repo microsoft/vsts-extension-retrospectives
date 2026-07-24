@@ -22,7 +22,7 @@ export const questions: ITeamAssessmentQuestion[] = [
     shortTitle: "Psychological Safety",
     discussActTemplate: "psy-safety",
     title: "I feel safe speaking up, raising issues, taking risks, and asking for help",
-    iconClassName: "psychological-safety",
+    iconClassName: "handshake",
     tooltip: "Teams perform better when people feel safe speaking up and taking risks. This helps surface issues early and supports learning and collaboration. Without safety, problems stay hidden and improvement slows. https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#psychological-safety (Learn more) about the supporting research and best practices.",
   },
   {
