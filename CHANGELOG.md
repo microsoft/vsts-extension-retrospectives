@@ -4,7 +4,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.60
 
-* Removed 45 redundant icon definitions, added missing mapping for 8 legacy icons, and updated internal names for 4 icons. From [GitHub PR TBD](https://github.com/microsoft/vsts-extension-retrospectives/pull/TBD)
+* Removed 45 redundant icon definitions, added missing mapping for 8 legacy icons, and updated internal names for 4 icons. From [GitHub PR #1873](https://github.com/microsoft/vsts-extension-retrospectives/pull/1873)
 
 ## v1.92.59
 
