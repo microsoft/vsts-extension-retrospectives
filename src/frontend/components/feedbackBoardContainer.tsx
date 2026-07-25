@@ -1458,7 +1458,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
     }
 
-    return { members: deduplicateTeamMembers(accumulated), didHitLimit };
+    const members = deduplicateTeamMembers(accumulated)
+      .filter(member => member?.identity?.id && !isGroupIdentity(member.identity))
+      .slice(0, additionalMemberAllowance);
+
+    return { members, didHitLimit };
   };
 
   const loadMembersForTeam = async (team: WebApiTeam | null | undefined): Promise<TeamMember[]> => {
