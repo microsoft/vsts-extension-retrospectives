@@ -598,6 +598,47 @@ describe("Board Metadata Form Permissions", () => {
       );
     });
 
+    it("should add board owner to permissions when deselect-all is clicked and owner was not previously in Members", async () => {
+      const onPermissionChanged = jest.fn();
+      const ownerId = testUserId;
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef(ownerId, "Board Owner"),
+        },
+        currentUserId: ownerId,
+        isNewBoardCreation: false,
+        // Owner NOT in Members — only another user is there
+        permissions: { Teams: [], Members: ["user2"] },
+        permissionOptions: [
+          { id: ownerId, name: "Board Owner", uniqueName: "owner@example.com", type: "member" },
+          { id: "user2", name: "User Beta", uniqueName: "user2@example.com", type: "member" },
+        ],
+        onPermissionChanged,
+      });
+
+      const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const selectAllCheckbox = getByLabelText("Add permission to every team or member in the table.");
+
+      // Simulate "Deselect All"
+      await act(async () => {
+        fireEvent.click(selectAllCheckbox);
+      });
+
+      // Board owner must be added to Members even though they were not there before
+      expect(onPermissionChanged).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          permissions: expect.objectContaining({
+            Members: expect.arrayContaining([ownerId]),
+            Teams: [],
+          }),
+        }),
+      );
+      // user2 must be removed
+      const lastCall = onPermissionChanged.mock.calls[onPermissionChanged.mock.calls.length - 1][0];
+      expect(lastCall.permissions.Members).not.toContain("user2");
+    });
+
     it("should reflect selectAll as checked only when all non-owner items are selected", async () => {
       const onPermissionChanged = jest.fn();
       const ownerId = testUserId;

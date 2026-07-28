@@ -153,12 +153,19 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         setTeamPermissions(current => current.filter(id => !visibleIds.includes(id)));
         // Preserve the board owner in memberPermissions: their checkbox is always visually
         // shown as checked (disabled), so "Deselect All" must not revoke their permission.
-        setMemberPermissions(current => current.filter(id => id === boardOwnerId || !visibleIds.includes(id)));
+        // Always ensure the owner is included even if they were not previously in the list.
+        setMemberPermissions(current => {
+          const filtered = current.filter(id => id === boardOwnerId || !visibleIds.includes(id));
+          if (boardOwnerId && !filtered.includes(boardOwnerId)) {
+            return [boardOwnerId, ...filtered];
+          }
+          return filtered;
+        });
       }
 
       setSelectAllState();
     },
-    [canManageBoard, filteredPermissionOptions, setSelectAllState],
+    [canManageBoard, boardOwnerId, filteredPermissionOptions, setSelectAllState],
   );
 
   const orderedPermissionOptions = React.useCallback((options: FeedbackBoardPermissionOption[]): FeedbackBoardPermissionOption[] => {
