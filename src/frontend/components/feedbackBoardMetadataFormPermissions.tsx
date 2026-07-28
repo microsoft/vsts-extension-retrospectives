@@ -125,12 +125,18 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
   }, [canManageBoard]);
 
   const setSelectAllState = React.useCallback(() => {
-    const allVisibleIds = filteredPermissionOptions.map(o => o.id);
+    // The board owner's checkbox is always visually checked regardless of the permissions lists,
+    // so exclude them from the "all selected" calculation to keep the header checkbox consistent.
+    const allVisibleNonOwnerIds = filteredPermissionOptions.filter(o => o.id !== boardOwnerId).map(o => o.id);
+    if (allVisibleNonOwnerIds.length === 0) {
+      setSelectAllChecked(false);
+      return;
+    }
     const allPermissionIds = [...teamPermissions, ...memberPermissions];
-    const allVisibleIdsAreInFilteredOptions: boolean = allVisibleIds.every(id => allPermissionIds.includes(id));
+    const allVisibleNonOwnerIdsHavePermission: boolean = allVisibleNonOwnerIds.every(id => allPermissionIds.includes(id));
 
-    setSelectAllChecked(allVisibleIdsAreInFilteredOptions);
-  }, [filteredPermissionOptions, memberPermissions, teamPermissions]);
+    setSelectAllChecked(allVisibleNonOwnerIdsHavePermission);
+  }, [boardOwnerId, filteredPermissionOptions, memberPermissions, teamPermissions]);
 
   const handleSelectAllClicked = React.useCallback(
     (checked: boolean) => {
@@ -145,7 +151,9 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
         setMemberPermissions(current => [...current, ...visibleMemberIds.filter(id => !current.includes(id))]);
       } else {
         setTeamPermissions(current => current.filter(id => !visibleIds.includes(id)));
-        setMemberPermissions(current => current.filter(id => !visibleIds.includes(id)));
+        // Preserve the board owner in memberPermissions: their checkbox is always visually
+        // shown as checked (disabled), so "Deselect All" must not revoke their permission.
+        setMemberPermissions(current => current.filter(id => id === boardOwnerId || !visibleIds.includes(id)));
       }
 
       setSelectAllState();

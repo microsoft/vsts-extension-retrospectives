@@ -559,6 +559,81 @@ describe("Board Metadata Form Permissions", () => {
       expect(selectAllCheckbox).toBeTruthy();
     });
 
+    it("should preserve board owner in permissions when deselect-all is clicked", async () => {
+      const onPermissionChanged = jest.fn();
+      const ownerId = testUserId;
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef(ownerId, "Board Owner"),
+        },
+        currentUserId: ownerId,
+        isNewBoardCreation: false,
+        // Owner already in Members after a previous "Select All"
+        permissions: { Teams: ["team1"], Members: [ownerId, "user2"] },
+        permissionOptions: [
+          { id: ownerId, name: "Board Owner", uniqueName: "owner@example.com", type: "member" },
+          { id: "team1", name: "Team Alpha", uniqueName: "team-alpha", type: "team" },
+          { id: "user2", name: "User Beta", uniqueName: "user2@example.com", type: "member" },
+        ],
+        onPermissionChanged,
+      });
+
+      const { getByLabelText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const selectAllCheckbox = getByLabelText("Add permission to every team or member in the table.");
+
+      // Simulate "Deselect All"
+      await act(async () => {
+        fireEvent.click(selectAllCheckbox);
+      });
+
+      // Board owner must still be in Members after deselect-all
+      expect(onPermissionChanged).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          permissions: expect.objectContaining({
+            Members: [ownerId],
+            Teams: [],
+          }),
+        }),
+      );
+    });
+
+    it("should reflect selectAll as checked only when all non-owner items are selected", async () => {
+      const onPermissionChanged = jest.fn();
+      const ownerId = testUserId;
+      const props = makeProps({
+        board: {
+          ...testExistingBoard,
+          createdBy: makeIdentityRef(ownerId, "Board Owner"),
+        },
+        currentUserId: ownerId,
+        isNewBoardCreation: false,
+        // Start with all items selected (board owner + others)
+        permissions: { Teams: ["team1"], Members: [ownerId, "user2"] },
+        permissionOptions: [
+          { id: ownerId, name: "Board Owner", uniqueName: "owner@example.com", type: "member" },
+          { id: "team1", name: "Team Alpha", uniqueName: "team-alpha", type: "team" },
+          { id: "user2", name: "User Beta", uniqueName: "user2@example.com", type: "member" },
+        ],
+        onPermissionChanged,
+      });
+
+      const { getByLabelText, container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const selectAllCheckbox = getByLabelText("Add permission to every team or member in the table.") as HTMLInputElement;
+
+      // All non-owner items (team1, user2) are in permissions, so select-all should be checked
+      expect(selectAllCheckbox.checked).toBe(true);
+
+      // Deselect all — board owner is preserved; team1 and user2 are removed
+      await act(async () => {
+        fireEvent.click(selectAllCheckbox);
+      });
+
+      // Select-all should now be unchecked (non-owner items no longer have permission)
+      const updatedCheckbox = container.querySelector("#select-all-permission-options-visible") as HTMLInputElement;
+      expect(updatedCheckbox.checked).toBe(false);
+    });
+
     it("should not allow non-owner/non-admin to select all", async () => {
       const onPermissionChanged = jest.fn();
       const props = makeProps({
