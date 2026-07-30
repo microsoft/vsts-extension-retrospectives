@@ -17,7 +17,7 @@ const WHATS_NEW_ITEMS = [
   "Fixed retrospective board links for Azure DevOps organizations.",
   "Added longer column titles.",
   "Added sort-direction indicators to History table.",
-  "Restricted editing of retrospective settings to the Board Owner and Team Admin.",
+  "Restricted editing of retrospective settings to the Board Owner or a Team Admin.",
   "Fixed the email summary Copy to clipboard action so it works reliably from the preview dialog.",
   "Extended permissions so team admins can also update column notes and edit or delete feedback cards.",
   "Improved hidden feedback behavior to display blurred feedback while announcing \"feedback blurred\".",
