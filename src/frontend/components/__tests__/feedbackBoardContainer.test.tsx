@@ -5,7 +5,7 @@ import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
-import { FeedbackBoardContainer, deduplicateTeamMembers, getAvatarImageUrl, getIdentityInitials } from "../feedbackBoardContainer";
+import { FeedbackBoardContainer, deduplicateTeamMembers, getAvatarImageUrl, getIdentityColor, getIdentityInitials } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -358,6 +358,14 @@ describe("avatar helpers", () => {
 
   it("returns two letters for single names", () => {
     expect(getIdentityInitials("David")).toBe("DA");
+  });
+
+  it("returns deterministic color for the same user seed", () => {
+    expect(getIdentityColor("user-123")).toBe(getIdentityColor("user-123"));
+  });
+
+  it("can return different colors for different users with same initials", () => {
+    expect(getIdentityColor("david-hanson-id")).not.toBe(getIdentityColor("daniel-harding-id"));
   });
 });
 

@@ -50,6 +50,7 @@ type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
 const BOARD_TIMER_DURATION_OPTIONS = Array.from({ length: 20 }, (_, index) => index + 1);
 const FORCE_RETRO_SUMMARY_INITIALS_FALLBACK = true;
+const AVATAR_FALLBACK_COLORS = ["#0078d4", "#d83b01", "#5c2d91", "#107c10", "#b146c2", "#c19c00", "#005a9e", "#ca5010"];
 
 type IdentityAvatarReference = {
   displayName?: string;
@@ -86,8 +87,22 @@ export const getIdentityInitials = (name?: string): string => {
   return `${tokens[0][0]}${tokens[1][0]}`.toUpperCase();
 };
 
-function RetroSummaryAvatar({ name, imageUrl }: { name?: string; imageUrl?: string }) {
+export const getIdentityColor = (seed?: string): string => {
+  if (!seed) {
+    return AVATAR_FALLBACK_COLORS[0];
+  }
+
+  let hash = 0;
+  for (let index = 0; index < seed.length; index++) {
+    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
+  }
+
+  return AVATAR_FALLBACK_COLORS[hash % AVATAR_FALLBACK_COLORS.length];
+};
+
+function RetroSummaryAvatar({ name, imageUrl, colorSeed }: { name?: string; imageUrl?: string; colorSeed?: string }) {
   const [showImage, setShowImage] = React.useState(!FORCE_RETRO_SUMMARY_INITIALS_FALLBACK && Boolean(imageUrl));
+  const fallbackColor = React.useMemo(() => getIdentityColor(colorSeed || name), [colorSeed, name]);
 
   React.useEffect(() => {
     setShowImage(!FORCE_RETRO_SUMMARY_INITIALS_FALLBACK && Boolean(imageUrl));
@@ -95,7 +110,7 @@ function RetroSummaryAvatar({ name, imageUrl }: { name?: string; imageUrl?: stri
 
   return (
     <span className="summary-avatar" aria-label={name || "Unknown user"}>
-      {showImage && imageUrl ? <img className="avatar" src={imageUrl} alt={name} onError={() => setShowImage(false)} /> : <span className="avatar-fallback">{getIdentityInitials(name)}</span>}
+      {showImage && imageUrl ? <img className="avatar" src={imageUrl} alt={name} onError={() => setShowImage(false)} /> : <span className="avatar-fallback" style={{ backgroundColor: fallbackColor }}>{getIdentityInitials(name)}</span>}
     </span>
   );
 }
@@ -2859,7 +2874,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               <div className="retro-summary-section-header">{t("feedback_board_basic_settings")}</div>
               <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>
               <div id="retro-summary-created-by">
-                {t("feedback_board_created_by")} <RetroSummaryAvatar name={state.currentBoard?.createdBy.displayName} imageUrl={getAvatarImageUrl(state.currentBoard?.createdBy)} /> {state.currentBoard?.createdBy.displayName}{" "}
+                {t("feedback_board_created_by")} <RetroSummaryAvatar name={state.currentBoard?.createdBy.displayName} imageUrl={getAvatarImageUrl(state.currentBoard?.createdBy)} colorSeed={state.currentBoard?.createdBy?.id} /> {state.currentBoard?.createdBy.displayName}{" "}
               </div>
             </section>
             <section className="retro-summary-section">
@@ -2870,7 +2885,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                 <div className="retro-summary-contributors-section">
                   {state.contributors.map(contributor => (
                     <div key={contributor.id} className="retro-summary-contributor">
-                      <RetroSummaryAvatar name={contributor.name} imageUrl={contributor.imageUrl} /> {contributor.name}
+                      <RetroSummaryAvatar name={contributor.name} imageUrl={contributor.imageUrl} colorSeed={contributor.id} /> {contributor.name}
                     </div>
                   ))}
                 </div>

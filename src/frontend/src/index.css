@@ -1474,7 +1474,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   width: 1.5rem;
   height: 1.5rem;
   font-size: 0.75rem;
-  background-color: #c75b12;
+  background-color: var(--color-primary);
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores {
