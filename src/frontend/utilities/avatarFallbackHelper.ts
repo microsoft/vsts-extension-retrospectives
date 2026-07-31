@@ -8,8 +8,6 @@ export type IdentityAvatarReference = {
   };
 };
 
-const FLUENT_PERSONA_COLOR_SWATCHES = ["#4F6BED", "#0078D4", "#004E8C", "#038387", "#498205", "#0B6A0B", "#C239B3", "#E3008C", "#881798", "#5C2E91", "#CA5010", "#D13438", "#A4262C", "#8764B8", "#986F0B", "#750B1C", "#7A7574", "#005B70", "#8E562E", "#69797E"];
-
 export const getAvatarImageUrl = (identity?: IdentityAvatarReference | null): string | undefined => {
   return identity?._links?.avatar?.href || identity?.imageUrl || undefined;
 };
@@ -48,5 +46,6 @@ export const getIdentityColor = (seed?: string, nameFallback?: string): string =
     hashCode ^= (characterCode << shift) + (characterCode >> (8 - shift));
   }
 
-  return FLUENT_PERSONA_COLOR_SWATCHES[Math.abs(hashCode) % FLUENT_PERSONA_COLOR_SWATCHES.length];
+  const hue = Math.abs(hashCode) % 360;
+  return `hsl(${hue} 70% 42%)`;
 };
