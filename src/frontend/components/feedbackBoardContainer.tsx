@@ -49,6 +49,56 @@ import { canCurrentUserManageBoard } from "../utilities/boardAccessHelper";
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
 const BOARD_TIMER_DURATION_OPTIONS = Array.from({ length: 20 }, (_, index) => index + 1);
+const FORCE_RETRO_SUMMARY_INITIALS_FALLBACK = true;
+
+type IdentityAvatarReference = {
+  displayName?: string;
+  imageUrl?: string;
+  _links?: {
+    avatar?: {
+      href?: string;
+    };
+  };
+};
+
+export const getAvatarImageUrl = (identity?: IdentityAvatarReference | null): string | undefined => {
+  return identity?._links?.avatar?.href || identity?.imageUrl || undefined;
+};
+
+export const getIdentityInitials = (name?: string): string => {
+  if (!name) {
+    return "?";
+  }
+
+  const tokens = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (!tokens.length) {
+    return "?";
+  }
+
+  if (tokens.length === 1) {
+    return tokens[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${tokens[0][0]}${tokens[1][0]}`.toUpperCase();
+};
+
+function RetroSummaryAvatar({ name, imageUrl }: { name?: string; imageUrl?: string }) {
+  const [showImage, setShowImage] = React.useState(!FORCE_RETRO_SUMMARY_INITIALS_FALLBACK && Boolean(imageUrl));
+
+  React.useEffect(() => {
+    setShowImage(!FORCE_RETRO_SUMMARY_INITIALS_FALLBACK && Boolean(imageUrl));
+  }, [imageUrl]);
+
+  return (
+    <span className="summary-avatar" aria-label={name || "Unknown user"}>
+      {showImage && imageUrl ? <img className="avatar" src={imageUrl} alt={name} onError={() => setShowImage(false)} /> : <span className="avatar-fallback">{getIdentityInitials(name)}</span>}
+    </span>
+  );
+}
 
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
@@ -89,7 +139,7 @@ export interface FeedbackBoardContainerState {
   isDropIssueInEdgeMessageBarVisible: boolean;
   allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
-  contributors: { id: string; name: string; imageUrl: string }[];
+  contributors: { id: string; name: string; imageUrl?: string }[];
   effectivenessMeasurementSummary: { questionId: number; question: string; average: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[];
   effectivenessMeasurementChartData: { questionId: number; red: number; yellow: number; green: number; teamAssessmentQuestion?: ITeamAssessmentQuestion }[];
   teamEffectivenessMeasurementAverageVisibilityClassName: string;
@@ -734,7 +784,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
       const contributors = feedbackItems
         .map(e => {
-          return { id: e.userIdRef, name: e?.createdBy?.displayName, imageUrl: e?.createdBy?.imageUrl };
+          return { id: e.userIdRef, name: e?.createdBy?.displayName, imageUrl: getAvatarImageUrl(e?.createdBy) };
         })
         .filter((v, i, a) => a.indexOf(v) === i);
 
@@ -2809,7 +2859,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               <div className="retro-summary-section-header">{t("feedback_board_basic_settings")}</div>
               <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>
               <div id="retro-summary-created-by">
-                {t("feedback_board_created_by")} <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
+                {t("feedback_board_created_by")} <RetroSummaryAvatar name={state.currentBoard?.createdBy.displayName} imageUrl={getAvatarImageUrl(state.currentBoard?.createdBy)} /> {state.currentBoard?.createdBy.displayName}{" "}
               </div>
             </section>
             <section className="retro-summary-section">
@@ -2820,7 +2870,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                 <div className="retro-summary-contributors-section">
                   {state.contributors.map(contributor => (
                     <div key={contributor.id} className="retro-summary-contributor">
-                      <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
+                      <RetroSummaryAvatar name={contributor.name} imageUrl={contributor.imageUrl} /> {contributor.name}
                     </div>
                   ))}
                 </div>

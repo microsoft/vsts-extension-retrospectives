@@ -5,7 +5,7 @@ import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
-import { FeedbackBoardContainer, deduplicateTeamMembers } from "../feedbackBoardContainer";
+import { FeedbackBoardContainer, deduplicateTeamMembers, getAvatarImageUrl, getIdentityInitials } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -335,6 +335,29 @@ describe("deduplicateTeamMembers", () => {
   it("handles empty array", () => {
     const deduped = deduplicateTeamMembers([]);
     expect(deduped).toHaveLength(0);
+  });
+});
+
+describe("avatar helpers", () => {
+  it("prefers avatar link href when available", () => {
+    const imageUrl = getAvatarImageUrl({
+      imageUrl: "https://example.com/image-url",
+      _links: { avatar: { href: "https://example.com/avatar-href" } },
+    });
+
+    expect(imageUrl).toBe("https://example.com/avatar-href");
+  });
+
+  it("falls back to imageUrl when avatar link is not present", () => {
+    expect(getAvatarImageUrl({ imageUrl: "https://example.com/image-url" })).toBe("https://example.com/image-url");
+  });
+
+  it("returns initials from first and last names", () => {
+    expect(getIdentityInitials("David Hanson")).toBe("DH");
+  });
+
+  it("returns two letters for single names", () => {
+    expect(getIdentityInitials("David")).toBe("DA");
   });
 });
 

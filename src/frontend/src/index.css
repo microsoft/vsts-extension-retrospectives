@@ -1459,6 +1459,24 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply h-6 rounded-full align-middle -mt-1.5 inline;
 }
 
+.retro-summary-dialog .summary-avatar {
+  @apply inline-flex items-center justify-center align-middle -mt-1.5;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.retro-summary-dialog .summary-avatar .avatar {
+  @apply h-6 w-6 rounded-full;
+}
+
+.retro-summary-dialog .summary-avatar .avatar-fallback {
+  @apply inline-flex items-center justify-center rounded-full text-white font-semibold;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.75rem;
+  background-color: #c75b12;
+}
+
 .retro-summary-dialog .retro-summary-effectiveness-scores {
   @apply clear-both relative min-w-25 min-h-25 p-0 flex flex-col items-center;
 }
