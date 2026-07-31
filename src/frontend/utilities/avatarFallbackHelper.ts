@@ -35,15 +35,15 @@ export const getIdentityInitials = (name?: string): string => {
   return `${tokens[0][0]}${tokens[1][0]}`.toUpperCase();
 };
 
-export const getIdentityColor = (name?: string): string => {
-  const displayName = name || "";
-  if (!displayName) {
+export const getIdentityColor = (seed?: string, nameFallback?: string): string => {
+  const valueToHash = seed || nameFallback || "";
+  if (!valueToHash) {
     return "#0078D4";
   }
 
   let hashCode = 0;
-  for (let index = displayName.length - 1; index >= 0; index--) {
-    const characterCode = displayName.charCodeAt(index);
+  for (let index = valueToHash.length - 1; index >= 0; index--) {
+    const characterCode = valueToHash.charCodeAt(index);
     const shift = index % 8;
     hashCode ^= (characterCode << shift) + (characterCode >> (8 - shift));
   }

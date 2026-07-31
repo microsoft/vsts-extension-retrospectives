@@ -2813,7 +2813,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               <div className="retro-summary-section-header">{t("feedback_board_basic_settings")}</div>
               <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>
               <div id="retro-summary-created-by">
-                {t("feedback_board_created_by")} <IdentityAvatar className="summary-avatar" name={state.currentBoard?.createdBy.displayName} imageUrl={getAvatarImageUrl(state.currentBoard?.createdBy)} forceInitialsFallback={FORCE_RETRO_SUMMARY_INITIALS_FALLBACK} /> {state.currentBoard?.createdBy.displayName}{" "}
+                {t("feedback_board_created_by")} <IdentityAvatar className="summary-avatar" name={state.currentBoard?.createdBy.displayName} imageUrl={getAvatarImageUrl(state.currentBoard?.createdBy)} colorSeed={state.currentBoard?.createdBy?.id} forceInitialsFallback={FORCE_RETRO_SUMMARY_INITIALS_FALLBACK} /> {state.currentBoard?.createdBy.displayName}{" "}
               </div>
             </section>
             <section className="retro-summary-section">
@@ -2824,7 +2824,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                 <div className="retro-summary-contributors-section">
                   {state.contributors.map(contributor => (
                     <div key={contributor.id} className="retro-summary-contributor">
-                      <IdentityAvatar className="summary-avatar" name={contributor.name} imageUrl={contributor.imageUrl} forceInitialsFallback={FORCE_RETRO_SUMMARY_INITIALS_FALLBACK} /> {contributor.name}
+                      <IdentityAvatar className="summary-avatar" name={contributor.name} imageUrl={contributor.imageUrl} colorSeed={contributor.id} forceInitialsFallback={FORCE_RETRO_SUMMARY_INITIALS_FALLBACK} /> {contributor.name}
                     </div>
                   ))}
                 </div>

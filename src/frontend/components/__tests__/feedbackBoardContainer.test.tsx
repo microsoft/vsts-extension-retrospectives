@@ -361,11 +361,11 @@ describe("avatar helpers", () => {
   });
 
   it("returns deterministic color for the same user seed", () => {
-    expect(getIdentityColor("David Hanson")).toBe(getIdentityColor("David Hanson"));
+    expect(getIdentityColor("aad.user-123", "David Hanson")).toBe(getIdentityColor("aad.user-123", "David Hanson"));
   });
 
   it("can return different colors for different users with same initials", () => {
-    expect(getIdentityColor("David Hanson")).not.toBe(getIdentityColor("Daniel Harding"));
+    expect(getIdentityColor("aad.user-123", "David Hanson")).not.toBe(getIdentityColor("msa.user-456", "David Hanson"));
   });
 });
 

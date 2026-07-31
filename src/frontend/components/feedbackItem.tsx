@@ -556,7 +556,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
     return (
       <div className="feedback-item-activity" aria-label={`Created by ${props.createdBy}`}>
-        <IdentityAvatar className="feedback-item-activity-avatar" name={props.createdBy} imageUrl={props.createdByProfileImage} forceInitialsFallback={true} />
+        <IdentityAvatar className="feedback-item-activity-avatar" name={props.createdBy} imageUrl={props.createdByProfileImage} colorSeed={props.userIdRef} forceInitialsFallback={true} />
         <div className="feedback-item-activity-details">
           <div className="feedback-item-activity-author">{props.createdBy}</div>
           <div className="feedback-item-activity-time">{formattedCreatedDate}</div>

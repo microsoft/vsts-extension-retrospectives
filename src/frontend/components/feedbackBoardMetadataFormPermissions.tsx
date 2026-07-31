@@ -214,7 +214,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       return <PeopleIcon />;
     }
 
-    return <IdentityAvatar className="permission-image" name={props.option.name} imageUrl={props.option.thumbnailUrl} forceInitialsFallback={true} />;
+    return <IdentityAvatar className="permission-image" name={props.option.name} imageUrl={props.option.thumbnailUrl} colorSeed={props.option.id || props.option.uniqueName} forceInitialsFallback={true} />;
   };
 
   useEffect(() => {
