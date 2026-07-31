@@ -841,16 +841,17 @@ describe("Board Metadata Form Permissions", () => {
       expect(teamIcon).toBeInTheDocument();
     });
 
-    it("should render profile image for member type options", () => {
+    it("should render initials fallback for member type options", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
         permissionOptions: [{ id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member", thumbnailUrl: "https://example.com/avatar.jpg" }],
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const memberImage = container.querySelector('.permission-image[src="https://example.com/avatar.jpg"]');
+      const memberFallback = container.querySelector(".permission-image .avatar-fallback");
 
-      expect(memberImage).toBeInTheDocument();
+      expect(memberFallback).toBeInTheDocument();
+      expect(memberFallback).toHaveTextContent("UO");
     });
   });
 
