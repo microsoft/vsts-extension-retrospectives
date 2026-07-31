@@ -46,6 +46,10 @@ export const getIdentityColor = (seed?: string, nameFallback?: string): string =
     hashCode ^= (characterCode << shift) + (characterCode >> (8 - shift));
   }
 
-  const hue = Math.abs(hashCode) % 360;
-  return `hsl(${hue} 70% 42%)`;
+  const normalizedHash = hashCode >>> 0;
+  const hue = normalizedHash % 360;
+  const saturation = 62 + ((normalizedHash >>> 9) % 16); // 62-77%
+  const lightness = 36 + ((normalizedHash >>> 17) % 14); // 36-49%
+
+  return `hsl(${hue} ${saturation}% ${lightness}%)`;
 };
