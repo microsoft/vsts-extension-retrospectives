@@ -1459,22 +1459,25 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply h-6 rounded-full align-middle -mt-1.5 inline;
 }
 
-.retro-summary-dialog .summary-avatar {
-  @apply inline-flex items-center justify-center align-middle -mt-1.5;
+.identity-avatar {
+  @apply inline-flex items-center justify-center align-middle;
   width: 1.5rem;
   height: 1.5rem;
 }
 
-.retro-summary-dialog .summary-avatar .avatar {
+.identity-avatar .avatar {
   @apply h-6 w-6 rounded-full;
 }
 
-.retro-summary-dialog .summary-avatar .avatar-fallback {
+.identity-avatar .avatar-fallback {
   @apply inline-flex items-center justify-center rounded-full text-white font-semibold;
   width: 1.5rem;
   height: 1.5rem;
   font-size: 0.75rem;
-  background-color: var(--color-primary);
+}
+
+.retro-summary-dialog .summary-avatar {
+  @apply -mt-1.5;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores {
@@ -2213,6 +2216,33 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .feedback-item-group .mainItemCard .card-integral-part .card-header,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .card-header {
   @apply inline-flex items-center justify-end gap-2 w-full h-8 mb-2.5 text-(--text-secondary-color);
+}
+
+.feedbackItem .feedback-item-activity,
+.feedback-item-group .feedback-item-activity,
+.feedbackItemGroupItem .feedback-item-activity {
+  @apply flex items-center gap-2 mx-4 mt-2.5;
+}
+
+.feedbackItem .feedback-item-activity .feedback-item-activity-avatar,
+.feedback-item-group .feedback-item-activity .feedback-item-activity-avatar,
+.feedbackItemGroupItem .feedback-item-activity .feedback-item-activity-avatar {
+  @apply shrink-0;
+}
+
+.feedbackItem .feedback-item-activity .feedback-item-activity-details,
+.feedback-item-group .feedback-item-activity .feedback-item-activity-details,
+.feedbackItemGroupItem .feedback-item-activity .feedback-item-activity-details {
+  @apply min-w-0;
+}
+
+.feedbackItem .feedback-item-activity .feedback-item-activity-author,
+.feedback-item-group .feedback-item-activity .feedback-item-activity-author,
+.feedbackItemGroupItem .feedback-item-activity .feedback-item-activity-author,
+.feedbackItem .feedback-item-activity .feedback-item-activity-time,
+.feedback-item-group .feedback-item-activity .feedback-item-activity-time,
+.feedbackItemGroupItem .feedback-item-activity .feedback-item-activity-time {
+  @apply text-(--text-secondary-color);
 }
 
 .focus-outline-primary {

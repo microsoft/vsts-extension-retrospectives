@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
-import { DocumentCard, DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
+import { DocumentCard } from "@fluentui/react/lib/DocumentCard";
 import { SearchBox } from "@fluentui/react/lib/SearchBox";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
@@ -20,6 +20,7 @@ import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetr
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getIconElement, MoreVerticalIcon } from "./icons";
 import { t } from "../utilities/localization";
+import IdentityAvatar from "./identityAvatar";
 
 export interface IFeedbackItemColumnContext {
   registerItemRef?: (itemId: string, element: HTMLElement | null) => void;
@@ -553,7 +554,15 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       return <div className="anonymous-created-date">{formattedCreatedDate}</div>;
     }
 
-    return <DocumentCardActivity activity={formattedCreatedDate} people={[{ name: props.createdBy, profileImageSrc: props.createdByProfileImage }]} />;
+    return (
+      <div className="feedback-item-activity" aria-label={`Created by ${props.createdBy}`}>
+        <IdentityAvatar className="feedback-item-activity-avatar" name={props.createdBy} imageUrl={props.createdByProfileImage} forceInitialsFallback={true} />
+        <div className="feedback-item-activity-details">
+          <div className="feedback-item-activity-author">{props.createdBy}</div>
+          <div className="feedback-item-activity-time">{formattedCreatedDate}</div>
+        </div>
+      </div>
+    );
   }, [props.createdBy, props.createdByProfileImage, props.createdDate]);
 
   const deleteFeedbackItem = useCallback(() => {
