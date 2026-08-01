@@ -39,17 +39,17 @@ export const getIdentityColor = (seed?: string, nameFallback?: string): string =
     return "#0078D4";
   }
 
-  let hashCode = 0;
-  for (let index = valueToHash.length - 1; index >= 0; index--) {
-    const characterCode = valueToHash.charCodeAt(index);
-    const shift = index % 8;
-    hashCode ^= (characterCode << shift) + (characterCode >> (8 - shift));
+  // FNV-1a 32-bit for lower collision rate than the previous XOR-shift hash.
+  let hashCode = 0x811c9dc5;
+  for (let index = 0; index < valueToHash.length; index++) {
+    hashCode ^= valueToHash.charCodeAt(index);
+    hashCode = Math.imul(hashCode, 0x01000193);
   }
 
   const normalizedHash = hashCode >>> 0;
   const hue = normalizedHash % 360;
-  const saturation = 62 + ((normalizedHash >>> 9) % 16); // 62-77%
-  const lightness = 36 + ((normalizedHash >>> 17) % 14); // 36-49%
+  const saturation = 65 + ((normalizedHash >>> 10) % 16); // 65-80%
+  const lightness = 38 + ((normalizedHash >>> 18) % 12); // 38-49%
 
   return `hsl(${hue} ${saturation}% ${lightness}%)`;
 };
