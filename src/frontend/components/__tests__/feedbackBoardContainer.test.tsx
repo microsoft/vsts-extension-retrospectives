@@ -353,19 +353,19 @@ describe("avatar helpers", () => {
   });
 
   it("returns initials from first and last names", () => {
-    expect(getIdentityInitials("David Hanson")).toBe("DH");
+    expect(getIdentityInitials("Jane Doe")).toBe("JD");
   });
 
   it("returns two letters for single names", () => {
-    expect(getIdentityInitials("David")).toBe("DA");
+    expect(getIdentityInitials("John")).toBe("JO");
   });
 
   it("returns deterministic color for the same user seed", () => {
-    expect(getIdentityColor("aad.user-123", "David Hanson")).toBe(getIdentityColor("aad.user-123", "David Hanson"));
+    expect(getIdentityColor("aad.user-123", "Jane Doe")).toBe(getIdentityColor("aad.user-123", "Jane Doe"));
   });
 
-  it("can return different colors for different users with same initials", () => {
-    expect(getIdentityColor("aad.user-123", "David Hanson")).not.toBe(getIdentityColor("msa.user-456", "David Hanson"));
+  it("can return different colors for different users", () => {
+    expect(getIdentityColor("aad.user-123", "Jane Doe")).not.toBe(getIdentityColor("msa.user-456", "John Smith"));
   });
 });
 
