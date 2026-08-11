@@ -2,6 +2,8 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.60
+
 ## v1.92.59
 
 * Added a "Move Everyone" control so board managers can move all participants to the selected retrospective phase. From [GitHub PR #1836](https://github.com/microsoft/vsts-extension-retrospectives/pull/1836)
