@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
@@ -917,26 +917,26 @@ describe("FeedbackBoardContainer integration", () => {
 
   it("adds the linked team to the team selector options when the user is not a member", async () => {
     props = { isHostedAzureDevOps: true, projectId: "1" };
-    const monacoTeam = { id: "monaco", name: "monaco Team", projectName: "P", description: "", url: "" };
-    const alternateTeam = { id: "alternate", name: "Alternate", projectName: "P", description: "", url: "" };
+    const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
+    const alternateTeam = { id: "alternate-team", name: "Alternate Team", projectName: "P", description: "", url: "" };
     const alternateBoard: IFeedbackBoardDocument = {
       ...mockBoard,
       id: "board-alternate",
-      title: "Alternate",
-      teamId: "alternate",
+      title: "Alternate Board",
+      teamId: "alternate-team",
       createdDate: new Date("2024-01-01T00:00:00Z"),
     };
 
-    // User is only a member of monacoTeam; deep link points to alternateTeam board
-    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=alternate&boardId=board-alternate"), setHash: jest.fn() } as any);
-    mocked(getConfiguration).mockReturnValue({ team: monacoTeam });
-    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([monacoTeam as WebApiTeam]);
-    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(monacoTeam as WebApiTeam);
-    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => teamId === "alternate" ? alternateTeam as WebApiTeam : null);
+    // User is only a member of Default Team; deep link points to Alternate Team's board.
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=alternate-team&boardId=board-alternate"), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([defaultTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => teamId === "alternate-team" ? alternateTeam as WebApiTeam : null);
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "alternate" ? [alternateBoard] : [mockBoard]);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "alternate-team" ? [alternateBoard] : [mockBoard]);
     mocked(itemDataService.getBoardItem).mockResolvedValue(alternateBoard);
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
@@ -946,15 +946,17 @@ describe("FeedbackBoardContainer integration", () => {
 
     expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
 
-    // The linked team must appear as an <option> so currentTeam.id matches a rendered option;
+    const teamSelector = screen.getByRole("group", { name: "Team selector" });
+
+    // The linked team must appear in the team selector so currentTeam.id matches a rendered option;
     // without this the browser shows the first option as selected and onChange never fires
     // when the user tries to switch back to that team.
-    expect(screen.getByRole("option", { name: "Alternate" })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "monaco Team" })).toBeInTheDocument();
+    expect(within(teamSelector).getByRole("option", { name: "Alternate Team" })).toBeInTheDocument();
+    expect(within(teamSelector).getByRole("option", { name: "Default Team" })).toBeInTheDocument();
 
     // The selected team and board must reflect the deep link
-    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("alternate");
-    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("alternate");
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("alternate-team");
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("alternate-team");
   });
 
   it("falls back to default team selection when board URL parsing fails", async () => {
