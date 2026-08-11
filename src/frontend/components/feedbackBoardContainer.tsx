@@ -1191,6 +1191,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       };
     }
 
+    // Ensure the linked team appears as a selectable option even when the user isn't a member,
+    // so the team selector value always matches a rendered <option> and onChange fires correctly.
+    if (!userTeams.some(team => team.id === matchedTeam.id)) {
+      userTeams = sortTeamsByName([...userTeams, matchedTeam]);
+    }
+
     let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
     if (boardsForMatchedTeam?.length) {
       boardsForMatchedTeam = boardsForMatchedTeam
@@ -1208,6 +1214,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       ...baseTeamState,
       currentBoard: boardsForMatchedTeam.length ? boardsForMatchedTeam[0] : null,
       currentTeam: matchedTeam,
+      userTeams,
+      filteredUserTeams: userTeams,
       boards: boardsForMatchedTeam,
     };
 
