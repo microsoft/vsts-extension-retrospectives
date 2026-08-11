@@ -86,7 +86,7 @@ const translations = {
     feedback_board_basic_settings: "Basic Settings",
     feedback_board_created_date: "Created date: {{date}}",
     feedback_board_created_by: "Created by",
-    feedback_board_participant_summary: "Participants",
+    feedback_board_participant_summary: "Participant Summary",
     feedback_board_contributors_count: "Contributors: {{count}} participant(s)",
     feedback_board_votes_summary: "{{participants}} participant(s) casted {{votes}} vote(s)",
     feedback_board_feedback_items_created: "{{count}} feedback item(s) created",

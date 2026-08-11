@@ -2821,7 +2821,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                 <div className="retro-summary-contributors-section">
                   {state.contributors.map(contributor => (
                     <div key={contributor.id} className="retro-summary-contributor">
-                      <PersonaCoin imageUrl={contributor.imageUrl} text={contributor.name} size={PersonaSize.size32} /> {contributor.name}
+                      <PersonaCoin className="retro-summary-contributor-avatar" imageUrl={contributor.imageUrl} text={contributor.name} size={PersonaSize.size24} />
+                      <span className="retro-summary-contributor-name">{contributor.name}</span>
                     </div>
                   ))}
                 </div>

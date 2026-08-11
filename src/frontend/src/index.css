@@ -1446,7 +1446,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply flex flex-wrap p-1.5;
 
     & .retro-summary-contributor {
-      @apply rounded-lg p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5;
+      @apply rounded-lg p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5 inline-flex items-center gap-2 whitespace-nowrap;
+
+      & .retro-summary-contributor-avatar {
+        @apply shrink-0;
+      }
+
+      & .retro-summary-contributor-name {
+        @apply whitespace-nowrap;
+      }
 
       &:last-child {
         @apply mr-0;
