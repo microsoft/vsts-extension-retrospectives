@@ -2807,7 +2807,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           </div>
           <div className="subText">
             <section className="retro-summary-section">
-              <div className="retro-summary-section-header">Board Owner</div>
+              <div className="retro-summary-section-header">{t("feedback_board_board_owner")}</div>
               <DocumentCardActivity
                 activity={formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "long", day: "numeric" })}
                 people={[{ name: state.currentBoard.createdBy.displayName, profileImageSrc: state.currentBoard.createdBy.imageUrl }]}
