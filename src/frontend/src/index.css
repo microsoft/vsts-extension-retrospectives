@@ -1422,7 +1422,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .retro-summary-dialog .retro-summary-section {
   @apply p-2.5;
 
-  & #retro-summary-created-by {
+  & .retro-summary-created-by {
     @apply my-1 mx-0;
   }
 
@@ -1538,6 +1538,38 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section section div {
   @apply w-5 h-5 rounded-full mr-1;
+}
+
+.avatar {
+  @apply inline-flex items-center justify-center overflow-hidden rounded-full font-semibold leading-none select-none;
+}
+
+.avatar .avatar-image {
+  @apply w-full h-full object-cover;
+}
+
+.avatar .avatar-fallback {
+  @apply flex w-full h-full items-center justify-center rounded-full text-white;
+}
+
+.avatar .avatar-initials {
+  @apply uppercase;
+}
+
+.avatar-activity {
+  @apply flex items-center gap-3;
+}
+
+.avatar-activity .avatar-activity-details {
+  @apply min-w-0;
+}
+
+.avatar-activity .avatar-activity-name {
+  @apply font-semibold text-(--text-primary-color) truncate;
+}
+
+.avatar-activity .avatar-activity-meta {
+  @apply text-sm text-(--text-secondary-color);
 }
 
 .feedback-board-metadata-form {

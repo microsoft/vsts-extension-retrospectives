@@ -1,6 +1,4 @@
 import React from "react";
-import { DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
-import { PersonaCoin, PersonaSize } from "@fluentui/react/lib/Persona";
 
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
@@ -47,6 +45,7 @@ import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
 import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
 import { canCurrentUserManageBoard } from "../utilities/boardAccessHelper";
+import Avatar, { AvatarActivity } from "./avatar";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
@@ -2808,9 +2807,12 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           <div className="subText">
             <section className="retro-summary-section">
               <div className="retro-summary-section-header">{t("feedback_board_board_owner")}</div>
-              <DocumentCardActivity
+              <AvatarActivity
                 activity={formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "long", day: "numeric" })}
-                people={[{ name: state.currentBoard.createdBy.displayName, profileImageSrc: state.currentBoard.createdBy.imageUrl }]}
+                avatarSize="large"
+                className="retro-summary-created-by"
+                imageUrl={state.currentBoard.createdBy.imageUrl}
+                name={state.currentBoard.createdBy.displayName}
               />
             </section>
             <section className="retro-summary-section">
@@ -2821,7 +2823,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                 <div className="retro-summary-contributors-section">
                   {state.contributors.map(contributor => (
                     <div key={contributor.id} className="retro-summary-contributor">
-                      <PersonaCoin className="retro-summary-contributor-avatar" imageUrl={contributor.imageUrl} text={contributor.name} size={PersonaSize.size24} />
+                      <Avatar className="retro-summary-contributor-avatar" imageUrl={contributor.imageUrl} name={contributor.name} size={24} />
                       <span className="retro-summary-contributor-name">{contributor.name}</span>
                     </div>
                   ))}
