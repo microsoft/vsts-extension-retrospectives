@@ -1938,7 +1938,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         id: member.identity.id,
         name: member.identity.displayName,
         uniqueName: member.identity.uniqueName,
-        thumbnailUrl: member.identity.imageUrl,
         type: "member" as const,
         isTeamAdmin: member.isTeamAdmin,
       })),
