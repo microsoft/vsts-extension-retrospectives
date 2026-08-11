@@ -81,6 +81,11 @@ export function getAvatarInitials(name?: string | null): string {
 
   words.forEach(word => {
     const firstCharacter = word[0];
+    if (!firstInitial && firstCharacter) {
+      firstInitial = firstCharacter;
+      return;
+    }
+
     if (firstCharacter && firstCharacter.match(LETTERS_REGEX)) {
       if (firstInitial.length === 0) {
         firstInitial = firstCharacter;
