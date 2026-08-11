@@ -29,16 +29,20 @@ describe("Avatar", () => {
     expect(getAvatarInitials("Jane Emily Doe")).toBe("JD");
   });
 
-  test("allows a leading symbol as the first initial", () => {
-    expect(getAvatarInitials("$Jane Doe")).toBe("$D");
+  test("keeps the first character for a single-token name with a leading symbol", () => {
+    expect(getAvatarInitials("$Hanson")).toBe("$");
   });
 
-  test("accepts number-leading words as initials", () => {
-    expect(getAvatarInitials("1st Jane")).toBe("1J");
+  test("keeps the first character for a single-token name with a leading number", () => {
+    expect(getAvatarInitials("1Hanson")).toBe("1");
   });
 
-  test("returns empty initials for all-symbol names", () => {
-    expect(getAvatarInitials("&*+! #$")).toBe("&");
+  test("ignores a leading symbol in a multi-token name", () => {
+    expect(getAvatarInitials("$ Hanson")).toBe("H");
+  });
+
+  test("ignores a leading number in a multi-token name", () => {
+    expect(getAvatarInitials("1 Hanson")).toBe("H");
   });
 
   test("matches Coin fallback color hashing", () => {
@@ -65,18 +69,14 @@ describe("Avatar", () => {
     expect(container.querySelector(".avatar-initials")?.textContent).toBe("");
   });
 
-  test("renders symbol-only name with empty initials and hashed fallback color", () => {
-    const name = "&*+! #$";
+  test("renders symbol-only name with the first character and hashed fallback color", () => {
+    const name = "$%";
     const { container } = render(<Avatar name={name} />);
 
     const fallback = container.querySelector(".avatar-fallback") as HTMLElement;
     expect(fallback).toBeInTheDocument();
     expect(fallback).toHaveStyle({ backgroundColor: getAvatarBackgroundColor(name) });
-    expect(container.querySelector(".avatar-initials")?.textContent).toBe("&");
-  });
-
-  test("uses the symbol when no valid initials are present", () => {
-    expect(getAvatarInitials("$Jane")).toBe("$");
+    expect(container.querySelector(".avatar-initials")?.textContent).toBe("$");
   });
 
   test("renders large avatar activity for summary owner", () => {
