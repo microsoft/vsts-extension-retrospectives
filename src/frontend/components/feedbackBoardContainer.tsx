@@ -1,6 +1,6 @@
 import React from "react";
 import { DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
-import { PersonaCoin, PersonaSize } from "@fluentui/react/lib/Persona";
+import { Coin, CoinSize } from "azure-devops-ui/Coin";
 
 import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
@@ -2821,7 +2821,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                 <div className="retro-summary-contributors-section">
                   {state.contributors.map(contributor => (
                     <div key={contributor.id} className="retro-summary-contributor">
-                      <PersonaCoin imageUrl={contributor.imageUrl} text={contributor.name} size={PersonaSize.size32} /> {contributor.name}
+                      <Coin displayName={contributor.name} imageUrl={contributor.imageUrl} size={CoinSize.size32} /> {contributor.name}
                     </div>
                   ))}
                 </div>
