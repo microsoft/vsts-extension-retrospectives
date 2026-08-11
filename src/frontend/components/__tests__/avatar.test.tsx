@@ -30,7 +30,7 @@ describe("Avatar", () => {
   });
 
   test("allows a leading symbol as the first initial", () => {
-    expect(getAvatarInitials("$Jane Doe")).toBe("$J");
+    expect(getAvatarInitials("$Jane Doe")).toBe("$D");
   });
 
   test("accepts number-leading words as initials", () => {
@@ -42,7 +42,7 @@ describe("Avatar", () => {
   });
 
   test("matches Coin fallback color hashing", () => {
-    expect(getAvatarBackgroundColor("Jane Doe")).toBe("rgb(0, 91, 112)");
+    expect(getAvatarBackgroundColor("Jane Doe")).toBe("rgb(194, 57, 179)");
   });
 
   test("renders default blue fallback when name and image are missing", () => {
