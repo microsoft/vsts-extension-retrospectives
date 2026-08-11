@@ -29,8 +29,50 @@ describe("Avatar", () => {
     expect(getAvatarInitials("Dana Lynn Hanson")).toBe("DH");
   });
 
+  test("skips symbol-leading words and uses next valid initial", () => {
+    expect(getAvatarInitials("#david Hanson")).toBe("H");
+  });
+
+  test("accepts number-leading words as initials", () => {
+    expect(getAvatarInitials("1st David")).toBe("1D");
+  });
+
+  test("returns empty initials for all-symbol names", () => {
+    expect(getAvatarInitials("&*+@ #%$-")).toBe("");
+  });
+
   test("matches Coin fallback color hashing", () => {
     expect(getAvatarBackgroundColor("Dana Hanson")).toBe("rgb(164, 38, 44)");
+  });
+
+  test("renders default blue fallback when name and image are missing", () => {
+    const { container } = render(<Avatar />);
+
+    const fallback = container.querySelector(".avatar-fallback") as HTMLElement;
+    expect(fallback).toBeInTheDocument();
+    expect(fallback).toHaveStyle({ backgroundColor: "rgb(79, 107, 237)" });
+    expect(container.querySelector(".avatar-initials")?.textContent).toBe("");
+  });
+
+  test("renders default blue fallback when image fails and name is missing", () => {
+    const { container } = render(<Avatar imageUrl="https://example.com/avatar.png" />);
+
+    fireEvent.error(screen.getByAltText(""));
+
+    const fallback = container.querySelector(".avatar-fallback") as HTMLElement;
+    expect(fallback).toBeInTheDocument();
+    expect(fallback).toHaveStyle({ backgroundColor: "rgb(79, 107, 237)" });
+    expect(container.querySelector(".avatar-initials")?.textContent).toBe("");
+  });
+
+  test("renders symbol-only name with empty initials and hashed fallback color", () => {
+    const name = "&*+@ #%$-";
+    const { container } = render(<Avatar name={name} />);
+
+    const fallback = container.querySelector(".avatar-fallback") as HTMLElement;
+    expect(fallback).toBeInTheDocument();
+    expect(fallback).toHaveStyle({ backgroundColor: getAvatarBackgroundColor(name) });
+    expect(container.querySelector(".avatar-initials")?.textContent).toBe("");
   });
 
   test("renders large avatar activity for summary owner", () => {
