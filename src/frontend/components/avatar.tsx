@@ -11,7 +11,7 @@ export interface IAvatarActivityProps {
   activity: string;
   imageUrl?: string | null;
   name: string;
-  avatarSize?: "small" | "large";
+  avatarSize?: "small" | "medium" | "large";
   className?: string;
 }
 
@@ -42,7 +42,8 @@ const COIN_COLOR_PALETTE = [
 const LETTERS_REGEX = "[0-9]|[A-Z]|[Ѐ-Я]|[a-z]|[ά-ώ]|[ǅ]|[ῼ]|[ʰ-ˁ]|[ᴬ-ᵡ]|[א-ת]|[ء-غ]|[一-鿃]|[À-ÿ]|[Ā-ſ]|[ƀ-ɏ]";
 const AVATAR_SIZE_BY_VARIANT: Record<NonNullable<IAvatarActivityProps["avatarSize"]>, number> = {
   small: 24,
-  large: 32,
+  medium: 32,
+  large: 36,
 };
 
 function formatCoinColor(color: { red: number; green: number; blue: number }): string {

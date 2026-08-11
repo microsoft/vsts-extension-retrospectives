@@ -38,12 +38,18 @@ describe("Avatar", () => {
 
     expect(screen.getByText("Dana Hanson")).toBeInTheDocument();
     expect(screen.getByText("August 11, 2026")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "Dana Hanson avatar" })).toHaveStyle({ width: "32px", height: "32px" });
+    expect(screen.getByRole("img", { name: "Dana Hanson avatar" })).toHaveStyle({ width: "36px", height: "36px" });
   });
 
   test("renders small avatar activity when requested", () => {
     render(<AvatarActivity activity="August 11, 2026" avatarSize="small" name="Dana Hanson" />);
 
     expect(screen.getByRole("img", { name: "Dana Hanson avatar" })).toHaveStyle({ width: "24px", height: "24px" });
+  });
+
+  test("renders medium avatar activity when requested", () => {
+    render(<AvatarActivity activity="August 11, 2026" avatarSize="medium" name="Dana Hanson" />);
+
+    expect(screen.getByRole("img", { name: "Dana Hanson avatar" })).toHaveStyle({ width: "32px", height: "32px" });
   });
 });
