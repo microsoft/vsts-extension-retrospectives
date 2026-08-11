@@ -2333,25 +2333,25 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .feedbackItemGroupItem .mainItemCard .card-integral-part .feedback-item-created-by,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .feedback-item-created-by,
 .feedbackItem .mainItemCard .card-integral-part .feedback-item-created-by {
-  @apply py-2 px-4;
+  @apply py-1.5 px-4 gap-2;
 }
 
 .feedbackItemGroupItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-details,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .feedback-item-created-by .avatar-activity-details,
 .feedbackItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-details {
-  @apply pl-1.5;
+  @apply pl-1;
 }
 
 .feedbackItemGroupItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-name,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .feedback-item-created-by .avatar-activity-name,
 .feedbackItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-name {
-  @apply text-sm font-normal text-(--text-secondary-color);
+  @apply text-[13px] leading-[15px] font-semibold text-(--text-primary-color);
 }
 
 .feedbackItemGroupItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-meta,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .feedback-item-created-by .avatar-activity-meta,
 .feedbackItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-meta {
-  @apply text-sm font-light text-(--text-secondary-color);
+  @apply text-[13px] leading-[15px] font-normal text-(--text-primary-color) opacity-90;
 }
 
 .feedbackItemGroupItem .mainItemCard .card-integral-part .anonymous-created-date,

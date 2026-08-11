@@ -50,6 +50,6 @@ describe("Avatar", () => {
   test("renders medium avatar activity when requested", () => {
     render(<AvatarActivity activity="August 11, 2026" avatarSize="medium" name="Dana Hanson" />);
 
-    expect(screen.getByRole("img", { name: "Dana Hanson avatar" })).toHaveStyle({ width: "32px", height: "32px" });
+    expect(screen.getByRole("img", { name: "Dana Hanson avatar" })).toHaveStyle({ width: "30px", height: "30px" });
   });
 });
