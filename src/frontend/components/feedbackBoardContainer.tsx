@@ -995,12 +995,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     const configuredTeam = info?.teamId ? getConfiguredTeam(info.teamId) : getConfiguredTeam();
-    let defaultTeam =
-      !isHostedAzureDevOps && info?.teamId
-        ? configuredTeam || createFallbackTeam(info.teamId)
-        : !isHostedAzureDevOps
-          ? configuredTeam
-          : undefined;
+    let defaultTeam: WebApiTeam | undefined = configuredTeam;
+    if (info?.teamId && !isHostedAzureDevOps) {
+      defaultTeam = configuredTeam || createFallbackTeam(info.teamId);
+    }
     if (defaultTeam) {
       userTeams = [defaultTeam];
     }
@@ -1134,6 +1132,33 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     if (!info?.teamId) {
+      if (isHostedAzureDevOps && configuredTeam) {
+        let boardsForConfiguredTeam = await BoardDataService.getBoardsForTeam(configuredTeam.id);
+        if (boardsForConfiguredTeam?.length) {
+          boardsForConfiguredTeam = boardsForConfiguredTeam
+            .filter((board: IFeedbackBoardDocument) =>
+              FeedbackBoardDocumentHelper.filter(
+                board,
+                userTeams.map(t => t.id),
+                currentUserId,
+              ),
+            )
+            .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+        }
+
+        const mostRecentUserVisit = await userDataService.getMostRecentVisit();
+        const mostRecentBoard = mostRecentUserVisit?.teamId === configuredTeam.id && mostRecentUserVisit.boardId
+          ? boardsForConfiguredTeam.find(board => board.id === mostRecentUserVisit.boardId)
+          : undefined;
+
+        return {
+          ...baseTeamState,
+          boards: boardsForConfiguredTeam,
+          currentBoard: mostRecentBoard || (boardsForConfiguredTeam?.length ? boardsForConfiguredTeam[0] : null),
+          currentTeam: configuredTeam,
+        };
+      }
+
       // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
       // visited user records.
       const recentVisitState = await loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams, currentUserId);

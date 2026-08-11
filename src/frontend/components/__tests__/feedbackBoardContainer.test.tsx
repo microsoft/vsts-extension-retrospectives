@@ -874,6 +874,47 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
   });
 
+  it("does not let a recent visit from another team override the host-selected team", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const teamA = { id: "t1", name: "Team A", projectName: "P", description: "", url: "" };
+    const teamB = { id: "t2", name: "Team B", projectName: "P", description: "", url: "" };
+    const teamABoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-team-a",
+      title: "Board A",
+      teamId: "t1",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+    const teamBBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-team-b",
+      title: "Board B",
+      teamId: "t2",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: teamB });
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([teamA as WebApiTeam, teamB as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(teamA as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "t1", boardId: "board-team-a" } as any);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "t1" ? [teamABoard] : [teamBBoard]));
+    mocked(itemDataService.getBoardItem).mockImplementation(async (_teamId, boardId) => (boardId === "board-team-a" ? teamABoard : teamBBoard));
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("t2");
+    expect(screen.getByRole("option", { name: "Team B" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Team A" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Board A")).not.toBeInTheDocument();
+  });
+
   it("falls back to default team selection when board URL parsing fails", async () => {
     mocked(getService).mockRejectedValue(new Error("Host navigation unavailable"));
     mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
