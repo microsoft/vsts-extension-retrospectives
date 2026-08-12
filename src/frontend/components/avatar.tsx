@@ -61,8 +61,8 @@ export function getAvatarBackgroundColor(name?: string | null): string {
     const shift = index % 8;
     hash ^= (characterCode << shift) + (characterCode >> (8 - shift));
   }
-
-  return formatCoinColor(COIN_COLOR_PALETTE[hash % COIN_COLOR_PALETTE.length]);
+  const colorIndex = Math.abs(hash) % COIN_COLOR_PALETTE.length;
+  return formatCoinColor(COIN_COLOR_PALETTE[colorIndex]);
 }
 
 export function getAvatarInitials(name?: string | null): string {
