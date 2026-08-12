@@ -959,6 +959,47 @@ describe("FeedbackBoardContainer integration", () => {
     expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("alternate-team");
   });
 
+  it("keeps the deep-linked default team selectable when the user belongs to a different team", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
+    const alternateTeam = { id: "alternate-team", name: "Alternate Team", projectName: "P", description: "", url: "" };
+    const defaultBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-default",
+      title: "Default Board",
+      teamId: "default-team",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+
+    // Actual scenario: the user is a member of the alternate team, but the deep link points to the project default team.
+    // In the filtered "My teams" experience, the linked default team remains selectable and the current selection matches the URL.
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=default-team&boardId=board-default"), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
+      forCurrentUserOnly ? [alternateTeam as WebApiTeam] : [alternateTeam as WebApiTeam, defaultTeam as WebApiTeam],
+    );
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => (teamId === "default-team" ? defaultTeam : teamId === "alternate-team" ? alternateTeam : null) as WebApiTeam | null);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "default-team" ? [defaultBoard] : [mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+
+    const teamSelector = screen.getByRole("group", { name: "Team selector" });
+    expect(within(teamSelector).getByRole("option", { name: "Default Team" })).toBeInTheDocument();
+    expect(within(teamSelector).queryByRole("option", { name: "Alternate Team" })).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("default-team");
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("default-team");
+  });
+
   it("falls back to default team selection when board URL parsing fails", async () => {
     mocked(getService).mockRejectedValue(new Error("Host navigation unavailable"));
     mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
