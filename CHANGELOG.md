@@ -19,6 +19,7 @@ From [GitHub PR #1893](https://github.com/microsoft/vsts-extension-retrospective
 * Optimized board, permission, workflow-stage, and Team Assessment History rendering to reduce unnecessary updates. From [GitHub PR #1840](https://github.com/microsoft/vsts-extension-retrospectives/pull/1840)
 * Improved the board settings dialog layout and accessibility, including dialog sizing and tab structure. From [GitHub PR #1833](https://github.com/microsoft/vsts-extension-retrospectives/pull/1833)
 * Refined board settings inputs, selector options, and tooltip positioning for a more consistent interface. From [GitHub PR #1841](https://github.com/microsoft/vsts-extension-retrospectives/pull/1841)
+
 * Restricted editing of retrospective settings to the Board Owner or a Team Admin.
 * Added a view-only retrospective settings experience for other users, including updated board menu text, dialog messaging, and disabled editing controls.
 * Fixed bug that prevented saving retrospective settings from the Permissions tab.
