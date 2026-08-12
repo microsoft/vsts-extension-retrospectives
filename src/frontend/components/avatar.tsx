@@ -77,7 +77,7 @@ export function getAvatarInitials(name?: string | null): string {
   }
 
   if (words.length === 1) {
-    return words[0][0]?.toUpperCase() ?? "";
+    return words[0][0].toUpperCase();
   }
 
   let firstInitial = "";
@@ -94,7 +94,7 @@ export function getAvatarInitials(name?: string | null): string {
     }
   });
 
-  return firstInitial ? `${firstInitial}${secondInitial}`.toUpperCase() : words[0][0]?.toUpperCase() ?? "";
+  return firstInitial ? `${firstInitial}${secondInitial}`.toUpperCase() : words[0][0].toUpperCase();
 }
 
 function Avatar(props: Readonly<IAvatarProps>): React.JSX.Element {

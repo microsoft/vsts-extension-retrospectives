@@ -29,6 +29,10 @@ describe("Avatar", () => {
     expect(getAvatarInitials("Jane Emily Doe")).toBe("JD");
   });
 
+  test("returns empty initials for whitespace-only name", () => {
+    expect(getAvatarInitials("   ")).toBe("");
+  });
+
   test("keeps the first character for a single-token name with a leading symbol", () => {
     expect(getAvatarInitials("$Hanson")).toBe("$");
   });
@@ -41,8 +45,8 @@ describe("Avatar", () => {
     expect(getAvatarInitials("$ Hanson")).toBe("H");
   });
 
-  test("ignores a leading number in a multi-token name", () => {
-    expect(getAvatarInitials("1 Hanson")).toBe("H");
+  test("falls back to first token when multi-token name has no letter or number initials", () => {
+    expect(getAvatarInitials("$ %")).toBe("$");
   });
 
   test("matches Coin fallback color hashing", () => {
@@ -97,5 +101,11 @@ describe("Avatar", () => {
     render(<AvatarActivity activity="August 11, 2026" avatarSize="medium" name="John Smith" />);
 
     expect(screen.getByRole("img", { name: "John Smith avatar" })).toHaveStyle({ width: "30px", height: "30px" });
+  });
+
+  test("defaults avatar activity size to small when avatarSize is omitted", () => {
+    render(<AvatarActivity activity="August 11, 2026" name="John Smith" />);
+
+    expect(screen.getByRole("img", { name: "John Smith avatar" })).toHaveStyle({ width: "24px", height: "24px" });
   });
 });
