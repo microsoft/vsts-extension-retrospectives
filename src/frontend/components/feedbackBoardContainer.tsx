@@ -45,6 +45,7 @@ import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
 import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
 import { canCurrentUserManageBoard } from "../utilities/boardAccessHelper";
+import Avatar, { AvatarActivity } from "./avatar";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
@@ -1938,7 +1939,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         id: member.identity.id,
         name: member.identity.displayName,
         uniqueName: member.identity.uniqueName,
-        thumbnailUrl: member.identity.imageUrl,
         type: "member" as const,
         isTeamAdmin: member.isTeamAdmin,
       })),
@@ -2806,11 +2806,14 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           </div>
           <div className="subText">
             <section className="retro-summary-section">
-              <div className="retro-summary-section-header">{t("feedback_board_basic_settings")}</div>
-              <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>
-              <div id="retro-summary-created-by">
-                {t("feedback_board_created_by")} <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
-              </div>
+              <div className="retro-summary-section-header">{t("feedback_board_board_owner")}</div>
+              <AvatarActivity
+                activity={formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "long", day: "numeric" })}
+                avatarSize="large"
+                className="retro-summary-created-by"
+                imageUrl={state.currentBoard.createdBy.imageUrl}
+                name={state.currentBoard.createdBy.displayName}
+              />
             </section>
             <section className="retro-summary-section">
               <div className="retro-summary-section-header">{t("feedback_board_participant_summary")}</div>
@@ -2820,7 +2823,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                 <div className="retro-summary-contributors-section">
                   {state.contributors.map(contributor => (
                     <div key={contributor.id} className="retro-summary-contributor">
-                      <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
+                      <Avatar className="retro-summary-contributor-avatar" imageUrl={contributor.imageUrl} name={contributor.name} size={24} />
+                      <span className="retro-summary-contributor-name">{contributor.name}</span>
                     </div>
                   ))}
                 </div>

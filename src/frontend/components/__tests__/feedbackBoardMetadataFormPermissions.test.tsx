@@ -841,16 +841,16 @@ describe("Board Metadata Form Permissions", () => {
       expect(teamIcon).toBeInTheDocument();
     });
 
-    it("should render profile image for member type options", () => {
+    it("should render person icon for member type options", () => {
       const props = makeProps({
         permissions: { Teams: [], Members: [] },
-        permissionOptions: [{ id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member", thumbnailUrl: "https://example.com/avatar.jpg" }],
+        permissionOptions: [{ id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member" }],
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const memberImage = container.querySelector('.permission-image[src="https://example.com/avatar.jpg"]');
+      const memberIcon = container.querySelector(".icon-person");
 
-      expect(memberImage).toBeInTheDocument();
+      expect(memberIcon).toBeInTheDocument();
     });
   });
 

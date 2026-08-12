@@ -1422,8 +1422,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 .retro-summary-dialog .retro-summary-section {
   @apply p-2.5;
 
-  & #retro-summary-created-by {
-    @apply my-1 mx-0;
+  & .retro-summary-created-by {
+    @apply my-1 mx-0 pl-2;
   }
 
   & .retro-summary-section-header {
@@ -1446,7 +1446,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     @apply flex flex-wrap p-1.5;
 
     & .retro-summary-contributor {
-      @apply rounded-lg p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5;
+      @apply rounded-lg p-3 w-fit bg-(--border-subtle-color) mr-2.5 mb-2.5 inline-flex items-center gap-2 whitespace-nowrap;
+
+      & .retro-summary-contributor-avatar {
+        @apply shrink-0;
+      }
+
+      & .retro-summary-contributor-name {
+        @apply whitespace-nowrap;
+      }
 
       &:last-child {
         @apply mr-0;
@@ -1530,6 +1538,38 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .retro-summary-dialog .retro-summary-effectiveness-scores .chart-legend-section section div {
   @apply w-5 h-5 rounded-full mr-1;
+}
+
+.avatar {
+  @apply inline-flex items-center justify-center overflow-hidden rounded-full font-semibold leading-none select-none;
+}
+
+.avatar .avatar-image {
+  @apply w-full h-full object-cover;
+}
+
+.avatar .avatar-fallback {
+  @apply flex w-full h-full items-center justify-center rounded-full text-white;
+}
+
+.avatar .avatar-initials {
+  @apply uppercase;
+}
+
+.avatar-activity {
+  @apply flex items-center gap-3;
+}
+
+.avatar-activity .avatar-activity-details {
+  @apply min-w-0;
+}
+
+.avatar-activity .avatar-activity-name {
+  @apply font-semibold text-(--text-primary-color) truncate;
+}
+
+.avatar-activity .avatar-activity-meta {
+  @apply text-sm text-(--text-secondary-color);
 }
 
 .feedback-board-metadata-form {
@@ -2288,6 +2328,30 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .msDocumentCardActivity-details {
   @apply pl-1.5;
+}
+
+.feedbackItemGroupItem .mainItemCard .card-integral-part .feedback-item-created-by,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .feedback-item-created-by,
+.feedbackItem .mainItemCard .card-integral-part .feedback-item-created-by {
+  @apply py-1.5 px-4 gap-2;
+}
+
+.feedbackItemGroupItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-details,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .feedback-item-created-by .avatar-activity-details,
+.feedbackItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-details {
+  @apply pl-1;
+}
+
+.feedbackItemGroupItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-name,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .feedback-item-created-by .avatar-activity-name,
+.feedbackItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-name {
+  @apply text-[13px] leading-[18px] font-semibold text-(--text-secondary-color);
+}
+
+.feedbackItemGroupItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-meta,
+.feedbackItemGroupItem .groupedItemCard .card-integral-part .feedback-item-created-by .avatar-activity-meta,
+.feedbackItem .mainItemCard .card-integral-part .feedback-item-created-by .avatar-activity-meta {
+  @apply text-[13px] leading-[18px] font-normal text-(--text-secondary-color) opacity-90;
 }
 
 .feedbackItemGroupItem .mainItemCard .card-integral-part .anonymous-created-date,

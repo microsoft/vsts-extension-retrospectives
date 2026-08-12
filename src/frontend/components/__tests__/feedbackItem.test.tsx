@@ -7545,7 +7545,7 @@ describe("Feedback Item", () => {
       expect(container.querySelector(".anonymous-created-date")).toBeInTheDocument();
     });
 
-    test("renders DocumentCardActivity when createdBy is provided", async () => {
+    test("renders AvatarActivity when createdBy is provided", async () => {
       const mockItem: IFeedbackItemDocument = {
         id: "non-anon-item",
         boardId: testBoardId,
@@ -7615,8 +7615,8 @@ describe("Feedback Item", () => {
         expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
       });
 
-      // Check for ms-DocumentCardActivity class which is used when createdBy is provided
-      expect(container.querySelector(".ms-DocumentCardActivity")).toBeInTheDocument();
+      // Check for local avatar activity class used when createdBy is provided
+      expect(container.querySelector(".feedback-item-created-by")).toBeInTheDocument();
     });
   });
 

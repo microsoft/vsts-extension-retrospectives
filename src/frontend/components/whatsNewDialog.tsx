@@ -6,25 +6,18 @@ interface IWhatsNewDialogProps {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
 }
 
-const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.59, v1.92.58, v1.92.57, and v1.92.56 include:";
+const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.60 and v1.92.59 include:";
 
 const WHATS_NEW_ITEMS = [
+  "Refactored avatar rendering for feedback cards and board summary to use a unified avatar implementation with ADO-compatible color palettes.",
+  "Simplified permissions table replacing avatars with team or user identity icons.",
   "Added a Move Everyone control so board managers can move all participants to the selected retrospective phase.",
   "Expanded feedback search to include archived boards.",
-  "Fixed a Focus Mode render loop that could cause constant CPU usage.",
+  "Improved keyboard navigation and accessibility for retrospective phase tabs.",
+  "Improved board settings dialog layout, tabs, accessibility, and view-only settings for non-editors.",
   "Optimized board and Team Assessment History rendering to reduce unnecessary updates.",
   "Improved team and board loading, including default-team lookup and recovery from local-network access restrictions.",
-  "Fixed retrospective board links for Azure DevOps organizations.",
-  "Added longer column titles.",
-  "Added sort-direction indicators to History table.",
-  "Added user settings to toggle between show all teams or my teams and to toggle between scrolling by board or by column.",
-  "Restricted editing of retrospective settings to the Board Owner and Team Admin.",
-  "Fixed the email summary Copy to clipboard action so it works reliably from the preview dialog.",
-  "Extended permissions so team admins can also update column notes and edit or delete feedback cards.",
-  "Improved hidden feedback behavior to display blurred feedback while announcing \"feedback blurred\".",
-  "Added team admin setting for configuring available work item types in \"Add work item\".",
-  "Defaulted add-work-item type options to Requirement Backlog types for the Act tab and Focus mode.",
-  "Adjusted the \"Add work item\" selection to ensure the full list of work item types is visible for the Act tab and Focus mode.",
+  "Fixed a Focus Mode render loop that could cause constant CPU usage.",
 ];
 
 const WHATS_NEW_FOOTER_TEXT = "Refer to the Changelog for a complete history of updates.";

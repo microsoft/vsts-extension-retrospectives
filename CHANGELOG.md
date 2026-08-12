@@ -2,6 +2,14 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.60
+
+* Refactored avatar rendering for feedback cards and board summary to use a unified avatar implementation.
+* Improved avatar fallback behavior for initials and color rendering to align with Azure DevOps Coin behavior.
+* Simplified permissions table to show people icon for teams and person icon for users, instead of avatar.
+
+From [GitHub PR #1893](https://github.com/microsoft/vsts-extension-retrospectives/pull/1893)
+
 ## v1.92.59
 
 * Added a "Move Everyone" control so board managers can move all participants to the selected retrospective phase. From [GitHub PR #1836](https://github.com/microsoft/vsts-extension-retrospectives/pull/1836)
@@ -11,6 +19,7 @@ You can find the changelog of the Retrospective Extension below.
 * Optimized board, permission, workflow-stage, and Team Assessment History rendering to reduce unnecessary updates. From [GitHub PR #1840](https://github.com/microsoft/vsts-extension-retrospectives/pull/1840)
 * Improved the board settings dialog layout and accessibility, including dialog sizing and tab structure. From [GitHub PR #1833](https://github.com/microsoft/vsts-extension-retrospectives/pull/1833)
 * Refined board settings inputs, selector options, and tooltip positioning for a more consistent interface. From [GitHub PR #1841](https://github.com/microsoft/vsts-extension-retrospectives/pull/1841)
+
 * Restricted editing of retrospective settings to the Board Owner or a Team Admin.
 * Added a view-only retrospective settings experience for other users, including updated board menu text, dialog messaging, and disabled editing controls.
 * Fixed bug that prevented saving retrospective settings from the Permissions tab.
