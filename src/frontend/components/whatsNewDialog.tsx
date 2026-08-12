@@ -9,15 +9,15 @@ interface IWhatsNewDialogProps {
 const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.60, v1.92.59, v1.92.58, and v1.92.57 include:";
 
 const WHATS_NEW_ITEMS = [
-  "Refactored avatar rendering for feedback cards and board summary to use a unified avatar implementation.",
-  "Improved avatar fallback behavior for initials and color rendering to align with Azure DevOps Coin behavior, and simplified permissions table identity icons.",
+  "Refactored avatar rendering for feedback cards and board summary to use a unified avatar implementation with ADO-compatible color palettes.",
+  "Simplified permissions table replacing avatars with team or user identity icons.",
   "Added a Move Everyone control so board managers can move all participants to the selected retrospective phase.",
   "Expanded feedback search to include archived boards.",
   "Fixed a Focus Mode render loop that could cause constant CPU usage.",
-  "Optimized board, permission, workflow-stage, and Team Assessment History rendering to reduce unnecessary updates.",
-  "Improved board settings dialog layout, tabs, accessibility, and view-only settings for non-editors.",
-  "Improved team and board loading, including default-team lookup, recovery from local-network access restrictions, and retrospective board links for Azure DevOps organizations in the Pakistan region.",
-  "Increased the allowed length of retrospective column titles, added sort-direction indicators to Board Summary table headers, and improved permission management with team search and select-all controls.",
+  "Optimized board and Team Assessment History rendering to reduce unnecessary updates.",
+  "Improved team and board loading, including default-team lookup, recovery from local-network access restrictions, and retrospective board links for ADO organizations in the Pakistan region.",
+  "Increased the allowed length of retrospective column titles.",
+  "Added sort-direction indicators to Board Summary table headers.",
 ];
 
 const WHATS_NEW_FOOTER_TEXT = "Refer to the Changelog for a complete history of updates.";
