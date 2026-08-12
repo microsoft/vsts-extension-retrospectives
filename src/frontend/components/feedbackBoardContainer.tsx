@@ -999,11 +999,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     if (info?.teamId && !isHostedAzureDevOps) {
       defaultTeam = configuredTeam || createFallbackTeam(info.teamId);
     }
-    if (defaultTeam) {
-      userTeams = [defaultTeam];
-    }
 
-    if (!defaultTeam) {
+    if (isHostedAzureDevOps || !defaultTeam) {
       try {
         userTeams = sortTeamsByName((await azureDevOpsCoreService.getAllTeams(projectId, true)) ?? []);
       } catch (error) {
@@ -1013,6 +1010,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           projectId,
         });
       }
+    }
+
+    if (defaultTeam && !userTeams.some(team => team.id === defaultTeam.id)) {
+      userTeams = sortTeamsByName([...userTeams, defaultTeam]);
     }
 
     defaultTeam = defaultTeam || (userTeams.length ? userTeams[0] : undefined);

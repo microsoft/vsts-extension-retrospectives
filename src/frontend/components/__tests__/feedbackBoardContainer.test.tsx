@@ -911,7 +911,7 @@ describe("FeedbackBoardContainer integration", () => {
     expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
     expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("t2");
     expect(screen.getByRole("option", { name: "Team B" })).toBeInTheDocument();
-    expect(screen.queryByRole("option", { name: "Team A" })).not.toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Team A" })).toBeInTheDocument();
     expect(screen.queryByText("Board A")).not.toBeInTheDocument();
   });
 
@@ -995,7 +995,7 @@ describe("FeedbackBoardContainer integration", () => {
 
     const teamSelector = screen.getByRole("group", { name: "Team selector" });
     expect(within(teamSelector).getByRole("option", { name: "Default Team" })).toBeInTheDocument();
-    expect(within(teamSelector).queryByRole("option", { name: "Alternate Team" })).not.toBeInTheDocument();
+    expect(within(teamSelector).getByRole("option", { name: "Alternate Team" })).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("default-team");
     expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("default-team");
   });
