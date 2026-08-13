@@ -1012,8 +1012,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
     }
 
-    if (defaultTeam && !userTeams.some(team => team.id === defaultTeam.id)) {
-      userTeams = sortTeamsByName([...userTeams, defaultTeam]);
+    const defaultTeamIsValidForCurrentUser = !!defaultTeam && userTeams.some(team => team.id === defaultTeam.id);
+    if (!defaultTeamIsValidForCurrentUser && userTeams.length) {
+      defaultTeam = userTeams[0];
+    } else if (!defaultTeamIsValidForCurrentUser && defaultTeam) {
+      userTeams = [defaultTeam];
     }
 
     defaultTeam = defaultTeam || (userTeams.length ? userTeams[0] : undefined);
@@ -1133,35 +1136,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     if (!info?.teamId) {
-      if (isHostedAzureDevOps && configuredTeam) {
-        let boardsForConfiguredTeam = await BoardDataService.getBoardsForTeam(configuredTeam.id);
-        if (boardsForConfiguredTeam?.length) {
-          boardsForConfiguredTeam = boardsForConfiguredTeam
-            .filter((board: IFeedbackBoardDocument) =>
-              FeedbackBoardDocumentHelper.filter(
-                board,
-                userTeams.map(t => t.id),
-                currentUserId,
-              ),
-            )
-            .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-        }
-
-        const mostRecentUserVisit = await userDataService.getMostRecentVisit();
-        const mostRecentBoard = mostRecentUserVisit?.teamId === configuredTeam.id && mostRecentUserVisit.boardId
-          ? boardsForConfiguredTeam.find(board => board.id === mostRecentUserVisit.boardId)
-          : undefined;
-
-        return {
-          ...baseTeamState,
-          boards: boardsForConfiguredTeam,
-          currentBoard: mostRecentBoard || (boardsForConfiguredTeam?.length ? boardsForConfiguredTeam[0] : null),
-          currentTeam: configuredTeam,
-        };
-      }
-
-      // If the teamId query param doesn't exist, attempt to pre-select a team and board by last
-      // visited user records.
+      // Simplified startup precedence: URL > recent visit > default team > alphabetical user team.
       const recentVisitState = await loadRecentlyVisitedOrDefaultTeamAndBoardState(defaultTeam, userTeams, currentUserId);
 
       return {
@@ -1194,22 +1169,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
     // Ensure the linked team appears as a selectable option even when the user isn't a member,
     // so the team selector value always matches a rendered <option> and onChange fires correctly.
-    if (!userTeams.some(team => team.id === matchedTeam.id)) {
-      userTeams = sortTeamsByName([...userTeams, matchedTeam]);
-    }
+    userTeams = ensureTeamVisibleInSelector(userTeams, matchedTeam);
 
-    let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(matchedTeam.id);
-    if (boardsForMatchedTeam?.length) {
-      boardsForMatchedTeam = boardsForMatchedTeam
-        .filter((board: IFeedbackBoardDocument) =>
-          FeedbackBoardDocumentHelper.filter(
-            board,
-            userTeams.map(t => t.id),
-            currentUserId,
-          ),
-        )
-        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-    }
+    const boardsForMatchedTeam = await getBoardsForTeamInUserContext(matchedTeam.id, userTeams, currentUserId);
 
     const queryParamTeamAndDefaultBoardState = {
       ...baseTeamState,
@@ -1269,6 +1231,35 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     });
   };
 
+  const ensureTeamVisibleInSelector = (teams: WebApiTeam[], candidateTeam: WebApiTeam): WebApiTeam[] => {
+    if (teams.some(team => team.id === candidateTeam.id)) {
+      return teams;
+    }
+
+    return sortTeamsByName([...teams, candidateTeam]);
+  };
+
+  const getBoardsForTeamInUserContext = async (
+    teamId: string,
+    visibleUserTeams: WebApiTeam[],
+    currentUserId: string,
+  ): Promise<IFeedbackBoardDocument[]> => {
+    let boardsForTeam = await BoardDataService.getBoardsForTeam(teamId);
+    if (boardsForTeam?.length) {
+      boardsForTeam = boardsForTeam
+        .filter((board: IFeedbackBoardDocument) =>
+          FeedbackBoardDocumentHelper.filter(
+            board,
+            visibleUserTeams.map(t => t.id),
+            currentUserId,
+          ),
+        )
+        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
+    }
+
+    return boardsForTeam ?? [];
+  };
+
   const initializeProjectTeams = (defaultTeam: WebApiTeam, userTeams: WebApiTeam[]) => {
     const projectTeams = userTeams?.length > 0 ? userTeams : defaultTeam ? [defaultTeam] : [];
 
@@ -1325,54 +1316,28 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
     if (mostRecentUserVisit) {
       const mostRecentTeam =
-        mostRecentUserVisit.teamId === defaultTeam.id
-          ? defaultTeam
-          : !isHostedAzureDevOps
-            ? createFallbackTeam(mostRecentUserVisit.teamId)
-            : await azureDevOpsCoreService.getTeam(projectId, mostRecentUserVisit.teamId);
+        userTeams.find(team => team.id === mostRecentUserVisit.teamId)
+        ?? (mostRecentUserVisit.teamId === defaultTeam.id ? defaultTeam : undefined)
+        ?? (!isHostedAzureDevOps ? createFallbackTeam(mostRecentUserVisit.teamId) : await azureDevOpsCoreService.getTeam(projectId, mostRecentUserVisit.teamId))
+        ?? defaultTeam;
 
-      if (mostRecentTeam) {
-        let boardsForTeam = await BoardDataService.getBoardsForTeam(mostRecentTeam.id);
-        if (boardsForTeam?.length > 0) {
-          boardsForTeam = boardsForTeam
-            .filter((board: IFeedbackBoardDocument) =>
-              FeedbackBoardDocumentHelper.filter(
-                board,
-                userTeams.map(t => t.id),
-                currentUserId,
-              ),
-            )
-            .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-        }
-        const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam[0] : null;
+      const boardsForTeam = await getBoardsForTeamInUserContext(mostRecentTeam.id, userTeams, currentUserId);
+      const currentBoard = boardsForTeam?.length > 0 ? boardsForTeam[0] : null;
+      const recentVisitState = {
+        boards: boardsForTeam,
+        currentBoard,
+        currentTeam: mostRecentTeam,
+      };
 
-        const recentVisitState = {
-          boards: boardsForTeam,
-          currentBoard,
-          currentTeam: mostRecentTeam,
-        };
-
-        if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
-          const mostRecentBoard = boardsForTeam.find(board => board.id === mostRecentUserVisit.boardId);
-          recentVisitState.currentBoard = mostRecentBoard || currentBoard;
-        }
-
-        return recentVisitState;
+      if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
+        const mostRecentBoard = boardsForTeam.find(board => board.id === mostRecentUserVisit.boardId);
+        recentVisitState.currentBoard = mostRecentBoard || currentBoard;
       }
+
+      return recentVisitState;
     }
 
-    let boardsForMatchedTeam = await BoardDataService.getBoardsForTeam(defaultTeam.id);
-    if (boardsForMatchedTeam?.length) {
-      boardsForMatchedTeam = boardsForMatchedTeam
-        .filter((board: IFeedbackBoardDocument) =>
-          FeedbackBoardDocumentHelper.filter(
-            board,
-            userTeams.map(t => t.id),
-            currentUserId,
-          ),
-        )
-        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-    }
+    const boardsForMatchedTeam = await getBoardsForTeamInUserContext(defaultTeam.id, userTeams, currentUserId);
 
     return {
       boards: boardsForMatchedTeam,
