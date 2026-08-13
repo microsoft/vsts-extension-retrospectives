@@ -961,6 +961,48 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.queryByText("Zebra Team")).not.toBeInTheDocument();
   });
 
+  it("returns to the default team after visiting a team the user is not a member of", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const firstUserTeam = { id: "a-team", name: "Alpha Team", projectName: "P", description: "", url: "" };
+    const defaultTeam = { id: "z-default", name: "Zebra Team", projectName: "P", description: "", url: "" };
+    const defaultBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-default",
+      title: "Default Board",
+      teamId: "z-default",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+    const alphaBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alpha",
+      title: "Alpha Board",
+      teamId: "a-team",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({});
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([firstUserTeam as WebApiTeam, defaultTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "outside-team", boardId: "outside-board" } as any);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === "z-default" ? [defaultBoard] : [alphaBoard],
+    );
+    mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("z-default");
+    expect(screen.getByText("Default Board")).toBeInTheDocument();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("z-default");
+  });
+
   it("ignores a recent visit whose board is not associated with the restored team", async () => {
     props = { isHostedAzureDevOps: true, projectId: "1" };
     const defaultTeam = { id: "z-default", name: "Zebra Team", projectName: "P", description: "", url: "" };

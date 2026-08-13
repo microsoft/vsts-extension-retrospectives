@@ -1012,7 +1012,23 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
     }
 
-    const defaultTeamIsValidForCurrentUser = !!defaultTeam && userTeams.some(team => team.id === defaultTeam.id);
+    let defaultTeamIsValidForCurrentUser = !!defaultTeam && userTeams.some(team => team.id === defaultTeam.id);
+    if (!defaultTeamIsValidForCurrentUser && userTeams.length && isHostedAzureDevOps) {
+      try {
+        const projectDefaultTeam = await azureDevOpsCoreService.getDefaultTeam(projectId);
+        if (projectDefaultTeam && userTeams.some(team => team.id === projectDefaultTeam.id)) {
+          defaultTeam = projectDefaultTeam;
+          defaultTeamIsValidForCurrentUser = true;
+        }
+      } catch (error) {
+        teamRestLookupFailed = true;
+        appInsights.trackException(error, {
+          action: "initializeFeedbackBoard.getDefaultTeam",
+          projectId,
+        });
+      }
+    }
+
     if (!defaultTeamIsValidForCurrentUser && userTeams.length) {
       defaultTeam = userTeams[0];
     } else if (!defaultTeamIsValidForCurrentUser && defaultTeam) {
