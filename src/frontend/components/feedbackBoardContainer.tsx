@@ -2171,14 +2171,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     return <div>{t("feedback_board_team_list_error")}</div>;
   }
 
-  const selectableTeams = showAllTeams && state.projectTeams.length ? state.projectTeams : state.userTeams.length ? state.userTeams : [state.currentTeam];
+  const selectableTeams = showAllTeams && state.projectTeams.length ? state.projectTeams : state.userTeams.length ? ensureTeamVisibleInSelector(state.userTeams, state.currentTeam) : [state.currentTeam];
 
   const handleShowAllTeamsChange = async (shouldShowAllTeams: boolean): Promise<void> => {
     if (!shouldShowAllTeams) {
       setShowAllTeams(false);
-      if (!state.userTeams.some(team => team.id === state.currentTeam?.id) && state.userTeams.length) {
-        await changeSelectedTeam(state.userTeams[0]);
-      }
       return;
     }
 
