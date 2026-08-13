@@ -4,7 +4,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.60
 
-* Improved startup team and board selection so shared links and valid recent visits open the correct retrospective, with project-default and My Teams fallbacks.
+* Improved startup team and board selection so shared links and valid recent visits open the correct retrospective, with project-default and My Teams fallback.
 * Updated Show My Teams to preserve the current team and board when viewing a team outside the user's memberships.
 
 From [GitHub PR #1895](https://github.com/microsoft/vsts-extension-retrospectives/pull/1895)
