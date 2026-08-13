@@ -961,6 +961,53 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.queryByText("Zebra Team")).not.toBeInTheDocument();
   });
 
+  it("ignores a recent visit whose board is not associated with the restored team", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "z-default", name: "Zebra Team", projectName: "P", description: "", url: "" };
+    const firstUserTeam = { id: "a-team", name: "Alpha Team", projectName: "P", description: "", url: "" };
+    const secondUserTeam = { id: "b-team", name: "Bravo Team", projectName: "P", description: "", url: "" };
+    const goodToDoneBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-good-to-done",
+      title: "Good-to-Done",
+      teamId: "z-default",
+      createdDate: new Date("2024-03-01T00:00:00Z"),
+    };
+    const alphaBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alpha",
+      title: "Alpha Board",
+      teamId: "a-team",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
+      forCurrentUserOnly ? [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam] : [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam, defaultTeam as WebApiTeam],
+    );
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "z-default", boardId: "board-alpha" } as any);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === "z-default" ? [goodToDoneBoard] : teamId === "a-team" ? [alphaBoard] : [mockBoard],
+    );
+    mocked(itemDataService.getBoardItem).mockImplementation(async (_teamId, boardId) =>
+      boardId === "board-alpha" ? alphaBoard : goodToDoneBoard,
+    );
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("a-team");
+    expect(screen.getByText("Alpha Board")).toBeInTheDocument();
+    expect(screen.queryByText("Good-to-Done")).not.toBeInTheDocument();
+  });
+
   it("uses the last visited team when it is still valid for the user", async () => {
     props = { isHostedAzureDevOps: true, projectId: "1" };
     const teamA = { id: "alpha-team", name: "Alpha Team", projectName: "P", description: "", url: "" };

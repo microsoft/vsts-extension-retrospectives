@@ -1315,6 +1315,19 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     const mostRecentUserVisit = await userDataService.getMostRecentVisit();
 
     if (mostRecentUserVisit) {
+      const recentVisitTeamMatchesUserTeams = userTeams.some(team => team.id === mostRecentUserVisit.teamId);
+      const recentVisitTeamMatchesDefault = mostRecentUserVisit.teamId === defaultTeam.id;
+
+      if (!recentVisitTeamMatchesUserTeams && !recentVisitTeamMatchesDefault) {
+        const boardsForMatchedTeam = await getBoardsForTeamInUserContext(defaultTeam.id, userTeams, currentUserId);
+
+        return {
+          boards: boardsForMatchedTeam,
+          currentBoard: boardsForMatchedTeam?.length ? boardsForMatchedTeam[0] : null,
+          currentTeam: defaultTeam,
+        };
+      }
+
       const mostRecentTeam =
         userTeams.find(team => team.id === mostRecentUserVisit.teamId)
         ?? (mostRecentUserVisit.teamId === defaultTeam.id ? defaultTeam : undefined)
@@ -1330,8 +1343,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       };
 
       if (boardsForTeam?.length && mostRecentUserVisit.boardId) {
-        const mostRecentBoard = boardsForTeam.find(board => board.id === mostRecentUserVisit.boardId);
-        recentVisitState.currentBoard = mostRecentBoard || currentBoard;
+        const mostRecentBoard = boardsForTeam.find(board => board.id === mostRecentUserVisit.boardId && board.teamId === mostRecentTeam.id);
+        if (mostRecentBoard) {
+          recentVisitState.currentBoard = mostRecentBoard;
+        }
       }
 
       return recentVisitState;
