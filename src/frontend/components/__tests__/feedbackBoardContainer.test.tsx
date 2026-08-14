@@ -1011,6 +1011,41 @@ describe("FeedbackBoardContainer integration", () => {
     expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("default-team");
   });
 
+  it("keeps a default team with no boards selected and shows the empty state", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
+    const alternateTeam = { id: "team-alt", name: "Alternate Team", projectName: "P", description: "", url: "" };
+    const alternateBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alternate",
+      title: "Alternate Board",
+      teamId: "team-alt",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([defaultTeam as WebApiTeam, alternateTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "default-team" ? [] : [alternateBoard]));
+    mocked(itemDataService.getBoardItem).mockResolvedValue(alternateBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("default-team");
+    expect(screen.getByText("Get started with your first Retrospective")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create Board" })).toBeInTheDocument();
+    expect(screen.queryByText("Alternate Board")).not.toBeInTheDocument();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("default-team");
+  });
+
   it("falls back to the first alphabetical team on first direct navigation when the user is not in the default team", async () => {
     props = { isHostedAzureDevOps: true, projectId: "1" };
     const defaultTeam = { id: "z-default", name: "Zebra Team", projectName: "P", description: "", url: "" };
