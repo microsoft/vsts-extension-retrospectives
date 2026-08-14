@@ -1056,7 +1056,7 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.queryByText("Zebra Team")).not.toBeInTheDocument();
   });
 
-  it("returns to the default team after visiting a team the user is not a member of", async () => {
+  it("falls back to the default member team when the recent visit belongs to a non-member team", async () => {
     props = { isHostedAzureDevOps: true, projectId: "1" };
     const firstUserTeam = { id: "a-team", name: "Alpha Team", projectName: "P", description: "", url: "" };
     const defaultTeam = { id: "z-default", name: "Zebra Team", projectName: "P", description: "", url: "" };
@@ -1219,7 +1219,7 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.getByText("Board A")).toBeInTheDocument();
   });
 
-  it("keeps the deep-linked team selected even when the user is not a member", async () => {
+  it("keeps a deep-linked non-member team and board selectable instead of restoring the recent visit", async () => {
     props = { isHostedAzureDevOps: true, projectId: "1" };
     const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
     const alternateTeam = { id: "alternate-team", name: "Alternate Team", projectName: "P", description: "", url: "" };
