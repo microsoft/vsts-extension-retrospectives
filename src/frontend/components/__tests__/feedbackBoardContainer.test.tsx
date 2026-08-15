@@ -757,7 +757,7 @@ describe("FeedbackBoardContainer integration", () => {
     expect(screen.getByText("Member Board")).toBeInTheDocument();
   });
 
-  it("keeps the selected non-member team and board available when switching to My Teams", async () => {
+  it("removes a temporary non-member team from My Teams after switching away", async () => {
     props = { isHostedAzureDevOps: true, projectId: "1" };
     const defaultTeam = { ...mockTeam, id: "z-default", name: "Zebra Team" };
     const firstMemberTeam = { ...mockTeam, id: "a-member", name: "Alpha Team" };
@@ -795,10 +795,11 @@ describe("FeedbackBoardContainer integration", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
     fireEvent.click(screen.getByRole("button", { name: "Show my teams" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Team" }), { target: { value: firstMemberTeam.id } });
 
-    await waitFor(() => expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue(outsideTeam.id));
-    expect(screen.getByRole("option", { name: "Outside Team" })).toBeInTheDocument();
-    expect(screen.getByText("Outside Board")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue(firstMemberTeam.id));
+    expect(screen.getByText("Member Board")).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Outside Team" })).not.toBeInTheDocument();
   });
 
   it("configures a custom tooltip for Team Assessment", async () => {

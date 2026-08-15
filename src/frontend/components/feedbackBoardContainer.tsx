@@ -1177,10 +1177,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       };
     }
 
-    // Ensure the linked team appears as a selectable option even when the user isn't a member,
-    // so the team selector value always matches a rendered <option> and onChange fires correctly.
-    userTeams = ensureTeamVisibleInSelector(userTeams, matchedTeam);
-
+    // Keep the underlying membership list stable. A deep-linked team that the user is not a
+    // member of should only be surfaced as a temporary selector option, not persisted into the
+    // actual user team list.
     const boardSelection = await loadBoardSelectionForTeam(matchedTeam.id, userTeams, currentUserId, info.boardId);
 
     const queryParamTeamAndDefaultBoardState = {
