@@ -791,7 +791,7 @@ describe("FeedbackBoardContainer integration", () => {
 
     fireEvent.change(screen.getByRole("combobox", { name: "Team" }), { target: { value: outsideTeam.id } });
     await waitFor(() => expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue(outsideTeam.id));
-  expect(screen.getByText("Outside Board")).toBeInTheDocument();
+    expect(screen.getByText("Outside Board")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
     fireEvent.click(screen.getByRole("button", { name: "Show my teams" }));

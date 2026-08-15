@@ -53,7 +53,7 @@ const BOARD_TIMER_DURATION_OPTIONS = Array.from({ length: 20 }, (_, index) => in
 export interface FeedbackBoardContainerState {
   boards: IFeedbackBoardDocument[];
   currentUserId: string;
-  currentBoard: IFeedbackBoardDocument;
+  currentBoard: IFeedbackBoardDocument | null;
   currentTeam: WebApiTeam;
   hasToggledArchive: boolean;
   isAppInitialized: boolean;
@@ -972,7 +972,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     userTeams: WebApiTeam[];
     currentTeam: WebApiTeam;
     boards: IFeedbackBoardDocument[];
-    currentBoard: IFeedbackBoardDocument;
+    currentBoard: IFeedbackBoardDocument | null;
     isTeamBoardDeletedInfoDialogHidden: boolean;
     teamBoardDeletedDialogTitle: string;
     teamBoardDeletedDialogMessage: string;
@@ -1253,7 +1253,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     visibleUserTeams: WebApiTeam[],
     currentUserId: string,
     preferredBoardId?: string,
-  ): Promise<{ boards: IFeedbackBoardDocument[]; currentBoard: IFeedbackBoardDocument }> => {
+  ): Promise<{ boards: IFeedbackBoardDocument[]; currentBoard: IFeedbackBoardDocument | null }> => {
     let boardsForTeam = await BoardDataService.getBoardsForTeam(teamId);
     if (boardsForTeam?.length) {
       boardsForTeam = boardsForTeam
@@ -1325,7 +1325,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     currentUserId: string,
   ): Promise<{
     boards: IFeedbackBoardDocument[];
-    currentBoard: IFeedbackBoardDocument;
+    currentBoard: IFeedbackBoardDocument | null;
     currentTeam: WebApiTeam;
   }> => {
     const mostRecentUserVisit = await userDataService.getMostRecentVisit();
