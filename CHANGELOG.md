@@ -2,6 +2,10 @@
 
 You can find the changelog of the Retrospective Extension below.
 
+## v1.92.60
+
+* Prioritized permissions to include board owner, users and teams granted permission, current team and current team members, plus additional project members and teams within hard caps of 500 users and 100 teams. From [GitHub PR #1866](https://github.com/microsoft/vsts-extension-retrospectives/pull/1866)
+
 ## v1.92.59
 
 * Added a "Move Everyone" control so board managers can move all participants to the selected retrospective phase. From [GitHub PR #1836](https://github.com/microsoft/vsts-extension-retrospectives/pull/1836)
@@ -11,10 +15,10 @@ You can find the changelog of the Retrospective Extension below.
 * Optimized board, permission, workflow-stage, and Team Assessment History rendering to reduce unnecessary updates. From [GitHub PR #1840](https://github.com/microsoft/vsts-extension-retrospectives/pull/1840)
 * Improved the board settings dialog layout and accessibility, including dialog sizing and tab structure. From [GitHub PR #1833](https://github.com/microsoft/vsts-extension-retrospectives/pull/1833)
 * Refined board settings inputs, selector options, and tooltip positioning for a more consistent interface. From [GitHub PR #1841](https://github.com/microsoft/vsts-extension-retrospectives/pull/1841)
+
 * Restricted editing of retrospective settings to the Board Owner or a Team Admin.
 * Added a view-only retrospective settings experience for other users, including updated board menu text, dialog messaging, and disabled editing controls.
 * Fixed bug that prevented saving retrospective settings from the Permissions tab.
-* Hardened frontend CI/CD pipeline by retrying publish once on transient failure.
 
 From [GitHub PR #1846](https://github.com/microsoft/vsts-extension-retrospectives/pull/1846)
 
