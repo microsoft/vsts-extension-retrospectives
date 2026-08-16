@@ -9,7 +9,7 @@ interface IWhatsNewDialogProps {
 const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.60 and v1.92.59 include:";
 
 const WHATS_NEW_ITEMS = [
-  "Improved permission loading and prioritization, with hard caps of 500 users and 100 teams.",
+  "Improved permission loading and prioritization, with hard caps of 200 users and 100 teams.",
   "Added a Move Everyone control so board managers can move all participants to the selected retrospective phase.",
   "Expanded feedback search to include archived boards.",
   "Fixed a Focus Mode render loop that could cause constant CPU usage.",

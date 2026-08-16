@@ -130,7 +130,7 @@ export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember
 }
 
 const PERMISSION_TEAM_LIMIT = 100;
-const PERMISSION_USER_LIMIT = 500;
+const PERMISSION_USER_LIMIT = 200;
 const MEMBER_LOAD_CONCURRENCY = 5;
 
 function uniqueItemsById<T extends { id?: string }>(items: Array<T | null | undefined>): T[] {

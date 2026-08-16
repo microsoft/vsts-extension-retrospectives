@@ -231,11 +231,11 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
     const hasTeamLimit = props.permissionLimitReached?.teams;
 
     if (hasUserLimit && hasTeamLimit) {
-      return "Showing up to 500 additional users and 100 additional teams.";
+      return "Showing up to 200 additional users and 100 additional teams.";
     }
 
     if (hasUserLimit) {
-      return "Showing up to 500 additional users.";
+      return "Showing up to 200 additional users.";
     }
 
     if (hasTeamLimit) {

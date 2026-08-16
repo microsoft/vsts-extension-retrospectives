@@ -377,7 +377,7 @@ describe("buildPermissionOptions", () => {
 
     const allMembers: TeamMember[] = [
       { identity: { id: "group-1", displayName: "[Project]\\Contributors", uniqueName: "[Project]\\Contributors" } as IdentityRef } as TeamMember,
-      ...Array.from({ length: 500 }, (_, index) => ({
+      ...Array.from({ length: 200 }, (_, index) => ({
         identity: {
           id: `user-${index + 1}`,
           displayName: `User ${index + 1}`,
@@ -411,7 +411,7 @@ describe("buildPermissionOptions", () => {
     });
 
     const memberOptions = result.permissionOptions.filter(option => option.type === "member");
-    expect(memberOptions).toHaveLength(501);
+    expect(memberOptions).toHaveLength(201);
     expect(memberOptions.some(option => option.id === "group-1")).toBe(false);
     expect(result.hasReachedUserLimit).toBe(false);
   });
@@ -684,7 +684,7 @@ describe("buildPermissionOptions", () => {
     const currentTeam = { id: "current-team", name: "Current Team", projectName: "Project" } as WebApiTeam;
     const boardOwner = { id: "owner-1", displayName: "Owner User", uniqueName: "owner@example.com" } as IdentityRef;
 
-    const currentTeamMembers: TeamMember[] = Array.from({ length: 500 }, (_, index) => ({
+    const currentTeamMembers: TeamMember[] = Array.from({ length: 200 }, (_, index) => ({
       identity: {
         id: `member-${index + 1}`,
         displayName: `Member ${index + 1}`,

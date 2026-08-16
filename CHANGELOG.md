@@ -4,7 +4,7 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.60
 
-* Prioritized permissions to include board owner, users and teams granted permission, current team and current team members, plus additional project members and teams within hard caps of 500 users and 100 teams. From [GitHub PR #1866](https://github.com/microsoft/vsts-extension-retrospectives/pull/1866)
+* Prioritized permissions to include board owner, users and teams granted permission, current team and current team members, plus additional project members and teams within hard caps of 200 users and 100 teams. From [GitHub PR #1866](https://github.com/microsoft/vsts-extension-retrospectives/pull/1866)
 
 ## v1.92.59
 
