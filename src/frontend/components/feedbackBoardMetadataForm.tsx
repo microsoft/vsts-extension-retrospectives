@@ -24,6 +24,10 @@ export interface IFeedbackBoardMetadataFormProps {
   maxVotesPerUser: number;
   availablePermissionOptions: FeedbackBoardPermissionOption[];
   currentUserId: string;
+  permissionLimitReached?: {
+    users: boolean;
+    teams: boolean;
+  };
   onFormSubmit: (title: string, maxVotesPerUser: number, columns: IFeedbackColumn[], isIncludeTeamEffectivenessMeasurement: boolean, shouldShowFeedbackAfterCollect: boolean, isBoardAnonymous: boolean, permissions: IFeedbackBoardDocumentPermissions, teamAssessmentQuestions: ITeamAssessmentQuestion[]) => void;
   onFormCancel: () => void;
 }
@@ -131,7 +135,7 @@ const getInitialState = (props: IFeedbackBoardMetadataFormProps) => {
 };
 
 export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps> = props => {
-  const { isNewBoardCreation, isDuplicatingBoard, currentBoard, canManageBoard = true, teamId, placeholderText, availablePermissionOptions, currentUserId, onFormSubmit, onFormCancel } = props;
+  const { isNewBoardCreation, isDuplicatingBoard, currentBoard, canManageBoard = true, teamId, placeholderText, availablePermissionOptions, currentUserId, permissionLimitReached, onFormSubmit, onFormCancel } = props;
   const trackActivity = useTrackMetric(reactPlugin, "FeedbackBoardMetadataForm");
 
   const [initialState] = useState(() => getInitialState(props));
@@ -668,7 +672,16 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
         {activeMetadataTab === "Permissions" && (
           <div id="board-metadata-permissions-panel" className="board-metadata-form" role="tabpanel" aria-labelledby="board-metadata-permissions-tab">
             {!canManageBoard && <div className="board-metadata-form-section-information board-metadata-read-only-banner">{getIconElement("exclamation")} {t("feedback_board_view_only_message")}</div>}
-            <FeedbackBoardMetadataFormPermissions board={currentBoard} permissions={permissions} permissionOptions={availablePermissionOptions} currentUserId={currentUserId} isNewBoardCreation={isNewBoardCreation} canManageBoard={canManageBoard} onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)} />
+            <FeedbackBoardMetadataFormPermissions
+              board={currentBoard}
+              permissions={permissions}
+              permissionOptions={availablePermissionOptions}
+              currentUserId={currentUserId}
+              isNewBoardCreation={isNewBoardCreation}
+              canManageBoard={canManageBoard}
+              permissionLimitReached={permissionLimitReached}
+              onPermissionChanged={(s: FeedbackBoardPermissionState) => setPermissions(s.permissions)}
+            />
           </div>
         )}
       </div>
