@@ -9,6 +9,7 @@ interface IWhatsNewDialogProps {
 const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.60, v1.92.59, v1.92.58, and v1.92.57 include:";
 
 const WHATS_NEW_ITEMS = [
+  "Improved deep-linked board navigation so the correct team stays visible even when the user is not a member of that team.",
   "Added a Move Everyone control so board managers can move all participants to the selected retrospective phase.",
   "Expanded feedback search to include archived boards.",
   "Fixed a Focus Mode render loop that could cause constant CPU usage.",
@@ -17,7 +18,7 @@ const WHATS_NEW_ITEMS = [
   "Fixed retrospective board links for Azure DevOps organizations.",
   "Added longer column titles.",
   "Added sort-direction indicators to History table.",
-  "Restricted editing of retrospective settings to the Board Owner or a Team Admin.",
+  "Restricted editing of retrospective settings to the Board Owner and Team Admin.",
   "Fixed the email summary Copy to clipboard action so it works reliably from the preview dialog.",
   "Extended permissions so team admins can also update column notes and edit or delete feedback cards.",
   "Improved hidden feedback behavior to display blurred feedback while announcing \"feedback blurred\".",

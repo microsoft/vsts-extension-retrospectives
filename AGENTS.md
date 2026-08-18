@@ -26,6 +26,11 @@ src/
 
 ## Build/Lint/Test Commands
 
+### Tooling Preferences
+
+- Start text searches with `grep`; use `rg` only if it is available and working.
+- Frontend Jest runs must use the `jsdom` environment, for example `npx jest --env=jsdom ...`.
+
 ### Frontend (run from `src/frontend/`)
 
 ```bash

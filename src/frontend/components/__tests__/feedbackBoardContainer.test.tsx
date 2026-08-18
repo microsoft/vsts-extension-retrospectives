@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
@@ -20,6 +20,8 @@ import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { copyToClipboard } from "../../utilities/clipboardHelper";
 import { setLocale } from "../../utilities/localization";
 import { reflectBackendService } from "../../dal/reflectBackendService";
+import { workService } from "../../dal/azureDevOpsWorkService";
+import { teamSettingsService } from "../../dal/teamSettingsService";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -104,9 +106,15 @@ jest.mock("../../dal/azureDevOpsCoreService");
 jest.mock("../../dal/azureDevOpsWorkItemService");
 jest.mock("../../dal/userDataService");
 jest.mock("../../dal/itemDataService");
+jest.mock("../../dal/teamSettingsService", () => ({
+  teamSettingsService: {
+    getAllowedActionItemWorkItemTypeNames: jest.fn().mockResolvedValue([]),
+  },
+}));
 jest.mock("../../dal/azureDevOpsWorkService", () => ({
   workService: {
     getIterations: jest.fn(),
+    getRequirementBacklogWorkItemTypeNames: jest.fn().mockResolvedValue([]),
   },
 }));
 jest.mock("../../utilities/sprintRetrospectiveHelper", () => ({
@@ -374,6 +382,8 @@ describe("FeedbackBoardContainer integration", () => {
   beforeEach(() => {
     props = { isHostedAzureDevOps: false, projectId: "1" };
     mocked(getConfiguration).mockReturnValue({});
+    mocked(workService.getRequirementBacklogWorkItemTypeNames).mockResolvedValue([]);
+    mocked(teamSettingsService.getAllowedActionItemWorkItemTypeNames).mockResolvedValue([]);
   });
 
   it("renders main UI after loading", () => {
@@ -706,6 +716,92 @@ describe("FeedbackBoardContainer integration", () => {
     expect(await screen.findByRole("option", { name: "Other Team" })).toBeInTheDocument();
   });
 
+  it("keeps the selected team and board when switching to My Teams while on a member team", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { ...mockTeam, id: "z-default", name: "Zebra Team" };
+    const memberTeam = { ...mockTeam, id: "a-member", name: "Alpha Team" };
+    const outsideTeam = { ...mockTeam, id: "outside-team", name: "Outside Team" };
+    const defaultBoard = { ...mockBoard, id: "default-board", title: "Default Board", teamId: defaultTeam.id };
+    const memberBoard = { ...mockBoard, id: "member-board", title: "Member Board", teamId: memberTeam.id };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
+      forCurrentUserOnly ? [memberTeam as WebApiTeam, defaultTeam as WebApiTeam] : [memberTeam as WebApiTeam, outsideTeam as WebApiTeam, defaultTeam as WebApiTeam],
+    );
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === defaultTeam.id ? [defaultBoard] : teamId === memberTeam.id ? [memberBoard] : [],
+    );
+    mocked(itemDataService.getBoardItem).mockResolvedValue(memberBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByText("Default Board")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show all teams" }));
+    expect(await screen.findByRole("option", { name: "Outside Team" })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Team" }), { target: { value: memberTeam.id } });
+    expect(await screen.findByText("Member Board")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show my teams" }));
+
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue(memberTeam.id));
+    expect(screen.getByText("Member Board")).toBeInTheDocument();
+  });
+
+  it("removes a temporary non-member team from My Teams after switching away", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { ...mockTeam, id: "z-default", name: "Zebra Team" };
+    const firstMemberTeam = { ...mockTeam, id: "a-member", name: "Alpha Team" };
+    const outsideTeam = { ...mockTeam, id: "outside-team", name: "Outside Team" };
+    const defaultBoard = { ...mockBoard, id: "default-board", title: "Default Board", teamId: defaultTeam.id };
+    const firstMemberBoard = { ...mockBoard, id: "member-board", title: "Member Board", teamId: firstMemberTeam.id };
+    const outsideBoard = { ...mockBoard, id: "outside-board", title: "Outside Board", teamId: outsideTeam.id };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
+      forCurrentUserOnly ? [firstMemberTeam as WebApiTeam, defaultTeam as WebApiTeam] : [firstMemberTeam as WebApiTeam, outsideTeam as WebApiTeam, defaultTeam as WebApiTeam],
+    );
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === defaultTeam.id ? [defaultBoard] : teamId === firstMemberTeam.id ? [firstMemberBoard] : [outsideBoard],
+    );
+    mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByText("Default Board")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show all teams" }));
+    expect(await screen.findByRole("option", { name: "Outside Team" })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Team" }), { target: { value: outsideTeam.id } });
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue(outsideTeam.id));
+    expect(screen.getByText("Outside Board")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "User/Admin Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show my teams" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Team" }), { target: { value: firstMemberTeam.id } });
+
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue(firstMemberTeam.id));
+    expect(screen.getByText("Member Board")).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Outside Team" })).not.toBeInTheDocument();
+  });
+
   it("configures a custom tooltip for Team Assessment", async () => {
     const assessmentBoard = { ...mockBoard, isIncludeTeamEffectivenessMeasurement: true };
 
@@ -872,6 +968,410 @@ describe("FeedbackBoardContainer integration", () => {
     expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("t1");
     expect(screen.getByRole("option", { name: "Team 1" })).toBeInTheDocument();
     expect(screen.queryByText("We are unable to retrieve the list of teams for this project. Try reloading the page.")).not.toBeInTheDocument();
+  });
+
+  it("prefers the default team on first direct navigation when the user belongs to it", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
+    const altTeam = { id: "team-alt", name: "Alternate Team", projectName: "P", description: "", url: "" };
+    const defaultBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-default",
+      title: "Default Board",
+      teamId: "default-team",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+    const olderDefaultBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-default-old",
+      title: "Older Default Board",
+      teamId: "default-team",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([defaultTeam as WebApiTeam, altTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === "default-team" ? [defaultBoard, olderDefaultBoard] : [mockBoard],
+    );
+    mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("default-team");
+    expect(screen.getByText("Default Board")).toBeInTheDocument();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("default-team");
+  });
+
+  it("keeps a default team with no boards selected and shows the empty state", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
+    const alternateTeam = { id: "team-alt", name: "Alternate Team", projectName: "P", description: "", url: "" };
+    const alternateBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alternate",
+      title: "Alternate Board",
+      teamId: "team-alt",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([defaultTeam as WebApiTeam, alternateTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "default-team" ? [] : [alternateBoard]));
+    mocked(itemDataService.getBoardItem).mockResolvedValue(alternateBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("default-team");
+    expect(screen.getByText("Get started with your first Retrospective")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create Board" })).toBeInTheDocument();
+    expect(screen.queryByText("Alternate Board")).not.toBeInTheDocument();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("default-team");
+  });
+
+  it("falls back to the first alphabetical team on first direct navigation when the user is not in the default team", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "z-default", name: "Zebra Team", projectName: "P", description: "", url: "" };
+    const firstUserTeam = { id: "a-team", name: "Alpha Team", projectName: "P", description: "", url: "" };
+    const secondUserTeam = { id: "b-team", name: "Bravo Team", projectName: "P", description: "", url: "" };
+    const alphaBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alpha",
+      title: "Alpha Board",
+      teamId: "a-team",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+    const betaBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-beta",
+      title: "Bravo Board",
+      teamId: "b-team",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
+      forCurrentUserOnly ? [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam] : [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam, defaultTeam as WebApiTeam],
+    );
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === "a-team" ? [alphaBoard] : teamId === "b-team" ? [betaBoard] : [mockBoard],
+    );
+    mocked(itemDataService.getBoardItem).mockResolvedValue(alphaBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("a-team");
+    expect(screen.getByText("Alpha Board")).toBeInTheDocument();
+    expect(screen.queryByText("Zebra Team")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the default member team when the recent visit belongs to a non-member team", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const firstUserTeam = { id: "a-team", name: "Alpha Team", projectName: "P", description: "", url: "" };
+    const defaultTeam = { id: "z-default", name: "Zebra Team", projectName: "P", description: "", url: "" };
+    const defaultBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-default",
+      title: "Default Board",
+      teamId: "z-default",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+    const alphaBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alpha",
+      title: "Alpha Board",
+      teamId: "a-team",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({});
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([firstUserTeam as WebApiTeam, defaultTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "outside-team", boardId: "outside-board" } as any);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === "z-default" ? [defaultBoard] : [alphaBoard],
+    );
+    mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("z-default");
+    expect(screen.getByText("Default Board")).toBeInTheDocument();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("z-default");
+  });
+
+  it("ignores a recent visit whose board is not associated with the restored team", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "z-default", name: "Zebra Team", projectName: "P", description: "", url: "" };
+    const firstUserTeam = { id: "a-team", name: "Alpha Team", projectName: "P", description: "", url: "" };
+    const secondUserTeam = { id: "b-team", name: "Bravo Team", projectName: "P", description: "", url: "" };
+    const goodToDoneBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-good-to-done",
+      title: "Good-to-Done",
+      teamId: "z-default",
+      createdDate: new Date("2024-03-01T00:00:00Z"),
+    };
+    const alphaBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alpha",
+      title: "Alpha Board",
+      teamId: "a-team",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
+      forCurrentUserOnly ? [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam] : [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam, defaultTeam as WebApiTeam],
+    );
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "z-default", boardId: "board-alpha" } as any);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === "z-default" ? [goodToDoneBoard] : teamId === "a-team" ? [alphaBoard] : [mockBoard],
+    );
+    mocked(itemDataService.getBoardItem).mockImplementation(async (_teamId, boardId) =>
+      boardId === "board-alpha" ? alphaBoard : goodToDoneBoard,
+    );
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("a-team");
+    expect(screen.getByText("Alpha Board")).toBeInTheDocument();
+    expect(screen.queryByText("Good-to-Done")).not.toBeInTheDocument();
+  });
+
+  it("uses the last visited team when it is still valid for the user", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const teamA = { id: "alpha-team", name: "Alpha Team", projectName: "P", description: "", url: "" };
+    const teamB = { id: "beta-team", name: "Beta Team", projectName: "P", description: "", url: "" };
+    const lastVisitedBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-last-visited",
+      title: "Last Visited Board",
+      teamId: "beta-team",
+      createdDate: new Date("2024-03-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([teamA as WebApiTeam, teamB as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(teamA as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "beta-team", boardId: "board-last-visited" } as any);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
+      teamId === "beta-team" ? [lastVisitedBoard] : [mockBoard],
+    );
+    mocked(itemDataService.getBoardItem).mockResolvedValue(lastVisitedBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("beta-team");
+    expect(screen.getByText("Last Visited Board")).toBeInTheDocument();
+  });
+
+  it("lets the most recent visit win over a different host-selected team under the simplified precedence rules", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const teamA = { id: "t1", name: "Team A", projectName: "P", description: "", url: "" };
+    const teamB = { id: "t2", name: "Team B", projectName: "P", description: "", url: "" };
+    const teamABoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-team-a",
+      title: "Board A",
+      teamId: "t1",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+    const teamBBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-team-b",
+      title: "Board B",
+      teamId: "t2",
+      createdDate: new Date("2024-02-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: teamB });
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([teamA as WebApiTeam, teamB as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(teamA as WebApiTeam);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "t1", boardId: "board-team-a" } as any);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "t1" ? [teamABoard] : [teamBBoard]));
+    mocked(itemDataService.getBoardItem).mockImplementation(async (_teamId, boardId) => (boardId === "board-team-a" ? teamABoard : teamBBoard));
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("t1");
+    expect(screen.getByRole("option", { name: "Team A" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Team B" })).toBeInTheDocument();
+    expect(screen.getByText("Board A")).toBeInTheDocument();
+  });
+
+  it("keeps a deep-linked non-member team and board selectable instead of restoring the recent visit", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
+    const alternateTeam = { id: "alternate-team", name: "Alternate Team", projectName: "P", description: "", url: "" };
+    const alternateBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alternate",
+      title: "Alternate Board",
+      teamId: "alternate-team",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=alternate-team&boardId=board-alternate"), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([defaultTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => teamId === "alternate-team" ? alternateTeam as WebApiTeam : null);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "default-team", boardId: "board-default" } as any);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "alternate-team" ? [alternateBoard] : [mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(alternateBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("alternate-team");
+    expect(screen.getByText("Alternate Board")).toBeInTheDocument();
+    expect(within(screen.getByRole("group", { name: "Team selector" })).getByRole("option", { name: "Alternate Team" })).toBeInTheDocument();
+  });
+
+  it("adds the linked team to the team selector options when the user is not a member", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
+    const alternateTeam = { id: "alternate-team", name: "Alternate Team", projectName: "P", description: "", url: "" };
+    const alternateBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-alternate",
+      title: "Alternate Board",
+      teamId: "alternate-team",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+
+    // User is only a member of Default Team; deep link points to Alternate Team's board.
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=alternate-team&boardId=board-alternate"), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([defaultTeam as WebApiTeam]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => teamId === "alternate-team" ? alternateTeam as WebApiTeam : null);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "alternate-team" ? [alternateBoard] : [mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(alternateBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+
+    const teamSelector = screen.getByRole("group", { name: "Team selector" });
+
+    // The linked team must appear in the team selector so currentTeam.id matches a rendered option;
+    // without this the browser shows the first option as selected and onChange never fires
+    // when the user tries to switch back to that team.
+    expect(within(teamSelector).getByRole("option", { name: "Alternate Team" })).toBeInTheDocument();
+    expect(within(teamSelector).getByRole("option", { name: "Default Team" })).toBeInTheDocument();
+
+    // The selected team and board must reflect the deep link
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("alternate-team");
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("alternate-team");
+  });
+
+  it("keeps the deep-linked default team selectable when the user belongs to a different team", async () => {
+    props = { isHostedAzureDevOps: true, projectId: "1" };
+    const defaultTeam = { id: "default-team", name: "Default Team", projectName: "P", description: "", url: "" };
+    const alternateTeam = { id: "alternate-team", name: "Alternate Team", projectName: "P", description: "", url: "" };
+    const defaultBoard: IFeedbackBoardDocument = {
+      ...mockBoard,
+      id: "board-default",
+      title: "Default Board",
+      teamId: "default-team",
+      createdDate: new Date("2024-01-01T00:00:00Z"),
+    };
+
+    // Actual scenario: the user is a member of the alternate team, but the deep link points to the project default team.
+    // In the filtered "My teams" experience, the linked default team remains selectable and the current selection matches the URL.
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=default-team&boardId=board-default"), setHash: jest.fn() } as any);
+    mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
+      forCurrentUserOnly ? [alternateTeam as WebApiTeam] : [alternateTeam as WebApiTeam, defaultTeam as WebApiTeam],
+    );
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
+    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => (teamId === "default-team" ? defaultTeam : teamId === "alternate-team" ? alternateTeam : null) as WebApiTeam | null);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "default-team" ? [defaultBoard] : [mockBoard]);
+    mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer {...props} />);
+
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+
+    const teamSelector = screen.getByRole("group", { name: "Team selector" });
+    expect(within(teamSelector).getByRole("option", { name: "Default Team" })).toBeInTheDocument();
+    expect(within(teamSelector).getByRole("option", { name: "Alternate Team" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Team" })).toHaveValue("default-team");
+    expect(BoardDataService.getBoardsForTeam).toHaveBeenCalledWith("default-team");
   });
 
   it("falls back to default team selection when board URL parsing fails", async () => {
