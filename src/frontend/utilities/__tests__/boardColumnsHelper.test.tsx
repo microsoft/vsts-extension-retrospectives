@@ -241,7 +241,7 @@ describe("boardColumnsHelper", () => {
         });
         expect(result[2]).toEqual({
           accentColor: "#0078d4",
-          iconClass: "rocket-launch",
+          iconClass: "rocket",
           id: "uuid-3",
           title: "Accelerators",
           notes: "",

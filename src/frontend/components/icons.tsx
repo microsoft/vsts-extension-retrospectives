@@ -169,7 +169,7 @@ export const CelebrationIcon = () => {
   );
 };
 
-export const NewReleasesOutlinedIcon = () => {
+export const NewReleasesIcon = () => {
   return (
     <svg className="icon-new-releases" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="m23 12-2.44-2.78.34-3.68-3.61-.82-1.89-3.18L12 3 8.6 1.54 6.71 4.72l-3.61.81.34 3.68L1 12l2.44 2.78-.34 3.69 3.61.82 1.89 3.18L12 21l3.4 1.46 1.89-3.18 3.61-.82-.34-3.68zm-4.51 2.11.26 2.79-2.74.62-1.43 2.41L12 18.82l-2.58 1.11-1.43-2.41-2.74-.62.26-2.8L3.66 12l1.85-2.12-.26-2.78 2.74-.61 1.43-2.41L12 5.18l2.58-1.11 1.43 2.41 2.74.62-.26 2.79L20.34 12zM11 15h2v2h-2zm0-8h2v6h-2z" />
@@ -216,6 +216,14 @@ export const MoreHorizontalIcon = () => {
   return (
     <svg className="icon-more-horizontal" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+    </svg>
+  );
+};
+
+export const MoreVerticalIcon = () => {
+  return (
+    <svg className="icon-more-vertical" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
     </svg>
   );
 };
@@ -364,9 +372,9 @@ export const DeleteIcon = () => {
   );
 };
 
-export const AdjustIcon = () => {
+export const FocusIcon = () => {
   return (
-    <svg className="icon-adjust" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-focus" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm7 3c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm7-11h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4z" />
     </svg>
   );
@@ -587,9 +595,9 @@ export const ArrowCircleUpIcon = () => {
   );
 };
 
-export const RocketLaunchIcon = () => {
+export const RocketIcon = () => {
   return (
-    <svg className="icon-rocket-launch" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-rocket" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M6,15c-0.83,0-1.58,0.34-2.12,0.88C2.7,17.06,2,22,2,22s4.94-0.7,6.12-1.88C8.66,19.58,9,18.83,9,18C9,16.34,7.66,15,6,15 z M6.71,18.71c-0.28,0.28-2.17,0.76-2.17,0.76s0.47-1.88,0.76-2.17C5.47,17.11,5.72,17,6,17c0.55,0,1,0.45,1,1 C7,18.28,6.89,18.53,6.71,18.71z M17.42,13.65L17.42,13.65c6.36-6.36,4.24-11.31,4.24-11.31s-4.95-2.12-11.31,4.24l-2.49-0.5 C7.21,5.95,6.53,6.16,6.05,6.63L2,10.69l5,2.14L11.17,17l2.14,5l4.05-4.05c0.47-0.47,0.68-1.15,0.55-1.81L17.42,13.65z M7.41,10.83L5.5,10.01l1.97-1.97l1.44,0.29C8.34,9.16,7.83,10.03,7.41,10.83z M13.99,18.5l-0.82-1.91 c0.8-0.42,1.67-0.93,2.49-1.5l0.29,1.44L13.99,18.5z M16,12.24c-1.32,1.32-3.38,2.4-4.04,2.73l-2.93-2.93 c0.32-0.65,1.4-2.71,2.73-4.04c4.68-4.68,8.23-3.99,8.23-3.99S20.68,7.56,16,12.24z M15,11c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2 S13.9,11,15,11z" />
     </svg>
   );
@@ -659,9 +667,9 @@ export const ElectricBoltIcon = () => {
   );
 };
 
-export const PsychologicalSafetyIcon = () => {
+export const HandshakeIcon = () => {
   return (
-    <svg className="icon-psychological-safety" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+    <svg className="icon-handshake" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
       <path d="M12.22 19.85c-.18.18-.5.21-.71 0-.18-.18-.21-.5 0-.71l3.39-3.39-1.41-1.41-3.39 3.39c-.19.2-.51.19-.71 0-.21-.21-.18-.53 0-.71l3.39-3.39-1.41-1.41-3.39 3.39c-.18.18-.5.21-.71 0-.19-.19-.19-.51 0-.71l3.39-3.39-1.42-1.41-3.39 3.39c-.18.18-.5.21-.71 0-.19-.2-.19-.51 0-.71L9.52 8.4l1.87 1.86c.95.95 2.59.94 3.54 0 .98-.98.98-2.56 0-3.54l-1.86-1.86.28-.28c.78-.78 2.05-.78 2.83 0l4.24 4.24c.78.78.78 2.05 0 2.83zm9.61-6.78c1.56-1.56 1.56-4.09 0-5.66l-4.24-4.24c-1.56-1.56-4.09-1.56-5.66 0l-.28.28-.28-.28c-1.56-1.56-4.09-1.56-5.66 0L2.17 6.71C.75 8.13.62 10.34 1.77 11.9l1.45-1.45c-.39-.75-.26-1.7.37-2.33l3.54-3.54c.78-.78 2.05-.78 2.83 0l3.56 3.56c.18.18.21.5 0 .71s-.53.18-.71 0L9.52 5.57l-5.8 5.79c-.98.97-.98 2.56 0 3.54.39.39.89.63 1.42.7.07.52.3 1.02.7 1.42s.9.63 1.42.7c.07.52.3 1.02.7 1.42s.9.63 1.42.7c.07.54.31 1.03.7 1.42.47.47 1.1.73 1.77.73s1.3-.26 1.77-.73z" />
     </svg>
   );
@@ -729,14 +737,6 @@ export const SpeedIcon = () => {
   );
 };
 
-export const MoreVerticalIcon = () => {
-  return (
-    <svg className="icon-more-vertical" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-    </svg>
-  );
-};
-
 export const GroupWorkIcon = () => {
   return (
     <svg className="icon-group-work" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
@@ -783,140 +783,95 @@ export interface IIconDefinition {
 export const iconDefinitions: IIconDefinition[] = [
   { id: "smile-face", name: "Smile", icon: <SmileFaceIcon />, trayOrder: 1, legacyAliases: ["far fa-smile"] },
   { id: "frown-face", name: "Frown", icon: <FrownFaceIcon />, trayOrder: 2, legacyAliases: ["far fa-frown", "sad-face"] },
-  { id: "add-circle", name: "Add Circle", icon: <AddCircleIcon />, trayOrder: 3, legacyAliases: ["fa-plus", "fa-plus-circle", "fas fa-cart-plus"] },
-  { id: "check-circle", name: "Check", icon: <CheckCircleIcon />, trayOrder: 4, legacyAliases: ["fa-check-circle"] },
+  { id: "add-circle", name: "Add Circle", icon: <AddCircleIcon />, trayOrder: 3, legacyAliases: ["far fa-square-plus", "fas fa-cart-plus"] },
+  { id: "check-circle", name: "Check", icon: <CheckCircleIcon />, trayOrder: 4, legacyAliases: ["far fa-square-check", "far fa-circle-check"] },
   { id: "help", name: "Question", icon: <HelpIcon />, trayOrder: 5, legacyAliases: ["fas fa-question", "far fa-question"] },
   { id: "exclamation", name: "Exclamation", icon: <ExclamationIcon />, trayOrder: 6, legacyAliases: ["fas fa-exclamation", "far fa-exclamation"] },
   { id: "thumb-up", name: "Thumb Up", icon: <ThumbUpIcon />, trayOrder: 7, legacyAliases: ["far fa-thumbs-up"] },
   { id: "thumb-down", name: "Thumb Down", icon: <ThumbDownIcon />, trayOrder: 8, legacyAliases: ["far fa-thumbs-down"] },
-  { id: "forum", name: "Forum", icon: <ForumIcon />, trayOrder: 9 },
+  { id: "forum", name: "Forum", icon: <ForumIcon />, trayOrder: 9, legacyAliases: ["far fa-comments"] },
   { id: "star", name: "Star", icon: <StarIcon />, trayOrder: 10, legacyAliases: ["far fa-star", "fas fa-star"] },
   { id: "celebration", name: "Celebration", icon: <CelebrationIcon />, trayOrder: 11 },
   { id: "birthday-cake", name: "Birthday Cake", icon: <BirthdayCakeIcon />, trayOrder: 12, legacyAliases: ["fas fa-birthday-cake"] },
   { id: "light-bulb", name: "Light Bulb", icon: <LightBulbIcon />, trayOrder: 13, legacyAliases: ["far fa-lightbulb"] },
-  { id: "play-circle", name: "Play", icon: <PlayCircleIcon />, trayOrder: 14, legacyAliases: ["fa-play-circle", "far fa-circle-play"] },
-  { id: "stop-circle", name: "Stop", icon: <StopCircleIcon />, trayOrder: 15, legacyAliases: ["fa-stop-circle", "far fa-circle-stop"] },
-  { id: "bullseye", name: "Bullseye", icon: <BullseyeIcon />, trayOrder: 16, legacyAliases: ["fa-bullseye"] },
+  { id: "play-circle", name: "Play", icon: <PlayCircleIcon />, trayOrder: 14, legacyAliases: ["far fa-circle-play"] },
+  { id: "stop-circle", name: "Stop", icon: <StopCircleIcon />, trayOrder: 15, legacyAliases: ["far fa-circle-stop"] },
+  { id: "bullseye", name: "Bullseye", icon: <BullseyeIcon />, trayOrder: 16 },
   { id: "explore", name: "Explore", icon: <ExploreIcon />, trayOrder: 17, legacyAliases: ["far fa-compass"] },
   { id: "eye", name: "Eye", icon: <EyeIcon />, trayOrder: 18, legacyAliases: ["far fa-eye"] },
   { id: "laptop", name: "Laptop", icon: <LaptopIcon />, trayOrder: 19, legacyAliases: ["fas fa-chalkboard"] },
   { id: "menu-book", name: "Book", icon: <MenuBookIcon />, trayOrder: 20, legacyAliases: ["fas fa-book"] },
-  { id: "rocket-launch", name: "Rocket", icon: <RocketLaunchIcon />, trayOrder: 21, legacyAliases: ["fas fa-rocket"] },
-  { id: "tools", name: "Tools", icon: <ToolsIcon />, trayOrder: 22, legacyAliases: ["construction", "fas fa-construction"] },
+  { id: "rocket", name: "Rocket", icon: <RocketIcon />, trayOrder: 21, legacyAliases: ["rocket-launch", "fas fa-rocket"] },
+  { id: "tools", name: "Tools", icon: <ToolsIcon />, trayOrder: 22, legacyAliases: ["construction", "fas fa-construction", "fas fa-wrench"] },
   { id: "anchor", name: "Anchor", icon: <AnchorIcon />, trayOrder: 23, legacyAliases: ["fas fa-anchor"] },
   { id: "coffee", name: "Coffee", icon: <CoffeeIcon />, trayOrder: 24 },
   { id: "search", name: "Search", icon: <SearchIcon />, trayOrder: 25, legacyAliases: ["search", "fa-solid fa-magnifying-glass"] },
   { id: "electric-bolt", name: "Electric Bolt", icon: <ElectricBoltIcon />, trayOrder: 26, legacyAliases: ["electric-bolt", "fa-solid fa-bolt"] },
-  { id: "psychological-safety", name: "Psychological Safety", icon: <PsychologicalSafetyIcon />, trayOrder: 27, legacyAliases: ["psychological-safety", "fa-regular fa-handshake"] },
+  { id: "handshake", name: "Handshake", icon: <HandshakeIcon />, trayOrder: 27, legacyAliases: ["handshake", "psychological-safety", "fa-regular fa-handshake"] },
   { id: "balance", name: "Balance", icon: <BalanceIcon />, trayOrder: 28, legacyAliases: ["balance", "fas fa-scale-balanced", "fas fa-scale-unbalanced", "fas fa-scale-unbalanced-flip", "fa-solid fa-scale-balanced"] },
-  { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 29 },
+  { id: "speed", name: "Speed", icon: <SpeedIcon />, trayOrder: 29, legacyAliases: ["speed", "fa-solid fa-square-poll-vertical"] },
   { id: "gears", name: "Gears", icon: <GearsIcon />, trayOrder: 30, legacyAliases: ["gear-with-stars", "gears", "fa-solid fa-gears"] },
-  { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 0 },
-  { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 0, legacyAliases: ["fas fa-lock"] },
-  { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
-  { id: "happy-face", name: "Happy Face", icon: <HappyFaceIcon />, trayOrder: 0 },
-  { id: "tear-face", name: "Tear", icon: <TearFaceIcon />, trayOrder: 0 },
+  { id: "add", name: "Add", icon: <AddIcon />, trayOrder: 0 },
   { id: "angry-face", name: "Angry", icon: <AngryFaceIcon />, trayOrder: 0, legacyAliases: ["far fa-angry"] },
-  { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
-  { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fan", "fas fa-fan"] },
-  { id: "danger", name: "Danger", icon: <DangerIcon />, trayOrder: 0 },
-  { id: "landscape", name: "Landscape", icon: <LandscapeIcon />, trayOrder: 0, legacyAliases: ["fas fa-skull-crossbones"] },
-  { id: "adjust", name: "Target", icon: <AdjustIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-dot"] },
-  { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
-  { id: "list-all", name: "List All", icon: <ListAllIcon />, trayOrder: 0 },
-  { id: "view-column", name: "View Column", icon: <ViewColumnIcon />, trayOrder: 0 },
-  { id: "add", name: "Add", icon: <AddIcon />, trayOrder: 0 },
-  { id: "edit", name: "Edit", icon: <EditIcon />, trayOrder: 0 },
-  { id: "link", name: "Link", icon: <LinkIcon />, trayOrder: 0 },
-  { id: "sms", name: "SMS", icon: <SMSIcon />, trayOrder: 0 },
-  { id: "note-add", name: "Note Add", icon: <NoteAddIcon />, trayOrder: 0 },
-  { id: "hourglass-top", name: "Hourglass Top", icon: <HourglassTopIcon />, trayOrder: 0 },
-  { id: "assignment-turned-in", name: "Assignment Turned In", icon: <AssignmentTurnedInIcon />, trayOrder: 0 },
-  { id: "close", name: "Close", icon: <CloseIcon />, trayOrder: 0 },
-  { id: "new-releases", name: "New Releases", icon: <NewReleasesOutlinedIcon />, trayOrder: 0 },
-  { id: "celebration", name: "Celebration", icon: <CelebrationIcon />, trayOrder: 0 },
-  { id: "cloud", name: "Cloud", icon: <CloudIcon />, trayOrder: 0 },
-  { id: "cloud-upload", name: "Cloud Upload", icon: <CloudUploadIcon />, trayOrder: 0 },
-  { id: "cloud-download", name: "Cloud Download", icon: <CloudDownloadIcon />, trayOrder: 0 },
-  { id: "arrow-circle-down", name: "Arrow Circle Down", icon: <ArrowCircleDownIcon />, trayOrder: 0 },
-  { id: "arrow-circle-up", name: "Arrow Circle Up", icon: <ArrowCircleUpIcon />, trayOrder: 0 },
-  { id: "person", name: "Person", icon: <PersonIcon />, trayOrder: 0 },
-  { id: "people", name: "People", icon: <PeopleIcon />, trayOrder: 0 },
-  { id: "square-rounded", name: "Square Rounded", icon: <SquareRoundedIcon />, trayOrder: 0 },
-  { id: "people-forward", name: "People Forward", icon: <PeopleForwardIcon />, trayOrder: 0 },
-  { id: "insights", name: "Insights", icon: <InsightsIcon />, trayOrder: 0 },
-  { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0, legacyAliases: ["fa-solid fa-square-poll-vertical"] },
-  { id: "chevron-up", name: "Chevron Up", icon: <ChevronUpIcon />, trayOrder: 0 },
-  { id: "chevron-down", name: "Chevron Down", icon: <ChevronDownIcon />, trayOrder: 0 },
-  { id: "chevron-left", name: "Chevron Left", icon: <ChevronLeftIcon />, trayOrder: 0 },
-  { id: "chevron-right", name: "Chevron Right", icon: <ChevronRightIcon />, trayOrder: 0 },
-  { id: "privacy-tip", name: "Privacy Tip", icon: <PrivacyTipIcon />, trayOrder: 0 },
-  { id: "support", name: "Support", icon: <SupportIcon />, trayOrder: 0, legacyAliases: ["fas fa-life-ring"] },
-  { id: "keyboard", name: "Keyboard", icon: <KeyboardIcon />, trayOrder: 0 },
-  { id: "volunteer-activism", name: "Volunteer Activism", icon: <VolunteerActivismIcon />, trayOrder: 0 },
-  { id: "contact-phone", name: "Contact Phone", icon: <ContactPhoneIcon />, trayOrder: 0 },
-  { id: "pause-circle", name: "Pause Circle", icon: <PauseCircleIcon />, trayOrder: 0 },
-  { id: "refresh", name: "Refresh", icon: <RefreshIcon />, trayOrder: 0 },
-  { id: "link-off", name: "Link Off", icon: <LinkOffIcon />, trayOrder: 0 },
-  { id: "table-chart", name: "Table Chart", icon: <TableChartIcon />, trayOrder: 0 },
-  { id: "info", name: "Info", icon: <InfoIcon />, trayOrder: 0 },
-  { id: "content-copy", name: "Content Copy", icon: <ContentCopyIcon />, trayOrder: 0 },
-  { id: "sim-card-download", name: "Sim Card Download", icon: <SimCardDownloadIcon />, trayOrder: 0 },
-  { id: "forward-to-inbox", name: "Forward To Inbox", icon: <ForwardToInboxIcon />, trayOrder: 0 },
-  { id: "source", name: "Source", icon: <SourceIcon />, trayOrder: 0 },
-  { id: "inventory", name: "Inventory", icon: <InventoryIcon />, trayOrder: 0 },
-  { id: "more-horizontal", name: "More Horizontal", icon: <MoreHorizontalIcon />, trayOrder: 0 },
-  { id: "more-vertical", name: "More Vertical", icon: <MoreVerticalIcon />, trayOrder: 0 },
-  { id: "report", name: "Report", icon: <ReportIcon />, trayOrder: 0 },
-  { id: "report-problem", name: "Report Problem", icon: <ReportProblemIcon />, trayOrder: 0 },
-  { id: "open-with", name: "Open With", icon: <OpenWithIcon />, trayOrder: 0 },
-  { id: "group-work", name: "Group Work", icon: <GroupWorkIcon />, trayOrder: 0 },
-  { id: "undo", name: "Undo", icon: <UndoIcon />, trayOrder: 0 },
-  { id: "logout", name: "Logout", icon: <LogoutIcon />, trayOrder: 0 },
-  { id: "add", name: "Add", icon: <AddIcon />, trayOrder: 0 },
-  { id: "edit", name: "Edit", icon: <EditIcon />, trayOrder: 0 },
-  { id: "link", name: "Link", icon: <LinkIcon />, trayOrder: 0 },
-  { id: "sms", name: "SMS", icon: <SMSIcon />, trayOrder: 0 },
-  { id: "note-add", name: "Note Add", icon: <NoteAddIcon />, trayOrder: 0 },
-  { id: "hourglass-top", name: "Hourglass Top", icon: <HourglassTopIcon />, trayOrder: 0 },
-  { id: "assignment-turned-in", name: "Assignment Turned In", icon: <AssignmentTurnedInIcon />, trayOrder: 0 },
-  { id: "close", name: "Close", icon: <CloseIcon />, trayOrder: 0 },
-  { id: "new-releases", name: "New Releases", icon: <NewReleasesOutlinedIcon />, trayOrder: 0 },
-  { id: "cloud", name: "Cloud", icon: <CloudIcon />, trayOrder: 0 },
-  { id: "cloud-upload", name: "Cloud Upload", icon: <CloudUploadIcon />, trayOrder: 0 },
-  { id: "cloud-download", name: "Cloud Download", icon: <CloudDownloadIcon />, trayOrder: 0 },
-  { id: "arrow-circle-down", name: "Arrow Circle Down", icon: <ArrowCircleDownIcon />, trayOrder: 0 },
-  { id: "arrow-circle-up", name: "Arrow Circle Up", icon: <ArrowCircleUpIcon />, trayOrder: 0 },
-  { id: "person", name: "Person", icon: <PersonIcon />, trayOrder: 0 },
-  { id: "people", name: "People", icon: <PeopleIcon />, trayOrder: 0 },
-  { id: "insights", name: "Insights", icon: <InsightsIcon />, trayOrder: 0 },
+  { id: "arrow-circle-down", name: "Arrow Circle Down", icon: <ArrowCircleDownIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-down"] },
+  { id: "arrow-circle-up", name: "Arrow Circle Up", icon: <ArrowCircleUpIcon />, trayOrder: 0, legacyAliases: ["far fa-circle-up"] },
   { id: "assessment", name: "Assessment", icon: <AssessmentIcon />, trayOrder: 0 },
-  { id: "chevron-up", name: "Chevron Up", icon: <ChevronUpIcon />, trayOrder: 0 },
+  { id: "assignment-turned-in", name: "Assignment Turned In", icon: <AssignmentTurnedInIcon />, trayOrder: 0 },
   { id: "chevron-down", name: "Chevron Down", icon: <ChevronDownIcon />, trayOrder: 0 },
   { id: "chevron-left", name: "Chevron Left", icon: <ChevronLeftIcon />, trayOrder: 0 },
   { id: "chevron-right", name: "Chevron Right", icon: <ChevronRightIcon />, trayOrder: 0 },
-  { id: "privacy-tip", name: "Privacy Tip", icon: <PrivacyTipIcon />, trayOrder: 0 },
-  { id: "keyboard", name: "Keyboard", icon: <KeyboardIcon />, trayOrder: 0 },
-  { id: "volunteer-activism", name: "Volunteer Activism", icon: <VolunteerActivismIcon />, trayOrder: 0 },
+  { id: "chevron-up", name: "Chevron Up", icon: <ChevronUpIcon />, trayOrder: 0 },
+  { id: "close", name: "Close", icon: <CloseIcon />, trayOrder: 0 },
+  { id: "cloud", name: "Cloud", icon: <CloudIcon />, trayOrder: 0 },
+  { id: "cloud-download", name: "Cloud Download", icon: <CloudDownloadIcon />, trayOrder: 0 },
+  { id: "cloud-upload", name: "Cloud Upload", icon: <CloudUploadIcon />, trayOrder: 0 },
+  { id: "comments", name: "Comments", icon: <CommentsIcon />, trayOrder: 0 },
   { id: "contact-phone", name: "Contact Phone", icon: <ContactPhoneIcon />, trayOrder: 0 },
-  { id: "pause-circle", name: "Pause Circle", icon: <PauseCircleIcon />, trayOrder: 0 },
-  { id: "refresh", name: "Refresh", icon: <RefreshIcon />, trayOrder: 0 },
-  { id: "link-off", name: "Link Off", icon: <LinkOffIcon />, trayOrder: 0 },
-  { id: "table-chart", name: "Table Chart", icon: <TableChartIcon />, trayOrder: 0 },
-  { id: "info", name: "Info", icon: <InfoIcon />, trayOrder: 0 },
   { id: "content-copy", name: "Content Copy", icon: <ContentCopyIcon />, trayOrder: 0 },
-  { id: "sim-card-download", name: "Sim Card Download", icon: <SimCardDownloadIcon />, trayOrder: 0 },
+  { id: "danger", name: "Danger", icon: <DangerIcon />, trayOrder: 0, legacyAliases: ["fas fa-exclamation-triangle"] },
+  { id: "delete", name: "Delete", icon: <DeleteIcon />, trayOrder: 0, legacyAliases: ["fas fa-trash"] },
+  { id: "edit", name: "Edit", icon: <EditIcon />, trayOrder: 0 },
+  { id: "fan", name: "Fan", icon: <FanIcon />, trayOrder: 0, legacyAliases: ["fas fa-fan"] },
+  { id: "focus", name: "Target", icon: <FocusIcon />, trayOrder: 0, legacyAliases: ["adjust", "far fa-circle-dot"] },
   { id: "forward-to-inbox", name: "Forward To Inbox", icon: <ForwardToInboxIcon />, trayOrder: 0 },
-  { id: "source", name: "Source", icon: <SourceIcon />, trayOrder: 0 },
+  { id: "gear", name: "Gear", icon: <GearIcon />, trayOrder: 0 },
+  { id: "group-work", name: "Group Work", icon: <GroupWorkIcon />, trayOrder: 0 },
+  { id: "happy-face", name: "Happy Face", icon: <HappyFaceIcon />, trayOrder: 0 },
+  { id: "hourglass-top", name: "Hourglass Top", icon: <HourglassTopIcon />, trayOrder: 0 },
+  { id: "info", name: "Info", icon: <InfoIcon />, trayOrder: 0 },
+  { id: "insights", name: "Insights", icon: <InsightsIcon />, trayOrder: 0 },
   { id: "inventory", name: "Inventory", icon: <InventoryIcon />, trayOrder: 0 },
+  { id: "keyboard", name: "Keyboard", icon: <KeyboardIcon />, trayOrder: 0 },
+  { id: "landscape", name: "Landscape", icon: <LandscapeIcon />, trayOrder: 0, legacyAliases: ["fas fa-skull-crossbones"] },
+  { id: "link", name: "Link", icon: <LinkIcon />, trayOrder: 0 },
+  { id: "link-off", name: "Link Off", icon: <LinkOffIcon />, trayOrder: 0 },
+  { id: "list-all", name: "List All", icon: <ListAllIcon />, trayOrder: 0 },
+  { id: "lock", name: "Lock", icon: <LockIcon />, trayOrder: 0, legacyAliases: ["fas fa-lock"] },
+  { id: "logout", name: "Logout", icon: <LogoutIcon />, trayOrder: 0 },
   { id: "more-horizontal", name: "More Horizontal", icon: <MoreHorizontalIcon />, trayOrder: 0 },
   { id: "more-vertical", name: "More Vertical", icon: <MoreVerticalIcon />, trayOrder: 0 },
+  { id: "new-releases", name: "New Releases", icon: <NewReleasesIcon />, trayOrder: 0 },
+  { id: "note-add", name: "Note Add", icon: <NoteAddIcon />, trayOrder: 0 },
+  { id: "open-with", name: "Open With", icon: <OpenWithIcon />, trayOrder: 0 },
+  { id: "pause-circle", name: "Pause Circle", icon: <PauseCircleIcon />, trayOrder: 0 },
+  { id: "people", name: "People", icon: <PeopleIcon />, trayOrder: 0 },
+  { id: "people-forward", name: "People Forward", icon: <PeopleForwardIcon />, trayOrder: 0 },
+  { id: "person", name: "Person", icon: <PersonIcon />, trayOrder: 0 },
+  { id: "privacy-tip", name: "Privacy Tip", icon: <PrivacyTipIcon />, trayOrder: 0 },
+  { id: "refresh", name: "Refresh", icon: <RefreshIcon />, trayOrder: 0 },
   { id: "report", name: "Report", icon: <ReportIcon />, trayOrder: 0 },
   { id: "report-problem", name: "Report Problem", icon: <ReportProblemIcon />, trayOrder: 0 },
-  { id: "open-with", name: "Open With", icon: <OpenWithIcon />, trayOrder: 0 },
-  { id: "group-work", name: "Group Work", icon: <GroupWorkIcon />, trayOrder: 0 },
+  { id: "sim-card-download", name: "Sim Card Download", icon: <SimCardDownloadIcon />, trayOrder: 0 },
+  { id: "sms", name: "SMS", icon: <SMSIcon />, trayOrder: 0 },
+  { id: "source", name: "Source", icon: <SourceIcon />, trayOrder: 0 },
+  { id: "square-rounded", name: "Square Rounded", icon: <SquareRoundedIcon />, trayOrder: 0 },
+  { id: "support", name: "Support", icon: <SupportIcon />, trayOrder: 0, legacyAliases: ["fas fa-life-ring"] },
+  { id: "table-chart", name: "Table Chart", icon: <TableChartIcon />, trayOrder: 0 },
+  { id: "tear-face", name: "Tear", icon: <TearFaceIcon />, trayOrder: 0 },
+  { id: "thumb-up-down", name: "Thumb Up/Down", icon: <ThumbUpDownIcon />, trayOrder: 0, legacyAliases: ["far fa-thumbs-up-down"] },
   { id: "undo", name: "Undo", icon: <UndoIcon />, trayOrder: 0 },
-  { id: "logout", name: "Logout", icon: <LogoutIcon />, trayOrder: 0 },
+  { id: "view-column", name: "View Column", icon: <ViewColumnIcon />, trayOrder: 0 },
+  { id: "volunteer-activism", name: "Volunteer Activism", icon: <VolunteerActivismIcon />, trayOrder: 0 },
 ];
 
 const iconDefinitionById = new Map(iconDefinitions.map(icon => [icon.id, icon]));
