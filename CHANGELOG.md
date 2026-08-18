@@ -60,7 +60,8 @@ From [GitHub PR #1832](https://github.com/microsoft/vsts-extension-retrospective
 
 ## v1.92.56
 
-* Introduced Admin Settings with an option to configure available work item types for "Add work item".
+* Introduced user setting with an option to toggle between "Show all teams" and "Show my teams".
+* Introduced admin setting with an option to configure available work item types for "Add work item".
 * Set available work item types to default to Requirement Backlog types for both the Act tab and Focus mode.
 * Fixed Link existing work item in Focus mode so it stays in Focus mode instead of returning to Act tab.
 * Refined the "Add work item" selection to ensure the full work item list is visible on the Act tab and Focus mode.
