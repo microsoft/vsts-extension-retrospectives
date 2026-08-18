@@ -5,6 +5,10 @@ You can find the changelog of the Retrospective Extension below.
 ## v1.92.60
 
 * Removed 45 redundant icon definitions, added missing mapping for 8 legacy icons, and updated internal names for 4 icons. From [GitHub PR #1873](https://github.com/microsoft/vsts-extension-retrospectives/pull/1873)
+* Improved startup team and board selection so shared links and valid recent visits open the correct retrospective, with project-default and My Teams fallback.
+* Updated Show My Teams to preserve the current team and board when viewing a team outside the user's memberships.
+
+From [GitHub PR #1895](https://github.com/microsoft/vsts-extension-retrospectives/pull/1895)
 
 ## v1.92.59
 
@@ -15,10 +19,10 @@ You can find the changelog of the Retrospective Extension below.
 * Optimized board, permission, workflow-stage, and Team Assessment History rendering to reduce unnecessary updates. From [GitHub PR #1840](https://github.com/microsoft/vsts-extension-retrospectives/pull/1840)
 * Improved the board settings dialog layout and accessibility, including dialog sizing and tab structure. From [GitHub PR #1833](https://github.com/microsoft/vsts-extension-retrospectives/pull/1833)
 * Refined board settings inputs, selector options, and tooltip positioning for a more consistent interface. From [GitHub PR #1841](https://github.com/microsoft/vsts-extension-retrospectives/pull/1841)
+
 * Restricted editing of retrospective settings to the Board Owner or a Team Admin.
 * Added a view-only retrospective settings experience for other users, including updated board menu text, dialog messaging, and disabled editing controls.
 * Fixed bug that prevented saving retrospective settings from the Permissions tab.
-* Hardened frontend CI/CD pipeline by retrying publish once on transient failure.
 
 From [GitHub PR #1846](https://github.com/microsoft/vsts-extension-retrospectives/pull/1846)
 
@@ -57,7 +61,8 @@ From [GitHub PR #1832](https://github.com/microsoft/vsts-extension-retrospective
 
 ## v1.92.56
 
-* Introduced Admin Settings with an option to configure available work item types for "Add work item".
+* Introduced user setting with an option to toggle between "Show all teams" and "Show my teams".
+* Introduced admin setting with an option to configure available work item types for "Add work item".
 * Set available work item types to default to Requirement Backlog types for both the Act tab and Focus mode.
 * Fixed Link existing work item in Focus mode so it stays in Focus mode instead of returning to Act tab.
 * Refined the "Add work item" selection to ensure the full work item list is visible on the Act tab and Focus mode.
