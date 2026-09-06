@@ -6,7 +6,7 @@
     "ghcr.io/devcontainers/features/common-utils:2.5.9": {},
     "ghcr.io/devcontainers/features/docker-in-docker:4.0.0": {},
     "ghcr.io/devcontainers/features/dotnet:2.5.0": {},
-    "ghcr.io/devcontainers/features/github-cli:1.1.0": {},
+    "ghcr.io/devcontainers/features/github-cli:1.1.2": {},
     "ghcr.io/devcontainers/features/node:2.1.0": {},
     "ghcr.io/devcontainers-extra/features/apt-packages": {
       "packages": "shellcheck"
