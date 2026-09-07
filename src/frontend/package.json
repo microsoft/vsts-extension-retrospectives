@@ -61,7 +61,7 @@
     "style-loader": "4.0.0",
     "tailwindcss": "4.3.3",
     "terser-webpack-plugin": "5.6.1",
-    "tfx-cli": "0.23.4",
+    "tfx-cli": "0.24.0",
     "ts-jest": "29.4.12",
     "ts-loader": "9.6.2",
     "typescript": "6.0.3",
