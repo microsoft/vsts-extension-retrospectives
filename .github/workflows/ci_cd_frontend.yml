@@ -222,6 +222,18 @@ jobs:
           echo "AZURE_DEVOPS_TOKEN=${token}" >> "${GITHUB_ENV}"
 
       - if: steps.changes.outputs.src == 'true'
+        name: "Show Azure DevOps Marketplace profile"
+        run: |
+          profile_id=$(az rest \
+            --method get \
+            --url "https://app.vssps.visualstudio.com/_apis/profile/profiles/me" \
+            --resource "499b84ac-1321-427f-aa17-267ca6975798" \
+            --query id \
+            --output tsv)
+
+          echo "Azure DevOps Marketplace profile ID: ${profile_id}"
+
+      - if: steps.changes.outputs.src == 'true'
         name: "Prepare package"
         working-directory: "src/frontend"
         run: |
