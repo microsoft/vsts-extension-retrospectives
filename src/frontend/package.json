@@ -67,7 +67,7 @@
     "typescript": "6.0.3",
     "webpack": "5.109.2",
     "webpack-bundle-analyzer": "5.3.1",
-    "webpack-cli": "7.2.2"
+    "webpack-cli": "7.2.3"
   },
   "overrides": {
     "@babel/core": "7.29.7",
