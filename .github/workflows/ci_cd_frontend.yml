@@ -206,64 +206,30 @@ jobs:
         uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: 16b3c013-d300-468d-ac64-7eda0820b6d3
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
 
       - if: steps.changes.outputs.src == 'true'
         name: "Get Azure DevOps Marketplace token"
         run: |
-          token=$(az account get-access-token \
-            --tenant "16b3c013-d300-468d-ac64-7eda0820b6d3" \
-            --resource "499b84ac-1321-427f-aa17-267ca6975798" \
-            --query accessToken \
-            --output tsv)
-
+          token=$(az account get-access-token --tenant "${{ secrets.AZURE_TENANT_ID }}" --resource "${{ secrets.AZURE_RESOURCE_ID }}" --query accessToken --output tsv)
           echo "::add-mask::${token}"
           echo "AZURE_DEVOPS_TOKEN=${token}" >> "${GITHUB_ENV}"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Show Azure DevOps Marketplace profile"
         run: |
-          profile_id=$(az rest \
-            --method get \
-            --url "https://app.vssps.visualstudio.com/_apis/profile/profiles/me" \
-            --resource "499b84ac-1321-427f-aa17-267ca6975798" \
-            --query id \
-            --output tsv)
-
+          profile_id=$(az rest --method get --url "https://app.vssps.visualstudio.com/_apis/profile/profiles/me" --resource "${{ secrets.AZURE_RESOURCE_ID }}" --query id --output tsv)
           echo "Azure DevOps Marketplace profile ID: ${profile_id}"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Prepare package"
-        working-directory: "src/frontend"
-        run: |
-          ext_file="vss-extension-dev.json"
-
-          cp "${ext_file}.template" "${ext_file}"
-
-          cat <<< $(jq 'del(.baseUri)' $ext_file) > $ext_file
-
-          cat <<< $(jq ".id = \"team-retrospectives-dev\"" $ext_file) > $ext_file
-          cat <<< $(jq ".publisher = \"enginpolat\"" $ext_file) > $ext_file
-          cat <<< $(jq ".public = false" $ext_file) > $ext_file
-
-          ext_info=$(npx tfx extension show --no-prompt --json --publisher "enginpolat" --extensionId "team-retrospectives-dev" --token "${AZURE_DEVOPS_TOKEN}")
-
-          if [[ "$ext_info" != "null" ]]; then
-            version=$(jq -r '.versions[0].version' <<< "$ext_info")
-            cat <<< $(jq ".version = \"$version\"" $ext_file) > $ext_file
-          fi
-
-          cat <<< $(jq ".contributions[0].properties.name = \"Retrospectives (Dev)\"" $ext_file) > $ext_file
-
-          cp ../../LICENSE ./assets/LICENSE.md
+        run: make prepare
 
       - if: steps.changes.outputs.src == 'true'
         name: "Publish extension to dev environment"
-        working-directory: "src/frontend"
         env:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: >
-          npm run publish:d
+        run: make publish
