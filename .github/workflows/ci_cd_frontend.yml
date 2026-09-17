@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
       issues: read
       pull-requests: read
       statuses: write
@@ -201,6 +202,38 @@ jobs:
           fail_ci_if_error: false
 
       - if: steps.changes.outputs.src == 'true'
+        name: "Log in to Azure"
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+          allow-no-subscriptions: true
+
+      - if: steps.changes.outputs.src == 'true'
+        name: "Get Azure DevOps Marketplace token"
+        run: |
+          token=$(az account get-access-token \
+            --tenant "72f988bf-86f1-41af-91ab-2d7cd011db47" \
+            --resource "499b84ac-1321-427f-aa17-267ca6975798" \
+            --query accessToken \
+            --output tsv)
+
+          echo "::add-mask::${token}"
+          echo "AZURE_DEVOPS_TOKEN=${token}" >> "${GITHUB_ENV}"
+
+      - if: steps.changes.outputs.src == 'true'
+        name: "Show Azure DevOps Marketplace profile"
+        run: |
+          profile_id=$(az rest \
+            --method get \
+            --url "https://app.vssps.visualstudio.com/_apis/profile/profiles/me" \
+            --resource "499b84ac-1321-427f-aa17-267ca6975798" \
+            --query id \
+            --output tsv)
+
+          echo "Azure DevOps Marketplace profile ID: ${profile_id}"
+
+      - if: steps.changes.outputs.src == 'true'
         name: "Prepare package"
         working-directory: "src/frontend"
         run: |
@@ -214,7 +247,7 @@ jobs:
           cat <<< $(jq ".publisher = \"enginpolat\"" $ext_file) > $ext_file
           cat <<< $(jq ".public = false" $ext_file) > $ext_file
 
-          ext_info=$(npx tfx extension show --no-prompt --json --publisher "enginpolat" --extensionId "team-retrospectives-dev" --token "${{ secrets.AZURE_DEVOPS_TOKEN }}")
+          ext_info=$(npx tfx extension show --no-prompt --json --publisher "enginpolat" --extensionId "team-retrospectives-dev" --token "${AZURE_DEVOPS_TOKEN}")
 
           if [[ "$ext_info" != "null" ]]; then
             version=$(jq -r '.versions[0].version' <<< "$ext_info")
@@ -232,6 +265,5 @@ jobs:
           REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-          AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
         run: >
           npm run publish:d

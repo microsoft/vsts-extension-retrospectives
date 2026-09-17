@@ -12,6 +12,7 @@ jobs:
     name: "Run frontend CI/CD"
     permissions:
       contents: read
+      id-token: write
       issues: read
       pull-requests: read
       statuses: write
