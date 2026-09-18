@@ -124,8 +124,8 @@
       },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {
         "type": "Transitive",
-        "resolved": "10.0.11",
-        "contentHash": "Dy9yElSej0rVQL8LBpCLatWTKXNH6h6VBVFmGndTCf1Wge0jSvH9U8mml6ddVDAQ089q1/fDYlhyukHSgx8unQ==",
+        "resolved": "10.0.12",
+        "contentHash": "DeE+Bq2OqB3FikFkZk+7gFBeLOQhkSolejLrbi+a9zpfvXtW1Ff6Nd6DIvHXIm+pc4aM4+52vDy3jnuau0qoUQ==",
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.19.2"
         }
@@ -540,7 +540,7 @@
           "Azure.Identity": "[1.21.0, )",
           "Azure.Security.KeyVault.Secrets": "[4.11.1, )",
           "Microsoft.ApplicationInsights.AspNetCore": "[3.1.2, )",
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.11, )",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.12, )",
           "Microsoft.Azure.SignalR": "[1.33.1, )",
           "System.IdentityModel.Tokens.Jwt": "[8.22.0, )"
         }
