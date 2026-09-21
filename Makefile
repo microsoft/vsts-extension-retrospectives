@@ -4,7 +4,7 @@ SHELL := /bin/bash
 
 .PHONY: publish
 
-prepare:
+publish:
 	set -euo pipefail
 
 	pushd src/frontend
@@ -30,14 +30,9 @@ prepare:
 
 	cp ../../LICENSE ./assets/LICENSE.md
 
-	popd
-
-publish: prepare
-	set -euo pipefail
-
-	pushd src/frontend
-
 	npm run pack:d
+
+	rm -f ./assets/LICENSE.md
 
 	npx tfx extension publish --manifests "$${ext_file}" --vsix ./dist/*.vsix --token "$${AZURE_DEVOPS_TOKEN}" --no-wait-validation
 
