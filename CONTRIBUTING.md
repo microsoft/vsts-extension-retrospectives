@@ -108,7 +108,7 @@ Either in the [dev container](#dev-containers) or locally:
     - `pre-commit run markdownlint` to run the markdown linting
     - `pre-commit run spellcheck-cli` to run the spellchecking
 
-4. To run linting for the typescript/javascript (must be done within the `src/frontend` directory): `npm run lint`
+4. To run linting for the typescript/javascript (must be done within the `src` directory): `npm run lint`
 
 Read more about the [Python pre-commit framework](https://pre-commit.com/). To disable the pre-commit hook run `pre-commit uninstall` from the root folder.
 
@@ -176,8 +176,12 @@ All of the development prerequisites, are listed in the [DevContainer Configurat
 
 ## Build
 
+The app lives directly in `src/`. Its HTML page, styles, and marketplace content
+are in `src/assets/`. Edit `src/assets/index.css`; `npm run compile` generates
+`src/assets/bundle.css`.
+
 To build the frontend for production, run `make build` from the repository root
-after installing frontend dependencies with `npm ci --prefix src/frontend`.
+after installing frontend dependencies with `npm ci --prefix src`.
 
 To run the frontend tests with coverage in jsdom, run `make test` from the
 repository root.
@@ -189,8 +193,8 @@ Test changes in the Azure DevOps environment by publishing a development version
 ---
 
 1. Clone this repository, and open in your preferred [development environment](#development-environments).
-2. Using Powershell, navigate to the `/src/frontend` folder, run `npm install`. This will download all the dependent packages listed in `package.json`.
-3. When developing or publishing the extension locally, you need to create a .env file at the top-level directory of the front end project (where `package.json` lives). You can copy `src/frontend/.env.template` to `src/frontend/.env` to get started.
+2. Using Powershell, navigate to the `/src` folder, run `npm install`. This will download all the dependent packages listed in `package.json`.
+3. When developing or publishing the extension locally, you need to create a .env file at the top-level directory of the front end project (where `package.json` lives). You can copy `src/.env.template` to `src/.env` to get started.
 
 The contents of the `.env` file are
 
@@ -248,7 +252,7 @@ Test changes by loading changes locally without having to re-package and re-publ
 
 ---
 
-1. In the `src/frontend` folder, create the `vss-extension-dev.json` file using the template file `vss-extension-dev.json.template` for reference.
+1. In the `src` folder, create the `vss-extension-dev.json` file using the template file `vss-extension-dev.json.template` for reference.
 2. Update the `webpack.config.js` to enable source maps. Set the devtool property to `inline-source-map`. Also set `devServer.https` to true and devServer.port to 3000.
 
     ```js
@@ -276,7 +280,7 @@ Test changes by loading changes locally without having to re-package and re-publ
     };
     ```
 
-4. In the root of the project, create a folder named `.vscode`. In there, create a file named `launch.json`, which will help to set up a debug configuration for VS Code that launches Firefox with the correct path mappings.  Inside of this file, you will add a path mapping with `url` set to `webpack:///` and have the path set to `${workspaceFolder}/src/frontend/`. Also set the reAttach property on the configuration to true to avoid restarting Firefox every time you debug.
+4. In the root of the project, create a folder named `.vscode`. In there, create a file named `launch.json`, which will help to set up a debug configuration for VS Code that launches Firefox with the correct path mappings.  Inside of this file, you will add a path mapping with `url` set to `webpack:///` and have the path set to `${workspaceFolder}/src/`. Also set the reAttach property on the configuration to true to avoid restarting Firefox every time you debug.
 
     ```json
     {
@@ -291,15 +295,15 @@ Test changes by loading changes locally without having to re-package and re-publ
           "pathMappings": [
             {
               "url": "webpack://retrospective-vsts-extension/components",
-              "path": "${workspaceFolder}/src/frontend/components"
+              "path": "${workspaceFolder}/src/components"
             },
             {
               "url": "webpack://retrospective-vsts-extension/dal",
-              "path": "${workspaceFolder}/src/frontend/dal"
+              "path": "${workspaceFolder}/src/dal"
             },
             {
               "url": "webpack:///",
-              "path": "${workspaceFolder}/src/frontend/"
+              "path": "${workspaceFolder}/src/"
             }
           ]
         }
@@ -307,7 +311,7 @@ Test changes by loading changes locally without having to re-package and re-publ
     }
     ```
 
-5. Navigate to the `/src/frontend` folder, run `npm install` to download all the dependent packages listed in `package.json`.
+5. Navigate to the `/src` folder, run `npm install` to download all the dependent packages listed in `package.json`.
 6. Run `npm run build:d` to build the project.
 7. Run `npm run start:dev` to start the webpack-dev-server
 8. Start debugger (making sure the webpack-dev-server is still running). The default launch configuration should be set to Launch Firefox.
@@ -325,14 +329,14 @@ This extension uses [ESLint](https://eslint.org/) for consistent formatting and 
 
 The extension has no backend service. All data is stored with the [Azure DevOps data service](https://docs.microsoft.com/en-us/azure/devops/extend/develop/data-storage?view=vsts) (boards in one collection per team, feedback items in one collection per board), and work items are read through the Azure DevOps REST clients.
 
-Changes made by other users are picked up by polling with the shared loop in [pollingLoop.ts](src/frontend/utilities/pollingLoop.ts), the same approach used by the [Estimate extension](https://github.com/microsoft/azure-boards-estimate):
+Changes made by other users are picked up by polling with the shared loop in [pollingLoop.ts](src/utilities/pollingLoop.ts), the same approach used by the [Estimate extension](https://github.com/microsoft/azure-boards-estimate):
 
 - `FeedbackBoard` polls the feedback items of the open board and `FeedbackBoardContainer` polls the open board every 2 seconds (`LIVE_SYNC_POLL_INTERVAL_MS`). A `poll` callback resolves `false` when it found nothing new (`FeedbackBoard` compares a fingerprint of the polled items, see `getFeedbackItemsFingerprint`; `FeedbackBoardContainer` checks whether the polled board is newer). After 5 polls in a row that found nothing new, such a loop polls every 6 seconds (`LIVE_SYNC_IDLE_POLL_INTERVAL_MS`) until a poll finds a change; resolving `true` or nothing counts as a change. `FeedbackBoardContainer` polls the team's list of boards every 2 minutes (`BOARD_LIST_POLL_INTERVAL_MS`) and also when the Board selection dropdown gets focus, unless the list was fetched in the last 10 seconds (`BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS`).
 - A loop runs one poll at a time, pauses while the browser tab is hidden, backs off exponentially after errors (up to about 30 seconds), and polls right away, back at the regular pace, when the tab becomes visible again or the browser comes back online.
 - Polls use the strict data access methods (for example `getFeedbackItemsForBoardStrict` and `getBoardsForTeamStrict`). These only treat a missing collection or document as empty and throw on any other error, so a failed read is retried instead of being mistaken for deleted data.
 - Polled documents are merged by their `__etag` revision (`mergeServerFeedbackItems`, `mergePolledBoard`). Unchanged columns and items keep their object identity, an older server copy never overwrites a newer local copy or a change that is still being saved, and items deleted locally are not brought back by a stale read.
 
-To share a change with other users, save it through the data services in [src/frontend/dal](src/frontend/dal). Other users pick it up on their next poll, so there is nothing to broadcast.
+To share a change with other users, save it through the data services in [src/dal](src/dal). Other users pick it up on their next poll, so there is nothing to broadcast.
 
 ### Frontend Unit Testing
 
@@ -349,22 +353,22 @@ React Component tests are written using the following packages:
 #### Test Coverage
 
 To automatically generate the test coverage report, add the `--coverage` flag to the `test` script defined in
-[package.json](src/frontend/package.json). After the test run is completed, coverage statistics will then be reported in the newly created `coverage` directory.
+[package.json](src/package.json). After the test run is completed, coverage statistics will then be reported in the newly created `coverage` directory.
 
 ---
 
 #### Test Execution
 
 - `npm install` must be executed before running any tests.
-- `npm run test` is the default test execution method defined in the [package.json](src/frontend/package.json) file. This will automatically run all of the tests in files suffixed with `.test.tsx` inside of the [tests folder](src/frontend/components/__tests__).
+- `npm run test` is the default test execution method defined in the [package.json](src/package.json) file. This will automatically run all of the tests in files suffixed with `.test.tsx` inside of the [tests folder](src/components/__tests__).
 - `jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit {FULL_FILE_PATH}` can be used to run tests only in the specified file. Wildcards also work instead of a fully qualified path.
 
 ---
 
 #### Mocks
 
-- In this project, mocks have been implemented for simulating API calls and external module functionality. Reusable mocks should be added to the [mock folder](src/frontend/components/__mocks__).
-- Mocks which are shared by the majority of tests should be initialized in the [test setup file](src/frontend/components/__tests__/setupTests.tsx).
+- In this project, mocks have been implemented for simulating API calls and external module functionality. Reusable mocks should be added to the [mock folder](src/components/__mocks__).
+- Mocks which are shared by the majority of tests should be initialized in the [test setup file](src/components/__tests__/setupTests.tsx).
 
 ---
 

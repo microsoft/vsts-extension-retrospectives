@@ -9,7 +9,7 @@ Do not ask which release range to document. Always target the latest production 
 Determine the target production version and previous production version from the best available repo evidence:
 
 1. Inspect `CHANGELOG.md` for the latest existing release headings.
-2. Inspect production extension metadata, especially `src/frontend/vss-extension-prod.json`, if it contains a real production version.
+2. Inspect production extension metadata, especially `src/vss-extension-prod.json`, if it contains a real production version.
 3. Inspect Git tags and recent commit history when available.
 4. Inspect merged PRs or commit messages since the previous documented production release.
 
@@ -28,9 +28,9 @@ Use these rules:
 Update these files as needed:
 
 - `CHANGELOG.md`
-- `src/frontend/components/whatsNewDialog.tsx`
+- `src/components/whatsNewDialog.tsx`
 - `README.md`, only if the release changes user-facing behavior, setup, screenshots, or core positioning
-- `src/frontend/assets/PACKAGE-DESCRIPTION.md`, only if the release changes marketplace-facing behavior, screenshots, or positioning
+- `src/assets/PACKAGE-DESCRIPTION.md`, only if the release changes marketplace-facing behavior, screenshots, or positioning
 
 Do not manually edit generated files such as coverage output or bundled distribution files unless this repository's release process explicitly requires it.
 
@@ -65,7 +65,7 @@ Update `CHANGELOG.md` so it is accurate for the inferred target production versi
 
 ## What's New Requirements
 
-Update `src/frontend/components/whatsNewDialog.tsx` so the in-app What's New dialog accurately highlights the inferred promoted release.
+Update `src/components/whatsNewDialog.tsx` so the in-app What's New dialog accurately highlights the inferred promoted release.
 
 - Mention the inferred target version, or the exact promoted version range if multiple versions are being promoted together.
 - Include only highlights, not the full changelog.
@@ -79,7 +79,7 @@ Update `src/frontend/components/whatsNewDialog.tsx` so the in-app What's New dia
 
 ## README And Package Description Requirements
 
-Review `README.md` and `src/frontend/assets/PACKAGE-DESCRIPTION.md` after updating the changelog and What's New.
+Review `README.md` and `src/assets/PACKAGE-DESCRIPTION.md` after updating the changelog and What's New.
 
 - Update them only when the release changes user-facing behavior, setup instructions, screenshots, core workflows, feature positioning, or marketplace-facing descriptions.
 - If no update is needed, leave them unchanged and mention that in the final summary.
@@ -91,7 +91,7 @@ After editing:
 
 - Verify the inferred target version appears in `CHANGELOG.md`.
 - Verify the first changelog release heading matches the inferred target production version.
-- Verify `src/frontend/components/whatsNewDialog.tsx` mentions the inferred target version or target release range.
+- Verify `src/components/whatsNewDialog.tsx` mentions the inferred target version or target release range.
 - Search the updated release text for future-tense phrases and remove any that imply upcoming work instead of completed work.
 - Run the narrowest useful validation available, such as markdown/editor diagnostics and focused frontend tests if the What's New component or tests changed.
 

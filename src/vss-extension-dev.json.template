@@ -1,11 +1,12 @@
 {
   "manifestVersion": 1,
-  "id": "team-retrospectives",
-  "publisher": "ms-devlabs",
-  "version": "01.01.01",
-  "name": "Retrospectives",
+  "id": "team-retrospectives-dev",
+  "publisher": "<publisher id>",
+  "version": "0.0.1",
+  "name": "Retrospectives (Dev)",
   "description": "An Azure DevOps extension for efficient retrospectives.",
-  "public": true,
+  "public": false,
+  "baseUri": "https://localhost:3000",
   "icons": {
     "small": "images/logos/logo_small.png",
     "branding": "images/logos/logo_branding.png",
@@ -28,9 +29,17 @@
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "demands": ["api-version/4.1"],
-  "tags": ["agile", "feedback", "retrospective"],
-  "categories": ["Azure Boards"],
+  "demands": [
+    "api-version/4.1"
+  ],
+  "tags": [
+    "agile",
+    "feedback",
+    "retrospective"
+  ],
+  "categories": [
+    "Azure Boards"
+  ],
   "repository": {
     "type": "git",
     "uri": "https://github.com/microsoft/vsts-extension-retrospectives"
@@ -38,15 +47,20 @@
   "CustomerQnASupport": {
     "enableqna": "true"
   },
-  "scopes": ["vso.work", "vso.work_write"],
+  "scopes": [
+    "vso.work",
+    "vso.work_write"
+  ],
   "contributions": [
     {
       "id": "home",
       "type": "ms.vss-web.hub",
-      "targets": ["ms.vss-work-web.work-hub-group"],
+      "targets": [
+        "ms.vss-work-web.work-hub-group"
+      ],
       "properties": {
-        "name": "Retrospectives",
-        "uri": "src/index.html",
+        "name": "Retrospectives (Dev)",
+        "uri": "assets/index.html",
         "icon": {
           "light": "asset://images/logos/logo_navbar_light_theme.png",
           "dark": "asset://images/logos/logo_navbar_dark_theme.png"
@@ -56,7 +70,7 @@
   ],
   "files": [
     {
-      "path": "src",
+      "path": "assets",
       "addressable": true
     },
     {

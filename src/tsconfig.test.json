@@ -10,7 +10,7 @@
     "strictNullChecks": false,
     "target": "es5",
     "downlevelIteration": true,
-    "rootDir": "src/",
+    "rootDir": ".",
     "outDir": "dist/",
     "jsx": "react",
     "lib": ["es5", "es6", "dom", "es2015.promise"],
@@ -25,5 +25,6 @@
     "isolatedModules": false,
     "noEmit": false
   },
-  "include": ["src", "react-html-attributes.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }

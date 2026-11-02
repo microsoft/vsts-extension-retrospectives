@@ -71,12 +71,12 @@ jobs:
         with:
           filters: |
             src:
-              - "src/frontend/**"
+              - "src/**"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Install dependencies"
         run: npm ci
-        working-directory: "src/frontend"
+        working-directory: "src"
 
       - if: steps.changes.outputs.src == 'true'
         name: "Run pre-commit hooks"
@@ -91,24 +91,24 @@ jobs:
       - if: steps.changes.outputs.src == 'true'
         name: "Build (bundle analysis)"
         run: npm run build
-        working-directory: "src/frontend"
+        working-directory: "src"
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - if: steps.changes.outputs.src == 'true'
         name: "Run tests"
         run: npm test
-        working-directory: "src/frontend"
+        working-directory: "src"
 
       - if: success() || failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: "Upload jest test results"
-          path: src/frontend/reports/jest-junit.xml
+          path: src/reports/jest-junit.xml
 
       - name: "Markdown lint"
         run: |
-          npx markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#src/frontend/node_modules"
+          npx markdownlint-cli2 "**/*.md" --config ".github/.markdownlint.json" "#src/node_modules"
 
       - name: "Spell check"
         run: |
@@ -197,7 +197,7 @@ jobs:
           name: frontend
           flags: frontend
           codecov_yml_path: .github/codecov.yml
-          files: src/frontend/coverage/coverage-final.json,src/frontend/coverage/cobertura-coverage.xml
+          files: src/coverage/coverage-final.json,src/coverage/cobertura-coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 

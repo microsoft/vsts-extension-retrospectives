@@ -5,7 +5,7 @@ import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelpe
 import { workItemService } from "./azureDevOpsWorkItemService";
 import { createDocument, deleteDocument, readDocument, readDocuments, readDocumentsStrict, updateDocument } from "./dataService";
 import { generateUUID } from "../utilities/random";
-import { IColumnItem } from "../../frontend/components/feedbackBoard";
+import { IColumnItem } from "../components/feedbackBoard";
 import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
 
 class ItemDataService {

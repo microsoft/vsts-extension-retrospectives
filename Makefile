@@ -7,7 +7,7 @@ SHELL := /bin/bash
 publish:
 	set -euo pipefail
 
-	pushd src/frontend
+	pushd src
 
 	export AZURE_DEVOPS_TOKEN=$$(az account get-access-token --tenant "$${AZURE_TENANT_ID}" --resource "$${AZURE_RESOURCE_ID}" --query accessToken --output tsv)
 
@@ -28,7 +28,7 @@ publish:
 
 	jq '.contributions[0].properties.name = "Retrospectives (Dev)"' "$${ext_file}" > "$${ext_file}.tmp" && mv "$${ext_file}.tmp" "$${ext_file}"
 
-	cp ../../LICENSE ./assets/LICENSE.md
+	cp ../LICENSE ./assets/LICENSE.md
 
 	npm run pack:d
 
@@ -39,7 +39,7 @@ publish:
 	popd
 
 build:
-	npm --prefix src/frontend run build
+	npm --prefix src run build
 
 test:
-	npm --prefix src/frontend test
+	npm --prefix src test

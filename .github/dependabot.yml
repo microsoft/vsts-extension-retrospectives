@@ -17,7 +17,7 @@ updates:
       - "dependencies"
       - "docs not needed"
   - package-ecosystem: "docker"
-    directory: "/src/frontend"
+    directory: "/src"
     schedule:
       interval: "weekly"
       day: "sunday"
@@ -25,7 +25,7 @@ updates:
       - "dependencies"
       - "docs not needed"
   - package-ecosystem: "npm"
-    directory: "/src/frontend"
+    directory: "/src"
     schedule:
       interval: "weekly"
       day: "sunday"

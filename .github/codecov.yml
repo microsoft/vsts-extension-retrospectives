@@ -10,24 +10,24 @@ component_management:
         target: auto
   individual_components:
     - component_id: frontend_components
-      name: frontend/components
+      name: src/components
       paths:
-        - src/frontend/components/**
+        - src/components/**
 
     - component_id: frontend_dal
-      name: frontend/dal
+      name: src/dal
       paths:
-        - src/frontend/dal/**
+        - src/dal/**
 
     - component_id: frontend_interfaces
-      name: frontend/interfaces
+      name: src/interfaces
       paths:
-        - src/frontend/interfaces/**
+        - src/interfaces/**
 
     - component_id: frontend_utilities
-      name: frontend/utilities
+      name: src/utilities
       paths:
-        - src/frontend/utilities/**
+        - src/utilities/**
 
 coverage:
   status:
@@ -37,7 +37,7 @@ coverage:
       frontend:
         target: auto
         paths:
-          - src/frontend/**
+          - src/**
     patch:
       default:
         target: auto
