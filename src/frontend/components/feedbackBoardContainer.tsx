@@ -44,10 +44,12 @@ import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
 import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
 import { canCurrentUserManageBoard } from "../utilities/boardAccessHelper";
-import { BOARD_LIST_POLL_INTERVAL_MS, IPollingLoop, LIVE_SYNC_POLL_INTERVAL_MS, startPollingLoop } from "../utilities/pollingLoop";
+import { BOARD_LIST_POLL_INTERVAL_MS, IPollingLoop, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS, startPollingLoop } from "../utilities/pollingLoop";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
+// Focusing the board picker refreshes the board list unless it was polled more recently than this.
+const BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS = 10000;
 const BOARD_TIMER_DURATION_OPTIONS = Array.from({ length: 20 }, (_, index) => index + 1);
 
 export interface FeedbackBoardContainerState {
@@ -347,6 +349,8 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const allBoardFeedbackSearchRequestIdRef = React.useRef(0);
 
   const boardPollingLoopRef = React.useRef<IPollingLoop | undefined>(undefined);
+  const boardListPollingLoopRef = React.useRef<IPollingLoop | undefined>(undefined);
+  const lastBoardListPollAtRef = React.useRef(0);
   // The last server copy of the current board, which tells the next poll what changed on the server.
   const lastServerBoardRef = React.useRef<IFeedbackBoardDocument | undefined>(undefined);
   // Bumped whenever the board list is loaded or changed outside the board list poll, so an in-flight poll doesn't overwrite it.
@@ -908,20 +912,20 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   }, []);
 
   const pollCurrentBoard = React.useCallback(
-    async (teamId: string, boardId: string, isActive: () => boolean) => {
+    async (teamId: string, boardId: string, isActive: () => boolean): Promise<boolean> => {
       const serverBoard = await BoardDataService.getBoardForTeamByIdStrict(teamId, boardId);
       if (!isActive()) {
-        return;
+        return false;
       }
 
       if (!serverBoard || serverBoard.isArchived) {
         handleBoardRemoved(teamId, boardId, serverBoard?.archivedBy?.id);
-        return;
+        return true;
       }
 
       const previousServerBoard = lastServerBoardRef.current?.id === boardId ? lastServerBoardRef.current : undefined;
       if (previousServerBoard && isPolledBoardUpToDate(previousServerBoard, serverBoard)) {
-        return;
+        return false;
       }
 
       lastServerBoardRef.current = serverBoard;
@@ -938,11 +942,14 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
           ...getVoteMetrics(serverBoard, prevState.currentUserId),
         };
       });
+
+      return true;
     },
     [handleBoardRemoved],
   );
 
   const pollTeamBoards = React.useCallback(async (teamId: string, isActive: () => boolean) => {
+    lastBoardListPollAtRef.current = Date.now();
     const boardListVersion = boardListVersionRef.current;
     const serverBoards = (await BoardDataService.getBoardsForTeamStrict(teamId)) ?? [];
     if (!isActive() || boardListVersion !== boardListVersionRef.current) {
@@ -987,6 +994,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
     const pollingLoop = startPollingLoop({
       intervalMs: LIVE_SYNC_POLL_INTERVAL_MS,
+      idleIntervalMs: LIVE_SYNC_IDLE_POLL_INTERVAL_MS,
       poll: isActive => pollCurrentBoard(currentTeamId, currentBoardId, isActive),
       onError: (error, consecutiveErrorCount) => {
         appInsights.trackException(error, { action: "pollCurrentBoard", boardId: currentBoardId, consecutiveErrorCount });
@@ -1015,9 +1023,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         appInsights.trackException(error, { action: "pollTeamBoards", teamId: currentTeamId, consecutiveErrorCount });
       },
     });
+    boardListPollingLoopRef.current = pollingLoop;
 
     return () => {
       pollingLoop.stop();
+      if (boardListPollingLoopRef.current === pollingLoop) {
+        boardListPollingLoopRef.current = undefined;
+      }
     };
   }, [currentTeamId, pollTeamBoards]);
 
@@ -2167,6 +2179,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
   };
 
+  // The board list is only polled every couple of minutes, so catch up with other users' boards when the picker is about to be used.
+  const handleBoardSelectorFocus = () => {
+    if (Date.now() - lastBoardListPollAtRef.current >= BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS) {
+      boardListPollingLoopRef.current?.pollNow();
+    }
+  };
+
   const saveTeamEffectivenessMeasurement = () => {
     const currentBoard = state.currentBoard;
     if (!currentBoard) {
@@ -2337,7 +2356,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       <label htmlFor="board-selector" className="sr-only">
                         Retrospective Board
                       </label>
-                      <select id="board-selector" className="selector-option" value={state.currentBoard?.id || ""} onChange={handleBoardSelectionChange} aria-label="Retrospective Board">
+                      <select id="board-selector" className="selector-option" value={state.currentBoard?.id || ""} onChange={handleBoardSelectionChange} onFocus={handleBoardSelectorFocus} aria-label="Retrospective Board">
                         {state.boards.map(board => (
                           <option key={board.id} value={board.id}>
                             {board.title}
