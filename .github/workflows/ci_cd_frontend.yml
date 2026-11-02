@@ -223,12 +223,10 @@ jobs:
           echo "Azure DevOps Marketplace profile ID: ${profile_id}"
 
       - if: steps.changes.outputs.src == 'true'
-        name: "Prepare package"
-        run: make prepare
-
-      - if: steps.changes.outputs.src == 'true'
         name: "Publish extension to dev environment"
         env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_RESOURCE_ID: ${{ secrets.AZURE_RESOURCE_ID }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: make publish
