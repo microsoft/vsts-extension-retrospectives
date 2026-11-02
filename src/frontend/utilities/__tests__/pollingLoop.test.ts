@@ -1,4 +1,4 @@
-import { BOARD_LIST_POLL_INTERVAL_MS, getPollingBackoffDelayMs, LIVE_SYNC_POLL_INTERVAL_MS, MAX_POLL_BACKOFF_MS, startPollingLoop, IPollingLoop } from "../pollingLoop";
+import { BOARD_LIST_POLL_INTERVAL_MS, DEFAULT_IDLE_AFTER_UNCHANGED_POLLS, getPollingBackoffDelayMs, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS, MAX_POLL_BACKOFF_MS, startPollingLoop, IPollingLoop } from "../pollingLoop";
 
 describe("getPollingBackoffDelayMs", () => {
   it("doubles the delay for each consecutive error and adds jitter", () => {
@@ -26,7 +26,9 @@ describe("getPollingBackoffDelayMs", () => {
 
   it("exposes sensible interval defaults", () => {
     expect(LIVE_SYNC_POLL_INTERVAL_MS).toBe(2000);
-    expect(BOARD_LIST_POLL_INTERVAL_MS).toBeGreaterThan(LIVE_SYNC_POLL_INTERVAL_MS);
+    expect(LIVE_SYNC_IDLE_POLL_INTERVAL_MS).toBeGreaterThan(LIVE_SYNC_POLL_INTERVAL_MS);
+    expect(BOARD_LIST_POLL_INTERVAL_MS).toBeGreaterThan(LIVE_SYNC_IDLE_POLL_INTERVAL_MS);
+    expect(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS).toBeGreaterThan(0);
   });
 });
 
@@ -326,5 +328,164 @@ describe("startPollingLoop", () => {
     window.dispatchEvent(new Event("online"));
     await jest.advanceTimersByTimeAsync(5000);
     expect(poll).toHaveBeenCalledTimes(1);
+  });
+
+  describe("idle slowdown", () => {
+    const REGULAR_MS = 1000;
+    const IDLE_MS = 5000;
+
+    const startIdleLoop = (poll: jest.Mock, idleAfterUnchangedPolls = 2) => startPollingLoop({ poll, intervalMs: REGULAR_MS, idleIntervalMs: IDLE_MS, idleAfterUnchangedPolls });
+
+    it("keeps the regular interval when no idle interval is set", async () => {
+      const poll = jest.fn().mockResolvedValue(false);
+      loop = startPollingLoop({ poll, intervalMs: REGULAR_MS });
+
+      await jest.advanceTimersByTimeAsync(20 * REGULAR_MS);
+      expect(poll).toHaveBeenCalledTimes(21);
+    });
+
+    it("slows down after the configured number of unchanged polls", async () => {
+      const poll = jest.fn().mockResolvedValue(false);
+      loop = startIdleLoop(poll, 3);
+
+      await jest.advanceTimersByTimeAsync(2 * REGULAR_MS);
+      expect(poll).toHaveBeenCalledTimes(3);
+
+      await jest.advanceTimersByTimeAsync(IDLE_MS - 1);
+      expect(poll).toHaveBeenCalledTimes(3);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(poll).toHaveBeenCalledTimes(4);
+
+      await jest.advanceTimersByTimeAsync(IDLE_MS);
+      expect(poll).toHaveBeenCalledTimes(5);
+    });
+
+    it("waits for the default number of unchanged polls before slowing down", async () => {
+      const poll = jest.fn().mockResolvedValue(false);
+      loop = startPollingLoop({ poll, intervalMs: REGULAR_MS, idleIntervalMs: IDLE_MS });
+
+      await jest.advanceTimersByTimeAsync((DEFAULT_IDLE_AFTER_UNCHANGED_POLLS - 1) * REGULAR_MS);
+      expect(poll).toHaveBeenCalledTimes(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS);
+
+      await jest.advanceTimersByTimeAsync(IDLE_MS - 1);
+      expect(poll).toHaveBeenCalledTimes(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(poll).toHaveBeenCalledTimes(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS + 1);
+    });
+
+    it("returns to the regular interval after a poll reports changes", async () => {
+      const poll = jest.fn().mockResolvedValue(false);
+      loop = startIdleLoop(poll);
+
+      await jest.advanceTimersByTimeAsync(REGULAR_MS);
+      expect(poll).toHaveBeenCalledTimes(2);
+
+      poll.mockResolvedValueOnce(true);
+      await jest.advanceTimersByTimeAsync(IDLE_MS);
+      expect(poll).toHaveBeenCalledTimes(3);
+
+      await jest.advanceTimersByTimeAsync(REGULAR_MS - 1);
+      expect(poll).toHaveBeenCalledTimes(3);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(poll).toHaveBeenCalledTimes(4);
+    });
+
+    it("treats a poll that resolves without a value as activity", async () => {
+      const poll = jest.fn().mockResolvedValue(undefined);
+      loop = startIdleLoop(poll);
+
+      await jest.advanceTimersByTimeAsync(10 * REGULAR_MS);
+      expect(poll).toHaveBeenCalledTimes(11);
+    });
+
+    const wakeUps: Array<[string, () => void]> = [
+      ["pollNow is called", () => loop?.pollNow()],
+      [
+        "the page becomes visible again",
+        () => {
+          setHidden(true);
+          setHidden(false);
+        },
+      ],
+      ["the browser comes back online", () => window.dispatchEvent(new Event("online"))],
+    ];
+
+    it.each(wakeUps)("returns to the regular interval when %s", async (_description, wakeUp) => {
+      const poll = jest.fn().mockResolvedValue(false);
+      loop = startIdleLoop(poll);
+
+      await jest.advanceTimersByTimeAsync(REGULAR_MS);
+      expect(poll).toHaveBeenCalledTimes(2);
+
+      wakeUp();
+      await jest.advanceTimersByTimeAsync(0);
+      expect(poll).toHaveBeenCalledTimes(3);
+
+      await jest.advanceTimersByTimeAsync(REGULAR_MS - 1);
+      expect(poll).toHaveBeenCalledTimes(3);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(poll).toHaveBeenCalledTimes(4);
+
+      await jest.advanceTimersByTimeAsync(IDLE_MS - 1);
+      expect(poll).toHaveBeenCalledTimes(4);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(poll).toHaveBeenCalledTimes(5);
+    });
+
+    it("does not count a poll as unchanged when pollNow was called while it was running", async () => {
+      const resolvers: Array<(hasChanges: boolean) => void> = [];
+      const poll = jest.fn().mockImplementation(() => new Promise<boolean>(resolve => resolvers.push(resolve)));
+      loop = startIdleLoop(poll);
+
+      await jest.advanceTimersByTimeAsync(0);
+      loop.pollNow();
+      resolvers[0](false);
+      await jest.advanceTimersByTimeAsync(0);
+      expect(poll).toHaveBeenCalledTimes(2);
+
+      resolvers[1](false);
+      await jest.advanceTimersByTimeAsync(REGULAR_MS - 1);
+      expect(poll).toHaveBeenCalledTimes(2);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(poll).toHaveBeenCalledTimes(3);
+    });
+
+    it("never idles faster than the regular interval", async () => {
+      const poll = jest.fn().mockResolvedValue(false);
+      loop = startPollingLoop({ poll, intervalMs: REGULAR_MS, idleIntervalMs: REGULAR_MS / 2, idleAfterUnchangedPolls: 1 });
+
+      await jest.advanceTimersByTimeAsync(0);
+      expect(poll).toHaveBeenCalledTimes(1);
+
+      await jest.advanceTimersByTimeAsync(REGULAR_MS - 1);
+      expect(poll).toHaveBeenCalledTimes(1);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(poll).toHaveBeenCalledTimes(2);
+    });
+
+    it("treats an idle threshold below one as one", async () => {
+      const poll = jest.fn().mockResolvedValue(true);
+      loop = startIdleLoop(poll, 0);
+
+      await jest.advanceTimersByTimeAsync(2 * REGULAR_MS);
+      expect(poll).toHaveBeenCalledTimes(3);
+
+      poll.mockResolvedValue(false);
+      await jest.advanceTimersByTimeAsync(REGULAR_MS);
+      expect(poll).toHaveBeenCalledTimes(4);
+
+      await jest.advanceTimersByTimeAsync(IDLE_MS - 1);
+      expect(poll).toHaveBeenCalledTimes(4);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(poll).toHaveBeenCalledTimes(5);
+    });
   });
 });

@@ -1,6 +1,8 @@
 export const LIVE_SYNC_POLL_INTERVAL_MS = 2000;
-export const BOARD_LIST_POLL_INTERVAL_MS = 30000;
+export const LIVE_SYNC_IDLE_POLL_INTERVAL_MS = 6000;
+export const BOARD_LIST_POLL_INTERVAL_MS = 120000;
 export const MAX_POLL_BACKOFF_MS = 30000;
+export const DEFAULT_IDLE_AFTER_UNCHANGED_POLLS = 5;
 
 const MAX_BACKOFF_EXPONENT = 16;
 const MAX_BACKOFF_JITTER_MS = 1000;
@@ -9,9 +11,17 @@ export interface IPollingLoopOptions {
   /**
    * Performs one poll. `isActive` turns false once the loop is stopped, so results
    * that arrive after a stop (e.g. board switch or unmount) can be discarded.
+   * Resolve `false` when the poll found nothing new; any other result counts as activity.
    */
-  poll: (isActive: () => boolean) => Promise<void>;
+  poll: (isActive: () => boolean) => Promise<void | boolean>;
   intervalMs: number;
+  /**
+   * Once `idleAfterUnchangedPolls` polls in a row resolved `false`, poll this slowly instead (never faster
+   * than `intervalMs`). A poll that finds something new, `pollNow`, the page becoming visible and the
+   * browser coming back online return the loop to `intervalMs`.
+   */
+  idleIntervalMs?: number;
+  idleAfterUnchangedPolls?: number;
   maxBackoffMs?: number;
   onError?: (error: unknown, consecutiveErrorCount: number) => void;
   pollImmediately?: boolean;
@@ -34,15 +44,19 @@ const isDocumentHidden = (): boolean => typeof document !== "undefined" && docum
 /**
  * Starts a sequential polling loop: polls never overlap, the loop pauses while the page is hidden,
  * wakes up immediately when the page becomes visible or the browser comes back online, and backs off
- * exponentially (with jitter) on consecutive failures.
+ * exponentially (with jitter) on consecutive failures. When `idleIntervalMs` is set, the loop also
+ * slows down while polls keep reporting that nothing changed.
  */
-export const startPollingLoop = ({ poll, intervalMs, maxBackoffMs = MAX_POLL_BACKOFF_MS, onError, pollImmediately = true, pauseWhenHidden = true }: IPollingLoopOptions): IPollingLoop => {
+export const startPollingLoop = ({ poll, intervalMs, idleIntervalMs = intervalMs, idleAfterUnchangedPolls = DEFAULT_IDLE_AFTER_UNCHANGED_POLLS, maxBackoffMs = MAX_POLL_BACKOFF_MS, onError, pollImmediately = true, pauseWhenHidden = true }: IPollingLoopOptions): IPollingLoop => {
   let active = true;
   let pollRequested = false;
   let consecutiveErrorCount = 0;
+  let unchangedPollCount = 0;
   let wakeUp: (() => void) | undefined;
 
   const isActive = () => active;
+
+  const getPollDelayMs = () => (unchangedPollCount >= Math.max(idleAfterUnchangedPolls, 1) ? Math.max(idleIntervalMs, intervalMs) : intervalMs);
 
   const sleep = (ms: number) =>
     new Promise<void>(resolve => {
@@ -63,6 +77,7 @@ export const startPollingLoop = ({ poll, intervalMs, maxBackoffMs = MAX_POLL_BAC
       return;
     }
 
+    unchangedPollCount = 0;
     pollRequested = true;
     wakeUp?.();
   };
@@ -85,9 +100,10 @@ export const startPollingLoop = ({ poll, intervalMs, maxBackoffMs = MAX_POLL_BAC
       }
 
       pollRequested = false;
+      let hasChanges: void | boolean;
 
       try {
-        await poll(isActive);
+        hasChanges = await poll(isActive);
         consecutiveErrorCount = 0;
       } catch (error) {
         if (!active) {
@@ -110,8 +126,10 @@ export const startPollingLoop = ({ poll, intervalMs, maxBackoffMs = MAX_POLL_BAC
         break;
       }
 
+      unchangedPollCount = hasChanges === false && !pollRequested ? unchangedPollCount + 1 : 0;
+
       if (!pollRequested) {
-        await sleep(intervalMs);
+        await sleep(getPollDelayMs());
       }
     }
   };

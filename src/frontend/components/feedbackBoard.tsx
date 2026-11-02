@@ -15,7 +15,7 @@ import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getBoardAccess } from "../utilities/boardAccessHelper";
-import { IPollingLoop, LIVE_SYNC_POLL_INTERVAL_MS, startPollingLoop } from "../utilities/pollingLoop";
+import { IPollingLoop, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS, startPollingLoop } from "../utilities/pollingLoop";
 import { getIconElement } from "./icons";
 
 export interface FeedbackBoardProps {
@@ -120,6 +120,17 @@ export const compareFeedbackItemVersions = (localItem: IFeedbackItemDocument, se
   }
 
   return JSON.stringify(localItem) === JSON.stringify(serverItem) ? 0 : -1;
+};
+
+/**
+ * Identifies the exact revisions of the given server items, so consecutive polls can be compared cheaply.
+ * Like `compareFeedbackItemVersions`, items without a numeric `__etag` are compared by their content.
+ */
+export const getFeedbackItemsFingerprint = (feedbackItems: IFeedbackItemDocument[]): string => {
+  return feedbackItems
+    .map(feedbackItem => (typeof feedbackItem.__etag === "number" ? `${feedbackItem.id}:${feedbackItem.__etag}` : JSON.stringify(feedbackItem)))
+    .sort()
+    .join("\n");
 };
 
 const haveSameWorkItems = (left: WorkItem[], right: WorkItem[]): boolean => {
@@ -310,6 +321,8 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
   const actionItemCacheRef = useRef(new Map<number, ICachedActionItem>());
   const actionItemRetryAtRef = useRef(0);
   const feedbackItemsPollingLoopRef = useRef<IPollingLoop | null>(null);
+  // Fingerprint of the items from the last completed poll; a poll that finds the same one lets the loop slow down.
+  const lastServerItemsFingerprintRef = useRef<string | null>(null);
 
   const markFeedbackItemsChanged = useCallback((feedbackItemIds: string[]) => {
     mutationVersionRef.current += 1;
@@ -653,18 +666,18 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
   );
 
   const pollFeedbackItems = useCallback(
-    async (boardId: string, isActive: () => boolean, animateNewItems: boolean): Promise<void> => {
+    async (boardId: string, isActive: () => boolean, animateNewItems: boolean): Promise<boolean> => {
       const pollStartVersion = mutationVersionRef.current;
       const pollStartedAt = Date.now();
 
       const serverFeedbackItems = ((await itemDataService.getFeedbackItemsForBoardStrict(boardId)) ?? []).filter(feedbackItem => !!feedbackItem?.id);
       if (!isActive()) {
-        return;
+        return false;
       }
 
       const actionItemsById = await loadActionItems(serverFeedbackItems, boardId);
       if (!isActive()) {
-        return;
+        return false;
       }
 
       const pendingItemIds = new Set<string>();
@@ -702,6 +715,12 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
           touchedItemVersionsRef.current.delete(feedbackItemId);
         }
       });
+
+      const fingerprint = getFeedbackItemsFingerprint(serverFeedbackItems);
+      const hasChanges = fingerprint !== lastServerItemsFingerprintRef.current;
+      lastServerItemsFingerprintRef.current = fingerprint;
+
+      return hasChanges;
     },
     [loadActionItems],
   );
@@ -715,13 +734,16 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
 
     const boardId = board.id;
     let hasLoadedItems = false;
+    lastServerItemsFingerprintRef.current = null;
 
     const pollingLoop = startPollingLoop({
       intervalMs: LIVE_SYNC_POLL_INTERVAL_MS,
+      idleIntervalMs: LIVE_SYNC_IDLE_POLL_INTERVAL_MS,
       poll: async isActive => {
         try {
-          await pollFeedbackItems(boardId, isActive, hasLoadedItems);
+          const hasChanges = await pollFeedbackItems(boardId, isActive, hasLoadedItems);
           hasLoadedItems = true;
+          return hasChanges;
         } finally {
           // Show the columns after the first attempt even if it failed; the loop keeps retrying.
           if (isActive()) {

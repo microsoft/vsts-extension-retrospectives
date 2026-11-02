@@ -4,7 +4,7 @@ import "@testing-library/jest-dom";
 import { IFeedbackBoardDocument, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { mocked } from "jest-mock";
-import FeedbackBoard, { FeedbackBoardProps, IColumn, IColumnItem, mergeServerFeedbackItems } from "../../components/feedbackBoard";
+import FeedbackBoard, { FeedbackBoardProps, IColumn, IColumnItem, getFeedbackItemsFingerprint, mergeServerFeedbackItems } from "../../components/feedbackBoard";
 import { testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import type { WorkItem } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
@@ -12,7 +12,7 @@ import { itemDataService } from "../../dal/itemDataService";
 import { workService } from "../../dal/azureDevOpsWorkService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { appInsights } from "../../utilities/telemetryClient";
-import { LIVE_SYNC_POLL_INTERVAL_MS } from "../../utilities/pollingLoop";
+import { DEFAULT_IDLE_AFTER_UNCHANGED_POLLS, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS } from "../../utilities/pollingLoop";
 
 const feedbackColumnPropsSpy = jest.fn();
 
@@ -900,6 +900,75 @@ describe("FeedbackBoard Component", () => {
       expect(itemDataService.getFeedbackItemsForBoardStrict).toHaveBeenCalledTimes(2);
     });
 
+    describe("when nothing changes", () => {
+      const pollsUntilIdle = 1 + DEFAULT_IDLE_AFTER_UNCHANGED_POLLS;
+      const getPollCount = () => (itemDataService.getFeedbackItemsForBoardStrict as jest.Mock).mock.calls.length;
+
+      beforeEach(() => {
+        (itemDataService.getFeedbackItemsForBoardStrict as jest.Mock).mockResolvedValue(mockFeedbackItems);
+      });
+
+      it("polls less often once several polls in a row found nothing new", async () => {
+        await loadBoard();
+        await advanceTime(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS * LIVE_SYNC_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle);
+
+        await advanceTime(LIVE_SYNC_IDLE_POLL_INTERVAL_MS - 1);
+        expect(getPollCount()).toBe(pollsUntilIdle);
+
+        await advanceTime(1);
+        expect(getPollCount()).toBe(pollsUntilIdle + 1);
+      });
+
+      it("polls at the regular interval again after another user changes an item", async () => {
+        const remoteItem: IFeedbackItemDocument = { ...mockFeedbackItems[0], id: "remote-new-item" };
+
+        await loadBoard();
+        await advanceTime(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS * LIVE_SYNC_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle);
+
+        (itemDataService.getFeedbackItemsForBoardStrict as jest.Mock).mockResolvedValue([...mockFeedbackItems, remoteItem]);
+        await advanceTime(LIVE_SYNC_IDLE_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle + 1);
+        expect(getColumnItemIds(remoteItem.columnId)).toContain(remoteItem.id);
+
+        await advanceTime(LIVE_SYNC_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle + 2);
+      });
+
+      it("polls at the regular interval again after the board settings change", async () => {
+        const { rerender } = await loadBoard();
+        await advanceTime(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS * LIVE_SYNC_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle);
+
+        rerender(<FeedbackBoard {...mockedProps} board={{ ...mockedBoard, modifiedDate: new Date() }} />);
+        await advanceTime(0);
+        expect(getPollCount()).toBe(pollsUntilIdle + 1);
+
+        await advanceTime(LIVE_SYNC_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle + 2);
+      });
+
+      it("starts over at the regular interval after switching to another board", async () => {
+        const otherBoard: IFeedbackBoardDocument = { ...mockedBoard, id: "other-board" };
+
+        const { rerender } = await loadBoard();
+        await advanceTime(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS * LIVE_SYNC_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle);
+
+        rerender(<FeedbackBoard {...mockedProps} board={otherBoard} />);
+        await advanceTime(0);
+        expect(itemDataService.getFeedbackItemsForBoardStrict).toHaveBeenLastCalledWith(otherBoard.id);
+
+        // Even though the new board has the same items, its first poll counts as a change.
+        await advanceTime(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS * LIVE_SYNC_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle + pollsUntilIdle);
+
+        await advanceTime(LIVE_SYNC_POLL_INTERVAL_MS);
+        expect(getPollCount()).toBe(pollsUntilIdle + pollsUntilIdle);
+      });
+    });
+
     it("loads the action items of polled items and reuses them on the next poll", async () => {
       const actionItem = { id: 123, rev: 1, fields: { "System.Title": "Action item" } };
       (itemDataService.getFeedbackItemsForBoardStrict as jest.Mock).mockResolvedValue([mockFeedbackItems[1]]);
@@ -923,7 +992,8 @@ describe("FeedbackBoard Component", () => {
       (workItemService.getWorkItemsByIds as jest.Mock).mockResolvedValueOnce([actionItem]).mockResolvedValue([updatedActionItem]);
 
       await loadBoard();
-      await advanceTime(32000);
+      // The loop has slowed down to its idle interval by the time the cached work items are 30 seconds old.
+      await advanceTime(30000 + LIVE_SYNC_IDLE_POLL_INTERVAL_MS);
 
       expect(workItemService.getWorkItemsByIds).toHaveBeenCalledTimes(2);
       expect(findColumnItem(mockFeedbackItems[1].columnId, mockFeedbackItems[1].id)?.actionItems).toEqual([updatedActionItem]);
@@ -1142,6 +1212,34 @@ describe("FeedbackBoard Component", () => {
       const columns = buildColumns([columnItem]);
 
       expect(mergeServerFeedbackItems(columns, [{ ...columnItem.feedbackItem, __etag: 1 }])).toBe(columns);
+    });
+  });
+
+  describe("getFeedbackItemsFingerprint", () => {
+    const firstItem: IFeedbackItemDocument = { ...mockFeedbackItems[0], __etag: 1 };
+    const secondItem: IFeedbackItemDocument = { ...mockFeedbackItems[1], __etag: 7 };
+
+    it("is the same for the same revisions in any order", () => {
+      expect(getFeedbackItemsFingerprint([firstItem, secondItem])).toBe(getFeedbackItemsFingerprint([secondItem, firstItem]));
+    });
+
+    it("changes when an item gets a new revision or an item is added or removed", () => {
+      const fingerprint = getFeedbackItemsFingerprint([firstItem, secondItem]);
+
+      expect(getFeedbackItemsFingerprint([{ ...firstItem, __etag: 2 }, secondItem])).not.toBe(fingerprint);
+      expect(getFeedbackItemsFingerprint([firstItem])).not.toBe(fingerprint);
+      expect(getFeedbackItemsFingerprint([firstItem, secondItem, { ...secondItem, id: "item-3" }])).not.toBe(fingerprint);
+    });
+
+    it("compares items without a revision by their content", () => {
+      const [itemWithoutRevision] = mockFeedbackItems;
+
+      expect(getFeedbackItemsFingerprint([{ ...itemWithoutRevision }])).toBe(getFeedbackItemsFingerprint([itemWithoutRevision]));
+      expect(getFeedbackItemsFingerprint([{ ...itemWithoutRevision, title: "Edited" }])).not.toBe(getFeedbackItemsFingerprint([itemWithoutRevision]));
+    });
+
+    it("is empty for a board without items", () => {
+      expect(getFeedbackItemsFingerprint([])).toBe("");
     });
   });
 
