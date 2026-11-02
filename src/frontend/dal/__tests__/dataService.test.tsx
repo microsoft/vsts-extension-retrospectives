@@ -1,6 +1,6 @@
 import { IExtensionDataManager, IExtensionDataService } from "azure-devops-extension-api";
 import { appInsights } from "../../utilities/telemetryClient";
-import { readDocuments, readDocument, createDocument, createOrUpdateDocument, updateDocument, deleteDocument, setValue, getValue } from "../dataService";
+import { readDocuments, readDocument, readDocumentsStrict, readDocumentStrict, createDocument, createOrUpdateDocument, updateDocument, deleteDocument, setValue, getValue } from "../dataService";
 
 const mockGetAccessToken = jest.fn();
 const mockGetService = jest.fn();
@@ -319,6 +319,103 @@ describe("dataService", () => {
 
       expect(result).toBeUndefined();
       expect(appInsights.trackException).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe("readDocumentsStrict", () => {
+    it("should return documents", async () => {
+      const mockData = [{ id: "1" }];
+      mockDataManager.getDocuments.mockResolvedValue(mockData);
+
+      await expect(readDocumentsStrict("testCollection")).resolves.toEqual(mockData);
+      expect(mockDataManager.getDocuments).toHaveBeenCalledWith("testCollection", undefined);
+    });
+
+    it("should read private documents with user scope", async () => {
+      mockDataManager.getDocuments.mockResolvedValue([]);
+
+      await readDocumentsStrict("testCollection", true);
+
+      expect(mockDataManager.getDocuments).toHaveBeenCalledWith("testCollection", { scopeType: "User" });
+    });
+
+    it("should return an empty array when the service returns no data", async () => {
+      mockDataManager.getDocuments.mockResolvedValue(undefined);
+
+      await expect(readDocumentsStrict("testCollection")).resolves.toEqual([]);
+    });
+
+    it("should return an empty array when the collection does not exist", async () => {
+      mockDataManager.getDocuments.mockRejectedValue({ serverError: { typeKey: "DocumentCollectionDoesNotExistException" } });
+
+      await expect(readDocumentsStrict("testCollection")).resolves.toEqual([]);
+    });
+
+    it("should rethrow other errors instead of returning an empty array", async () => {
+      const error = { status: 500, message: "Server error" };
+      mockDataManager.getDocuments.mockRejectedValue(error);
+
+      await expect(readDocumentsStrict("testCollection")).rejects.toBe(error);
+      expect(appInsights.trackException).not.toHaveBeenCalled();
+    });
+
+    it("should recreate the data manager with a fresh token after an authentication failure", async () => {
+      mockDataManager.getDocuments.mockResolvedValue([]);
+      await readDocumentsStrict("testCollection");
+      mockExtensionDataService.getExtensionDataManager.mockClear();
+      mockGetAccessToken.mockClear();
+
+      const authError = { status: 401, message: "Unauthorized" };
+      mockDataManager.getDocuments.mockRejectedValueOnce(authError);
+      await expect(readDocumentsStrict("testCollection")).rejects.toBe(authError);
+      expect(mockExtensionDataService.getExtensionDataManager).not.toHaveBeenCalled();
+
+      await readDocumentsStrict("testCollection");
+      expect(mockGetAccessToken).toHaveBeenCalledTimes(1);
+      expect(mockExtensionDataService.getExtensionDataManager).toHaveBeenCalledTimes(1);
+    });
+
+    it("should keep the data manager after non-authentication failures", async () => {
+      mockDataManager.getDocuments.mockResolvedValue([]);
+      await readDocumentsStrict("testCollection");
+      mockExtensionDataService.getExtensionDataManager.mockClear();
+
+      mockDataManager.getDocuments.mockRejectedValueOnce(new Error("Network failure"));
+      await expect(readDocumentsStrict("testCollection")).rejects.toThrow("Network failure");
+      await readDocumentsStrict("testCollection");
+
+      expect(mockExtensionDataService.getExtensionDataManager).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("readDocumentStrict", () => {
+    it("should return the document", async () => {
+      const mockData = { id: "1" };
+      mockDataManager.getDocument.mockResolvedValue(mockData);
+
+      await expect(readDocumentStrict("testCollection", "1")).resolves.toEqual(mockData);
+      expect(mockDataManager.getDocument).toHaveBeenCalledWith("testCollection", "1", undefined);
+    });
+
+    it("should read private documents with user scope", async () => {
+      mockDataManager.getDocument.mockResolvedValue({ id: "1" });
+
+      await readDocumentStrict("testCollection", "1", true);
+
+      expect(mockDataManager.getDocument).toHaveBeenCalledWith("testCollection", "1", { scopeType: "User" });
+    });
+
+    it("should return undefined when the document does not exist", async () => {
+      mockDataManager.getDocument.mockRejectedValue({ status: 404, serverError: { typeKey: "DocumentDoesNotExistException" } });
+
+      await expect(readDocumentStrict("testCollection", "1")).resolves.toBeUndefined();
+    });
+
+    it("should rethrow other errors", async () => {
+      const error = new Error("Network failure");
+      mockDataManager.getDocument.mockRejectedValue(error);
+
+      await expect(readDocumentStrict("testCollection", "1")).rejects.toBe(error);
     });
   });
 });

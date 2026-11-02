@@ -107,7 +107,6 @@ jobs:
       - name: Package exact extension version
         id: package_extension
         env:
-          REACT_APP_COLLABORATION_STATE_SERVICE_URL: ${{ secrets.BACKEND_WEBAPP }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
           VERSION: ${{ steps.release.outputs.version }}
           ASSET_NAME: ${{ steps.release.outputs.asset_name }}

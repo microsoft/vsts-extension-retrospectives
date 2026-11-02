@@ -13,7 +13,6 @@ import GroupedFeedbackList from "./groupedFeedbackList";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
 import { itemDataService } from "../dal/itemDataService";
 import localStorageHelper from "../utilities/localStorageHelper";
-import { reflectBackendService } from "../dal/reflectBackendService";
 import { IColumn } from "./feedbackBoard";
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
@@ -69,13 +68,13 @@ export interface IFeedbackItemProps {
   requestTimerStart: (feedbackItemId: string) => void;
   notifyTimerStopped: (feedbackItemId: string) => void;
 
-  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
+  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
 
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
 
-  refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void;
+  refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[]) => void;
 
-  moveFeedbackItem: (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void, boardId: string, feedbackItemId: string, columnId: string) => void;
+  moveFeedbackItem: (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[]) => void, boardId: string, feedbackItemId: string, columnId: string) => void;
 }
 
 export interface IGroupedFeedbackItemProps {
@@ -93,7 +92,6 @@ export interface IFeedbackItemState {
   isBeingDragged: boolean;
   isGroupFeedbackItemDialogHidden: boolean;
   isMarkedForDeletion: boolean;
-  isLocalDelete: boolean;
   isMobileFeedbackItemActionsDialogHidden: boolean;
   isMoveFeedbackItemDialogHidden: boolean;
   isRemoveFeedbackItemFromGroupConfirmationDialogHidden: boolean;
@@ -127,7 +125,7 @@ export interface FeedbackItemHandle {
 
   showRemoveFeedbackItemFromGroupConfirmationDialog: () => void;
   onConfirmRemoveFeedbackItemFromGroup: () => void;
-  markFeedbackItemForDelete: (isLocalDelete?: boolean) => void;
+  markFeedbackItemForDelete: () => void;
   setDisabledFeedbackItemDeletion: (boardId: string, id: string) => Promise<void>;
 
   hideMobileFeedbackItemActionsDialog: () => void;
@@ -159,7 +157,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     isBeingDragged: false,
     isDeleteItemConfirmationDialogHidden: true,
     isGroupFeedbackItemDialogHidden: true,
-    isLocalDelete: false,
     isMarkedForDeletion: false,
     isMobileFeedbackItemActionsDialogHidden: true,
     isMoveFeedbackItemDialogHidden: true,
@@ -316,20 +313,16 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const groupedItemPropsRef = useRef(props.groupedItemProps);
   groupedItemPropsRef.current = props.groupedItemProps;
 
-  const markFeedbackItemForDelete = useCallback(
-    (isLocalDelete: boolean = false) => {
-      if (groupedItemPropsRef.current?.isMainItem && groupedItemPropsRef.current.isGroupExpanded) {
-        groupedItemPropsRef.current.toggleGroupExpand();
-      }
+  const markFeedbackItemForDelete = useCallback(() => {
+    if (groupedItemPropsRef.current?.isMainItem && groupedItemPropsRef.current.isGroupExpanded) {
+      groupedItemPropsRef.current.toggleGroupExpand();
+    }
 
-      setStateMerge({
-        isDeleteItemConfirmationDialogHidden: true,
-        isMarkedForDeletion: true,
-        isLocalDelete,
-      });
-    },
-    [setStateMerge],
-  );
+    setStateMerge({
+      isDeleteItemConfirmationDialogHidden: true,
+      isMarkedForDeletion: true,
+    });
+  }, [setStateMerge]);
 
   const initiateDeleteFeedbackItem = useCallback(async () => {
     if (props.newlyCreated) {
@@ -339,18 +332,14 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
     const updatedItems = await itemDataService.deleteFeedbackItem(props.boardId, props.id);
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemDeleted, properties: { boardId: props.boardId, feedbackItemId: props.id } });
-    reflectBackendService.broadcastDeletedItem("dummyColumn", props.id);
 
     if (updatedItems.updatedChildFeedbackItems) {
-      props.refreshFeedbackItems(
-        updatedItems.updatedChildFeedbackItems.filter(item => item),
-        true,
-      );
+      props.refreshFeedbackItems(updatedItems.updatedChildFeedbackItems.filter(item => item));
     }
   }, [props.newlyCreated, props.id, props.boardId, props.refreshFeedbackItems, removeFeedbackItem]);
 
   const onConfirmDeleteFeedbackItem = useCallback(async () => {
-    markFeedbackItemForDelete(true);
+    markFeedbackItemForDelete();
     await initiateDeleteFeedbackItem();
   }, [markFeedbackItemForDelete, initiateDeleteFeedbackItem]);
 
@@ -412,7 +401,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
 
       if (updatedFeedbackItem) {
         await isVoted(props.id);
-        props.refreshFeedbackItems([updatedFeedbackItem], true);
+        props.refreshFeedbackItems([updatedFeedbackItem]);
         await setDisabledFeedbackItemDeletion(props.boardId, props.id);
       }
     },
@@ -433,7 +422,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         if (currentItem && currentItem.timerState === true) {
           updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId);
           if (updatedFeedbackItem) {
-            props.refreshFeedbackItems([updatedFeedbackItem], true);
+            props.refreshFeedbackItems([updatedFeedbackItem]);
           }
         }
       };
@@ -441,18 +430,18 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       if (!props.timerState) {
         updatedFeedbackItem = await itemDataService.updateTimer(boardId, feedbackItemId, true);
         if (updatedFeedbackItem) {
-          props.refreshFeedbackItems([updatedFeedbackItem], true);
+          props.refreshFeedbackItems([updatedFeedbackItem]);
         }
         const tid = props.timerId ?? setInterval(incTimer, 1000);
         updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, tid);
         if (updatedFeedbackItem) {
-          props.refreshFeedbackItems([updatedFeedbackItem], true);
+          props.refreshFeedbackItems([updatedFeedbackItem]);
         }
       } else {
         clearInterval(props.timerId);
         updatedFeedbackItem = await itemDataService.flipTimer(boardId, feedbackItemId, null);
         if (updatedFeedbackItem) {
-          props.refreshFeedbackItems([updatedFeedbackItem], true);
+          props.refreshFeedbackItems([updatedFeedbackItem]);
         }
         props.notifyTimerStopped(feedbackItemId);
       }
@@ -473,14 +462,14 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         const newFeedbackItem = await itemDataService.createItemForBoard(props.boardId, newTitle, props.columnId, !props.createdBy);
         appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemCreated, properties: { boardId: props.boardId, feedbackItemId: newFeedbackItem.id } });
         removeFeedbackItem(feedbackItemId);
-        props.addFeedbackItems(props.columnId, [newFeedbackItem], true, false, false, true, false);
+        props.addFeedbackItems(props.columnId, [newFeedbackItem], false, false, true, false);
         return;
       }
 
       const updatedFeedbackItem = await itemDataService.updateTitle(props.boardId, feedbackItemId, newTitle);
       appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemTitleEdited, properties: { boardId: props.boardId, feedbackItemId: feedbackItemId } });
       if (updatedFeedbackItem) {
-        props.refreshFeedbackItems([updatedFeedbackItem], true);
+        props.refreshFeedbackItems([updatedFeedbackItem]);
       }
     },
     [props.boardId, props.columnId, props.createdBy, props.addFeedbackItems, props.refreshFeedbackItems, removeFeedbackItem],
@@ -498,7 +487,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
   const onUpdateActionItem = useCallback(
     async (updatedFeedbackItem: IFeedbackItemDocument | null) => {
       if (updatedFeedbackItem) {
-        props.refreshFeedbackItems([updatedFeedbackItem], true);
+        props.refreshFeedbackItems([updatedFeedbackItem]);
       }
     },
     [props.refreshFeedbackItems],
@@ -624,18 +613,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
     [props],
   );
 
-  const markFeedbackItemForDeleteRef = useRef(markFeedbackItemForDelete);
-  markFeedbackItemForDeleteRef.current = markFeedbackItemForDelete;
-
-  const receiveDeletedItemHandler = useCallback(
-    (_columnId: string, feedbackItemId: string) => {
-      if (feedbackItemId === props.id && !stateRef.current.isMarkedForDeletion) {
-        markFeedbackItemForDeleteRef.current(false);
-      }
-    },
-    [props.id],
-  );
-
   useEffect(() => {
     const element = itemElementRef.current;
     if (props.columnProps?.registerItemRef) {
@@ -670,13 +647,6 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       document.removeEventListener("pointerdown", handleDocumentPointerDown);
     };
   }, []);
-
-  useEffect(() => {
-    reflectBackendService.onReceiveDeletedItem(receiveDeletedItemHandler);
-    return () => {
-      reflectBackendService.removeOnReceiveDeletedItem(receiveDeletedItemHandler);
-    };
-  }, [receiveDeletedItemHandler]);
 
   useEffect(() => {
     const timerId = props.timerId;
@@ -1035,15 +1005,11 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       onTouchStart={trackActivity}
       onAnimationEnd={async () => {
         if (state.isMarkedForDeletion) {
-          if (state.isLocalDelete) {
-            removeFeedbackItem(props.id, true);
-          } else {
-            removeFeedbackItem(props.id, false);
-          }
+          removeFeedbackItem(props.id, true);
 
           if (props.groupedItemProps && !props.groupedItemProps.isMainItem) {
             const updatedItem = await itemDataService.getFeedbackItem(props.boardId, props.groupedItemProps.parentItemId);
-            props.refreshFeedbackItems([updatedItem], true);
+            props.refreshFeedbackItems([updatedItem]);
           }
         }
       }}
@@ -1311,10 +1277,7 @@ export class FeedbackItemHelper {
   public static readonly handleDropFeedbackItemOnFeedbackItem = async (feedbackItemProps: IFeedbackItemProps, droppedItemId: string, targetItemId: string) => {
     const updatedFeedbackItems = await itemDataService.addFeedbackItemAsChild(feedbackItemProps.boardId, targetItemId, droppedItemId);
 
-    feedbackItemProps.refreshFeedbackItems(
-      [updatedFeedbackItems.updatedParentFeedbackItem, updatedFeedbackItems.updatedChildFeedbackItem, ...updatedFeedbackItems.updatedGrandchildFeedbackItems, updatedFeedbackItems.updatedOldParentFeedbackItem].filter(item => item),
-      true,
-    );
+    feedbackItemProps.refreshFeedbackItems([updatedFeedbackItems.updatedParentFeedbackItem, updatedFeedbackItems.updatedChildFeedbackItem, ...updatedFeedbackItems.updatedGrandchildFeedbackItems, updatedFeedbackItems.updatedOldParentFeedbackItem].filter(item => item));
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemGrouped, properties: feedbackItemProps });
   };
 }

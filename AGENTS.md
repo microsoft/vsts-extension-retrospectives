@@ -4,24 +4,21 @@ Instructions for AI coding agents working on the Retrospectives Extension for Az
 
 ## Project Overview
 
-Full-stack Azure DevOps extension:
+Azure DevOps extension with only a frontend: React 19 + TypeScript in `src/frontend/`.
 
-- **Frontend**: React 19 + TypeScript in `src/frontend/`
-- **Backend**: .NET 9 (ASP.NET Core + SignalR) in `src/backend/`
+There is no backend service. All data is stored in the Azure DevOps Extension Data Service, and changes made by other users are picked up by polling.
 
 ## Directory Structure
 
 ```text
 src/
-├── frontend/              # React/TypeScript frontend
-│   ├── components/        # React components
-│   │   ├── __tests__/     # Jest tests (*.test.tsx)
-│   │   └── __mocks__/     # Test mocks
-│   ├── dal/               # Data access layer
-│   ├── interfaces/        # TypeScript interfaces
-│   └── utilities/         # Utility functions
-├── backend/               # C#/.NET SignalR backend
-└── backend.tests/         # xUnit tests for backend
+└── frontend/              # React/TypeScript frontend
+    ├── components/        # React components
+    │   ├── __tests__/     # Jest tests (*.test.tsx)
+    │   └── __mocks__/     # Test mocks
+    ├── dal/               # Data access layer
+    ├── interfaces/        # TypeScript interfaces
+    └── utilities/         # Utility functions
 ```
 
 ## Build/Lint/Test Commands
@@ -44,16 +41,6 @@ npx jest --env=jsdom components/__tests__/feedbackItem.test.tsx
 
 # Full check (lint + format + pre-commit + test)
 npm run check
-```
-
-### Backend (run from `src/backend/`)
-
-```bash
-dotnet restore --locked-mode && dotnet build
-
-# Run tests (from src/backend.tests/)
-dotnet test
-dotnet test --filter "FullyQualifiedName~TestMethodName"  # Single test
 ```
 
 ### Pre-commit Hooks
@@ -101,26 +88,6 @@ pre-commit run --all-files      # Run on all files
 - `forwardRef` + `useImperativeHandle` for ref-exposing components
 - Define prop/state interfaces before component
 
-### C# (Backend)
-
-Follow [C# Coding Conventions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions):
-
-- PascalCase for public members/methods/classes
-- `_camelCase` for private fields (`_logger`, `_insights`)
-- XML documentation comments for public methods
-- Async methods return `Task`
-
-```csharp
-/// <summary>
-/// Broadcast receiveNewItem to all other clients.
-/// </summary>
-public Task BroadcastNewItem(string reflectBoardId, string columnId, string feedbackItemId)
-{
-    _logger.LogInformation($"BroadcastNewItem connectionID: {Context.ConnectionId}");
-    return Clients.OthersInGroup(reflectBoardId).SendAsync(receiveNewItem.ToString(), columnId, feedbackItemId);
-}
-```
-
 ## Testing
 
 ### Frontend (Jest + React Testing Library)
@@ -128,11 +95,7 @@ public Task BroadcastNewItem(string reflectBoardId, string columnId, string feed
 - Test files: `components/__tests__/*.test.tsx`
 - Mock Azure DevOps SDK, telemetry, and external services
 - Use `@testing-library/react` and `@testing-library/user-event`
-
-### Backend (xUnit + Moq)
-
-- Test files: `src/backend.tests/`
-- Use Moq for mocking, Arrange-Act-Assert pattern
+- The feedback item and board loops poll as soon as they start; the board list loop waits one interval first. To trigger the next poll, advance fake timers past the interval or dispatch `new Event("online")` on `window`, which makes every active loop poll immediately.
 
 ## Error Handling
 
@@ -146,17 +109,14 @@ try {
 }
 ```
 
-**Backend**: logging + Application Insights:
-
-```csharp
-_logger.LogInformation($"Operation: {Context.ConnectionId}");
-_insights.TrackEvent("Event name");
-```
+Inside a polling loop's `poll` callback, let errors propagate: the loop reports them through `onError` and retries after an increasing delay.
 
 ## Key Patterns
 
-- **SignalR**: Backend hub `ReflectHub.cs`, frontend `dal/reflectBackendService`
-- **Signal names**: Defined in `ReflectBackendSignals` enum
+- **Live updates**: `startPollingLoop` in `utilities/pollingLoop.ts` polls the open board's feedback items (`feedbackBoard.tsx`) and the open board (`feedbackBoardContainer.tsx`) every 2 seconds, and the team's board list every 30 seconds. Loops pause while the tab is hidden and back off after errors.
+- **Poll reads**: use the strict data access methods (`getFeedbackItemsForBoardStrict`, `getBoardsForTeamStrict`, `getBoardForTeamByIdStrict`), which throw on failures instead of returning empty data.
+- **Merging**: merge polled documents by `__etag` (`mergeServerFeedbackItems`, `mergePolledBoard`, `mergePolledBoardList`). Keep object identity for unchanged data and never let an older server copy overwrite newer local state.
+- **Sharing changes**: save through the data access layer (`dal/`); other users pick up changes on their next poll, so there is nothing to broadcast. "Move everyone" to a phase is detected through the board's `activePhaseUpdatedDate`.
 - **Data storage**: Azure DevOps data service (via extension SDK)
 
 ## CI/CD
@@ -164,7 +124,6 @@ _insights.TrackEvent("Event name");
 PRs trigger:
 
 1. Frontend: lint, build, test (with coverage)
-2. Backend: restore, build, test
-3. Pre-commit: gitleaks (secrets), shellcheck, formatting
+2. Pre-commit: gitleaks (secrets), shellcheck, formatting
 
 Always run `npm test` before committing frontend changes.

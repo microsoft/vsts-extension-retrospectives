@@ -3,7 +3,7 @@ import { IFeedbackBoardDocument, IFeedbackItemDocument, ITeamEffectivenessMeasur
 import { appInsights } from "../utilities/telemetryClient";
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
 import { workItemService } from "./azureDevOpsWorkItemService";
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument } from "./dataService";
+import { createDocument, deleteDocument, readDocument, readDocuments, readDocumentsStrict, updateDocument } from "./dataService";
 import { generateUUID } from "../utilities/random";
 import { IColumnItem } from "../../frontend/components/feedbackBoard";
 import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
@@ -88,6 +88,14 @@ class ItemDataService {
     }
 
     return feedbackItems;
+  };
+
+  /**
+   * Get all feedback items in the board without masking read failures.
+   * A board without items resolves to an empty list; any other error is rethrown so live sync polling can retry.
+   */
+  public getFeedbackItemsForBoardStrict = async (boardId: string): Promise<IFeedbackItemDocument[]> => {
+    return await readDocumentsStrict<IFeedbackItemDocument>(boardId);
   };
 
   /**

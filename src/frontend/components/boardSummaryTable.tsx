@@ -7,7 +7,6 @@ import { IFeedbackBoardDocument } from "../interfaces/feedback";
 import BoardDataService from "../dal/boardDataService";
 import { itemDataService } from "../dal/itemDataService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
-import { reflectBackendService } from "../dal/reflectBackendService";
 import { formatDate, t } from "../utilities/localization";
 import { appInsights, reactPlugin, TelemetryEvents } from "../utilities/telemetryClient";
 import { obfuscateUserId, getUserIdentity } from "../utilities/userIdentityHelper";
@@ -433,7 +432,6 @@ function BoardSummaryTable(props: Readonly<IBoardSummaryTableProps>): React.JSX.
   const handleConfirmDelete = async () => {
     try {
       await BoardDataService.deleteFeedbackBoard(teamId, openDialogBoardId);
-      reflectBackendService.broadcastDeletedBoard(teamId, openDialogBoardId);
 
       setTableData(prevData => prevData.filter(board => board.id !== openDialogBoardId));
 

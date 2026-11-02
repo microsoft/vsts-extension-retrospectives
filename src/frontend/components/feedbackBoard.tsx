@@ -5,7 +5,6 @@ import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTrack
 import { workService } from "../dal/azureDevOpsWorkService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
 import { itemDataService } from "../dal/itemDataService";
-import { reflectBackendService } from "../dal/reflectBackendService";
 import FeedbackColumn, { type FeedbackColumnProps, type FeedbackColumnHandle } from "./feedbackColumn";
 import { IFeedbackBoardDocument, IFeedbackColumn, IFeedbackItemDocument } from "../interfaces/feedback";
 import { ExceptionCode } from "../interfaces/retrospectiveState";
@@ -16,6 +15,7 @@ import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { appInsights, reactPlugin } from "../utilities/telemetryClient";
 import { isAnyModalDialogOpen } from "../utilities/dialogHelper";
 import { getBoardAccess } from "../utilities/boardAccessHelper";
+import { IPollingLoop, LIVE_SYNC_POLL_INTERVAL_MS, startPollingLoop } from "../utilities/pollingLoop";
 import { getIconElement } from "./icons";
 
 export interface FeedbackBoardProps {
@@ -86,6 +86,188 @@ export const getColumnNotesOrEmpty = (columnNotes: { [columnId: string]: string 
   return getTextOrEmpty(columnNotes[columnId]);
 };
 
+const emptyFeedbackItemId = "emptyFeedbackItem";
+
+// Locally deleted items stay hidden until a poll that started after the delete confirms it (or this expires).
+const DELETED_ITEM_TOMBSTONE_MS = 60000;
+
+// Action items are work items, which change without touching the feedback item document, so they're re-fetched periodically.
+const ACTION_ITEM_REFRESH_INTERVAL_MS = 30000;
+
+interface ICachedActionItem {
+  workItem: WorkItem | null;
+  fetchedAt: number;
+}
+
+export interface IServerFeedbackItemMergeOptions {
+  /** Work items for the associated action item ids; `null` marks a work item that no longer exists. */
+  actionItemsById?: ReadonlyMap<number, WorkItem | null>;
+  /** Items changed locally while the poll was in flight; their local state wins. */
+  pendingItemIds?: ReadonlySet<string>;
+  /** Items kept even when the server no longer has them (being edited or playing their delete animation). */
+  preservedItemIds?: ReadonlySet<string>;
+  /** Items deleted locally that a stale server read must not bring back. */
+  deletedItemIds?: ReadonlySet<string>;
+  animateNewItems?: boolean;
+}
+
+/**
+ * Positive when the local copy is newer than the server copy, zero when both are the same revision.
+ */
+export const compareFeedbackItemVersions = (localItem: IFeedbackItemDocument, serverItem: IFeedbackItemDocument): number => {
+  if (typeof localItem.__etag === "number" && typeof serverItem.__etag === "number") {
+    return localItem.__etag - serverItem.__etag;
+  }
+
+  return JSON.stringify(localItem) === JSON.stringify(serverItem) ? 0 : -1;
+};
+
+const haveSameWorkItems = (left: WorkItem[], right: WorkItem[]): boolean => {
+  return left.length === right.length && left.every((workItem, index) => workItem === right[index] || (workItem.id === right[index].id && workItem.rev === right[index].rev));
+};
+
+const resolveActionItems = (feedbackItem: IFeedbackItemDocument, actionItemsById: ReadonlyMap<number, WorkItem | null>, fallbackActionItems: WorkItem[] = []): WorkItem[] => {
+  const actionItems: WorkItem[] = [];
+
+  (feedbackItem.associatedActionItemIds ?? []).forEach(actionItemId => {
+    const workItem = actionItemsById.has(actionItemId) ? actionItemsById.get(actionItemId) : fallbackActionItems.find(item => item.id === actionItemId);
+    if (workItem) {
+      actionItems.push(workItem);
+    }
+  });
+
+  return actionItems;
+};
+
+const mergeColumnItem = (localItem: IColumnItem, feedbackItem: IFeedbackItemDocument, actionItemsById: ReadonlyMap<number, WorkItem | null>): IColumnItem => {
+  const resolvedActionItems = resolveActionItems(feedbackItem, actionItemsById, localItem.actionItems);
+  const actionItems = haveSameWorkItems(localItem.actionItems, resolvedActionItems) ? localItem.actionItems : resolvedActionItems;
+
+  if (feedbackItem === localItem.feedbackItem && actionItems === localItem.actionItems) {
+    return localItem;
+  }
+
+  return { ...localItem, feedbackItem, actionItems };
+};
+
+/**
+ * Merges the feedback items read from the server into the board columns. Unchanged columns and items keep
+ * their identity (the previous columns object is returned when nothing changed), local-only state such as
+ * focus flags is preserved, and an item only takes the server copy when that copy is newer than the local one.
+ */
+export const mergeServerFeedbackItems = (previousColumns: { [id: string]: IColumn }, serverFeedbackItems: IFeedbackItemDocument[], options: IServerFeedbackItemMergeOptions = {}): { [id: string]: IColumn } => {
+  const actionItemsById = options.actionItemsById ?? new Map<number, WorkItem | null>();
+  const pendingItemIds = options.pendingItemIds ?? new Set<string>();
+  const preservedItemIds = options.preservedItemIds ?? new Set<string>();
+  const deletedItemIds = options.deletedItemIds ?? new Set<string>();
+  const animateNewItems = options.animateNewItems ?? false;
+
+  const serverItemsById = new Map<string, IFeedbackItemDocument>();
+  serverFeedbackItems.forEach(serverItem => serverItemsById.set(serverItem.id, serverItem));
+
+  const nextColumnItems = new Map<string, IColumnItem[]>();
+  Object.keys(previousColumns).forEach(columnId => nextColumnItems.set(columnId, []));
+
+  const changedColumnIds = new Set<string>();
+  const placedItemIds = new Set<string>();
+  const relocatedItems: { localItem: IColumnItem; feedbackItem: IFeedbackItemDocument }[] = [];
+
+  nextColumnItems.forEach((columnItems, columnId) => {
+    previousColumns[columnId].columnItems.forEach(localItem => {
+      const itemId = localItem.feedbackItem.id;
+
+      if (placedItemIds.has(itemId)) {
+        changedColumnIds.add(columnId);
+        return;
+      }
+
+      placedItemIds.add(itemId);
+
+      if (pendingItemIds.has(itemId)) {
+        columnItems.push(localItem);
+        return;
+      }
+
+      const serverItem = serverItemsById.get(itemId);
+
+      if (!serverItem) {
+        if (localItem.newlyCreated || itemId === emptyFeedbackItemId || preservedItemIds.has(itemId)) {
+          columnItems.push(localItem);
+        } else {
+          changedColumnIds.add(columnId);
+        }
+        return;
+      }
+
+      const isServerNewer = compareFeedbackItemVersions(localItem.feedbackItem, serverItem) < 0;
+      const feedbackItem = isServerNewer ? serverItem : localItem.feedbackItem;
+
+      if (feedbackItem.columnId !== columnId && (nextColumnItems.has(feedbackItem.columnId) || isServerNewer)) {
+        // Moved to another column, or to a column this board no longer has (in which case it is dropped).
+        if (nextColumnItems.has(feedbackItem.columnId)) {
+          relocatedItems.push({ localItem, feedbackItem });
+        }
+        changedColumnIds.add(columnId);
+        return;
+      }
+
+      const mergedItem = mergeColumnItem(localItem, feedbackItem, actionItemsById);
+      if (mergedItem !== localItem) {
+        changedColumnIds.add(columnId);
+      }
+      columnItems.push(mergedItem);
+    });
+  });
+
+  relocatedItems.forEach(({ localItem, feedbackItem }) => {
+    nextColumnItems.get(feedbackItem.columnId).push(mergeColumnItem(localItem, feedbackItem, actionItemsById));
+    changedColumnIds.add(feedbackItem.columnId);
+  });
+
+  serverItemsById.forEach((serverItem, itemId) => {
+    if (placedItemIds.has(itemId) || deletedItemIds.has(itemId) || !nextColumnItems.has(serverItem.columnId)) {
+      return;
+    }
+
+    placedItemIds.add(itemId);
+    nextColumnItems.get(serverItem.columnId).push({
+      feedbackItem: serverItem,
+      actionItems: resolveActionItems(serverItem, actionItemsById),
+      showAddedAnimation: animateNewItems,
+    });
+    changedColumnIds.add(serverItem.columnId);
+  });
+
+  if (!changedColumnIds.size) {
+    return previousColumns;
+  }
+
+  const nextColumns = { ...previousColumns };
+  changedColumnIds.forEach(columnId => {
+    nextColumns[columnId] = { ...previousColumns[columnId], columnItems: nextColumnItems.get(columnId) };
+  });
+
+  return nextColumns;
+};
+
+/**
+ * Items that must survive a poll even when the server no longer has them: the one being edited
+ * and the ones playing their delete animation (they are removed from the column when it ends).
+ */
+const getLocallyPreservedFeedbackItemIds = (): Set<string> => {
+  const preservedItemIds = new Set<string>();
+
+  const activeEditorElement = document.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input");
+  const activeEditingItemId = activeEditorElement?.closest("[data-feedback-item-id]")?.getAttribute("data-feedback-item-id");
+  if (activeEditingItemId) {
+    preservedItemIds.add(activeEditingItemId);
+  }
+
+  document.querySelectorAll("[data-feedback-item-id].removeFeedbackItem").forEach(itemElement => preservedItemIds.add(itemElement.getAttribute("data-feedback-item-id")));
+
+  return preservedItemIds;
+};
+
 const getColumnsWithReleasedFocus = (columns: { [id: string]: IColumn }) => {
   const resetFocusForStateColumns = { ...columns };
 
@@ -121,62 +303,94 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
   const prevBoardModifiedDateRef = useRef<Date | undefined>(board.modifiedDate);
   const prevTeamIdRef = useRef<string>(team.id);
 
+  // Bumped on every local change; a poll ignores items changed after it started, so a stale read can't undo the change.
+  const mutationVersionRef = useRef(0);
+  const touchedItemVersionsRef = useRef(new Map<string, number>());
+  const deletedItemIdsRef = useRef(new Map<string, number>());
+  const actionItemCacheRef = useRef(new Map<number, ICachedActionItem>());
+  const actionItemRetryAtRef = useRef(0);
+  const feedbackItemsPollingLoopRef = useRef<IPollingLoop | null>(null);
+
+  const markFeedbackItemsChanged = useCallback((feedbackItemIds: string[]) => {
+    mutationVersionRef.current += 1;
+    const version = mutationVersionRef.current;
+
+    feedbackItemIds.forEach(feedbackItemId => touchedItemVersionsRef.current.set(feedbackItemId, version));
+  }, []);
+
+  const cacheActionItems = useCallback((requestedIds: number[], workItems: WorkItem[]) => {
+    const fetchedAt = Date.now();
+
+    requestedIds.forEach(actionItemId => actionItemCacheRef.current.set(actionItemId, { workItem: null, fetchedAt }));
+    workItems.forEach(workItem => actionItemCacheRef.current.set(workItem.id, { workItem, fetchedAt }));
+  }, []);
+
   const refreshFeedbackItems = useCallback(
-    async (updatedFeedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean): Promise<void> => {
-      if (updatedFeedbackItems.length) {
-        const updatedColumnItems: IColumnItem[] = await Promise.all(
-          updatedFeedbackItems.map(async feedbackItem => {
-            const actionItems = feedbackItem.associatedActionItemIds?.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
-
-            return {
-              feedbackItem,
-              actionItems,
-            };
-          }),
-        );
-
-        setColumns(previousColumns => {
-          const newColumnsAsList = columnIds.map(columnId => {
-            return {
-              key: columnId,
-              value: {
-                columnProperties: previousColumns[columnId].columnProperties,
-                columnItems: previousColumns[columnId].columnItems
-                  .filter(columnItem => {
-                    return !updatedColumnItems.some(item => item.feedbackItem.id === columnItem.feedbackItem.id && item.feedbackItem.columnId !== columnItem.feedbackItem.columnId);
-                  })
-                  .map(columnItem => {
-                    const updatedItem = updatedColumnItems.find(item => item.feedbackItem.id === columnItem.feedbackItem.id && item.feedbackItem.columnId === columnItem.feedbackItem.columnId);
-                    return updatedItem || columnItem;
-                  })
-                  .concat(
-                    updatedColumnItems.filter(columnItem => {
-                      return columnItem.feedbackItem.columnId === columnId && !previousColumns[columnId].columnItems.some(existingColumnItem => columnItem.feedbackItem.id === existingColumnItem.feedbackItem.id);
-                    }),
-                  ),
-              },
-            };
-          });
-
-          const emptyColumns: { [id: string]: IColumn } = {};
-
-          const newColumns = newColumnsAsList.reduce((cols, columnsAsList) => {
-            cols[columnsAsList.key] = columnsAsList.value;
-            return cols;
-          }, emptyColumns);
-
-          setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
-          return newColumns;
-        });
+    async (updatedFeedbackItems: IFeedbackItemDocument[]): Promise<void> => {
+      const feedbackItemsToRefresh = updatedFeedbackItems.filter(feedbackItem => !!feedbackItem);
+      if (!feedbackItemsToRefresh.length) {
+        return;
       }
 
-      if (shouldBroadcast) {
-        updatedFeedbackItems.forEach(updatedFeedbackItem => {
-          reflectBackendService.broadcastUpdatedItem("dummyColumn", updatedFeedbackItem.id);
+      markFeedbackItemsChanged(feedbackItemsToRefresh.map(feedbackItem => feedbackItem.id));
+
+      const updatedColumnItems: IColumnItem[] = await Promise.all(
+        feedbackItemsToRefresh.map(async feedbackItem => {
+          const actionItemIds = feedbackItem.associatedActionItemIds ?? [];
+          const actionItems = actionItemIds.length ? await workItemService.getWorkItemsByIds(actionItemIds) : [];
+          if (actionItemIds.length) {
+            cacheActionItems(actionItemIds, actionItems);
+          }
+
+          return {
+            feedbackItem,
+            actionItems,
+          };
+        }),
+      );
+
+      setColumns(previousColumns => {
+        const localFeedbackItemsById = new Map<string, IFeedbackItemDocument>();
+        Object.keys(previousColumns).forEach(columnId => {
+          previousColumns[columnId].columnItems.forEach(columnItem => localFeedbackItemsById.set(columnItem.feedbackItem.id, columnItem.feedbackItem));
         });
-      }
+
+        // A newer copy may already be on the board (e.g. from a later local change or a poll), so never go back in time.
+        const applicableColumnItems = updatedColumnItems.filter(updatedItem => {
+          const localFeedbackItem = localFeedbackItemsById.get(updatedItem.feedbackItem.id);
+          return !localFeedbackItem || compareFeedbackItemVersions(localFeedbackItem, updatedItem.feedbackItem) <= 0;
+        });
+
+        if (!applicableColumnItems.length) {
+          return previousColumns;
+        }
+
+        const newColumns: { [id: string]: IColumn } = {};
+
+        Object.keys(previousColumns).forEach(columnId => {
+          newColumns[columnId] = {
+            columnProperties: previousColumns[columnId].columnProperties,
+            columnItems: previousColumns[columnId].columnItems
+              .filter(columnItem => {
+                return !applicableColumnItems.some(item => item.feedbackItem.id === columnItem.feedbackItem.id && item.feedbackItem.columnId !== columnItem.feedbackItem.columnId);
+              })
+              .map(columnItem => {
+                const updatedItem = applicableColumnItems.find(item => item.feedbackItem.id === columnItem.feedbackItem.id && item.feedbackItem.columnId === columnItem.feedbackItem.columnId);
+                return updatedItem || columnItem;
+              })
+              .concat(
+                applicableColumnItems.filter(columnItem => {
+                  return columnItem.feedbackItem.columnId === columnId && !previousColumns[columnId].columnItems.some(existingColumnItem => columnItem.feedbackItem.id === existingColumnItem.feedbackItem.id);
+                }),
+              ),
+          };
+        });
+
+        setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
+        return newColumns;
+      });
     },
-    [columnIds],
+    [markFeedbackItemsChanged, cacheActionItems],
   );
 
   const stopTimerById = useCallback(
@@ -199,7 +413,7 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
       try {
         const updatedFeedbackItem = await itemDataService.flipTimer(board.id, feedbackItemId, null);
         if (updatedFeedbackItem) {
-          await refreshFeedbackItems([updatedFeedbackItem], true);
+          await refreshFeedbackItems([updatedFeedbackItem]);
         }
       } catch (error) {
         appInsights.trackException(error, {
@@ -236,87 +450,100 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
     isTeamAdmin: currentUserIsTeamAdmin,
   });
 
-  const addFeedbackItems = useCallback((columnId: string, feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItemsParam: boolean) => {
-    setColumns(previousColumns => {
-      const firstAddedItemId = feedbackItems.length && feedbackItems[0].id;
-      const resetFocusForStateColumns = getColumnsWithReleasedFocus(previousColumns);
+  const addFeedbackItems = useCallback(
+    (columnId: string, feedbackItems: IFeedbackItemDocument[], newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItemsParam: boolean) => {
+      markFeedbackItemsChanged(feedbackItems.map(feedbackItem => feedbackItem.id));
 
-      const updatedColumnItems = feedbackItems
-        .map((feedbackItem): IColumnItem => {
-          if (feedbackItem.id === firstAddedItemId) {
+      setColumns(previousColumns => {
+        if (!previousColumns[columnId]) {
+          return previousColumns;
+        }
+
+        const firstAddedItemId = feedbackItems.length && feedbackItems[0].id;
+        const resetFocusForStateColumns = getColumnsWithReleasedFocus(previousColumns);
+
+        const updatedColumnItems = feedbackItems
+          .map((feedbackItem): IColumnItem => {
+            if (feedbackItem.id === firstAddedItemId) {
+              return {
+                actionItems: [],
+                feedbackItem,
+                hideFeedbackItems: hideFeedbackItemsParam,
+                newlyCreated,
+                shouldHaveFocus,
+                showAddedAnimation,
+              };
+            }
+
             return {
               actionItems: [],
               feedbackItem,
               hideFeedbackItems: hideFeedbackItemsParam,
               newlyCreated,
-              shouldHaveFocus,
               showAddedAnimation,
             };
-          }
+          })
+          .concat(resetFocusForStateColumns[columnId].columnItems);
 
-          return {
-            actionItems: [],
-            feedbackItem,
-            hideFeedbackItems: hideFeedbackItemsParam,
-            newlyCreated,
-            showAddedAnimation,
-          };
-        })
-        .concat(resetFocusForStateColumns[columnId].columnItems);
+        const newColumns = { ...resetFocusForStateColumns };
+        newColumns[columnId].columnItems = updatedColumnItems;
+        setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
+        setIsDataLoaded(true);
 
-      const newColumns = { ...resetFocusForStateColumns };
-      newColumns[columnId].columnItems = updatedColumnItems;
-      setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
-      setIsDataLoaded(true);
-
-      return newColumns;
-    });
-
-    if (shouldBroadcast) {
-      feedbackItems.forEach(columnItem => {
-        reflectBackendService.broadcastNewItem(columnId, columnItem.id);
+        return newColumns;
       });
-    }
-  }, []);
+    },
+    [markFeedbackItemsChanged],
+  );
 
-  const removeFeedbackItemFromColumn = useCallback((columnId: string, feedbackItemId: string, shouldSetFocusOnFirstAvailableItem: boolean) => {
-    setColumns(previousColumns => {
-      const removedItemIndex: number = previousColumns[columnId].columnItems.findIndex(columnItem => columnItem.feedbackItem.id === feedbackItemId);
-      const updatedColumnItems = previousColumns[columnId].columnItems.filter(columnItem => {
-        return columnItem.feedbackItem.id !== feedbackItemId;
-      });
+  const removeFeedbackItemFromColumn = useCallback(
+    (columnId: string, feedbackItemId: string, shouldSetFocusOnFirstAvailableItem: boolean) => {
+      markFeedbackItemsChanged([feedbackItemId]);
+      deletedItemIdsRef.current.set(feedbackItemId, Date.now());
 
-      let updatedColumnItemsWithActiveFocus = updatedColumnItems;
-      let shouldFocusOnCreateFeedback: boolean = false;
-
-      if (shouldSetFocusOnFirstAvailableItem) {
-        if (updatedColumnItems.length > 0 && updatedColumnItems[0]) {
-          updatedColumnItemsWithActiveFocus = updatedColumnItems.map((columnItem): IColumnItem => {
-            return { ...columnItem, shouldHaveFocus: false };
-          });
-
-          const nextAvailableItemIndex = removedItemIndex >= updatedColumnItemsWithActiveFocus.length ? 0 : removedItemIndex;
-          updatedColumnItemsWithActiveFocus[nextAvailableItemIndex] = { ...updatedColumnItemsWithActiveFocus[nextAvailableItemIndex], shouldHaveFocus: true };
-        } else {
-          shouldFocusOnCreateFeedback = true;
+      setColumns(previousColumns => {
+        if (!previousColumns[columnId]) {
+          return previousColumns;
         }
-      }
 
-      const resetFocusForStateColumns = getColumnsWithReleasedFocus(previousColumns);
+        const removedItemIndex: number = previousColumns[columnId].columnItems.findIndex(columnItem => columnItem.feedbackItem.id === feedbackItemId);
+        const updatedColumnItems = previousColumns[columnId].columnItems.filter(columnItem => {
+          return columnItem.feedbackItem.id !== feedbackItemId;
+        });
 
-      const newColumns = {
-        ...resetFocusForStateColumns,
-        [columnId]: {
-          ...resetFocusForStateColumns[columnId],
-          columnItems: updatedColumnItemsWithActiveFocus,
-          shouldFocusOnCreateFeedback,
-        },
-      };
+        let updatedColumnItemsWithActiveFocus = updatedColumnItems;
+        let shouldFocusOnCreateFeedback: boolean = false;
 
-      setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
-      return newColumns;
-    });
-  }, []);
+        if (shouldSetFocusOnFirstAvailableItem) {
+          if (updatedColumnItems.length > 0 && updatedColumnItems[0]) {
+            updatedColumnItemsWithActiveFocus = updatedColumnItems.map((columnItem): IColumnItem => {
+              return { ...columnItem, shouldHaveFocus: false };
+            });
+
+            const nextAvailableItemIndex = removedItemIndex >= updatedColumnItemsWithActiveFocus.length ? 0 : removedItemIndex;
+            updatedColumnItemsWithActiveFocus[nextAvailableItemIndex] = { ...updatedColumnItemsWithActiveFocus[nextAvailableItemIndex], shouldHaveFocus: true };
+          } else {
+            shouldFocusOnCreateFeedback = true;
+          }
+        }
+
+        const resetFocusForStateColumns = getColumnsWithReleasedFocus(previousColumns);
+
+        const newColumns = {
+          ...resetFocusForStateColumns,
+          [columnId]: {
+            ...resetFocusForStateColumns[columnId],
+            columnItems: updatedColumnItemsWithActiveFocus,
+            shouldFocusOnCreateFeedback,
+          },
+        };
+
+        setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
+        return newColumns;
+      });
+    },
+    [markFeedbackItemsChanged],
+  );
 
   const getFocusModeModel = useCallback((): FocusModeModel => {
     return {
@@ -347,7 +574,6 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
   const initColumns = useCallback(() => {
     const columnProperties = board.columns;
 
-    const stateColumns: { [id: string]: IColumn } = {};
     const newColumnIds: string[] = [];
     const newColumnNotes: { [columnId: string]: string } = {};
 
@@ -360,118 +586,160 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
 
       col.notes = getTextOrEmpty(col.notes);
 
-      const column: IColumn = {
-        columnProperties: col,
-        columnItems: [],
-        shouldFocusOnCreateFeedback: false,
-      };
-      stateColumns[col.id] = column;
       newColumnIds.push(col.id);
       newColumnNotes[col.id] = getTextOrEmpty(col.notes);
     });
 
-    setColumns(stateColumns);
-    setColumnIds(newColumnIds);
-    setColumnNotes(newColumnNotes);
-    setActiveTimerFeedbackItemId(null);
-  }, [board.columns]);
+    // Keep the items already on the board so a board update (e.g. a column edit) doesn't blank it until the next poll.
+    setColumns(previousColumns => {
+      const stateColumns: { [id: string]: IColumn } = {};
 
-  const isFetchingRef = useRef(false);
-
-  const getAllBoardFeedbackItems = useCallback(async () => {
-    if (isFetchingRef.current) {
-      return;
-    }
-    isFetchingRef.current = true;
-    try {
-      const feedbackItems = await itemDataService.getFeedbackItemsForBoard(board.id);
-
-      if (!feedbackItems) {
-        setIsDataLoaded(true);
-        setActiveTimerFeedbackItemId(null);
-        return;
-      }
-
-      const columnItemPromises: Promise<IColumnItem>[] = feedbackItems.map(async feedbackItem => {
-        const actionItems = feedbackItem.associatedActionItemIds?.length ? await workItemService.getWorkItemsByIds(feedbackItem.associatedActionItemIds) : [];
-
-        return {
-          actionItems,
-          feedbackItem,
+      columnProperties.forEach(col => {
+        stateColumns[col.id] = {
+          columnProperties: col,
+          columnItems: previousColumns[col.id]?.columnItems ?? [],
+          shouldFocusOnCreateFeedback: false,
         };
       });
 
-      const columnItems = await Promise.all(columnItemPromises);
+      setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(stateColumns));
+      return stateColumns;
+    });
+    setColumnIds(newColumnIds);
+    setColumnNotes(newColumnNotes);
+  }, [board.columns]);
 
-      const activeEditorElement = document.querySelector(".editable-text-input-container textarea, .editable-text-input-container input, .editable-text-input") as HTMLElement | null;
-      const activeEditingItemId = activeEditorElement?.closest("[data-feedback-item-id]")?.getAttribute("data-feedback-item-id");
+  const loadActionItems = useCallback(
+    async (feedbackItems: IFeedbackItemDocument[], boardId: string): Promise<Map<number, WorkItem | null>> => {
+      const now = Date.now();
+      const referencedIds: number[] = [];
+      const seenIds = new Set<number>();
 
-      setColumns(prevColumns => {
-        const newColumns = { ...prevColumns };
-
-        const serverItemsByColumn = new Map<string, IColumnItem[]>();
-        columnItems.forEach(columnItem => {
-          const columnId = columnItem.feedbackItem.columnId;
-          if (columnIds.indexOf(columnId) < 0) {
-            return;
+      feedbackItems.forEach(feedbackItem => {
+        (feedbackItem.associatedActionItemIds ?? []).forEach(actionItemId => {
+          if (!seenIds.has(actionItemId)) {
+            seenIds.add(actionItemId);
+            referencedIds.push(actionItemId);
           }
-
-          const existingItems = serverItemsByColumn.get(columnId) ?? [];
-          existingItems.push(columnItem);
-          serverItemsByColumn.set(columnId, existingItems);
         });
-
-        columnIds.forEach(columnId => {
-          if (!newColumns[columnId]) {
-            return;
-          }
-
-          const serverItems = serverItemsByColumn.get(columnId) ?? [];
-          const serverIds = new Set(serverItems.map(item => item.feedbackItem.id));
-
-          const localItemsToPreserve = newColumns[columnId].columnItems.filter(columnItem => {
-            const itemId = columnItem.feedbackItem.id;
-            if (serverIds.has(itemId)) {
-              return false;
-            }
-
-            return columnItem.newlyCreated || itemId === "emptyFeedbackItem" || (activeEditingItemId !== null && itemId === activeEditingItemId);
-          });
-
-          newColumns[columnId] = {
-            ...newColumns[columnId],
-            columnItems: [...localItemsToPreserve, ...serverItems],
-          };
-        });
-
-        setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(newColumns));
-        return newColumns;
       });
 
-      setIsDataLoaded(true);
-    } finally {
-      isFetchingRef.current = false;
-    }
-  }, [board.id, columnIds]);
+      const idsToFetch = referencedIds.filter(actionItemId => {
+        const cachedActionItem = actionItemCacheRef.current.get(actionItemId);
+        return !cachedActionItem || now - cachedActionItem.fetchedAt >= ACTION_ITEM_REFRESH_INTERVAL_MS;
+      });
 
-  const getAllBoardFeedbackItemsRef = useRef(getAllBoardFeedbackItems);
-  getAllBoardFeedbackItemsRef.current = getAllBoardFeedbackItems;
+      if (idsToFetch.length && now >= actionItemRetryAtRef.current) {
+        try {
+          cacheActionItems(idsToFetch, await workItemService.getWorkItemsByIds(idsToFetch));
+        } catch (error) {
+          // Keep syncing feedback with the action items already on the board; retry the work items later.
+          actionItemRetryAtRef.current = Date.now() + ACTION_ITEM_REFRESH_INTERVAL_MS;
+          appInsights.trackException(error, { action: "pollActionItems", boardId, actionItemCount: idsToFetch.length });
+        }
+      }
+
+      const actionItemsById = new Map<number, WorkItem | null>();
+      referencedIds.forEach(actionItemId => {
+        const cachedActionItem = actionItemCacheRef.current.get(actionItemId);
+        if (cachedActionItem) {
+          actionItemsById.set(actionItemId, cachedActionItem.workItem);
+        }
+      });
+
+      return actionItemsById;
+    },
+    [cacheActionItems],
+  );
+
+  const pollFeedbackItems = useCallback(
+    async (boardId: string, isActive: () => boolean, animateNewItems: boolean): Promise<void> => {
+      const pollStartVersion = mutationVersionRef.current;
+      const pollStartedAt = Date.now();
+
+      const serverFeedbackItems = ((await itemDataService.getFeedbackItemsForBoardStrict(boardId)) ?? []).filter(feedbackItem => !!feedbackItem?.id);
+      if (!isActive()) {
+        return;
+      }
+
+      const actionItemsById = await loadActionItems(serverFeedbackItems, boardId);
+      if (!isActive()) {
+        return;
+      }
+
+      const pendingItemIds = new Set<string>();
+      touchedItemVersionsRef.current.forEach((version, feedbackItemId) => {
+        if (version > pollStartVersion) {
+          pendingItemIds.add(feedbackItemId);
+        }
+      });
+
+      const serverItemIds = new Set(serverFeedbackItems.map(feedbackItem => feedbackItem.id));
+      const now = Date.now();
+      const deletedItemIds = new Set<string>();
+      deletedItemIdsRef.current.forEach((deletedAt, feedbackItemId) => {
+        const isDeleteConfirmed = deletedAt < pollStartedAt && !serverItemIds.has(feedbackItemId);
+        if (isDeleteConfirmed || now - deletedAt > DELETED_ITEM_TOMBSTONE_MS) {
+          deletedItemIdsRef.current.delete(feedbackItemId);
+        } else {
+          deletedItemIds.add(feedbackItemId);
+        }
+      });
+
+      const preservedItemIds = getLocallyPreservedFeedbackItemIds();
+
+      setColumns(previousColumns => {
+        const nextColumns = mergeServerFeedbackItems(previousColumns, serverFeedbackItems, { actionItemsById, pendingItemIds, preservedItemIds, deletedItemIds, animateNewItems });
+        if (nextColumns !== previousColumns) {
+          setActiveTimerFeedbackItemId(findActiveTimerFeedbackItemId(nextColumns));
+        }
+
+        return nextColumns;
+      });
+
+      touchedItemVersionsRef.current.forEach((version, feedbackItemId) => {
+        if (version <= pollStartVersion) {
+          touchedItemVersionsRef.current.delete(feedbackItemId);
+        }
+      });
+    },
+    [loadActionItems],
+  );
+
+  const hasColumns = columnIds.length > 0;
 
   useEffect(() => {
-    let fallbackPollingIntervalId: number | undefined;
-
-    if (workflowPhase === WorkflowPhase.Collect) {
-      fallbackPollingIntervalId = window.setInterval(() => {
-        void getAllBoardFeedbackItemsRef.current();
-      }, 10000);
+    if (!hasColumns) {
+      return undefined;
     }
 
+    const boardId = board.id;
+    let hasLoadedItems = false;
+
+    const pollingLoop = startPollingLoop({
+      intervalMs: LIVE_SYNC_POLL_INTERVAL_MS,
+      poll: async isActive => {
+        try {
+          await pollFeedbackItems(boardId, isActive, hasLoadedItems);
+          hasLoadedItems = true;
+        } finally {
+          // Show the columns after the first attempt even if it failed; the loop keeps retrying.
+          if (isActive()) {
+            setIsDataLoaded(true);
+          }
+        }
+      },
+      onError: (error, consecutiveErrorCount) => {
+        appInsights.trackException(error, { action: "pollFeedbackItems", boardId, consecutiveErrorCount });
+      },
+    });
+    feedbackItemsPollingLoopRef.current = pollingLoop;
+
     return () => {
-      if (fallbackPollingIntervalId !== undefined) {
-        window.clearInterval(fallbackPollingIntervalId);
-      }
+      pollingLoop.stop();
+      feedbackItemsPollingLoopRef.current = null;
     };
-  }, [workflowPhase]);
+  }, [board.id, hasColumns, pollFeedbackItems]);
 
   const setDefaultIterationAndAreaPath = useCallback(async (teamId: string): Promise<void> => {
     let currentIterations = await workService.getIterations(teamId, "current");
@@ -644,11 +912,10 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
   }, [initColumns]);
 
   useEffect(() => {
-    if (columnIds.length > 0) {
-      getAllBoardFeedbackItems();
+    if (hasColumns) {
       setDefaultIterationAndAreaPath(team.id);
     }
-  }, [columnIds.length > 0 ? null : columnIds, getAllBoardFeedbackItems, setDefaultIterationAndAreaPath, team.id]);
+  }, [hasColumns, board.id, team.id, setDefaultIterationAndAreaPath]);
 
   useEffect(() => {
     if (prevBoardIdRef.current !== board.id) {
@@ -657,6 +924,8 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
       setColumnIds([]);
       setColumnNotes({});
       setActiveTimerFeedbackItemId(null);
+      touchedItemVersionsRef.current.clear();
+      deletedItemIdsRef.current.clear();
       initColumns();
       prevBoardIdRef.current = board.id;
     }
@@ -664,9 +933,9 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
 
   useEffect(() => {
     if (prevBoardModifiedDateRef.current !== board.modifiedDate) {
-      setColumnNotes({});
-      setActiveTimerFeedbackItemId(null);
       initColumns();
+      // The board settings changed (e.g. columns were edited), so sync the items now instead of on the next tick.
+      feedbackItemsPollingLoopRef.current?.pollNow();
       prevBoardModifiedDateRef.current = board.modifiedDate;
     }
   }, [board.modifiedDate, initColumns]);
@@ -677,26 +946,6 @@ const FeedbackBoardComponent: React.FC<FeedbackBoardProps> = ({ displayBoard, bo
       prevTeamIdRef.current = team.id;
     }
   }, [team.id, setDefaultIterationAndAreaPath]);
-
-  useEffect(() => {
-    const receiveNewItemHandler = async (columnId: string, feedbackItemId: string) => {
-      const newItem = await itemDataService.getFeedbackItem(board.id, feedbackItemId);
-      addFeedbackItems(columnId, [newItem], /*shouldBroadcast*/ false, /*newlyCreated*/ false, /*showAddedAnimation*/ true, /*shouldHaveFocus*/ false, hideFeedbackItems);
-    };
-
-    const receiveUpdatedItemHandler = async (_: string, feedbackItemId: string) => {
-      const updatedItem = await itemDataService.getFeedbackItem(board.id, feedbackItemId);
-      refreshFeedbackItems([updatedItem], false);
-    };
-
-    reflectBackendService.onReceiveNewItem(receiveNewItemHandler);
-    reflectBackendService.onReceiveUpdatedItem(receiveUpdatedItemHandler);
-
-    return () => {
-      reflectBackendService.removeOnReceiveNewItem(receiveNewItemHandler);
-      reflectBackendService.removeOnReceiveUpdatedItem(receiveUpdatedItemHandler);
-    };
-  }, [board.id, hideFeedbackItems, addFeedbackItems, refreshFeedbackItems]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleBoardKeyDown);

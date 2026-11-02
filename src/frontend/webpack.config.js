@@ -100,7 +100,6 @@ export default (_, argv) => {
         "process.env.NODE_ENV": JSON.stringify(mode),
         "process.env.BUILD_BUILDNUMBER": JSON.stringify(process.env.BUILD_BUILDNUMBER),
         "process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY": JSON.stringify(process.env.REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY),
-        "process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL": JSON.stringify(process.env.REACT_APP_COLLABORATION_STATE_SERVICE_URL),
       }),
       new CompressionPlugin(),
       codecovWebpackPlugin({

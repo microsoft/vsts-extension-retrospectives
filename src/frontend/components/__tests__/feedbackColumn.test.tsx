@@ -2379,7 +2379,7 @@ describe("Feedback Column ", () => {
       await moveFeedbackItem(refreshFeedbackItems, "board-1", "child-1", "target-column");
 
       expect(itemDataService.addFeedbackItemAsMainItemToColumn).toHaveBeenCalledWith("board-1", "child-1", "target-column");
-      expect(refreshFeedbackItems).toHaveBeenCalledWith(expect.arrayContaining([updatedItem, { id: "child-2" }]), true);
+      expect(refreshFeedbackItems).toHaveBeenCalledWith(expect.arrayContaining([updatedItem, { id: "child-2" }]));
       expect(appInsights.trackEvent).toHaveBeenCalledWith({ name: TelemetryEvents.FeedbackItemUngrouped, properties: { boardId: "board-1", feedbackItemId: "child-1", columnId: "target-column" } });
     });
 

@@ -4,7 +4,6 @@ import { WorkflowPhase } from "../interfaces/workItem";
 import WorkflowStage from "./workflowStage";
 import BoardDataService from "../dal/boardDataService";
 import { FeedbackBoardDocumentHelper, IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument, ITeamAssessmentQuestion } from "../interfaces/feedback";
-import { reflectBackendService } from "../dal/reflectBackendService";
 import BoardSummaryTable from "./boardSummaryTable";
 import FeedbackBoardMetadataForm from "./feedbackBoardMetadataForm";
 import FeedbackBoard from "../components/feedbackBoard";
@@ -45,6 +44,7 @@ import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
 import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
 import { canCurrentUserManageBoard } from "../utilities/boardAccessHelper";
+import { BOARD_LIST_POLL_INTERVAL_MS, IPollingLoop, LIVE_SYNC_POLL_INTERVAL_MS, startPollingLoop } from "../utilities/pollingLoop";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
@@ -57,8 +57,6 @@ export interface FeedbackBoardContainerState {
   currentTeam: WebApiTeam;
   hasToggledArchive: boolean;
   isAppInitialized: boolean;
-  isBackendServiceConnected: boolean;
-  isBackendServiceReconnecting: boolean;
   isTeamDataLoaded: boolean;
   isAllTeamsLoaded: boolean;
   maxVotesPerUser: number;
@@ -83,7 +81,6 @@ export interface FeedbackBoardContainerState {
   teamBoardDeletedDialogTitle: string;
   focusModeModel: FocusModeModel | null;
   isIncludeTeamEffectivenessMeasurementDialogHidden: boolean;
-  isLiveSyncInTfsIssueMessageBarVisible: boolean;
   isDropIssueInEdgeMessageBarVisible: boolean;
   allowCrossColumnGroups: boolean;
   feedbackItems: IFeedbackItemDocument[];
@@ -125,6 +122,117 @@ export function deduplicateTeamMembers(allTeamMembers: TeamMember[]): TeamMember
   });
 }
 
+function getVoteMetrics(board: IFeedbackBoardDocument | undefined, currentUserId: string): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> {
+  if (!board || !currentUserId) {
+    return {
+      castedVoteCount: 0,
+      currentVoteCount: "0",
+      teamVoteCapacity: 0,
+    };
+  }
+
+  const voteCollection = board.boardVoteCollection || {};
+  const votes = Object.values(voteCollection);
+  const totalVotesUsed = votes.length > 0 ? votes.reduce((sum, vote) => sum + vote, 0) : 0;
+
+  const userIdKey = obfuscateUserId(currentUserId);
+  const currentUserVotes = voteCollection[userIdKey]?.toString() || "0";
+
+  const voterCount = Object.keys(voteCollection).length;
+  const maxVotesPerUser = board.maxVotesPerUser ?? 0;
+  const teamVoteCapacity = voterCount > 0 && maxVotesPerUser > 0 ? voterCount * maxVotesPerUser : 0;
+
+  return {
+    castedVoteCount: totalVotesUsed,
+    currentVoteCount: currentUserVotes,
+    teamVoteCapacity,
+  };
+}
+
+const getTimeOrUndefined = (date: Date | string | undefined): number | undefined => (date ? new Date(date).getTime() : undefined);
+
+const getActivePhaseMarker = (board: IFeedbackBoardDocument): string => `${board.activePhase}|${getTimeOrUndefined(board.activePhaseUpdatedDate) ?? ""}`;
+
+/**
+ * Whether a polled board is no newer than the copy already applied. Extension Data Service etags grow with every
+ * write, so an older etag means the poll raced with a write that this client already applied.
+ */
+export function isPolledBoardUpToDate(appliedBoard: IFeedbackBoardDocument, polledBoard: IFeedbackBoardDocument): boolean {
+  if (typeof appliedBoard.__etag === "number" && typeof polledBoard.__etag === "number") {
+    return polledBoard.__etag <= appliedBoard.__etag;
+  }
+
+  return JSON.stringify(appliedBoard) === JSON.stringify(polledBoard);
+}
+
+/**
+ * Whether someone moved everyone to a phase between two server copies of the board. Each move stamps
+ * activePhaseUpdatedDate, so a move to the phase the board is already in still counts.
+ */
+export function hasEveryoneBeenMoved(previousServerBoard: IFeedbackBoardDocument | undefined, serverBoard: IFeedbackBoardDocument): boolean {
+  return previousServerBoard !== undefined && getActivePhaseMarker(previousServerBoard) !== getActivePhaseMarker(serverBoard);
+}
+
+/**
+ * Applies a polled server copy of the board to the local one. The server copy wins, except for what only exists
+ * for this user: the phase they are looking at (unless someone moved everyone), the generated email summary and
+ * their unsaved team assessment answers. The columns keep their identity while the board settings are unchanged
+ * so the board doesn't rebuild its columns on every vote.
+ */
+export function mergePolledBoard(localBoard: IFeedbackBoardDocument, serverBoard: IFeedbackBoardDocument, previousServerBoard: IFeedbackBoardDocument | undefined, currentUserId: string): IFeedbackBoardDocument {
+  const mergedBoard: IFeedbackBoardDocument = {
+    ...serverBoard,
+    activePhase: hasEveryoneBeenMoved(previousServerBoard, serverBoard) ? serverBoard.activePhase : localBoard.activePhase,
+    teamEffectivenessMeasurementVoteCollection: serverBoard.teamEffectivenessMeasurementVoteCollection ?? [],
+  };
+
+  if (localBoard.emailContent !== undefined) {
+    mergedBoard.emailContent = localBoard.emailContent;
+  }
+
+  // Columns only change together with modifiedDate (see BoardDataService.updateBoardMetadata).
+  if (getTimeOrUndefined(localBoard.modifiedDate) === getTimeOrUndefined(serverBoard.modifiedDate)) {
+    mergedBoard.modifiedDate = localBoard.modifiedDate;
+    mergedBoard.columns = localBoard.columns;
+  }
+
+  const currentUserKey = currentUserId ? obfuscateUserId(currentUserId) : undefined;
+  const localAnswers = currentUserKey ? localBoard.teamEffectivenessMeasurementVoteCollection?.find(vote => vote?.userId === currentUserKey) : undefined;
+  const previousServerAnswers = currentUserKey ? previousServerBoard?.teamEffectivenessMeasurementVoteCollection?.find(vote => vote?.userId === currentUserKey) : undefined;
+
+  if (localAnswers && JSON.stringify(localAnswers) !== JSON.stringify(previousServerAnswers)) {
+    const serverVotes = mergedBoard.teamEffectivenessMeasurementVoteCollection;
+    mergedBoard.teamEffectivenessMeasurementVoteCollection = serverVotes.some(vote => vote?.userId === currentUserKey) ? serverVotes.map(vote => (vote?.userId === currentUserKey ? localAnswers : vote)) : [...serverVotes, localAnswers];
+  }
+
+  return mergedBoard;
+}
+
+/**
+ * Applies a polled board list for the team: only the boards the user can see, newest first. Entries that are
+ * already up to date keep their object, and the current board stays listed so the board poll can report it if it
+ * was archived or deleted. Returns the previous list when nothing changed.
+ */
+export function mergePolledBoardList(previousBoards: IFeedbackBoardDocument[], serverBoards: IFeedbackBoardDocument[], teamIds: string[], currentUserId: string, currentBoardId: string | undefined): IFeedbackBoardDocument[] {
+  const previousBoardsById = new Map(previousBoards.map(board => [board.id, board]));
+  const visibleBoards = serverBoards.filter(board => FeedbackBoardDocumentHelper.filter(board, teamIds, currentUserId));
+
+  const previousCurrentBoard = currentBoardId ? previousBoardsById.get(currentBoardId) : undefined;
+  if (previousCurrentBoard && !visibleBoards.some(board => board.id === currentBoardId)) {
+    visibleBoards.push(previousCurrentBoard);
+  }
+
+  const boards = visibleBoards
+    .map(board => {
+      const previousBoard = previousBoardsById.get(board.id);
+      return previousBoard && isPolledBoardUpToDate(previousBoard, board) ? previousBoard : board;
+    })
+    .sort((board1, board2) => FeedbackBoardDocumentHelper.sort(board1, board2));
+
+  const isUnchanged = boards.length === previousBoards.length && boards.every((board, index) => board === previousBoards[index]);
+  return isUnchanged ? previousBoards : boards;
+}
+
 const initialState: FeedbackBoardContainerState = {
   allWorkItemTypes: [],
   availableActionItemWorkItemTypes: [],
@@ -136,12 +244,9 @@ const initialState: FeedbackBoardContainerState = {
   hasToggledArchive: false,
   isAllTeamsLoaded: false,
   isAppInitialized: false,
-  isBackendServiceConnected: false,
-  isBackendServiceReconnecting: false,
   focusModeModel: null,
   isIncludeTeamEffectivenessMeasurementDialogHidden: true,
   isDropIssueInEdgeMessageBarVisible: true,
-  isLiveSyncInTfsIssueMessageBarVisible: true,
   isMobileBoardActionsDialogHidden: true,
   isMobileTeamSelectorDialogHidden: true,
   isTeamBoardDeletedInfoDialogHidden: true,
@@ -239,8 +344,13 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   const [isMovingEveryone, setIsMovingEveryone] = React.useState(false);
 
   const boardTimerIntervalIdRef = React.useRef<number | undefined>(undefined);
-  const connectionWatchdogIntervalIdRef = React.useRef<number | undefined>(undefined);
   const allBoardFeedbackSearchRequestIdRef = React.useRef(0);
+
+  const boardPollingLoopRef = React.useRef<IPollingLoop | undefined>(undefined);
+  // The last server copy of the current board, which tells the next poll what changed on the server.
+  const lastServerBoardRef = React.useRef<IFeedbackBoardDocument | undefined>(undefined);
+  // Bumped whenever the board list is loaded or changed outside the board list poll, so an in-flight poll doesn't overwrite it.
+  const boardListVersionRef = React.useRef(0);
 
   const prevCurrentTeamRef = React.useRef<WebApiTeam | undefined>(undefined);
   const prevCurrentBoardRef = React.useRef<IFeedbackBoardDocument | undefined>(undefined);
@@ -309,21 +419,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   useShowModalWhenVisible(visibleDialogs.isTeamAssessmentHistoryDialogVisible, teamAssessmentHistoryDialogRef);
   useShowModalWhenVisible(visibleDialogs.isTeamEffectivenessDialogVisible, teamEffectivenessDialogRef);
 
-  const handleBackendConnectionClosed = React.useCallback(() => {
-    appInsights.trackEvent({ name: TelemetryEvents.LiveSyncConnectionClosed });
-    setContainerState(previousState => ({ ...previousState, isBackendServiceConnected: false, isBackendServiceReconnecting: false }));
-  }, []);
-
-  const handleBackendConnectionReconnecting = React.useCallback(() => {
-    appInsights.trackEvent({ name: TelemetryEvents.LiveSyncReconnecting });
-    setContainerState(previousState => ({ ...previousState, isBackendServiceConnected: false, isBackendServiceReconnecting: true }));
-  }, []);
-
-  const handleBackendConnectionReconnected = React.useCallback(() => {
-    appInsights.trackEvent({ name: TelemetryEvents.LiveSyncReconnected });
-    setContainerState(previousState => ({ ...previousState, isBackendServiceConnected: true, isBackendServiceReconnecting: false }));
-  }, []);
-
   const handleBoardActionsDocumentPointerDown = React.useCallback((event: PointerEvent) => {
     const target = event.target as Node | null;
     if (!target) {
@@ -366,19 +461,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     let initialCurrentTeam: WebApiTeam | undefined;
     let initialCurrentBoard: IFeedbackBoardDocument | undefined;
 
-    if (isHostedAzureDevOps) {
-      try {
-        const isBackendServiceConnected = await reflectBackendService.startConnection();
-        setContainerState(previousState => ({ ...previousState, isBackendServiceConnected, isBackendServiceReconnecting: false }));
-      } catch (error) {
-        appInsights.trackException(error, {
-          action: "connect",
-        });
-      }
-    } else {
-      setContainerState(previousState => ({ ...previousState, isBackendServiceConnected: false, isBackendServiceReconnecting: false }));
-    }
-
     try {
       const savedScrollMode = await BoardDataService.getSetting<ScrollMode>(SCROLL_MODE_SETTING_KEY);
       if (savedScrollMode === "column" || savedScrollMode === "board") {
@@ -396,8 +478,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       initializeProjectTeams(initialCurrentTeam, initializedTeamAndBoardState.userTeams);
 
       setContainerState(previousState => ({ ...previousState, ...initializedTeamAndBoardState, isTeamDataLoaded: true }));
-      reflectBackendService.switchToTeam(initialCurrentTeam ? initialCurrentTeam.id : undefined);
-      reflectBackendService.switchToBoard(initialCurrentBoard ? initialCurrentBoard.id : undefined);
     } catch (error) {
       appInsights.trackException(error, {
         action: "initializeTeamAndBoardState",
@@ -422,7 +502,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     }
 
     try {
-      const voteMetricsState = getVoteMetricsState(initialCurrentBoard);
+      const voteMetricsState = getVoteMetrics(initialCurrentBoard, currentUserId);
       setContainerState(previousState => ({ ...previousState, ...voteMetricsState }));
     } catch (error) {
       appInsights.trackException(error, {
@@ -430,46 +510,19 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       });
     }
 
-    try {
-      reflectBackendService.onConnectionClose(handleBackendConnectionClosed);
-      reflectBackendService.onConnectionReconnecting(handleBackendConnectionReconnecting);
-      reflectBackendService.onConnectionReconnected(handleBackendConnectionReconnected);
-
-      reflectBackendService.onReceiveNewBoard(handleBoardCreated);
-      reflectBackendService.onReceiveDeletedBoard(handleBoardDeleted);
-      reflectBackendService.onReceiveUpdatedBoard(handleBoardUpdated);
-    } catch (e) {
-      appInsights.trackException(e, {
-        action: "catchError",
-      });
-    }
-
     setContainerState(previousState => ({ ...previousState, isAppInitialized: true }));
 
     document.addEventListener("pointerdown", handleBoardActionsDocumentPointerDown);
-  }, [handleBackendConnectionClosed, handleBackendConnectionReconnected, handleBackendConnectionReconnecting, handleBoardActionsDocumentPointerDown]);
+  }, [handleBoardActionsDocumentPointerDown]);
 
   const cleanupOnUnmount = React.useCallback(() => {
-    reflectBackendService.removeOnConnectionClose(handleBackendConnectionClosed);
-    reflectBackendService.removeOnConnectionReconnecting(handleBackendConnectionReconnecting);
-    reflectBackendService.removeOnConnectionReconnected(handleBackendConnectionReconnected);
-    reflectBackendService.removeOnReceiveNewBoard(handleBoardCreated);
-    reflectBackendService.removeOnReceiveDeletedBoard(handleBoardDeleted);
-    reflectBackendService.removeOnReceiveUpdatedBoard(handleBoardUpdated);
-    reflectBackendService.switchToBoard(undefined);
-    reflectBackendService.switchToTeam(undefined);
     if (boardTimerIntervalIdRef.current !== undefined) {
       window.clearInterval(boardTimerIntervalIdRef.current);
       boardTimerIntervalIdRef.current = undefined;
     }
 
-    if (connectionWatchdogIntervalIdRef.current !== undefined) {
-      window.clearInterval(connectionWatchdogIntervalIdRef.current);
-      connectionWatchdogIntervalIdRef.current = undefined;
-    }
-
     document.removeEventListener("pointerdown", handleBoardActionsDocumentPointerDown);
-  }, [handleBackendConnectionClosed, handleBackendConnectionReconnected, handleBackendConnectionReconnecting, handleBoardActionsDocumentPointerDown]);
+  }, [handleBoardActionsDocumentPointerDown]);
 
   React.useEffect(() => {
     void initializeOnMount();
@@ -484,22 +537,25 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     const prevActiveTab = prevActiveTabRef.current;
 
     if (prevCurrentTeam !== undefined && prevCurrentTeam !== state.currentTeam && state.currentTeam) {
-      reflectBackendService.switchToTeam(state.currentTeam.id);
       appInsights.trackEvent({ name: TelemetryEvents.TeamSelectionChanged, properties: { teamId: state.currentTeam.id } });
       void setSupportedWorkItemTypesForProject(state.currentTeam.id);
     }
 
+    // Polling replaces the board object whenever it changes on the server, so only react to a different board or phase.
     if (prevCurrentBoard !== undefined && prevCurrentBoard !== state.currentBoard) {
-      reflectBackendService.switchToBoard(state.currentBoard ? state.currentBoard.id : undefined);
-      appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: { boardId: state.currentBoard?.id } });
-      if (state.isAppInitialized && state.currentTeam) {
-        userDataService.addVisit(state.currentTeam.id, state.currentBoard ? state.currentBoard.id : undefined);
-      }
-      if (state.currentTeam && state.currentBoard) {
-        void updateFeedbackItemsAndContributors(state.currentTeam, state.currentBoard);
-      }
-      if (prevCurrentBoard?.id !== state.currentBoard?.id) {
+      const hasBoardChanged = prevCurrentBoard?.id !== state.currentBoard?.id;
+      const hasPhaseChanged = prevCurrentBoard?.activePhase !== state.currentBoard?.activePhase;
+
+      if (hasBoardChanged) {
+        appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardSelectionChanged, properties: { boardId: state.currentBoard?.id } });
+        if (state.isAppInitialized && state.currentTeam) {
+          userDataService.addVisit(state.currentTeam.id, state.currentBoard ? state.currentBoard.id : undefined);
+        }
         resetBoardTimer();
+      }
+
+      if ((hasBoardChanged || hasPhaseChanged) && state.currentTeam && state.currentBoard) {
+        void updateFeedbackItemsAndContributors(state.currentTeam, state.currentBoard);
       }
     }
 
@@ -734,45 +790,16 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         })
         .filter((v, i, a) => a.indexOf(v) === i);
 
-      const voteMetricsState = getVoteMetricsState(board);
-
       setContainerState(previousState => ({
         ...previousState,
         actionItemIds: actionItemIds.filter(item => item !== undefined),
         feedbackItems,
         contributors: [...new Set(contributors.map(e => e.id))].map(e => contributors.find(i => i.id === e)),
-        ...voteMetricsState,
+        ...getVoteMetrics(board, previousState.currentUserId),
       }));
     },
     [updateUrlWithBoardAndTeamInformation],
   );
-
-  const getVoteMetricsState = React.useCallback((board: IFeedbackBoardDocument | undefined): Pick<FeedbackBoardContainerState, "castedVoteCount" | "currentVoteCount" | "teamVoteCapacity"> => {
-    if (!board || !state.currentUserId) {
-      return {
-        castedVoteCount: 0,
-        currentVoteCount: "0",
-        teamVoteCapacity: 0,
-      };
-    }
-
-    const voteCollection = board.boardVoteCollection || {};
-    const votes = Object.values(voteCollection);
-    const totalVotesUsed = votes.length > 0 ? votes.reduce((sum, vote) => sum + vote, 0) : 0;
-
-    const userIdKey = obfuscateUserId(state.currentUserId);
-    const currentUserVotes = voteCollection[userIdKey]?.toString() || "0";
-
-    const voterCount = Object.keys(voteCollection).length;
-    const maxVotesPerUser = board.maxVotesPerUser ?? 0;
-    const teamVoteCapacity = voterCount > 0 && maxVotesPerUser > 0 ? voterCount * maxVotesPerUser : 0;
-
-    return {
-      castedVoteCount: totalVotesUsed,
-      currentVoteCount: currentUserVotes,
-      teamVoteCapacity,
-    };
-  }, [state.currentUserId]);
 
   const numberFormatter = React.useCallback((value: number) => {
     return formatNumber(value, { style: "decimal", minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -780,43 +807,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const percentageFormatter = React.useCallback((value: number) => {
     return formatNumber(value / 100, { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  }, []);
-
-  const handleBoardCreated = React.useCallback(async (teamId: string, boardId: string) => {
-    if (!teamId) {
-      return;
-    }
-
-    const boardToAdd = await BoardDataService.getBoardForTeamById(teamId, boardId);
-
-    if (!boardToAdd) {
-      return;
-    }
-
-    setContainerState(prevState => {
-      if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
-        return prevState;
-      }
-
-      const boardsForTeam = [...prevState.boards, boardToAdd]
-        .filter((board: IFeedbackBoardDocument) =>
-          FeedbackBoardDocumentHelper.filter(
-            board,
-            prevState.userTeams.map(t => t.id),
-            prevState.currentUserId,
-          ),
-        )
-        .sort((b1, b2) => FeedbackBoardDocumentHelper.sort(b1, b2));
-
-      const newCurrentBoard = boardsForTeam.length === 1 ? boardsForTeam[0] : prevState.currentBoard;
-
-      return {
-        ...prevState,
-        boards: boardsForTeam,
-        currentBoard: newCurrentBoard,
-        isTeamBoardDeletedInfoDialogHidden: true,
-      };
-    });
   }, []);
 
   const getActionItemWorkItemTypes = (availableWorkItemTypes: WorkItemType[], requirementWorkItemTypeNames: string[], allowedWorkItemTypeNames: string[]): WorkItemType[] => {
@@ -862,105 +852,174 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     [state.currentTeam?.id, setSupportedWorkItemTypesForProject],
   );
 
-  const replaceBoard = React.useCallback(
-    (updatedBoard: IFeedbackBoardDocument) => {
-      setContainerState(prevState => {
-        const newBoards = prevState.boards.map(board => (board.id === updatedBoard.id ? updatedBoard : board));
-
-        const currentBoard = prevState.currentBoard;
-        const newCurrentBoard = currentBoard && currentBoard.id === updatedBoard.id ? updatedBoard : currentBoard;
-
-        return {
-          ...prevState,
-          boards: newBoards,
-          currentBoard: newCurrentBoard,
-        };
-      });
-    },
-    [],
-  );
-
-  const handleBoardUpdated = React.useCallback(async (teamId: string, updatedBoardId: string) => {
-    if (!teamId || !state.currentTeam || state.currentTeam.id !== teamId) {
-      return;
+  const replaceBoard = React.useCallback((updatedBoard: IFeedbackBoardDocument) => {
+    // The board was written by this client, so later polls compare against it.
+    if (lastServerBoardRef.current?.id === updatedBoard.id) {
+      lastServerBoardRef.current = updatedBoard;
     }
 
-    const updatedBoard = await BoardDataService.getBoardForTeamById(teamId, updatedBoardId);
+    setContainerState(prevState => {
+      const newBoards = prevState.boards.map(board => (board.id === updatedBoard.id ? updatedBoard : board));
 
-    if (!updatedBoard) {
-      // Board has been deleted after the update. Just ignore the update. The delete should be handled on its own.
-      return;
-    }
+      const currentBoard = prevState.currentBoard;
+      const newCurrentBoard = currentBoard && currentBoard.id === updatedBoard.id ? updatedBoard : currentBoard;
+
+      return {
+        ...prevState,
+        boards: newBoards,
+        currentBoard: newCurrentBoard,
+      };
+    });
+  }, []);
+
+  /**
+   * @description Handles the current board being archived or deleted: it is dropped from the board list and the
+   * most recently created board is selected instead. Users are only told when someone else removed the board.
+   */
+  const handleBoardRemoved = React.useCallback((teamId: string, removedBoardId: string, archivedByUserId?: string) => {
+    boardListVersionRef.current += 1;
 
     setContainerState(prevState => {
       if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
         return prevState;
       }
 
-      const boards = prevState.boards.map(board => (board.id === updatedBoard.id ? updatedBoard : board));
-      const currentBoard = prevState.currentBoard?.id === updatedBoard.id ? updatedBoard : prevState.currentBoard;
+      const boards = prevState.boards.filter(board => board.id !== removedBoardId);
+
+      if (prevState.currentBoard?.id !== removedBoardId) {
+        return boards.length === prevState.boards.length ? prevState : { ...prevState, boards };
+      }
+
+      const nextBoard = boards[0] ?? null;
+
+      if (archivedByUserId && archivedByUserId === prevState.currentUserId) {
+        return { ...prevState, boards, currentBoard: nextBoard };
+      }
 
       return {
         ...prevState,
         boards,
-        currentBoard,
+        currentBoard: nextBoard,
+        isTeamBoardDeletedInfoDialogHidden: false,
+        teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
+        teamBoardDeletedDialogMessage: nextBoard ? "The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team." : "The retrospective you were viewing has been archived or deleted by another user.",
       };
     });
-  }, [state.currentTeam]);
+  }, []);
 
-  const handleBoardDeleted = React.useCallback(async (teamId: string, deletedBoardId: string) => {
-    if (!teamId) {
+  const pollCurrentBoard = React.useCallback(
+    async (teamId: string, boardId: string, isActive: () => boolean) => {
+      const serverBoard = await BoardDataService.getBoardForTeamByIdStrict(teamId, boardId);
+      if (!isActive()) {
+        return;
+      }
+
+      if (!serverBoard || serverBoard.isArchived) {
+        handleBoardRemoved(teamId, boardId, serverBoard?.archivedBy?.id);
+        return;
+      }
+
+      const previousServerBoard = lastServerBoardRef.current?.id === boardId ? lastServerBoardRef.current : undefined;
+      if (previousServerBoard && isPolledBoardUpToDate(previousServerBoard, serverBoard)) {
+        return;
+      }
+
+      lastServerBoardRef.current = serverBoard;
+
+      setContainerState(prevState => {
+        if (prevState.currentTeam?.id !== teamId || prevState.currentBoard?.id !== boardId) {
+          return prevState;
+        }
+
+        return {
+          ...prevState,
+          boards: prevState.boards.map(board => (board.id === boardId ? serverBoard : board)),
+          currentBoard: mergePolledBoard(prevState.currentBoard, serverBoard, previousServerBoard, prevState.currentUserId),
+          ...getVoteMetrics(serverBoard, prevState.currentUserId),
+        };
+      });
+    },
+    [handleBoardRemoved],
+  );
+
+  const pollTeamBoards = React.useCallback(async (teamId: string, isActive: () => boolean) => {
+    const boardListVersion = boardListVersionRef.current;
+    const serverBoards = (await BoardDataService.getBoardsForTeamStrict(teamId)) ?? [];
+    if (!isActive() || boardListVersion !== boardListVersionRef.current) {
       return;
     }
 
-    let selectedBoardId: string | undefined;
-    let shouldAddVisit = false;
     setContainerState(prevState => {
-      if (!prevState.currentTeam || prevState.currentTeam.id !== teamId) {
+      if (prevState.currentTeam?.id !== teamId) {
         return prevState;
       }
 
-      shouldAddVisit = true;
-      selectedBoardId = prevState.currentBoard?.id;
-      const currentBoards = prevState.boards;
-      const boardsForTeam = currentBoards.filter(board => board.id !== deletedBoardId);
+      const boards = mergePolledBoardList(
+        prevState.boards,
+        serverBoards,
+        prevState.userTeams.map(team => team.id),
+        prevState.currentUserId,
+        prevState.currentBoard?.id,
+      );
 
-      if (prevState.currentBoard && deletedBoardId === prevState.currentBoard.id) {
-        if (!boardsForTeam || boardsForTeam.length === 0) {
-          selectedBoardId = undefined;
-          reflectBackendService.switchToBoard(undefined);
-          return {
-            ...prevState,
-            boards: [],
-            currentBoard: null,
-            isTeamBoardDeletedInfoDialogHidden: false,
-            teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
-            teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user.",
-          };
-        }
-
-        const currentBoard = boardsForTeam[0];
-        selectedBoardId = currentBoard.id;
-        reflectBackendService.switchToBoard(currentBoard.id);
-        return {
-          ...prevState,
-          boards: boardsForTeam,
-          currentBoard: currentBoard,
-          isTeamBoardDeletedInfoDialogHidden: false,
-          teamBoardDeletedDialogTitle: "Retrospective archived or deleted",
-          teamBoardDeletedDialogMessage: "The retrospective you were viewing has been archived or deleted by another user. You will be switched to the last created retrospective for this team.",
-        };
+      // Select the first board someone creates for a team that had none.
+      if (!prevState.currentBoard && boards.length > 0) {
+        return { ...prevState, boards, currentBoard: boards[0], isTeamBoardDeletedInfoDialogHidden: true };
       }
 
-      return {
-        ...prevState,
-        boards: boardsForTeam,
-      };
+      return boards === prevState.boards ? prevState : { ...prevState, boards };
     });
-    if (shouldAddVisit) {
-      await userDataService.addVisit(teamId, selectedBoardId);
-    }
   }, []);
+
+  const currentTeamId = state.currentTeam?.id;
+  const currentBoardId = state.currentBoard?.id;
+
+  React.useEffect(() => {
+    if (!currentTeamId || !currentBoardId) {
+      return undefined;
+    }
+
+    // Start from the listed copy so the first poll can tell whether someone moved everyone since the list was loaded.
+    // Reading state.boards here is intentional: the loop only restarts when the selected board changes.
+    if (lastServerBoardRef.current?.id !== currentBoardId) {
+      lastServerBoardRef.current = state.boards.find(board => board.id === currentBoardId);
+    }
+
+    const pollingLoop = startPollingLoop({
+      intervalMs: LIVE_SYNC_POLL_INTERVAL_MS,
+      poll: isActive => pollCurrentBoard(currentTeamId, currentBoardId, isActive),
+      onError: (error, consecutiveErrorCount) => {
+        appInsights.trackException(error, { action: "pollCurrentBoard", boardId: currentBoardId, consecutiveErrorCount });
+      },
+    });
+    boardPollingLoopRef.current = pollingLoop;
+
+    return () => {
+      pollingLoop.stop();
+      if (boardPollingLoopRef.current === pollingLoop) {
+        boardPollingLoopRef.current = undefined;
+      }
+    };
+  }, [currentTeamId, currentBoardId, pollCurrentBoard]);
+
+  React.useEffect(() => {
+    if (!currentTeamId) {
+      return undefined;
+    }
+
+    const pollingLoop = startPollingLoop({
+      intervalMs: BOARD_LIST_POLL_INTERVAL_MS,
+      pollImmediately: false,
+      poll: isActive => pollTeamBoards(currentTeamId, isActive),
+      onError: (error, consecutiveErrorCount) => {
+        appInsights.trackException(error, { action: "pollTeamBoards", teamId: currentTeamId, consecutiveErrorCount });
+      },
+    });
+
+    return () => {
+      pollingLoop.stop();
+    };
+  }, [currentTeamId, pollTeamBoards]);
 
   /**
    * @description Loads team data for this project and the current user. Attempts to use query
@@ -1206,14 +1265,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         matchedBoard.teamEffectivenessMeasurementVoteCollection = [];
       }
 
-      // Set the active phase from URL if provided
-      if (info.phase) {
-        matchedBoard.activePhase = info.phase;
-      }
-
       return {
         ...queryParamTeamAndDefaultBoardState,
-        currentBoard: matchedBoard,
+        // Copy the board for the phase from the URL so the board list keeps the server phase, which polling compares against.
+        currentBoard: info.phase ? { ...matchedBoard, activePhase: info.phase } : matchedBoard,
       };
     } else {
       // If the boardId query param wasn't valid, we fall back to using the most recently
@@ -1430,6 +1485,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
    */
   const reloadBoardsForCurrentTeam = async (preferredBoardId?: string) => {
     setContainerState(previousState => ({ ...previousState, isTeamDataLoaded: false }));
+    boardListVersionRef.current += 1;
 
     try {
       const boardSelection = await loadBoardSelectionForTeam(
@@ -1632,7 +1688,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
   };
 
   const moveEveryoneToSelectedPhase = async (newPhase: WorkflowPhase): Promise<void> => {
-    if (!state.currentBoard || !state.currentTeam || !canManageBoard || !state.isBackendServiceConnected || isMovingEveryone) {
+    if (!state.currentBoard || !state.currentTeam || !canManageBoard || isMovingEveryone) {
       return;
     }
 
@@ -1646,7 +1702,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
       }
 
       replaceBoard(updatedBoard);
-      reflectBackendService.broadcastUpdatedBoard(state.currentTeam.id, updatedBoard.id);
       toast(t("workflow_move_everyone_to_phase_success", { phase: newPhase }), { intent: "success" });
       appInsights.trackEvent({ name: TelemetryEvents.WorkflowPhaseBroadcast, properties: { boardId, newWorkflowPhase: newPhase } });
     } catch (error) {
@@ -1674,7 +1729,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     await reloadBoardsForCurrentTeam();
     hideBoardCreationDialog();
     hideBoardDuplicateDialog();
-    reflectBackendService.broadcastNewBoard(state.currentTeam.id, createdBoard.id);
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardCreated, properties: { boardId: createdBoard.id } });
     return createdBoard;
   };
@@ -1844,7 +1898,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
     const updatedBoard = await BoardDataService.updateBoardMetadata(state.currentTeam.id, state.currentBoard.id, maxVotesPerUser, title, columns, permissions);
 
-    updateBoardAndBroadcast(updatedBoard);
+    updateBoard(updatedBoard);
   };
 
   const showBoardUpdateDialog = (): void => {
@@ -1880,7 +1934,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
 
   const archiveCurrentBoard = async () => {
     await BoardDataService.archiveFeedbackBoard(state.currentTeam.id, state.currentBoard.id);
-    reflectBackendService.broadcastDeletedBoard(state.currentTeam.id, state.currentBoard.id);
     hideDialog("isArchiveBoardDialogVisible", archiveBoardDialogRef);
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardArchived, properties: { boardId: state.currentBoard.id } });
     await reloadBoardsForCurrentTeam();
@@ -1964,35 +2017,25 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     );
   };
 
-  const updateCurrentVoteCount = React.useCallback(async () => {
-    const teamId = state.currentTeam?.id;
-    const boardId = state.currentBoard?.id;
-    if (!teamId || !boardId) {
-      return;
-    }
-
-    const boardItem = await itemDataService.getBoardItem(teamId, boardId);
-    if (!boardItem) {
-      return;
-    }
-
-    const voteMetricsState = getVoteMetricsState(boardItem);
-    setContainerState(previousState => ({ ...previousState, ...voteMetricsState }));
-  }, [state.currentTeam?.id, state.currentBoard?.id, getVoteMetricsState]);
+  const updateCurrentVoteCount = React.useCallback(() => {
+    // Votes are stored on the board document, so read it now instead of waiting for the next poll.
+    boardPollingLoopRef.current?.pollNow();
+  }, []);
 
   const handleFocusModeModelChange = React.useCallback((focusModeModel: FocusModeModel) => {
     setContainerState(previousState => ({ ...previousState, focusModeModel }));
   }, []);
 
-  const updateBoardAndBroadcast = (updatedBoard: IFeedbackBoardDocument) => {
+  const updateBoard = (updatedBoard: IFeedbackBoardDocument) => {
     if (!updatedBoard) {
-      void handleBoardDeleted(state.currentTeam.id, state.currentBoard.id);
+      hideBoardUpdateDialog();
+      handleBoardRemoved(state.currentTeam.id, state.currentBoard.id);
+      return;
     }
 
     replaceBoard(updatedBoard);
 
     hideBoardUpdateDialog();
-    reflectBackendService.broadcastUpdatedBoard(state.currentTeam.id, updatedBoard.id);
     appInsights.trackEvent({ name: TelemetryEvents.FeedbackBoardMetadataUpdated, properties: { boardId: updatedBoard.id } });
   };
 
@@ -2014,7 +2057,6 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         }
 
         replaceBoard(updatedBoard);
-        reflectBackendService.broadcastUpdatedBoard(teamId, updatedBoard.id);
       } catch (error) {
         appInsights.trackException(error, {
           action: "updateColumnNotes",
@@ -2037,76 +2079,11 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     hideDialog("isCarouselDialogVisible", carouselDialogRef);
   };
 
-  const hideLiveSyncInTfsIssueMessageBar = () => {
-    setContainerState(previousState => ({ ...previousState, isLiveSyncInTfsIssueMessageBarVisible: false }));
-  };
-
   const hideDropIssueInEdgeMessageBar = () => {
     setContainerState(previousState => ({ ...previousState, isDropIssueInEdgeMessageBarVisible: false }));
   };
 
-  const attemptBackendReconnect = React.useCallback(
-    async (isManualRetry: boolean): Promise<void> => {
-      if (state.isBackendServiceReconnecting) {
-        return;
-      }
-
-      if (isManualRetry) {
-        appInsights.trackEvent({ name: TelemetryEvents.LiveSyncManualRetry });
-      }
-
-      setContainerState(previousState => ({ ...previousState, isBackendServiceReconnecting: true }));
-
-      const isBackendServiceConnected = await reflectBackendService.retryConnection();
-      if (!isBackendServiceConnected && isManualRetry) {
-        appInsights.trackEvent({ name: TelemetryEvents.LiveSyncManualRetryFailed });
-      }
-
-      setContainerState(previousState => ({ ...previousState, isBackendServiceConnected, isBackendServiceReconnecting: false }));
-
-      if (isBackendServiceConnected && state.currentTeam && state.currentBoard) {
-        await updateFeedbackItemsAndContributors(state.currentTeam, state.currentBoard);
-      }
-    },
-    [state.isBackendServiceReconnecting, state.currentTeam, state.currentBoard, updateFeedbackItemsAndContributors],
-  );
-
-  const retryBackendConnection = async () => {
-    await attemptBackendReconnect(true);
-  };
-
-  React.useEffect(() => {
-    if (isHostedAzureDevOps) {
-      connectionWatchdogIntervalIdRef.current = window.setInterval(() => {
-        if (state.isBackendServiceConnected || state.isBackendServiceReconnecting) {
-          return;
-        }
-
-        void attemptBackendReconnect(false);
-      }, 5000);
-    }
-
-    return () => {
-      if (connectionWatchdogIntervalIdRef.current !== undefined) {
-        window.clearInterval(connectionWatchdogIntervalIdRef.current);
-        connectionWatchdogIntervalIdRef.current = undefined;
-      }
-    };
-  }, [isHostedAzureDevOps, state.isBackendServiceConnected, state.isBackendServiceReconnecting, attemptBackendReconnect]);
-
-  const allBoardFeedbackSearchInput = React.useMemo(
-    () => (
-      <input
-        id="all-board-feedback-search-input"
-        className="feedback-search-input"
-        type="search"
-        placeholder="Enter words to search"
-        aria-label="Enter words to search"
-        onChange={handleAllBoardFeedbackSearchInputChange}
-      />
-    ),
-    [handleAllBoardFeedbackSearchInputChange],
-  );
+  const allBoardFeedbackSearchInput = React.useMemo(() => <input id="all-board-feedback-search-input" className="feedback-search-input" type="search" placeholder="Enter words to search" aria-label="Enter words to search" onChange={handleAllBoardFeedbackSearchInputChange} />, [handleAllBoardFeedbackSearchInputChange]);
 
   const includeArchivedBoardsCheckbox = React.useMemo(
     () => (
@@ -2522,10 +2499,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                         </>
                       )}
                       <div className="flex flex-row gap-3" role="tablist" aria-label="Workflow stage">
-                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} isLiveSyncAvailable={state.isBackendServiceConnected} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
-                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} isLiveSyncAvailable={state.isBackendServiceConnected} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
-                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} isLiveSyncAvailable={state.isBackendServiceConnected} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
-                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} isLiveSyncAvailable={state.isBackendServiceConnected} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
+                        <WorkflowStage display="Collect" ariaPosInSet={1} value={WorkflowPhase.Collect} isActive={state.currentBoard.activePhase === WorkflowPhase.Collect} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
+                        <WorkflowStage display="Group" ariaPosInSet={2} value={WorkflowPhase.Group} isActive={state.currentBoard.activePhase === WorkflowPhase.Group} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
+                        <WorkflowStage display="Vote" ariaPosInSet={3} value={WorkflowPhase.Vote} isActive={state.currentBoard.activePhase === WorkflowPhase.Vote} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
+                        <WorkflowStage display="Act" ariaPosInSet={4} value={WorkflowPhase.Act} isActive={state.currentBoard.activePhase === WorkflowPhase.Act} clickEventCallback={clickWorkflowStateCallback} canManageBoard={canManageBoard} isMoveEveryonePending={isMovingEveryone} moveEveryoneCallback={moveEveryoneToSelectedPhase} />
                       </div>
                       {state.currentBoard.activePhase === WorkflowPhase.Vote && (
                         <div className="feedback-votes-count" role="status" aria-live="polite">
@@ -2605,19 +2582,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
             <div className={`feedback-board-container scroll-mode-${state.scrollMode}`}>
               {state.currentTeam && state.currentBoard && (
                 <>
-                  {!isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
-                    <div className="retro-message-bar">
-                      <span>
-                        <em>Retrospectives</em> does not support live updates for on-premise installations. To see updates from other users, please refresh the page.
-                      </span>
-                      <div className="actions">
-                        <button type="button" className="dismiss" onClick={hideLiveSyncInTfsIssueMessageBar} aria-label="Dismiss notification">
-                          <span aria-hidden="true">×</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  {!isHostedAzureDevOps && state.isDropIssueInEdgeMessageBarVisible && !state.isBackendServiceConnected && (
+                  {!isHostedAzureDevOps && state.isDropIssueInEdgeMessageBarVisible && (
                     <div className="retro-message-bar" role="alert" aria-live="assertive">
                       <span>If your browser does not support grouping a card by dragging and dropping, we recommend using the ellipsis menu on the top-right corner of the feedback.</span>
                       <div className="actions">
@@ -2627,52 +2592,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                       </div>
                     </div>
                   )}
-                  {isHostedAzureDevOps && state.isLiveSyncInTfsIssueMessageBarVisible && !state.isBackendServiceConnected && (
-                    <div className="retro-message-bar" role="alert" aria-live="assertive">
-                      <span>
-                        {state.isBackendServiceReconnecting
-                          ? "We are reconnecting to the live syncing service."
-                          : <>We are unable to connect to the live syncing service. You can continue to create and edit items as usual, but changes will not be updated in real-time to or from other users. <a href="https://github.com/microsoft/vsts-extension-retrospectives/blob/main/README.md#live-sync-troubleshooting" target="_blank" rel="noopener noreferrer">Troubleshooting steps</a></>
-                        }
-                      </span>
-                      <div className="actions">
-                        <button
-                          type="button"
-                          onClick={retryBackendConnection}
-                          aria-label="Retry live sync"
-                          title="Retry live sync"
-                          disabled={state.isBackendServiceReconnecting}
-                        >
-                          <span>{state.isBackendServiceReconnecting ? "Retrying..." : "Retry"}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={hideLiveSyncInTfsIssueMessageBar}
-                          aria-label="Dismiss notification"
-                          title="Dismiss notification"
-                        >
-                          <span>Dismiss</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  <FeedbackBoard
-                    board={state.currentBoard}
-                    team={state.currentTeam}
-                    displayBoard={true}
-                    workflowPhase={state.currentBoard.activePhase}
-                    nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes}
-                    focusModeNonHiddenWorkItemTypes={state.focusModeNonHiddenWorkItemTypes}
-                    allWorkItemTypes={state.allWorkItemTypes}
-                    onFocusModeModelChange={handleFocusModeModelChange}
-                    isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false}
-                    hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false}
-                    userId={state.currentUserId}
-                    currentUserIsTeamAdmin={currentUserIsTeamAdmin}
-                    onVoteCasted={updateCurrentVoteCount}
-                    onColumnNotesChange={persistColumnNotes}
-                    scrollMode={state.scrollMode}
-                  />
+                  <FeedbackBoard board={state.currentBoard} team={state.currentTeam} displayBoard={true} workflowPhase={state.currentBoard.activePhase} nonHiddenWorkItemTypes={state.nonHiddenWorkItemTypes} focusModeNonHiddenWorkItemTypes={state.focusModeNonHiddenWorkItemTypes} allWorkItemTypes={state.allWorkItemTypes} onFocusModeModelChange={handleFocusModeModelChange} isAnonymous={state.currentBoard.isAnonymous ? state.currentBoard.isAnonymous : false} hideFeedbackItems={state.currentBoard.shouldShowFeedbackAfterCollect ? state.currentBoard.activePhase == WorkflowPhase.Collect && state.currentBoard.shouldShowFeedbackAfterCollect : false} userId={state.currentUserId} currentUserIsTeamAdmin={currentUserIsTeamAdmin} onVoteCasted={updateCurrentVoteCount} onColumnNotesChange={persistColumnNotes} scrollMode={state.scrollMode} />
                 </>
               )}
             </div>

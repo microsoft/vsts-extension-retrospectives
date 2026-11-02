@@ -1,5 +1,5 @@
 import BoardDataService from "../boardDataService";
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, setValue, getValue } from "../dataService";
+import { createDocument, deleteDocument, readDocument, readDocumentStrict, readDocuments, readDocumentsStrict, updateDocument, setValue, getValue } from "../dataService";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../../interfaces/feedback";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
 import { appInsights } from "../../utilities/telemetryClient";
@@ -20,7 +20,9 @@ jest.mock("../dataService", () => ({
   createDocument: jest.fn(),
   deleteDocument: jest.fn(),
   readDocument: jest.fn(),
+  readDocumentStrict: jest.fn(),
   readDocuments: jest.fn(),
+  readDocumentsStrict: jest.fn(),
   updateDocument: jest.fn(),
   getValue: jest.fn(),
   setValue: jest.fn(),
@@ -176,6 +178,36 @@ describe("BoardDataService - getBoardsForTeam", () => {
   });
 });
 
+describe("BoardDataService - strict reads", () => {
+  it("getBoardsForTeamStrict should return the boards of the team", async () => {
+    (readDocumentsStrict as jest.Mock).mockResolvedValue(mockBoards);
+
+    await expect(BoardDataService.getBoardsForTeamStrict("team-123")).resolves.toEqual(mockBoards);
+    expect(readDocumentsStrict).toHaveBeenCalledWith("team-123");
+  });
+
+  it("getBoardsForTeamStrict should propagate read failures", async () => {
+    const error = new Error("Network failure");
+    (readDocumentsStrict as jest.Mock).mockRejectedValue(error);
+
+    await expect(BoardDataService.getBoardsForTeamStrict("team-123")).rejects.toBe(error);
+  });
+
+  it("getBoardForTeamByIdStrict should return the board", async () => {
+    (readDocumentStrict as jest.Mock).mockResolvedValue(mockBoards[0]);
+
+    await expect(BoardDataService.getBoardForTeamByIdStrict("team-123", "board-1")).resolves.toEqual(mockBoards[0]);
+    expect(readDocumentStrict).toHaveBeenCalledWith("team-123", "board-1");
+  });
+
+  it("getBoardForTeamByIdStrict should propagate read failures", async () => {
+    const error = new Error("Network failure");
+    (readDocumentStrict as jest.Mock).mockRejectedValue(error);
+
+    await expect(BoardDataService.getBoardForTeamByIdStrict("team-123", "board-1")).rejects.toBe(error);
+  });
+});
+
 describe("BoardDataService - deleteFeedbackBoard", () => {
   it("should delete the board and all associated documents", async () => {
     (readDocuments as jest.Mock).mockResolvedValue([{ id: "item-1" }, { id: "item-2" }]);
@@ -274,6 +306,20 @@ describe("BoardDataService - updateActivePhase", () => {
     await BoardDataService.updateActivePhase("team-123", "board-1", WorkflowPhase.Collect);
 
     expect(updateDocument).toHaveBeenCalledWith("team-123", expect.objectContaining({ activePhase: WorkflowPhase.Collect }));
+  });
+
+  it("stamps a new phase update date on every move so polling clients follow even an unchanged phase", async () => {
+    const dateNowSpy = jest.spyOn(Date, "now").mockReturnValue(new Date("2026-02-01T10:00:00Z").getTime());
+
+    const first = await BoardDataService.updateActivePhase("team-123", "board-1", WorkflowPhase.Collect);
+    expect(first.activePhaseUpdatedDate).toEqual(new Date("2026-02-01T10:00:00Z"));
+
+    dateNowSpy.mockReturnValue(new Date("2026-02-01T10:05:00Z").getTime());
+    const second = await BoardDataService.updateActivePhase("team-123", "board-1", WorkflowPhase.Collect);
+    expect(second.activePhaseUpdatedDate).toEqual(new Date("2026-02-01T10:05:00Z"));
+    expect(second.modifiedDate).toBe(modifiedDate);
+
+    dateNowSpy.mockRestore();
   });
 
   it("returns undefined when the board does not exist", async () => {

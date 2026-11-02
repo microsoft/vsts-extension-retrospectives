@@ -36,5 +36,29 @@ export function isAzureDevOpsError(error: unknown): error is AzureDevOpsError {
  */
 export const AzureDevOpsErrorTypes = {
   DocumentCollectionDoesNotExist: "DocumentCollectionDoesNotExistException",
+  DocumentDoesNotExist: "DocumentDoesNotExistException",
   CurrentIterationDoesNotExist: "CurrentIterationDoesNotExistException",
 } as const;
+
+/**
+ * Returns true when an extension data service error means the requested document or collection
+ * does not exist (as opposed to a transient/network/auth failure).
+ */
+export function isDocumentOrCollectionMissingError(error: unknown): boolean {
+  if (!isAzureDevOpsError(error)) {
+    return false;
+  }
+
+  const typeKey = error.serverError?.typeKey;
+  if (typeKey === AzureDevOpsErrorTypes.DocumentCollectionDoesNotExist || typeKey === AzureDevOpsErrorTypes.DocumentDoesNotExist) {
+    return true;
+  }
+
+  const status = error.status ?? (error as { statusCode?: number }).statusCode;
+  if (status === 404) {
+    return true;
+  }
+
+  const message = `${error.message ?? ""} ${error.serverError?.message ?? ""}`;
+  return /1660002|collection does not exist|document does not exist/i.test(message);
+}

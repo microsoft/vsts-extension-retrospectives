@@ -897,6 +897,23 @@ describe("ItemDataService - getFeedbackItemsForBoard", () => {
   });
 });
 
+describe("ItemDataService - getFeedbackItemsForBoardStrict", () => {
+  it("should return feedback items for board", async () => {
+    const mockItems = [baseFeedbackItem];
+    (dataService.readDocumentsStrict as jest.Mock).mockResolvedValue(mockItems);
+
+    await expect(itemDataService.getFeedbackItemsForBoardStrict("board-1")).resolves.toEqual(mockItems);
+    expect(dataService.readDocumentsStrict).toHaveBeenCalledWith("board-1");
+  });
+
+  it("should propagate read failures instead of returning an empty board", async () => {
+    const error = new Error("Network failure");
+    (dataService.readDocumentsStrict as jest.Mock).mockRejectedValue(error);
+
+    await expect(itemDataService.getFeedbackItemsForBoardStrict("board-1")).rejects.toBe(error);
+  });
+});
+
 describe("ItemDataService - getFeedbackItemsByIds", () => {
   it("should filter items by IDs", async () => {
     const item1 = { ...baseFeedbackItem, id: "item-1" };

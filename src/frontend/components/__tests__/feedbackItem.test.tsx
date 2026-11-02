@@ -4,7 +4,6 @@ import "@testing-library/jest-dom";
 import FeedbackItem, { FeedbackItemHelper, FeedbackItemHandle } from "../feedbackItem";
 import { testColumns, testBoardId, testColumnUuidOne, testColumnIds, testFeedbackItem } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { itemDataService } from "../../dal/itemDataService";
-import { reflectBackendService } from "../../dal/reflectBackendService";
 import { IFeedbackItemDocument } from "../../interfaces/feedback";
 import localStorageHelper from "../../utilities/localStorageHelper";
 import * as dialogHelper from "../../utilities/dialogHelper";
@@ -1279,8 +1278,8 @@ describe("Feedback Item", () => {
 
       expect(addChildSpy).toHaveBeenCalledWith(testBoardId, "parent", "child");
       expect(refreshFeedbackItems).toHaveBeenCalledTimes(1);
-      const [updatedItems, shouldBroadcast] = refreshFeedbackItems.mock.calls[0];
-      expect(shouldBroadcast).toBe(true);
+      const [updatedItems] = refreshFeedbackItems.mock.calls[0];
+      expect(refreshFeedbackItems.mock.calls[0]).toHaveLength(1);
       expect(updatedItems).toEqual(expect.arrayContaining([parent, child, grandChild]));
 
       addChildSpy.mockRestore();
@@ -8434,15 +8433,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
   });
 
-  test("component mount/unmount registers item ref and reflect backend callbacks", async () => {
+  test("component mount/unmount registers item ref and keyboard listener", async () => {
     const addListenerSpy = jest.spyOn(HTMLElement.prototype, "addEventListener");
     const removeListenerSpy = jest.spyOn(HTMLElement.prototype, "removeEventListener");
-
-    const deletedItemCallbacks: Array<(columnId: string, feedbackItemId: string) => void> = [];
-    const onReceiveDeletedItemSpy = jest.spyOn(reflectBackendService, "onReceiveDeletedItem").mockImplementation(cb => {
-      deletedItemCallbacks.push(cb);
-    });
-    const removeOnReceiveDeletedItemSpy = jest.spyOn(reflectBackendService, "removeOnReceiveDeletedItem").mockImplementation(() => undefined);
 
     const props = makeProps();
     const { unmount, container } = render(<FeedbackItem {...props} />);
@@ -8457,14 +8450,11 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     expect(props.columnProps.registerItemRef).toHaveBeenCalledWith(props.id, root);
     expect(addListenerSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
-    expect(onReceiveDeletedItemSpy).toHaveBeenCalled();
 
     unmount();
 
     expect(props.columnProps.registerItemRef).toHaveBeenCalledWith(props.id, null);
     expect(removeListenerSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
-    expect(removeOnReceiveDeletedItemSpy).toHaveBeenCalled();
-    expect(deletedItemCallbacks.length).toBeGreaterThan(0);
   });
 
   test("Tab and Arrow navigation moves focus between items", async () => {
@@ -8645,7 +8635,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     expect(updateTimerSpy).toHaveBeenCalled();
   });
 
-  test("delete paths: local delete (newlyCreated) and remote delete via reflect backend callback", async () => {
+  test("delete paths: local delete (newlyCreated)", async () => {
     const removeFeedbackItemFromColumn = jest.fn();
 
     // Newly created: delete removes immediately
@@ -8664,31 +8654,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
     await waitFor(() => {
       expect(removeFeedbackItemFromColumn).toHaveBeenCalledWith(propsNew.columnId, propsNew.id, false);
     });
-
-    // Remote delete: simulate backend callback -> animation end removes
-    const deletedItemCallbacks: Array<(columnId: string, feedbackItemId: string) => void> = [];
-    jest.spyOn(reflectBackendService, "onReceiveDeletedItem").mockImplementation(cb => {
-      deletedItemCallbacks.push(cb);
-    });
-    jest.spyOn(reflectBackendService, "removeOnReceiveDeletedItem").mockImplementation(() => undefined);
-
-    const propsRemote = makeProps({
-      id: "remote-item",
-      workflowPhase: "Collect",
-      removeFeedbackItemFromColumn: jest.fn(),
-    });
-
-    const { container: cRemote } = render(<FeedbackItem {...propsRemote} />);
-    await waitFor(() => expect(deletedItemCallbacks.length).toBeGreaterThan(0));
-
-    act(() => {
-      deletedItemCallbacks[0]("dummyColumn", propsRemote.id);
-    });
-
-    const rootRemote = cRemote.querySelector(`[data-feedback-item-id="${propsRemote.id}"]`) as HTMLElement;
-    fireEvent.animationEnd(rootRemote);
-
-    expect(propsRemote.removeFeedbackItemFromColumn).toHaveBeenCalledWith(propsRemote.columnId, propsRemote.id, false);
   });
 
   test("child item deletion refreshes parent item on animation end", async () => {
@@ -8724,8 +8689,31 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     await waitFor(() => {
       expect(itemDataService.getFeedbackItem).toHaveBeenCalledWith(props.boardId, parent.id);
-      expect(refreshFeedbackItems).toHaveBeenCalledWith([parent], true);
+      expect(refreshFeedbackItems).toHaveBeenCalledWith([parent]);
     });
+  });
+
+  test("ungrouped item deletion removes the item and moves focus on animation end", async () => {
+    jest.spyOn(itemDataService, "deleteFeedbackItem").mockResolvedValue({ updatedParentFeedbackItem: undefined, updatedChildFeedbackItems: [] } as any);
+    const getFeedbackItemSpy = jest.spyOn(itemDataService, "getFeedbackItem");
+
+    const props = makeProps({ workflowPhase: "Collect" });
+
+    const { container } = render(<FeedbackItem {...props} />);
+    const root = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
+
+    fireEvent.keyDown(root, { key: "Delete" });
+    fireEvent.click(await screen.findByRole("button", { name: "Delete" }));
+    await waitFor(() => expect(itemDataService.deleteFeedbackItem).toHaveBeenCalledWith(props.boardId, props.id));
+    expect(props.removeFeedbackItemFromColumn).not.toHaveBeenCalled();
+
+    getFeedbackItemSpy.mockClear();
+    await act(async () => {
+      fireEvent.animationEnd(root);
+    });
+
+    expect(props.removeFeedbackItemFromColumn).toHaveBeenCalledWith(props.columnId, props.id, true);
+    expect(getFeedbackItemSpy).not.toHaveBeenCalled();
   });
 
   test("group dialog: search filters results, click groups item, and closes", async () => {
@@ -8806,7 +8794,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     );
 
     expect(itemDataService.addFeedbackItemAsChild).toHaveBeenCalledWith(testBoardId, "target", "dropped");
-    expect(refreshFeedbackItems).toHaveBeenCalledWith(expect.any(Array), true);
+    expect(refreshFeedbackItems).toHaveBeenCalledWith(expect.any(Array));
   });
 
   test("Escape key closes Move dialog, Group dialog, and Remove from Group dialog", async () => {
@@ -9786,7 +9774,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       await (ref.current as any).onUpdateActionItem(updatedItem);
     });
 
-    expect(refreshFeedbackItems).toHaveBeenCalledWith([updatedItem], true);
+    expect(refreshFeedbackItems).toHaveBeenCalledWith([updatedItem]);
   });
 
   test("onUpdateActionItem does nothing when updatedFeedbackItem is falsy", async () => {
@@ -9943,7 +9931,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
-    (ref.current as any).markFeedbackItemForDelete(true);
+    (ref.current as any).markFeedbackItemForDelete();
 
     expect(toggleGroupExpand).toHaveBeenCalled();
   });
@@ -10268,7 +10256,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     const mockUpdatedItem = { id: "updated-item" } as any;
     await (ref.current as any).onUpdateActionItem(mockUpdatedItem);
 
-    expect(refreshFeedbackItems).toHaveBeenCalledWith([mockUpdatedItem], true);
+    expect(refreshFeedbackItems).toHaveBeenCalledWith([mockUpdatedItem]);
   });
 
   test("onUpdateActionItem does not call refreshFeedbackItems when updatedFeedbackItem is null", async () => {
@@ -10559,7 +10547,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     expect(card).toBeTruthy();
 
     await act(async () => {
-      (ref.current as any).setState({ isMarkedForDeletion: true, isLocalDelete: true });
+      (ref.current as any).setState({ isMarkedForDeletion: true });
     });
 
     await act(async () => {
@@ -10569,7 +10557,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     await waitFor(() => {
       expect(props.removeFeedbackItemFromColumn).toHaveBeenCalledWith(props.columnId, props.id, true);
       expect(itemDataService.getFeedbackItem).toHaveBeenCalledWith(props.boardId, parentId);
-      expect(props.refreshFeedbackItems).toHaveBeenCalledWith([expect.anything()], true);
+      expect(props.refreshFeedbackItems).toHaveBeenCalledWith([expect.anything()]);
     });
   });
 
@@ -10587,7 +10575,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     expect(createSpy).toHaveBeenCalledWith(props.boardId, "New title", props.columnId, true);
     expect(props.removeFeedbackItemFromColumn).toHaveBeenCalledWith(props.columnId, props.id, false);
-    expect(props.addFeedbackItems).toHaveBeenCalledWith(props.columnId, [created], true, false, false, true, false);
+    expect(props.addFeedbackItems).toHaveBeenCalledWith(props.columnId, [created], false, false, true, false);
   });
 
   test("mobile action button hides the mobile dialog and opens delete confirmation", async () => {
@@ -10673,13 +10661,11 @@ describe("FeedbackItem additional coverage (merged)", () => {
       updatedChildFeedbackItems: [child1, undefined, null],
     } as any);
 
-    jest.spyOn(reflectBackendService, "broadcastDeletedItem").mockImplementation(() => undefined as any);
-
     await act(async () => {
       await (ref.current as any).initiateDeleteFeedbackItem();
     });
 
-    expect(props.refreshFeedbackItems).toHaveBeenCalledWith([child1], true);
+    expect(props.refreshFeedbackItems).toHaveBeenCalledWith([child1]);
   });
 
   test("Escape does not close the group dialog", async () => {
@@ -11546,7 +11532,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       await waitFor(() => expect(itemDataService.getFeedbackItem).toHaveBeenCalled());
 
       await act(async () => {
-        ref.current?.markFeedbackItemForDelete(true);
+        ref.current?.markFeedbackItemForDelete();
       });
       expect(toggleGroupExpand).toHaveBeenCalled();
     });
@@ -12299,7 +12285,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
       // Mark for deletion
       await act(async () => {
-        ref.current?.markFeedbackItemForDelete(true);
+        ref.current?.markFeedbackItemForDelete();
       });
 
       // Trigger animation end
@@ -12427,7 +12413,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
       expect(groupShowSpy).not.toHaveBeenCalled();
     });
 
-    test("markFeedbackItemForDelete default argument works for ungrouped items", async () => {
+    test("markFeedbackItemForDelete marks ungrouped items for deletion", async () => {
       const props = makeProps();
       const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
       render(<FeedbackItem {...props} ref={ref} />);
@@ -12439,7 +12425,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
       });
 
       expect(ref.current?.state.isMarkedForDeletion).toBe(true);
-      expect(ref.current?.state.isLocalDelete).toBe(false);
     });
 
     test("vote handlers tolerate updateVote returning null", async () => {
@@ -12480,34 +12465,6 @@ describe("FeedbackItem additional coverage (merged)", () => {
         },
       });
       expect(dropSpy).toHaveBeenCalledWith(expect.any(Object), "fallback-drop-id", props.id);
-    });
-
-    test("external delete callback ignores other items and already marked items", async () => {
-      const deletedItemCallbacks: Array<(columnId: string, feedbackItemId: string) => void> = [];
-      jest.spyOn(reflectBackendService, "onReceiveDeletedItem").mockImplementation(callback => {
-        deletedItemCallbacks.push(callback);
-      });
-      jest.spyOn(reflectBackendService, "removeOnReceiveDeletedItem").mockImplementation(() => undefined);
-
-      const props = makeProps({ id: "external-delete-branch" });
-      const ref = React.createRef<InstanceType<typeof FeedbackItem>>();
-      const { container } = render(<FeedbackItem {...props} ref={ref} />);
-
-      await waitFor(() => expect(deletedItemCallbacks.length).toBeGreaterThan(0));
-
-      act(() => {
-        deletedItemCallbacks[0](props.columnId, "different-item");
-      });
-      expect(ref.current?.state.isMarkedForDeletion).toBe(false);
-
-      act(() => {
-        ref.current?.markFeedbackItemForDelete(false);
-        deletedItemCallbacks[0](props.columnId, props.id);
-      });
-
-      const card = container.querySelector(`[data-feedback-item-id="${props.id}"]`) as HTMLElement;
-      fireEvent.animationEnd(card);
-      expect(props.removeFeedbackItemFromColumn).toHaveBeenCalledTimes(1);
     });
 
     test("act shortcut does nothing when add action button is absent", async () => {
