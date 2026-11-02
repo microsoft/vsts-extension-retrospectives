@@ -95,7 +95,7 @@ pre-commit run --all-files      # Run on all files
 - Test files: `components/__tests__/*.test.tsx`
 - Mock Azure DevOps SDK, telemetry, and external services
 - Use `@testing-library/react` and `@testing-library/user-event`
-- The feedback item and board loops poll as soon as they start; the board list loop waits one interval first. To trigger the next poll, advance fake timers past the interval or dispatch `new Event("online")` on `window`, which makes every active loop poll immediately.
+- The feedback item and board loops poll as soon as they start; the board list loop waits one interval first. To trigger the next poll, advance fake timers past the interval or dispatch `new Event("online")` on `window`, which makes every active loop poll immediately and returns it to the regular pace. The feedback item and board loops slow down to `LIVE_SYNC_IDLE_POLL_INTERVAL_MS` after `DEFAULT_IDLE_AFTER_UNCHANGED_POLLS` polls that found nothing new (the poll that `online` triggers is the first of them), so when a test counts polls, start counting from such an `online` event.
 
 ## Error Handling
 
@@ -113,7 +113,7 @@ Inside a polling loop's `poll` callback, let errors propagate: the loop reports 
 
 ## Key Patterns
 
-- **Live updates**: `startPollingLoop` in `utilities/pollingLoop.ts` polls the open board's feedback items (`feedbackBoard.tsx`) and the open board (`feedbackBoardContainer.tsx`) every 2 seconds, and the team's board list every 30 seconds. Loops pause while the tab is hidden and back off after errors.
+- **Live updates**: `startPollingLoop` in `utilities/pollingLoop.ts` polls the open board's feedback items (`feedbackBoard.tsx`) and the open board (`feedbackBoardContainer.tsx`) every 2 seconds, slowing to every 6 seconds while polls keep finding nothing new (a `poll` callback resolves `false` for "nothing new"), and the team's board list every 2 minutes plus whenever the board picker gets focus. Loops pause while the tab is hidden and back off after errors.
 - **Poll reads**: use the strict data access methods (`getFeedbackItemsForBoardStrict`, `getBoardsForTeamStrict`, `getBoardForTeamByIdStrict`), which throw on failures instead of returning empty data.
 - **Merging**: merge polled documents by `__etag` (`mergeServerFeedbackItems`, `mergePolledBoard`, `mergePolledBoardList`). Keep object identity for unchanged data and never let an older server copy overwrite newer local state.
 - **Sharing changes**: save through the data access layer (`dal/`); other users pick up changes on their next poll, so there is nothing to broadcast. "Move everyone" to a phase is detected through the board's `activePhaseUpdatedDate`.

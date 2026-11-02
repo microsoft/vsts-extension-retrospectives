@@ -1,4 +1,4 @@
-import { BOARD_LIST_POLL_INTERVAL_MS, DEFAULT_IDLE_AFTER_UNCHANGED_POLLS, getPollingBackoffDelayMs, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS, MAX_POLL_BACKOFF_MS, startPollingLoop, IPollingLoop } from "../pollingLoop";
+import { BOARD_LIST_POLL_INTERVAL_MS, BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS, DEFAULT_IDLE_AFTER_UNCHANGED_POLLS, getPollingBackoffDelayMs, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS, MAX_POLL_BACKOFF_MS, startPollingLoop, IPollingLoop } from "../pollingLoop";
 
 describe("getPollingBackoffDelayMs", () => {
   it("doubles the delay for each consecutive error and adds jitter", () => {
@@ -28,6 +28,7 @@ describe("getPollingBackoffDelayMs", () => {
     expect(LIVE_SYNC_POLL_INTERVAL_MS).toBe(2000);
     expect(LIVE_SYNC_IDLE_POLL_INTERVAL_MS).toBeGreaterThan(LIVE_SYNC_POLL_INTERVAL_MS);
     expect(BOARD_LIST_POLL_INTERVAL_MS).toBeGreaterThan(LIVE_SYNC_IDLE_POLL_INTERVAL_MS);
+    expect(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS).toBeLessThan(BOARD_LIST_POLL_INTERVAL_MS);
     expect(DEFAULT_IDLE_AFTER_UNCHANGED_POLLS).toBeGreaterThan(0);
   });
 });

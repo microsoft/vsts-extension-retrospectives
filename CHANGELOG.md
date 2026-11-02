@@ -10,9 +10,10 @@ You can find the changelog of the Retrospective Extension below.
 
 From [GitHub PR #1895](https://github.com/microsoft/vsts-extension-retrospectives/pull/1895)
 
-* Removed the separate live sync service. Boards now check Azure DevOps for changes from other users, including Move Everyone phase changes, every 2 seconds in every retrospective phase (previously every 10 seconds and only in the Collect phase when the live sync connection was unavailable). Live updates no longer need an extra connection that some networks and proxies blocked, and they work the same way on Azure DevOps Server.
+* Removed the separate live sync service. Boards now check Azure DevOps for changes from other users, including Move Everyone phase changes, every 2 seconds in every retrospective phase, or every 6 seconds while nothing has changed for a while (previously every 10 seconds and only in the Collect phase when the live sync connection was unavailable). Live updates no longer need an extra connection that some networks and proxies blocked, and they work the same way on Azure DevOps Server.
 * Improved live update reliability: a failed check no longer empties the board and is retried automatically with an increasing delay, and checks pause while the browser tab is hidden.
-* The Board selection dropdown now refreshes for other users within about 30 seconds when a retrospective is created, archived, or restored, and anyone viewing a retrospective that is archived or deleted is moved to the most recent retrospective.
+* The Board selection dropdown now refreshes for other users within about 2 minutes, or as soon as they open it, when a retrospective is created, archived, or restored, and anyone viewing a retrospective that is archived or deleted is moved to the most recent retrospective.
+* Reduced the network traffic of open boards: checks slow down while nothing changes, and the list of retrospectives, which is the largest response, is checked every 2 minutes instead of every 30 seconds.
 * Fixed the vote counters showing zero votes when a retrospective is first opened.
 
 ## v1.92.59

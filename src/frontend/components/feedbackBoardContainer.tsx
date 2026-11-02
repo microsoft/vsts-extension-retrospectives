@@ -44,12 +44,10 @@ import { TeamAssessmentHistoryChart } from "./teamAssessmentHistoryChart";
 import { workService } from "../dal/azureDevOpsWorkService";
 import { useDelayedTooltip } from "../utilities/useDelayedTooltip";
 import { canCurrentUserManageBoard } from "../utilities/boardAccessHelper";
-import { BOARD_LIST_POLL_INTERVAL_MS, IPollingLoop, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS, startPollingLoop } from "../utilities/pollingLoop";
+import { BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS, BOARD_LIST_POLL_INTERVAL_MS, IPollingLoop, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS, startPollingLoop } from "../utilities/pollingLoop";
 
 type ScrollMode = "column" | "board";
 const SCROLL_MODE_SETTING_KEY = "lastScrollMode";
-// Focusing the board picker refreshes the board list unless it was polled more recently than this.
-const BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS = 10000;
 const BOARD_TIMER_DURATION_OPTIONS = Array.from({ length: 20 }, (_, index) => index + 1);
 
 export interface FeedbackBoardContainerState {
@@ -1014,6 +1012,9 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
     if (!currentTeamId) {
       return undefined;
     }
+
+    // The board list was loaded right before the team got selected.
+    lastBoardListPollAtRef.current = Date.now();
 
     const pollingLoop = startPollingLoop({
       intervalMs: BOARD_LIST_POLL_INTERVAL_MS,

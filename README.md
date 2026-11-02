@@ -328,20 +328,21 @@ Selecting a retrospective expands the row to reveal more details, including a co
 
 ![Expanded retrospective view showing a summary of feedback and work item counts on the left and a work item table on the right with columns: Title, State, Type, Last Updated, Assigned To, and Priority.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-row-expanded.png)
 
-To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved. Archiving will take effect immediately for the user performing the action. Other users will see the change within about 30 seconds, and anyone viewing the retrospective will be moved to the most recently created retrospective within a few seconds.
+To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved. Archiving will take effect immediately for the user performing the action. Other users will see the change within about 2 minutes, or as soon as they open the Board selection dropdown, and anyone viewing the retrospective will be moved to the most recently created retrospective within a few seconds.
 
-To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown. Restoring will take effect immediately for the user performing the action, while other users will see the retrospective in their Board selection dropdown within about 30 seconds.
+To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown. Restoring will take effect immediately for the user performing the action, while other users will see the retrospective in their Board selection dropdown within about 2 minutes, or as soon as they open it.
 
 To _delete_ an archived retrospective, wait for two minutes after archiving, then click the trash icon to _permanently_ delete the retrospective.  The delay between archiving and deleting was added to encourage users to try the archive functionality before deleting, since the delete action cannot be undone and, in most cases, archiving will be sufficient.  Deleting will take effect immediately for all users.
 
 ## Live Sync Troubleshooting
 
-The extension stores everything in Azure DevOps, and each open board checks Azure DevOps for changes every 2 seconds. The list of retrospectives is checked every 30 seconds. Changes from other users therefore show up within a few seconds without refreshing the page.
+The extension stores everything in Azure DevOps, and each open board checks Azure DevOps for changes every 2 seconds. When nothing has changed for about 10 seconds, the board checks every 6 seconds instead, and it goes back to every 2 seconds as soon as something changes. The list of retrospectives is checked every 2 minutes and whenever you open the Board selection dropdown. Changes from other users therefore show up within a few seconds without refreshing the page.
 
 ### Quick checks
 
 - Checks pause while the browser tab is hidden and run again as soon as the tab is visible, so a board that was in a background tab catches up when you return to it.
 - When a check fails (for example, while the network is down), the board keeps working and retries with an increasing delay of up to about 30 seconds. It checks again right away when the browser comes back online.
+- While a board is quiet, a change from another user (including a facilitator moving everyone to the next phase) can take up to about 6 seconds to appear.
 - Refresh the browser tab if changes from other users still do not appear.
 
 ### Network / proxy checks (including enterprise ZTNA, ZScaler, etc.)

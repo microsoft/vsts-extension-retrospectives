@@ -19,7 +19,7 @@ import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { copyToClipboard } from "../../utilities/clipboardHelper";
 import { setLocale } from "../../utilities/localization";
-import { BOARD_LIST_POLL_INTERVAL_MS } from "../../utilities/pollingLoop";
+import { BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS, BOARD_LIST_POLL_INTERVAL_MS, DEFAULT_IDLE_AFTER_UNCHANGED_POLLS, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS } from "../../utilities/pollingLoop";
 import { workService } from "../../dal/azureDevOpsWorkService";
 import { teamSettingsService } from "../../dal/teamSettingsService";
 import { appInsights } from "../../utilities/telemetryClient";
@@ -1887,6 +1887,136 @@ describe("FeedbackBoardContainer - Live sync polling", () => {
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  describe("pace of the polling", () => {
+    const advance = (ms: number) =>
+      act(async () => {
+        await jest.advanceTimersByTimeAsync(ms);
+      });
+    const boardPollCount = () => mocked(BoardDataService.getBoardForTeamByIdStrict).mock.calls.length;
+    const boardListPollCount = () => mocked(BoardDataService.getBoardsForTeamStrict).mock.calls.length;
+    const boardWithTeammatesBoard = () => [createServerBoard(), createServerBoard({ id: "b2", title: "Board 2", createdDate: new Date("2024-01-04T00:00:00Z") })];
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("polls the board less often while nothing changes and returns to the regular pace once the board changes", async () => {
+      await renderLoadedContainer([createServerBoard()]);
+      // The poll that this triggers is already the first one that finds nothing new.
+      await pollNow();
+      const baseline = boardPollCount();
+      const regularPollsBeforeIdle = DEFAULT_IDLE_AFTER_UNCHANGED_POLLS - 1;
+
+      await advance(LIVE_SYNC_POLL_INTERVAL_MS * regularPollsBeforeIdle);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle);
+
+      await advance(LIVE_SYNC_IDLE_POLL_INTERVAL_MS - 1);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle);
+      await advance(1);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle + 1);
+
+      serverBoards = [createServerBoard({ __etag: 2, title: "Updated board" })];
+      await advance(LIVE_SYNC_IDLE_POLL_INTERVAL_MS);
+      expect(screen.getByRole("option", { name: "Updated board" })).toBeInTheDocument();
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle + 2);
+
+      await advance(LIVE_SYNC_POLL_INTERVAL_MS - 1);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle + 2);
+      await advance(1);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle + 3);
+    });
+
+    it("polls the board list only every couple of minutes", async () => {
+      await renderLoadedContainer([createServerBoard()]);
+      await pollNow();
+      const baseline = boardListPollCount();
+
+      await advance(BOARD_LIST_POLL_INTERVAL_MS - 1);
+      expect(boardListPollCount() - baseline).toBe(0);
+      await advance(1);
+      expect(boardListPollCount() - baseline).toBe(1);
+      await advance(BOARD_LIST_POLL_INTERVAL_MS);
+      expect(boardListPollCount() - baseline).toBe(2);
+    });
+
+    describe("when the board picker gets focus", () => {
+      const focusBoardPicker = () =>
+        act(async () => {
+          fireEvent.focus(screen.getByRole("combobox", { name: "Retrospective Board" }));
+        });
+
+      it("does not fetch the board list again right after it was loaded", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        const baseline = boardListPollCount();
+
+        await focusBoardPicker();
+
+        expect(boardListPollCount()).toBe(baseline);
+      });
+
+      it("lists the boards that teammates created in the meantime", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        await advance(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS);
+        expect(screen.queryByRole("option", { name: "Board 2" })).not.toBeInTheDocument();
+
+        serverBoards = boardWithTeammatesBoard();
+        await focusBoardPicker();
+
+        expect(screen.getByRole("option", { name: "Board 2" })).toBeInTheDocument();
+        expect(screen.getByRole("combobox", { name: "Retrospective Board" })).toHaveValue("b1");
+      });
+
+      it("fetches the board list at most once per refresh window", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        await advance(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS);
+        const baseline = boardListPollCount();
+
+        await focusBoardPicker();
+        expect(boardListPollCount() - baseline).toBe(1);
+
+        await focusBoardPicker();
+        await advance(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS - 1);
+        await focusBoardPicker();
+        expect(boardListPollCount() - baseline).toBe(1);
+
+        await advance(1);
+        await focusBoardPicker();
+        expect(boardListPollCount() - baseline).toBe(2);
+      });
+
+      it("counts a poll of the board list as a refresh", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        await advance(BOARD_LIST_POLL_INTERVAL_MS);
+        const baseline = boardListPollCount();
+
+        await focusBoardPicker();
+
+        expect(boardListPollCount()).toBe(baseline);
+      });
+
+      it("does not start another refresh when the board picker is focused again while the list is still loading", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        await advance(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS);
+        const baseline = boardListPollCount();
+        let finishListPoll: (boards: IFeedbackBoardDocument[]) => void = () => undefined;
+        mocked(BoardDataService.getBoardsForTeamStrict).mockImplementationOnce(() => new Promise(resolve => (finishListPoll = resolve)));
+
+        await focusBoardPicker();
+        await focusBoardPicker();
+        await act(async () => {
+          finishListPoll(boardWithTeammatesBoard());
+        });
+
+        expect(screen.getByRole("option", { name: "Board 2" })).toBeInTheDocument();
+        expect(boardListPollCount() - baseline).toBe(1);
+      });
+    });
   });
 });
 

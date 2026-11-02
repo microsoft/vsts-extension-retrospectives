@@ -1,6 +1,8 @@
 export const LIVE_SYNC_POLL_INTERVAL_MS = 2000;
 export const LIVE_SYNC_IDLE_POLL_INTERVAL_MS = 6000;
 export const BOARD_LIST_POLL_INTERVAL_MS = 120000;
+// Focusing the board picker refreshes the board list unless it was fetched more recently than this.
+export const BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS = 10000;
 export const MAX_POLL_BACKOFF_MS = 30000;
 export const DEFAULT_IDLE_AFTER_UNCHANGED_POLLS = 5;
 
