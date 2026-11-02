@@ -17,7 +17,7 @@ Relevant Issue(s): <!-- What issue(s) is this PR fixing  -->
 - [ ] My code follows the code style of this project.
 - [ ] I have updated any relevant documentation accordingly.
 - [ ] I have added either the `docs updated` or `docs not needed` label to this PR.
-- [ ] If I used `docs updated`, I updated the relevant release-facing content, such as `CHANGELOG.md`, What's New, `README.md`, or `src/frontend/assets/PACKAGE-DESCRIPTION.md`.
+- [ ] If I used `docs updated`, I updated the relevant release-facing content, such as `CHANGELOG.md`, What's New, `README.md`, or `src/assets/PACKAGE-DESCRIPTION.md`.
   - [ ] If I updated `CHANGELOG.md`, I included a link to this PR in that blurb.
 - [ ] I have added tests to cover my changes.
 - [ ] All new and existing tests passed.

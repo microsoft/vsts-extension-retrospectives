@@ -4,7 +4,7 @@ Instructions for AI coding agents working on the Retrospectives Extension for Az
 
 ## Project Overview
 
-Azure DevOps extension with only a frontend: React 19 + TypeScript in `src/frontend/`.
+Azure DevOps extension with only a frontend: React 19 + TypeScript in `src/`.
 
 There is no backend service. All data is stored in the Azure DevOps Extension Data Service, and changes made by other users are picked up by polling.
 
@@ -12,13 +12,13 @@ There is no backend service. All data is stored in the Azure DevOps Extension Da
 
 ```text
 src/
-└── frontend/              # React/TypeScript frontend
-    ├── components/        # React components
-    │   ├── __tests__/     # Jest tests (*.test.tsx)
-    │   └── __mocks__/     # Test mocks
-    ├── dal/               # Data access layer
-    ├── interfaces/        # TypeScript interfaces
-    └── utilities/         # Utility functions
+├── assets/                # HTML, styles, and marketplace content
+├── components/            # React components
+│   ├── __tests__/         # Jest tests (*.test.tsx)
+│   └── __mocks__/         # Test mocks
+├── dal/                   # Data access layer
+├── interfaces/            # TypeScript interfaces
+└── utilities/             # Utility functions
 ```
 
 ## Build/Lint/Test Commands
@@ -28,7 +28,7 @@ src/
 - Start text searches with `grep`; use `rg` only if it is available and working.
 - Frontend Jest runs must use the `jsdom` environment, for example `npx jest --env=jsdom ...`.
 
-### Frontend (run from `src/frontend/`)
+### Frontend (run from `src/`)
 
 ```bash
 npm ci                     # Install dependencies

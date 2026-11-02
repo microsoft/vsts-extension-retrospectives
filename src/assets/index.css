@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-@source "./src/**/*.{js,jsx,ts,tsx}";
-@source "./components/**/*.{js,jsx,ts,tsx}";
+@source "../index.tsx";
+@source "../components/**/*.{js,jsx,ts,tsx}";
 
 @theme {
   --breakpoint-lg: 1200px;

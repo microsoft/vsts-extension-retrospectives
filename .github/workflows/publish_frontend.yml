@@ -43,7 +43,7 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: src/frontend/package-lock.json
+          cache-dependency-path: src/package-lock.json
 
       - name: Validate release
         id: release
@@ -112,13 +112,13 @@ jobs:
           ASSET_NAME: ${{ steps.release.outputs.asset_name }}
         run: |
           set -euo pipefail
-          cd src/frontend
+          cd src
 
           tmp_versioned=$(mktemp)
           jq --arg version "${VERSION}" '.version = $version' vss-extension-prod.json > "${tmp_versioned}"
           mv "${tmp_versioned}" vss-extension-prod.json
 
-          cp ../../LICENSE ./assets/LICENSE.md
+          cp ../LICENSE ./assets/LICENSE.md
 
           npm ci
           npm run build
@@ -147,7 +147,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ steps.release.outputs.asset_name }}
-          path: src/frontend/dist/${{ steps.release.outputs.asset_name }}
+          path: src/dist/${{ steps.release.outputs.asset_name }}
           if-no-files-found: error
 
       - name: Create the tag for the extension release
@@ -171,7 +171,7 @@ jobs:
           ASSET_SIZE: ${{ steps.package_extension.outputs.asset_size }}
         run: |
           set -euo pipefail
-          gh release create "${TAG}" "src/frontend/dist/${ASSET_NAME}" \
+          gh release create "${TAG}" "src/dist/${ASSET_NAME}" \
             --repo "${REPOSITORY}" \
             --verify-tag \
             --draft \
