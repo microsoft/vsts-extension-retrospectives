@@ -367,8 +367,8 @@ describe("Action Item Display component", () => {
     // Click the button again to toggle
     fireEvent.click(addButton!);
 
-    // Callout should still be open or might close - this depends on Fluent UI behavior
-    // So we just verify the test completes without error
+    // The callout may stay open or close after the second click,
+    // so we just verify the test completes without error
     expect(addButton).toBeTruthy();
   });
 

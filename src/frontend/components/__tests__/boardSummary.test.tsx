@@ -1422,8 +1422,6 @@ describe("Board Summary", () => {
     it("triggers onColumnClick handler when clicking Title column header", async () => {
       const { container } = render(<BoardSummary {...mockedPropsWithActionItems} />);
 
-      // Find the Title column header button (Fluent UI DetailsList uses buttons for sortable columns)
-
       // Find all column headers
       const columnHeaders = container.querySelectorAll('[role="columnheader"]');
       const titleHeader = Array.from(columnHeaders).find(header => header.textContent?.includes("Title"));

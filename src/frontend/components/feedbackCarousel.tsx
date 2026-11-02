@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Pivot, PivotItem } from "@fluentui/react/lib/Pivot";
 import { moveFeedbackItem } from "./feedbackColumn";
 import FeedbackItem, { IFeedbackItemProps } from "./feedbackItem";
 import { reactPlugin } from "../utilities/telemetryClient";
@@ -52,9 +51,7 @@ export const getSelectedCarouselColumnKey = (selectedColumnId: string | undefine
   return selectedColumnId ?? feedbackColumns[0]?.columnId;
 };
 
-export const getPivotItemKey = (item?: { props: { itemKey?: string } } | null): string | undefined => {
-  return item?.props.itemKey;
-};
+const getCarouselTabId = (columnId: string): string => `feedback-carousel-tab-${columnId}`;
 
 export interface IFeedbackCarouselProps {
   focusModeModel: FocusModeModel;
@@ -162,6 +159,36 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
     setSelectedColumnId(columnId);
   }, []);
 
+  const handleTabListKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]'));
+    const currentIndex = tabs.indexOf(event.target as HTMLElement);
+    let targetIndex: number;
+
+    switch (event.key) {
+      case "ArrowRight":
+        targetIndex = Math.min(currentIndex + 1, tabs.length - 1);
+        break;
+      case "ArrowLeft":
+        targetIndex = Math.max(currentIndex - 1, 0);
+        break;
+      case "Home":
+        targetIndex = 0;
+        break;
+      case "End":
+        targetIndex = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    tabs[targetIndex].focus();
+  }, []);
+
   const renderFeedbackCarouselItems = useCallback(
     (column: FocusModeColumn) => {
       const sortedItems = getSortedColumnItems(column);
@@ -228,50 +255,68 @@ export const FeedbackCarousel: React.FC<IFeedbackCarouselProps> = ({ focusModeMo
     [focusModeModel, isFocusModalHidden],
   );
 
-  return (
-    <Pivot className="feedback-carousel-pivot" selectedKey={getSelectedCarouselColumnKey(selectedColumnId, feedbackColumns)} onLinkClick={item => selectColumn(getPivotItemKey(item))} onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
-      {feedbackColumns.map(column => {
-        const feedbackCarouselItems = renderFeedbackCarouselItems(column);
-        const slideIds = feedbackCarouselItems.map((_, index) => `slide-${column.columnId}-${index}`);
-        const activeDotCss = slideIds.map(slideId => `.carousel-container:has(#${slideId}:target) .carousel-dots a[href="#${slideId}"] { opacity: 1; transform: scale(1.05); }`).join("\n");
-        const sortedItems = getSortedColumnItems(column);
+  const selectedColumnKey = getSelectedCarouselColumnKey(selectedColumnId, feedbackColumns);
+  const selectedColumn = feedbackColumns.find(column => column.columnId === selectedColumnKey);
 
-        return (
-          <PivotItem key={column.columnId} itemKey={column.columnId} headerText={column.columnName} className="feedback-carousel-pivot-item" {...column}>
-            <div className="carousel-container">
-              {activeDotCss && <style>{activeDotCss}</style>}
-              <ol className="carousel-track" id={`carousel-${column.columnId}`}>
-                {feedbackCarouselItems.map((child, index) => {
-                  const feedbackItemId = sortedItems[index].feedbackItem.id;
-                  return (
-                    <li className="carousel-slide" id={`slide-${column.columnId}-${index}`} key={child.key} onClickCapture={() => recordActiveCarouselPosition(column.columnId, feedbackItemId)} onFocusCapture={() => recordActiveCarouselPosition(column.columnId, feedbackItemId)}>
-                      {index > 0 && (
-                        <a href={`#slide-${column.columnId}-${index - 1}`} className="back-button" aria-label="Previous slide" onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index - 1].feedbackItem.id)}>
-                          {getIconElement("chevron-left")}
-                        </a>
-                      )}
-                      <div className="carousel-viewport">{child}</div>
-                      {index < feedbackCarouselItems.length - 1 && (
-                        <a href={`#slide-${column.columnId}-${index + 1}`} className="next-button" aria-label="Next slide" onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index + 1].feedbackItem.id)}>
-                          {getIconElement("chevron-right")}
-                        </a>
-                      )}
-                    </li>
-                  );
-                })}
-              </ol>
-              <ul className="carousel-dots" aria-label="Focus mode pagination">
-                {slideIds.map((slideId, index) => (
-                  <li key={slideId}>
-                    <a href={`#${slideId}`} className="carousel-dot" aria-label={`Go to card ${index + 1} of ${slideIds.length}`} onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index].feedbackItem.id)} />
+  const renderColumnPanel = (column: FocusModeColumn) => {
+    const feedbackCarouselItems = renderFeedbackCarouselItems(column);
+    const slideIds = feedbackCarouselItems.map((_, index) => `slide-${column.columnId}-${index}`);
+    const activeDotCss = slideIds.map(slideId => `.carousel-container:has(#${slideId}:target) .carousel-dots a[href="#${slideId}"] { opacity: 1; transform: scale(1.05); }`).join("\n");
+    const sortedItems = getSortedColumnItems(column);
+
+    return (
+      <div key={column.columnId} role="tabpanel" aria-labelledby={getCarouselTabId(column.columnId)}>
+        <div className="feedback-carousel-pivot-item">
+          <div className="carousel-container">
+            {activeDotCss && <style>{activeDotCss}</style>}
+            <ol className="carousel-track" id={`carousel-${column.columnId}`}>
+              {feedbackCarouselItems.map((child, index) => {
+                const feedbackItemId = sortedItems[index].feedbackItem.id;
+                return (
+                  <li className="carousel-slide" id={`slide-${column.columnId}-${index}`} key={child.key} onClickCapture={() => recordActiveCarouselPosition(column.columnId, feedbackItemId)} onFocusCapture={() => recordActiveCarouselPosition(column.columnId, feedbackItemId)}>
+                    {index > 0 && (
+                      <a href={`#slide-${column.columnId}-${index - 1}`} className="back-button" aria-label="Previous slide" onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index - 1].feedbackItem.id)}>
+                        {getIconElement("chevron-left")}
+                      </a>
+                    )}
+                    <div className="carousel-viewport">{child}</div>
+                    {index < feedbackCarouselItems.length - 1 && (
+                      <a href={`#slide-${column.columnId}-${index + 1}`} className="next-button" aria-label="Next slide" onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index + 1].feedbackItem.id)}>
+                        {getIconElement("chevron-right")}
+                      </a>
+                    )}
                   </li>
-                ))}
-              </ul>
-            </div>
-          </PivotItem>
-        );
-      })}
-    </Pivot>
+                );
+              })}
+            </ol>
+            <ul className="carousel-dots" aria-label="Focus mode pagination">
+              {slideIds.map((slideId, index) => (
+                <li key={slideId}>
+                  <a href={`#${slideId}`} className="carousel-dot" aria-label={`Go to card ${index + 1} of ${slideIds.length}`} onClick={() => recordActiveCarouselPosition(column.columnId, sortedItems[index].feedbackItem.id)} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="feedback-carousel-pivot" onKeyDown={trackActivity} onMouseMove={trackActivity} onTouchStart={trackActivity}>
+      <div role="tablist" aria-label="Feedback columns" onKeyDown={handleTabListKeyDown}>
+        {feedbackColumns.map(column => {
+          const isSelected = column.columnId === selectedColumnKey;
+
+          return (
+            <button key={column.columnId} id={getCarouselTabId(column.columnId)} type="button" role="tab" className={`pivot-tab${isSelected ? " active" : ""}`} aria-selected={isSelected} tabIndex={isSelected ? 0 : -1} onClick={() => selectColumn(column.columnId)}>
+              {column.columnName}
+            </button>
+          );
+        })}
+      </div>
+      {selectedColumn && renderColumnPanel(selectedColumn)}
+    </div>
   );
 };
 

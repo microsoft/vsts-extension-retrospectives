@@ -122,13 +122,12 @@ describe("Action Item component", () => {
 describe("Behavioral tests for ActionItem", () => {
   it("does not render actions when areActionIconsHidden is true", () => {
     const { container } = render(<ActionItem {...defaultTestProps} areActionIconsHidden={true} />);
-    const documentCardActions = container.querySelector('[class*="ms-DocumentCardActions"]');
-    expect(documentCardActions).toBeNull();
+    expect(container.querySelector("button.action")).toBeNull();
   });
 
   it("renders actions when areActionIconsHidden is false", () => {
     const { container } = render(<ActionItem {...defaultTestProps} areActionIconsHidden={false} />);
-    expect(container.firstChild).toBeTruthy();
+    expect(container.querySelector("button.action")).toBeTruthy();
   });
 
   it("toggles unlink confirmation dialog visibility based on state", () => {

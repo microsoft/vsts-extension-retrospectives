@@ -107,50 +107,6 @@ body {
   @apply text-primary;
 }
 
-.ms-Button--primary {
-  @apply bg-white text-primary border border-primary;
-}
-
-.ms-Button--primary:hover {
-  @apply bg-primary text-white;
-}
-
-.ms-Button--default {
-  @apply bg-white;
-}
-
-div.ms-Tooltip-content p.ms-Tooltip-subtext a {
-  @apply text-primary underline;
-}
-
-.ms-Pivot .ms-Button {
-  @apply text-(--text-primary-color);
-}
-
-.ms-Pivot-link:hover {
-  @apply bg-inherit;
-}
-
-.ms-Checkbox.is-disabled {
-  @apply bg-transparent!;
-}
-
-.is-disabled .ms-Checkbox-text {
-  @apply text-(--text-disabled-color)!;
-}
-
-.is-disabled {
-  @apply bg-(--text-disabled-color) border-(--text-disabled-color) text-(--text-disabled-color);
-
-  & :is(.ms-Checkbox-text, .ms-Checkbox-checkbox, .ms-Checkbox-checkmark) {
-    @apply text-(--text-disabled-color)!;
-  }
-}
-
-.ms-ContextualMenu-divider {
-  @apply opacity-20;
-}
-
 .header-menu-with-timer {
   @apply flex items-center gap-3;
 }
@@ -330,22 +286,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   & svg {
     @apply w-5 h-5;
   }
-}
-
-.extended-options-menu {
-  @apply bg-(--callout-background-color) max-h-none;
-
-  & button.ms-ContextualMenu-link {
-    @apply text-(--text-primary-color);
-
-    &:hover {
-      @apply bg-(--border-subtle-color) text-primary;
-    }
-  }
-}
-
-.ms-ContextualMenu-Callout .ms-Callout-main {
-  @apply bg-(--callout-background-color);
 }
 
 .retrospectives-board-metadata-dialog,
@@ -732,7 +672,7 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
       @apply min-w-0;
     }
 
-    & .feedbackItemGroupItem.removeFeedbackItem .ms-DocumentCard {
+    & .feedbackItemGroupItem.removeFeedbackItem .feedback-card-surface {
       @apply animate-[fadeOutToRed_1000ms_ease-in_1_forwards];
     }
 
@@ -893,10 +833,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.add-action-item-list-items .ms-List-cell:hover {
-  @apply bg-(--border-subtle-color);
-}
-
 .action-item-display-container {
   display: contents;
 }
@@ -906,26 +842,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
   & .work-item-type-icon-container {
     @apply bg-(--background-color);
-  }
-
-  & .ms-DocumentCard .ms-DocumentCardActions {
-    @apply p-0 pr-1.5;
-
-    & .ms-DocumentCardActions-action {
-      @apply h-7.5 w-6;
-
-      & .ms-Button .ms-Button-flexContainer i {
-        @apply text-primary text-xs;
-      }
-
-      & .ms-Button:hover:not(:disabled) i {
-        @apply font-bold;
-      }
-    }
-  }
-
-  & .ms-DocumentCardPreview {
-    @apply border-r border-border-gray;
   }
 }
 
@@ -1104,10 +1020,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply bg-(--border-subtle-color);
       }
 
-      & tr .board-summary-container .action-items-summary-card .ms-DetailsList-headerWrapper {
-        @apply border-b-3 border-(--border-subtle-color);
-      }
-
       & tr .board-summary-container .action-items-summary-card .board-summary-action-items-table {
         @apply w-full h-full border-collapse table-fixed;
       }
@@ -1163,32 +1075,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
         @apply bg-(--border-subtle-color);
       }
 
-      & tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"] {
-        @apply bg-(--background-color) text-(--text-primary-color) border-b border-white;
-      }
-
-      & tr .board-summary-container .action-items-summary-card .ms-DetailsHeader-cell[role="columnheader"]:hover {
-        @apply text-(--text-primary-color);
-      }
-
       & tr .board-summary-container .action-items-summary-card .overflow-ellipsis {
         @apply text-ellipsis overflow-hidden whitespace-nowrap block w-full;
-      }
-
-      & tr .board-summary-container .action-items-summary-card .ms-Viewport {
-        @apply h-full;
-      }
-
-      & tr .board-summary-container .action-items-summary-card .ms-Viewport .ms-DetailsList {
-        @apply h-full;
-      }
-
-      & tr .board-summary-container .action-items-summary-card .ms-Viewport .ms-DetailsRow {
-        @apply border-0;
-      }
-
-      & tr .board-summary-container .action-items-summary-card .ms-List-cell {
-        @apply text-sm;
       }
 
       & tr .board-summary-container .action-items-summary-card .work-item-title {
@@ -1197,10 +1085,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       & tr .board-summary-container .action-items-summary-card .no-action-items {
         @apply text-sm relative top-1/2 -translate-y-1/2 text-center;
-      }
-
-      & tr .board-summary-container .board-summary-card .board-summary-card-title .ms-DocumentCardTitle {
-        @apply font-semibold p-0 mb-5 h-auto text-(--text-primary-color);
       }
     }
   }
@@ -1316,10 +1200,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .feedback-carousel-pivot > div {
   @apply flex;
-}
-
-.feedback-carousel-pivot > .ms-Pivot .ms-Button {
-  @apply bg-(--background-color) text-(--text-primary-color) border-none;
 }
 
 .feedback-carousel-pivot-item {
@@ -1619,50 +1499,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
     }
   }
 
-  & .ms-Checkbox.is-checked .ms-Checkbox-checkbox {
-    @apply bg-(--background-color);
-  }
-
-  & .ms-Checkbox.is-checked .ms-Checkbox-checkbox:hover {
-    @apply bg-primary text-white;
-  }
-
-  & .ms-Checkbox.is-checked .ms-Checkbox-checkmark {
-    @apply text-(--text-primary-color);
-  }
-
-  & .ms-Checkbox.is-checked .ms-Checkbox-checkmark:hover {
-    @apply text-white;
-  }
-
-  & .ms-Checkbox.is-disabled .ms-Checkbox-checkbox:hover {
-    @apply bg-(--background-color);
-  }
-
-  & .ms-Checkbox .ms-Checkbox-text {
-    @apply text-(--text-primary-color);
-  }
-
-  & .ms-Checkbox .ms-Checkbox-text:hover {
-    @apply text-primary;
-  }
-
-  & .ms-Checkbox .ms-Checkbox-checkbox {
-    @apply bg-(--background-color) border-[#aaa];
-  }
-
-  & .ms-Checkbox .ms-Checkbox-checkbox:hover {
-    @apply bg-primary;
-  }
-
-  & .ms-Checkbox .ms-Checkbox-checkmark {
-    @apply text-(--text-primary-color);
-  }
-
-  & .ms-Checkbox .ms-Checkbox-checkmark:hover {
-    @apply text-white;
-  }
-
   & .feedback-column-card {
     @apply flex items-center max-w-full bg-(---nav-vertical-background-color) text-(--text-primary-color) h-15 mt-2.5;
 
@@ -1695,14 +1531,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
       &:hover {
         @apply bg-gray-light;
-      }
-
-      &.is-disabled {
-        @apply bg-(--text-disabled-color);
-      }
-
-      &.is-disabled i {
-        @apply text-(--text-disabled-color);
       }
     }
   }
@@ -1761,18 +1589,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-3xl h-12 m-1;
 }
 
-.ms-Checkbox:not(.is-checked):hover .ms-Checkbox-checkmark {
-  @apply hidden;
-}
-
-.ms-Dialog-button.ms-Dialog-button--close .ms-Button-icon {
-  @apply text-(--text-primary-color);
-}
-
-.ms-Dialog-button.ms-Dialog-button--close:hover {
-  @apply bg-(--border-subtle-color);
-}
-
 .feedback-board-container {
   @apply flex flex-col flex-1 h-[calc(100vh-88px)] min-h-0 border-t-4 border-(--nav-header-active-item-background) overflow-y-auto overflow-x-auto;
 }
@@ -1783,10 +1599,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 .extension-header-spacer {
   @apply pb-12;
-}
-
-.team-filter-container .ms-TextField {
-  @apply my-2 mx-1.5;
 }
 
 #extension-header {
@@ -1801,10 +1613,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply mt-1 ml-auto mr-5;
 }
 
-#extension-header .contact-us-button .ms-Button {
-  @apply min-w-10;
-}
-
 #extension-header .contact-us-button:hover {
   @apply bg-[#eeeeee];
 }
@@ -1815,22 +1623,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
 
 #extension-header .team-selector {
   @apply font-normal flex items-baseline my-0 mx-6 pt-1;
-}
-
-.pivot-container {
-  @apply fixed top-11 z-2 w-full items-center justify-start;
-}
-
-.pivot-container .ms-Pivot {
-  @apply ml-0.5;
-}
-
-.pivot-container button[role="tab"] {
-  @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)];
-}
-
-.pivot-container button[role="tab"]:hover {
-  @apply text-[rgba(var(--palette-neutral-80,51,51,51),1)] bg-transparent;
 }
 
 .pivot-tab {
@@ -2158,11 +1950,15 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply outline-[3px] outline-primary outline-offset-2 shadow-[0_0_8px_rgba(0,120,212,0.3)];
 }
 
-.feedbackItem.newFeedbackItem .ms-DocumentCard {
+.feedback-card-surface {
+  @apply relative min-w-[206px] max-w-[320px] bg-(--background-color) border border-border-gray select-none antialiased;
+}
+
+.feedbackItem.newFeedbackItem .feedback-card-surface {
   @apply animate-[fadeInFromGreen_1000ms_ease-in_1];
 }
 
-.feedbackItem.removeFeedbackItem .ms-DocumentCard {
+.feedbackItem.removeFeedbackItem .feedback-card-surface {
   @apply animate-[fadeOutToRed_1000ms_ease-in_1_forwards];
 }
 
@@ -2185,10 +1981,42 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply border-l-3;
 }
 
-.feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span,
-.feedback-item-group .mainItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span,
-.feedbackItemGroupItem .groupedItemCard .card-integral-part .ms-DocumentCardActivity .ms-DocumentCardActivity-details span {
-  @apply text-(--text-secondary-color);
+.feedback-card-activity {
+  @apply flex items-start gap-2.5 px-4 py-2;
+}
+
+.feedback-card-activity-avatar {
+  @apply relative -ml-0.5 size-8 shrink-0;
+
+  &::after {
+    @apply absolute -inset-px rounded-full border-2 border-white;
+    content: "";
+  }
+
+  & img,
+  & .feedback-card-activity-initials {
+    @apply size-full rounded-full;
+  }
+
+  & img {
+    @apply object-cover;
+  }
+}
+
+.feedback-card-activity-initials {
+  @apply flex items-center justify-center text-sm font-semibold text-white;
+}
+
+.feedback-card-activity-details {
+  @apply min-w-0 flex-1 text-xs leading-[15px] text-(--text-secondary-color);
+
+  & > span {
+    @apply block h-[15px] truncate;
+  }
+
+  & .feedback-card-activity-name {
+    @apply font-semibold;
+  }
 }
 
 .feedbackItem .mainItemCard .card-integral-part .card-header,
@@ -2286,10 +2114,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-xs;
 }
 
-.feedbackItem .mainItemCard .card-integral-part .ms-DocumentCardActivity .msDocumentCardActivity-details {
-  @apply pl-1.5;
-}
-
 .feedbackItemGroupItem .mainItemCard .card-integral-part .anonymous-created-date,
 .feedbackItemGroupItem .groupedItemCard .card-integral-part .anonymous-created-date,
 .feedbackItem .mainItemCard .card-integral-part .anonymous-created-date {
@@ -2361,19 +2185,6 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   }
 }
 
-.retrospectives-move-feedback-item-dialog {
-  @apply bg-(--background-color);
-}
-
-.retrospectives-move-feedback-item-dialog .ms-Dialog-title,
-.retrospectives-move-feedback-item-dialog .ms-Dialog-subText {
-  @apply text-(--text-primary-color);
-}
-
-.retrospectives-move-feedback-item-dialog .move-feedback-item-column-button i {
-  @apply mr-2.5;
-}
-
 .retrospectives-group-feedback-item-dialog .output-container,
 .retrospectives-all-board-feedback-search-dialog .output-container {
   @apply overflow-y-auto h-75 mx-4 flex flex-col gap-3;
@@ -2438,34 +2249,8 @@ div.ms-Tooltip-content p.ms-Tooltip-subtext a {
   @apply text-(--text-primary-color);
 }
 
-.retrospectives-group-feedback-item-dialog .ms-DocumentCardActivity-avatar::after {
+.retrospectives-group-feedback-item-dialog .feedback-card-activity-avatar::after {
   @apply border border-solid border-(--text-primary-color);
-}
-
-.feedback-action-menu {
-  @apply border border-solid border-(--border-subtle-color);
-}
-
-.feedback-action-menu .ms-ContextualMenu-list {
-  @apply bg-(--background-color);
-}
-
-.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-itemText {
-  @apply text-(--text-primary-color);
-}
-
-.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link:hover {
-  @apply text-(--text-primary-color) bg-(--border-subtle-color);
-}
-
-.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link:focus,
-.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link:focus-visible,
-.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link.is-focused {
-  @apply outline-none text-(--text-primary-color) bg-(--border-subtle-color);
-}
-
-.feedback-action-menu .ms-ContextualMenu-list .ms-ContextualMenu-link.is-disabled .ms-ContextualMenu-itemText {
-  @apply text-(--text-disabled-color);
 }
 
 .retro-toast {

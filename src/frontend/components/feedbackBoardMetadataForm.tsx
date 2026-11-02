@@ -1,5 +1,4 @@
 import React, { ChangeEvent, useState, useEffect, useRef, useCallback } from "react";
-import { List } from "@fluentui/react/lib/List";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 
 import BoardDataService from "../dal/boardDataService";
@@ -429,10 +428,9 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                   <option value="efficiency">Efficiency</option>
                 </select>
               </div>
-              <List
-                items={columnCards}
-                onRenderCell={(columnCard: IFeedbackColumnCard, index: number) => {
-                  return (
+              <ul>
+                {columnCards.map((columnCard, index) => (
+                  <li key={columnCard.column.id}>
                     <div className={columnCard.markedForDeletion ? "feedback-column-card marked-for-deletion" : "feedback-column-card"}>
                       <div className="flex grow items-center">
                         <button
@@ -535,9 +533,9 @@ export const FeedbackBoardMetadataForm: React.FC<IFeedbackBoardMetadataFormProps
                         )}
                       </div>
                     </div>
-                  );
-                }}
-              />
+                  </li>
+                ))}
+              </ul>
               <button
                 className="create-feedback-column-card-button"
                 aria-label="Add new column"

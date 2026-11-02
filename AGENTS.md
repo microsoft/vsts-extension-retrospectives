@@ -57,7 +57,7 @@ pre-commit run --all-files      # Run on all files
 **Imports** - organize in order:
 
 1. React and hooks
-2. Third-party libraries (@fluentui, azure-devops-extension-*)
+2. Third-party libraries (`azure-devops-extension-*`, `@microsoft/applicationinsights-*`)
 3. Local interfaces/types
 4. Local components
 5. Local utilities/services
