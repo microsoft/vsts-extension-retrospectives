@@ -30,9 +30,9 @@ export interface FocusModeModel {
   requestTimerStart: (feedbackItemId: string) => void;
   notifyTimerStopped: (feedbackItemId: string) => void;
 
-  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
+  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
-  refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void;
+  refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[]) => void;
 }
 
 interface FocusModeColumn {

@@ -1,4 +1,4 @@
-import { WorkItemExpand, WorkItemErrorPolicy } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
+import { WorkItem, WorkItemExpand, WorkItemErrorPolicy } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WorkItemTrackingRestClient } from "azure-devops-extension-api/WorkItemTracking/WorkItemTrackingClient";
 import { RelationshipType } from "../interfaces/workItem";
 
@@ -8,6 +8,8 @@ import { getProjectId } from "../utilities/servicesHelper";
 class WorkItemService {
   public static readonly retrospective_type = "Retrospective";
   public static readonly task_type = "Task";
+  // Azure DevOps rejects work item batch requests with more than 200 ids.
+  private static readonly maxWorkItemsPerRequest = 200;
 
   private _httpClient: WorkItemTrackingRestClient;
 
@@ -51,11 +53,20 @@ class WorkItemService {
    * Gets the work items by given ids.
    * @param ids The ids of the work items to fetch.
    */
-  public async getWorkItemsByIds(ids: number[]) {
-    const projectId = await getProjectId();
-    const workItems = await this._httpClient.getWorkItems(ids, projectId, undefined, undefined, WorkItemExpand.All, WorkItemErrorPolicy.Omit);
+  public async getWorkItemsByIds(ids: number[]): Promise<WorkItem[]> {
+    if (!ids?.length) {
+      return [];
+    }
 
-    return workItems.filter(wi => wi != null);
+    const projectId = await getProjectId();
+    const batches: number[][] = [];
+    for (let index = 0; index < ids.length; index += WorkItemService.maxWorkItemsPerRequest) {
+      batches.push(ids.slice(index, index + WorkItemService.maxWorkItemsPerRequest));
+    }
+
+    const batchResults = await Promise.all(batches.map(batch => this._httpClient.getWorkItems(batch, projectId, undefined, undefined, WorkItemExpand.All, WorkItemErrorPolicy.Omit)));
+
+    return batchResults.reduce<WorkItem[]>((allWorkItems, workItems) => allWorkItems.concat(workItems ?? []), []).filter(wi => wi != null);
   }
 
   public getReferencedByReverseItemIds(itemId: number) {

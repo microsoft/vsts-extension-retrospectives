@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 .ONESHELL:
 
-.PHONY: publish
+.PHONY: publish build test
 
 publish:
 	set -euo pipefail
@@ -37,3 +37,9 @@ publish:
 	npx tfx extension publish --manifests "$${ext_file}" --vsix ./dist/*.vsix --token "$${AZURE_DEVOPS_TOKEN}" --no-wait-validation
 
 	popd
+
+build:
+	npm --prefix src/frontend run build
+
+test:
+	npm --prefix src/frontend test

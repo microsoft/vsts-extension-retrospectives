@@ -13,7 +13,6 @@ import { itemDataService } from "../../dal/itemDataService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { IFeedbackBoardDocument } from "../../interfaces/feedback";
 import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
-import { reflectBackendService } from "../../dal/reflectBackendService";
 import * as userIdentityHelper from "../../utilities/userIdentityHelper";
 
 jest.mock("../../utilities/telemetryClient", () => {
@@ -60,12 +59,6 @@ jest.mock("../../dal/boardDataService", () => {
   };
   return mockBoardDataService;
 });
-
-jest.mock("../../dal/reflectBackendService", () => ({
-  reflectBackendService: {
-    broadcastDeletedBoard: jest.fn(),
-  },
-}));
 
 jest.mock("../../dal/azureDevOpsWorkItemService");
 
@@ -1587,7 +1580,7 @@ describe("BoardSummaryTable - Delete confirmation flow", () => {
     (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
   });
 
-  it("deletes board and broadcasts changes when confirmed", async () => {
+  it("deletes the board and removes it from the table when confirmed", async () => {
     const archivedBoard: IFeedbackBoardDocument = { ...mockBoards[0], id: "board-archive", title: "Archived Board", isArchived: true, archivedDate: new Date(Date.now() - 5 * 60 * 1000) };
     (BoardDataService.getBoardsForTeam as jest.Mock).mockResolvedValue([archivedBoard]);
     (BoardDataService.deleteFeedbackBoard as jest.Mock).mockResolvedValue(undefined);
@@ -1616,7 +1609,7 @@ describe("BoardSummaryTable - Delete confirmation flow", () => {
     });
 
     await waitFor(() => {
-      expect(reflectBackendService.broadcastDeletedBoard).toHaveBeenCalledWith(baseProps.teamId, "board-archive");
+      expect(container.querySelector(".trash-icon")).toBeNull();
     });
   });
 

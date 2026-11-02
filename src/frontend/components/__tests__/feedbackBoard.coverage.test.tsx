@@ -9,6 +9,7 @@ import { workService } from "../../dal/azureDevOpsWorkService";
 import { workItemService } from "../../dal/azureDevOpsWorkItemService";
 import { appInsights } from "../../utilities/telemetryClient";
 import { WorkflowPhase } from "../../interfaces/workItem";
+import { LIVE_SYNC_POLL_INTERVAL_MS } from "../../utilities/pollingLoop";
 
 const feedbackColumnPropsSpy = jest.fn();
 const mockNavigateByKeyboard = jest.fn();
@@ -34,7 +35,7 @@ jest.mock("@microsoft/applicationinsights-react-js", () => ({
 
 jest.mock("../../dal/itemDataService", () => ({
   itemDataService: {
-    getFeedbackItemsForBoard: jest.fn(),
+    getFeedbackItemsForBoardStrict: jest.fn(),
     getFeedbackItem: jest.fn(),
     getBoardItem: jest.fn(),
     flipTimer: jest.fn(),
@@ -51,17 +52,6 @@ jest.mock("../../dal/azureDevOpsWorkService", () => ({
 jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
   workItemService: {
     getWorkItemsByIds: jest.fn(),
-  },
-}));
-
-jest.mock("../../dal/reflectBackendService", () => ({
-  reflectBackendService: {
-    onReceiveNewItem: jest.fn(),
-    onReceiveUpdatedItem: jest.fn(),
-    removeOnReceiveNewItem: jest.fn(),
-    removeOnReceiveUpdatedItem: jest.fn(),
-    broadcastNewItem: jest.fn(),
-    broadcastUpdatedItem: jest.fn(),
   },
 }));
 
@@ -186,7 +176,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   jest.useRealTimers();
   omitImperativeMethods = false;
-  (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValue([]);
+  (itemDataService.getFeedbackItemsForBoardStrict as jest.Mock).mockResolvedValue([]);
   (itemDataService.getFeedbackItem as jest.Mock).mockResolvedValue(createItem());
   (itemDataService.flipTimer as jest.Mock).mockResolvedValue(createItem());
   (workService.getIterations as jest.Mock).mockResolvedValue([{ path: "iteration-a" }]);
@@ -288,7 +278,7 @@ describe("FeedbackBoard targeted coverage", () => {
 
     const columnProps = getLatestColumnPropsById("col-1");
     await act(async () => {
-      await columnProps.refreshFeedbackItems([createItem({ associatedActionItemIds: [42] })], false);
+      await columnProps.refreshFeedbackItems([createItem({ associatedActionItemIds: [42] })]);
     });
 
     expect(workItemService.getWorkItemsByIds).toHaveBeenCalledWith([42]);
@@ -300,7 +290,7 @@ describe("FeedbackBoard targeted coverage", () => {
     const localEditingItem = createItem({ id: "editing-1", title: "local", associatedActionItemIds: [] });
     const serverItem = createItem({ id: "server-1", title: "server", associatedActionItemIds: [88] });
 
-    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([]).mockResolvedValueOnce([serverItem]);
+    (itemDataService.getFeedbackItemsForBoardStrict as jest.Mock).mockResolvedValueOnce([]).mockResolvedValueOnce([serverItem]);
 
     const querySpy = jest.spyOn(document, "querySelector").mockImplementation(() => {
       return {
@@ -316,11 +306,11 @@ describe("FeedbackBoard targeted coverage", () => {
 
     const beforePollProps = getLatestColumnPropsById("col-1");
     await act(async () => {
-      beforePollProps.addFeedbackItems("col-1", [localEditingItem], false, true, false, false, false);
+      beforePollProps.addFeedbackItems("col-1", [localEditingItem], true, false, false, false);
     });
 
     await act(async () => {
-      jest.advanceTimersByTime(10000);
+      await jest.advanceTimersByTimeAsync(LIVE_SYNC_POLL_INTERVAL_MS);
     });
 
     await waitFor(() => {
@@ -338,7 +328,7 @@ describe("FeedbackBoard targeted coverage", () => {
     jest.useFakeTimers();
     const serverItemWithoutActions = createItem({ id: "server-no-actions", associatedActionItemIds: undefined });
 
-    (itemDataService.getFeedbackItemsForBoard as jest.Mock).mockResolvedValueOnce([]).mockResolvedValueOnce([serverItemWithoutActions]);
+    (itemDataService.getFeedbackItemsForBoardStrict as jest.Mock).mockResolvedValueOnce([]).mockResolvedValueOnce([serverItemWithoutActions]);
 
     renderBoard({ workflowPhase: WorkflowPhase.Collect });
 
@@ -348,11 +338,11 @@ describe("FeedbackBoard targeted coverage", () => {
 
     const columnProps = getLatestColumnPropsById("col-1");
     await act(async () => {
-      await columnProps.refreshFeedbackItems([createItem({ id: "refresh-no-actions", associatedActionItemIds: undefined })], false);
+      await columnProps.refreshFeedbackItems([createItem({ id: "refresh-no-actions", associatedActionItemIds: undefined })]);
     });
 
     await act(async () => {
-      jest.advanceTimersByTime(10000);
+      await jest.advanceTimersByTimeAsync(LIVE_SYNC_POLL_INTERVAL_MS);
     });
 
     expect(workItemService.getWorkItemsByIds).not.toHaveBeenCalledWith(undefined);
@@ -367,7 +357,7 @@ describe("FeedbackBoard targeted coverage", () => {
 
     const colProps = getLatestColumnPropsById("col-1");
     await act(async () => {
-      colProps.addFeedbackItems("col-1", [createItem({ id: "a" }), createItem({ id: "b" })], false, false, false, false, false);
+      colProps.addFeedbackItems("col-1", [createItem({ id: "a" }), createItem({ id: "b" })], false, false, false, false);
     });
 
     await act(async () => {

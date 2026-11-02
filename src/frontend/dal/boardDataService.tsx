@@ -1,4 +1,4 @@
-import { createDocument, deleteDocument, readDocument, readDocuments, updateDocument, getValue, setValue } from "./dataService";
+import { createDocument, deleteDocument, readDocument, readDocumentStrict, readDocuments, readDocumentsStrict, updateDocument, getValue, setValue } from "./dataService";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackColumn, IFeedbackItemDocument, ITeamAssessmentQuestion } from "../interfaces/feedback";
 import { WorkflowPhase } from "../interfaces/workItem";
 import { getUserIdentity } from "../utilities/userIdentityHelper";
@@ -66,6 +66,20 @@ class BoardDataService {
 
   public getBoardForTeamById = async (teamId: string, boardId: string) => {
     return await readDocument<IFeedbackBoardDocument>(teamId, boardId);
+  };
+
+  /**
+   * Get all boards of the team without masking read failures (a team without boards resolves to an empty list).
+   */
+  public getBoardsForTeamStrict = async (teamId: string) => {
+    return await readDocumentsStrict<IFeedbackBoardDocument>(teamId);
+  };
+
+  /**
+   * Get a board without masking read failures; resolves to undefined only when the board no longer exists.
+   */
+  public getBoardForTeamByIdStrict = async (teamId: string, boardId: string) => {
+    return await readDocumentStrict<IFeedbackBoardDocument>(teamId, boardId);
   };
 
   public deleteFeedbackBoard = async (teamId: string, boardId: string) => {
@@ -152,6 +166,7 @@ class BoardDataService {
     }
 
     board.activePhase = activePhase;
+    board.activePhaseUpdatedDate = new Date(Date.now());
     return await this.updateBoard(teamId, board);
   };
 

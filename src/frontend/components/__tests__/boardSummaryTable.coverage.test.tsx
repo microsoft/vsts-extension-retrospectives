@@ -54,12 +54,6 @@ jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
   },
 }));
 
-jest.mock("../../dal/reflectBackendService", () => ({
-  reflectBackendService: {
-    broadcastDeletedBoard: jest.fn(),
-  },
-}));
-
 jest.mock("../boardSummaryTableBody", () => {
   const ReactLib = require("react");
 

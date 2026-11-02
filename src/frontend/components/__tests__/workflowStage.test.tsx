@@ -188,13 +188,13 @@ describe("Workflow Stage", () => {
       expect(button).toHaveAttribute("aria-busy", "true");
     });
 
-    it("disables the button and explains when live sync is unavailable", () => {
-      render(<WorkflowStage {...mockedProps} canManageBoard={true} isLiveSyncAvailable={false} />);
+    it("enables the button and describes the move when no move is pending", () => {
+      render(<WorkflowStage {...mockedProps} canManageBoard={true} />);
 
       const button = screen.getByRole("button", { name: "Move everyone to Sample Workflow Stage Text" });
       const tooltip = document.getElementById(button.getAttribute("aria-describedby")!);
-      expect(button).toBeDisabled();
-      expect(tooltip).toHaveTextContent("Live sync is unavailable.");
+      expect(button).toBeEnabled();
+      expect(tooltip).toHaveTextContent("Move everyone to Sample Workflow Stage Text");
       expect(tooltip).toHaveAttribute("popover", "hint");
     });
   });

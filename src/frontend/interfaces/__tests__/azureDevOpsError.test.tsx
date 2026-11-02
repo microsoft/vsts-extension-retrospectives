@@ -1,4 +1,4 @@
-import { isAzureDevOpsError, AzureDevOpsError, AzureDevOpsErrorTypes } from "../azureDevOpsError";
+import { isAzureDevOpsError, isDocumentOrCollectionMissingError, AzureDevOpsError, AzureDevOpsErrorTypes } from "../azureDevOpsError";
 
 describe("azureDevOpsError", () => {
   describe("isAzureDevOpsError", () => {
@@ -85,6 +85,36 @@ describe("azureDevOpsError", () => {
 
     it("should have CurrentIterationDoesNotExist constant", () => {
       expect(AzureDevOpsErrorTypes.CurrentIterationDoesNotExist).toBe("CurrentIterationDoesNotExistException");
+    });
+
+    it("should have DocumentDoesNotExist constant", () => {
+      expect(AzureDevOpsErrorTypes.DocumentDoesNotExist).toBe("DocumentDoesNotExistException");
+    });
+  });
+
+  describe("isDocumentOrCollectionMissingError", () => {
+    it.each([
+      ["a missing collection type key", { serverError: { typeKey: AzureDevOpsErrorTypes.DocumentCollectionDoesNotExist } }],
+      ["a missing document type key", { serverError: { typeKey: AzureDevOpsErrorTypes.DocumentDoesNotExist } }],
+      ["an HTTP 404 status", { status: 404 }],
+      ["an HTTP 404 statusCode", { statusCode: 404 }],
+      ["the 1660002 error code", { message: "TF1660002: The document could not be found." }],
+      ["a collection does not exist message", { message: "The Collection does not exist" }],
+      ["a document does not exist server message", { serverError: { message: "Document does not exist" } }],
+    ])("should return true for %s", (_, error) => {
+      expect(isDocumentOrCollectionMissingError(error)).toBe(true);
+    });
+
+    it.each([
+      ["null", null],
+      ["undefined", undefined],
+      ["a string", "Document does not exist"],
+      ["a network failure", Object.assign(new Error("TF400893: Unable to contact the server."), { name: "NetworkException" })],
+      ["an HTTP 401 status", { status: 401, message: "Unauthorized" }],
+      ["an HTTP 500 status", { status: 500, serverError: { typeKey: "InternalServerErrorException" } }],
+      ["a conflict", { status: 409, serverError: { typeKey: "InvalidDocumentVersionException" } }],
+    ])("should return false for %s", (_, error) => {
+      expect(isDocumentOrCollectionMissingError(error)).toBe(false);
     });
   });
 });

@@ -4,7 +4,6 @@
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9514/badge)](https://www.bestpractices.dev/projects/9514)
 [![CodeCov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
 [![CI and CD for Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_cd_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_cd_frontend.yml)
-[![CI_Backend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml)
 
 Retrospectives is an [Azure DevOps](https://dev.azure.com) extension to perform _smart and efficient retrospectives from within the Azure DevOps._
 
@@ -30,7 +29,7 @@ The [Retrospectives extension](https://marketplace.visualstudio.com/items?itemNa
 ## Retrospective Features
 
 - Retrospectives in Azure DevOps
-- Real time support for distributed retrospectives
+- Live updates for distributed retrospectives
 - Ability to create Azure DevOps work items associated to feedback
 - Create an emailable summary of a retrospective
 
@@ -99,7 +98,7 @@ Once you have created the retrospective board and you want to select a retrospec
 
 ### 6. Share the Link to the Retrospective
 
-Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link even from their mobile browsers to participate in the retrospective. The extension offers real time synchronization, so all users will see the most up-to-date information without having to refresh the page.
+Once you create a new retrospective, you can share a link to it to all participants. Users can then access that link even from their mobile browsers to participate in the retrospective. The board updates automatically, so all users see changes from others within a few seconds without having to refresh the page.
 
 ![A screenshot of the dropdown from the Board Actions Menu. The option for 'Copy retrospective link' is highlighted as the fourth menu option.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/menu-dropdown-copy-retrospective-link.png)
 
@@ -329,33 +328,30 @@ Selecting a retrospective expands the row to reveal more details, including a co
 
 ![Expanded retrospective view showing a summary of feedback and work item counts on the left and a work item table on the right with columns: Title, State, Type, Last Updated, Assigned To, and Priority.](https://github.com/microsoft/vsts-extension-retrospectives/raw/main/documentation/images/desktop/history-row-expanded.png)
 
-To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved Archiving will take effect immediately for the user performing the action, while other users will see the change only after reloading the Retrospective boards.
+To _archive_ a retrospective, check the box in the Archived column. The retrospective will no longer appear in the Board selection dropdown, though all data remains preserved. Archiving will take effect immediately for the user performing the action. Other users will see the change within about 2 minutes, or as soon as they open the Board selection dropdown, and anyone viewing the retrospective will be moved to the most recently created retrospective within a few seconds.
 
-To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown. Restoring will take effect immediately for the user performing the action, while other users will see the change only after reloading the Retrospective boards.
+To _restore_ an archived retrospective, uncheck the box in the Archived column. The retrospective will reappear in the Board selection dropdown. Restoring will take effect immediately for the user performing the action, while other users will see the retrospective in their Board selection dropdown within about 2 minutes, or as soon as they open it.
 
 To _delete_ an archived retrospective, wait for two minutes after archiving, then click the trash icon to _permanently_ delete the retrospective.  The delay between archiving and deleting was added to encourage users to try the archive functionality before deleting, since the delete action cannot be undone and, in most cases, archiving will be sufficient.  Deleting will take effect immediately for all users.
 
 ## Live Sync Troubleshooting
 
-If you see the in-app message that live syncing is unavailable, the board still works, but updates from other users may not appear until the connection is restored.
+The extension stores everything in Azure DevOps, and each open board checks Azure DevOps for changes every 2 seconds. When nothing has changed for about 10 seconds, the board checks every 6 seconds instead, and it goes back to every 2 seconds as soon as something changes. The list of retrospectives is checked every 2 minutes and whenever you open the Board selection dropdown. Changes from other users therefore show up within a few seconds without refreshing the page.
 
 ### Quick checks
 
-- Select **Retry** in the warning banner and wait for reconnection.
-- Refresh the browser tab if the warning persists.
-- Verify system clock/timezone are accurate on the client machine (token validation depends on local time).
+- Checks pause while the browser tab is hidden and run again as soon as the tab is visible, so a board that was in a background tab catches up when you return to it.
+- When a check fails (for example, while the network is down), the board keeps working and retries with an increasing delay of up to about 30 seconds. It checks again right away when the browser comes back online.
+- While a board is quiet, a change from another user (including a facilitator moving everyone to the next phase) can take up to about 6 seconds to appear.
+- Refresh the browser tab if changes from other users still do not appear.
 
 ### Network / proxy checks (including enterprise ZTNA, ZScaler, etc.)
 
-Live sync uses a SignalR connection to the backend service URL `https://app-retrospective-extension-prod.azurewebsites.net`.
-
-- Ensure outbound HTTPS/WebSocket traffic to that hostname is allowed by your firewall/proxy.
-- If your organization uses network security tooling (for example, SSL interception, private access, or zero-trust gateways), add an allow rule for the collaboration service hostname.
-- Confirm that proxy policy permits long-lived connections (WebSocket or SignalR fallback transports).
+Live updates use the same Azure DevOps services as the rest of the extension, so there is no extra hostname to allow and no WebSocket or other long-lived connection. If the extension loads and saves feedback, live updates work too.
 
 ### On-premise note
 
-For Azure DevOps Server/on-prem deployments, behavior depends on your environment and backend setup. If live sync does not connect reliably, use page refresh as a fallback while validating proxy/allowlist configuration for your collaboration service endpoint.
+Azure DevOps Server deployments get the same live updates, since they rely only on the Azure DevOps Server itself.
 
 ## Best Practices
 

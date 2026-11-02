@@ -1,7 +1,7 @@
 import { getAccessToken, getExtensionContext, getService } from "azure-devops-extension-sdk";
 import { CommonServiceIds, IExtensionDataManager, IExtensionDataService } from "azure-devops-extension-api/Common";
 import { appInsights } from "../utilities/telemetryClient";
-import { isAzureDevOpsError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
+import { isAzureDevOpsError, isDocumentOrCollectionMissingError, AzureDevOpsErrorTypes } from "../interfaces/azureDevOpsError";
 
 let extensionDataManager: IExtensionDataManager;
 
@@ -13,6 +13,52 @@ async function getDataService(): Promise<IExtensionDataManager> {
   }
 
   return extensionDataManager;
+}
+
+function rethrowReadError(e: unknown): never {
+  // The data manager is bound to the access token it was created with; recreate it with a fresh token after an auth failure.
+  if (isAzureDevOpsError(e) && e.status === 401) {
+    extensionDataManager = undefined;
+  }
+
+  throw e;
+}
+
+/**
+ * Read user/account scoped documents without masking failures.
+ * A missing collection resolves to an empty array; any other error is rethrown so callers such as
+ * pollers can retry instead of mistaking a failed read for "no documents".
+ */
+export async function readDocumentsStrict<T>(collectionName: string, isPrivate?: boolean): Promise<T[]> {
+  const dataService: IExtensionDataManager = await getDataService();
+
+  try {
+    return (await dataService.getDocuments(collectionName, isPrivate ? { scopeType: "User" } : undefined)) ?? [];
+  } catch (e: unknown) {
+    if (isDocumentOrCollectionMissingError(e)) {
+      return [];
+    }
+
+    return rethrowReadError(e);
+  }
+}
+
+/**
+ * Read a specific user/account scoped document without masking failures.
+ * A missing document or collection resolves to undefined; any other error is rethrown.
+ */
+export async function readDocumentStrict<T>(collectionName: string, id: string, isPrivate?: boolean): Promise<T | undefined> {
+  const dataService: IExtensionDataManager = await getDataService();
+
+  try {
+    return await dataService.getDocument(collectionName, id, isPrivate ? { scopeType: "User" } : undefined);
+  } catch (e: unknown) {
+    if (isDocumentOrCollectionMissingError(e)) {
+      return undefined;
+    }
+
+    return rethrowReadError(e);
+  }
 }
 
 /**

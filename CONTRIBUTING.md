@@ -12,7 +12,6 @@
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9514/badge)](https://www.bestpractices.dev/projects/9514)
 [![CodeCov](https://codecov.io/gh/microsoft/vsts-extension-retrospectives/branch/main/graph/badge.svg?token=XU0895TPB4)](https://codecov.io/gh/microsoft/vsts-extension-retrospectives)
 [![CI and CD for Frontend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_cd_frontend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_cd_frontend.yml)
-[![CI_Backend](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml/badge.svg)](https://github.com/microsoft/vsts-extension-retrospectives/actions/workflows/ci_backend.yml)
 
 ## Table of Contents
 
@@ -31,20 +30,15 @@
 - [Build](#build)
   - [Test in Azure DevOps](#test-in-azure-devops)
   - [Test with Hot Reload and Debug](#test-with-hot-reload-and-debug)
-  - [Test with Deployed Backend Service](#test-with-deployed-backend-service)
 - [Frontend Development](#frontend-development)
   - [Style Guide](#frontend-style-guide)
+  - [Storage and Live Updates](#storage-and-live-updates)
   - [Unit Testing](#frontend-unit-testing)
-- [Backend Development](#backend-development)
-  - [Style Guidelines](#style-guidelines)
-  - [Storage](#storage)
-  - [Code](#code)
-  - [Unit Testing](#backend-unit-testing)
 - [Application Monitoring and Telemetry](#application-monitoring-and-telemetry)
 
 ## Background
 
-Retrospectives is an Azure DevOps extension. Visit the [Azure DevOps Extension overview](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) to learn more about developing extensions. The Retrospectives Azure DevOps extension frontend is implemented in React using Typescript, and the backend is implemented in C#. The project follows a single branch source control strategy.
+Retrospectives is an Azure DevOps extension. Visit the [Azure DevOps Extension overview](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) to learn more about developing extensions. The Retrospectives Azure DevOps extension is implemented in React using Typescript and runs entirely in the browser: it stores its data in Azure DevOps and has no backend service. The project follows a single branch source control strategy.
 
 ## Ways to Contribute
 
@@ -75,7 +69,7 @@ If you want to contribute code changes, bug fixes, or new features:
 
 1. Follow the [Contributing Guidelines](#contributing-guidelines) outlined in this document
 2. Read through the [Development Environments](#development-environments) section to set up your local development environment*
-3. Review the [Frontend Development](#frontend-development) and [Backend Development](#backend-development) sections for specific guidance
+3. Review the [Frontend Development](#frontend-development) section for specific guidance
 4. Ensure your changes include appropriate tests and documentation
 
 *Alternatively, watch the [Azure DevOps Retrospective Extension - Setting Up Development Environment](https://www.youtube.com/watch?v=GwsscfcAjg8) video for instructions on setting up your development environment.
@@ -168,7 +162,7 @@ All of the development prerequisites, are listed in the [DevContainer Configurat
 
 ---
 
-- Some commands, such as `dotnet build` and `npm run build` may need `sudo` prefixed to execute successfully.
+- Some commands, such as `npm run build` may need `sudo` prefixed to execute successfully.
 
 ### Github Codespaces
 
@@ -181,6 +175,12 @@ All of the development prerequisites, are listed in the [DevContainer Configurat
 4. Codespaces are powered by [Visual Studio Code and dev containers](https://docs.github.com/en/codespaces/developing-in-codespaces/developing-in-a-codespace) \- once the codespace has been entered, you can follow the instructions within the [dev containers section](#dev-containers) for continuing to set up the development environment. View the [Developing in a codespace](https://docs.github.com/en/codespaces/developing-in-codespaces/developing-in-a-codespace) documentation for additional details.
 
 ## Build
+
+To build the frontend for production, run `make build` from the repository root
+after installing frontend dependencies with `npm ci --prefix src/frontend`.
+
+To run the frontend tests with coverage in jsdom, run `make test` from the
+repository root.
 
 ### Test in Azure DevOps
 
@@ -195,15 +195,13 @@ Test changes in the Azure DevOps environment by publishing a development version
 The contents of the `.env` file are
 
   ```bash
-  # Backend Service URL
-  REACT_APP_COLLABORATION_STATE_SERVICE_URL="put the deployed backend service URL here"
   # App Instrumentation Key
   REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY="put Instrumentation key here"
   ```
 
 - In lieu of the .env file you can set actual environment variables.
 
-- When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set Application Insights instrumentation key and the backend service URL.
+- When using the CI/CD Github action(s) pipeline to deploy the extension, environment variables are used to set the Application Insights instrumentation key.
 
 1. Run `npm run build:d` or `npm run build:p` to build the project. The difference in commands is `development` versus `production`, respectively; the `production` command will generate a smaller bundle.
 2. To test your changes, you will need to publish a new extension under a new Azure DevOps publisher account. Refer to the [documentation](https://docs.microsoft.com/en-us/azure/devops/extend/publish/overview?view=vsts) on publishing extensions. You can publish it to any test Azure DevOps organization that you are an admin of. (As a Microsoft employee, you can create a new test organization from your Azure DevOps profile page.) Currently this is the only way to test the extension.
@@ -230,7 +228,7 @@ The contents of the `.env` file are
 
 - For updates, rebuild and package your extension and publish an update from the Azure DevOps marketplace. That will automatically update the extension in your project.
 
-- For the real time live syncing to work, our service needs to know your publisher ID and your extension's unique key. To enable real time updates for your test extension, please [reach out to us](https://github.com/microsoft/vsts-extension-retrospectives/issues) with your publisher ID and the [unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key) of your extension.
+- Live updates work in test extensions without any extra setup, since they only use Azure DevOps.
 
 ### Test with Hot Reload and Debug
 
@@ -317,57 +315,24 @@ Test changes by loading changes locally without having to re-package and re-publ
 10. Once Firefox starts up, you should get an untrusted certificate error page.  Select Advanced and then select **Accept the Risk and Continue** and log into your Azure DevOps account. From now on, if you leave this Firefox window open, the debugger will reattach instead of starting a clean Firefox instance each time.
 11. Once you are logged in to Azure DevOps, your extension should be running.  Set a breakpoint in a method in VS Code and you should see that breakpoint hit when that method executes.
 
-### Test with Deployed Backend Service
-
-The Retrospectives extension uses the [Azure SignalR service](https://azure.microsoft.com/en-us/services/signalr-service/) to add real time support. The backend codebase can be found in the [Retrospectives Extension Backend Repository](src/backend).
-
-To enable real time updates from your test extension you will need to deploy the backend to Azure specifying your publisher ID and the unique key of your extension.
-
----
-
-#### Notes
-
-- This setup is **not** required for contributing to this extension, but can be helpful if you want certain debugging options available to you.
-- If you are part of a team working on the Retrospectives extension you can deploy a single backend to support multiple developer test extensions.
-
-#### Backend Prerequisites
-
-1. Azure CLI - [installation instructions here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-
-2. dotnet CLI - the CLI comes as a part of the [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/5.0)
-
-3. the `zip` CLI tool - via `brew install zip` or `apt-get install zip` in a unix-flavored environment.
-
-#### Setup
-
-1. Copy `/deploy/.env.template` to `/deploy/.env` and make the following changes:
-
-   - Add the Service Principal values used by the `env_setup.sh` script.  [Instructions on how to create a Service Principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli#password-based-authentication).
-   - Add the `RESOURCE_NAME_SUFFIX` value. This will be used for naming all Azure resources including the App Service name - `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
-     **Note:** The app name must be globally unique so select something accordingly.
-   - Add the `LOCATION` value i.e., "eastus", "westus", etc.
-
-2. Copy `/allowed_origins.json.template` to `/allowed_origins.json` and replace the `<publisher id>` with your publisher ID. This ID uniquely identifies your publisher in the Visual Studio Marketplace. If you are part of a team working on the retro tool you can add additional allowed origins. There should be two allowed origins per publisher ID. Remember to increment the name index as you add additional origins.
-
-3. Copy `/dev_certs.json.template` to `/dev_certs.json` and replace the `<extension secret>` with your secret. [Instructions on how to download the unique key](https://docs.microsoft.com/en-us/azure/devops/extend/develop/auth?view=vsts#get-your-extensions-key).  If you are part of a team working on the retro tool you can add additional
- secrets. Remember to increment the name index to add additional secrets.
-
-4. Run the `deploy/env_setup.sh` script.
-
-5. Once the script completes, it will output the URL of the backend service. You can navigate to the [Azure Portal](https://portal.azure.com) and validate that the `rg-<RESOURCE_NAME_SUFFIX>` resource group exists and contains the App Service, App Service Plan and SignalR resources.
-
-6. Update the `src/frontend/config/environment.tsx` to reflect changes to:
-
-   - `CollaborationStateServiceUrl` value to the App Service URL - `https://<RESOURCE_NAME_SUFFIX>.azurewebsites.net`.
-   - `AppInsightsInstrumentKey` value to Application Insights' Instrumentation Key for the resource `ai-<RESOURCE_NAME_SUFFIX>`.
-
-7. After updating the above values redeploy the extension.
-
 ## Frontend Development
 
 ### Frontend Style Guide
 
 This extension uses [ESLint](https://eslint.org/) for consistent formatting and styling within the React components.
+
+### Storage and Live Updates
+
+The extension has no backend service. All data is stored with the [Azure DevOps data service](https://docs.microsoft.com/en-us/azure/devops/extend/develop/data-storage?view=vsts) (boards in one collection per team, feedback items in one collection per board), and work items are read through the Azure DevOps REST clients.
+
+Changes made by other users are picked up by polling with the shared loop in [pollingLoop.ts](src/frontend/utilities/pollingLoop.ts), the same approach used by the [Estimate extension](https://github.com/microsoft/azure-boards-estimate):
+
+- `FeedbackBoard` polls the feedback items of the open board and `FeedbackBoardContainer` polls the open board every 2 seconds (`LIVE_SYNC_POLL_INTERVAL_MS`). A `poll` callback resolves `false` when it found nothing new (`FeedbackBoard` compares a fingerprint of the polled items, see `getFeedbackItemsFingerprint`; `FeedbackBoardContainer` checks whether the polled board is newer). After 5 polls in a row that found nothing new, such a loop polls every 6 seconds (`LIVE_SYNC_IDLE_POLL_INTERVAL_MS`) until a poll finds a change; resolving `true` or nothing counts as a change. `FeedbackBoardContainer` polls the team's list of boards every 2 minutes (`BOARD_LIST_POLL_INTERVAL_MS`) and also when the Board selection dropdown gets focus, unless the list was fetched in the last 10 seconds (`BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS`).
+- A loop runs one poll at a time, pauses while the browser tab is hidden, backs off exponentially after errors (up to about 30 seconds), and polls right away, back at the regular pace, when the tab becomes visible again or the browser comes back online.
+- Polls use the strict data access methods (for example `getFeedbackItemsForBoardStrict` and `getBoardsForTeamStrict`). These only treat a missing collection or document as empty and throw on any other error, so a failed read is retried instead of being mistaken for deleted data.
+- Polled documents are merged by their `__etag` revision (`mergeServerFeedbackItems`, `mergePolledBoard`). Unchanged columns and items keep their object identity, an older server copy never overwrites a newer local copy or a change that is still being saved, and items deleted locally are not brought back by a stale read.
+
+To share a change with other users, save it through the data services in [src/frontend/dal](src/frontend/dal). Other users pick it up on their next poll, so there is nothing to broadcast.
 
 ### Frontend Unit Testing
 
@@ -403,74 +368,11 @@ To automatically generate the test coverage report, add the `--coverage` flag to
 
 ---
 
-## Backend Development
-
-### Style Guidelines
-
-Follow the coding guidelines here - [C# Coding Conventions (C# Programming Guide)](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions).
-
-### Storage
-
-The Retrospectives tool uses the [Azure DevOps data service](https://docs.microsoft.com/en-us/azure/devops/extend/develop/data-storage?view=vsts) for handling all its storage.
-
-### Code
-
-1. The project is developed using the [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) development platform. The `CollaborationStateService` web project contains the code for the backend service. Since .NET Core is platform independent, project can be developed on any operating system.
-
-2. The `ReflectBackend.ReflectHub` class contains the implementation of all the functions that the backend service supports. New methods should be added here to support more real time scenarios.
-
-3. Examples:
-
-   - The code snippet below provides a method that the client can use to join a backend Group. Groups in SignalR provide a method for broadcasting messages to specified subsets of connected clients. Any client using this method gets added to the group that it specifies by the reflectBoardId.
-
-     ```csharp
-         /// <summary>
-         /// Adds the client to the group for this reflect board.
-         /// </summary>
-         /// <param name="reflectBoardId">The ID of the reflect board.</param>
-         public Task JoinReflectBoardGroup( string reflectBoardId )
-         {
-             _insights.TrackEvent("Adding client to board");
-             return Groups.AddToGroupAsync( Context.ConnectionId, reflectBoardId );
-         }
-     ```
-
-   - The code snippet below broadcasts that a new Feedback specified by the `feedbackItemId` is available on the board specified by `reflectBoardId`.  The `columnId` specifies which column of the board the item was added to.  Clients can use this method to signal to other clients that a new Feedback was added to one of its boards.
-
-     ```csharp
-     /// <summary>
-     /// Broadcast receiveNewItem to all other clients viewing the same reflect board.
-     /// </summary>
-     /// <param name="reflectBoardId">The ID of the reflect board.</param>
-     /// <param name="columnId">The ID of column this item is associated with.</param>
-     /// <param name="feedbackItemId">The ID of the new feedback item.</param>
-     public Task BroadcastNewItem( string reflectBoardId, string columnId, string feedbackItemId )
-     {
-         _insights.TrackEvent("Broadcasting new item");
-         return Clients.OthersInGroup( reflectBoardId ).SendAsync( "receiveNewItem",
-                                                                  columnId, feedbackItemId );
-     }
-     ```
-
-### Backend Unit Testing
-
-Unit Tests for the Backend are located in the [Backend Tests folder](src/backend.tests). To execute these tests, perform the following steps:
-
-1. Navigate to the `RetrospectiveExtension.Backend` folder.
-
-2. Execute `dotnet restore`.
-
-3. Execute `dotnet build`.
-
-4. Execute `dotnet test ../RetrospectiveExtension.Backend.Tests`.
-
-5. View test results in the terminal.
-
 ## Application Monitoring and Telemetry
 
 1. The Retro tool uses [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) to capture application logs, telemetry and performance data.
 
-2. A custom Azure portal is deployed as part of the backend deployment script that enables real time monitoring of the application. The dashboard includes useful telemetry data such as number of active user sessions, histogram of React Components visited, HTTP requests made, page load times, backend and front end exceptions and other metrics.
+2. Failed live update polls are tracked as exceptions with the `pollFeedbackItems`, `pollCurrentBoard` or `pollTeamBoards` action and the number of consecutive failures, which helps to find users whose boards are not receiving updates.
 
 ## License Information
 

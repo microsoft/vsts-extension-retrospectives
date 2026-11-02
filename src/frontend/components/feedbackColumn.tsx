@@ -46,9 +46,9 @@ export interface FeedbackColumnProps {
   requestTimerStart: (feedbackItemId: string) => void;
   notifyTimerStopped: (feedbackItemId: string) => void;
 
-  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], shouldBroadcast: boolean, newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
+  addFeedbackItems: (columnId: string, columnItems: IFeedbackItemDocument[], newlyCreated: boolean, showAddedAnimation: boolean, shouldHaveFocus: boolean, hideFeedbackItems: boolean) => void;
   removeFeedbackItemFromColumn: (columnIdToDeleteFrom: string, feedbackItemIdToDelete: string, shouldSetFocusOnFirstAvailableItem: boolean) => void;
-  refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void;
+  refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[]) => void;
 }
 
 export interface FeedbackColumnHandle {
@@ -65,14 +65,11 @@ interface FocusPreservation {
   cursorPosition: number | null;
 }
 
-export const moveFeedbackItem = async (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[], shouldBroadcast: boolean) => void, boardId: string, feedbackItemId: string, columnId: string) => {
+export const moveFeedbackItem = async (refreshFeedbackItems: (feedbackItems: IFeedbackItemDocument[]) => void, boardId: string, feedbackItemId: string, columnId: string) => {
   const updatedFeedbackItems = await itemDataService.addFeedbackItemAsMainItemToColumn(boardId, feedbackItemId, columnId);
 
   if (updatedFeedbackItems) {
-    refreshFeedbackItems(
-      [updatedFeedbackItems.updatedOldParentFeedbackItem, updatedFeedbackItems.updatedFeedbackItem, ...updatedFeedbackItems.updatedChildFeedbackItems].filter(item => item),
-      true,
-    );
+    refreshFeedbackItems([updatedFeedbackItems.updatedOldParentFeedbackItem, updatedFeedbackItems.updatedFeedbackItem, ...updatedFeedbackItems.updatedChildFeedbackItems].filter(item => item));
   }
 
   appInsights.trackEvent({ name: TelemetryEvents.FeedbackItemUngrouped, properties: { boardId, feedbackItemId, columnId } });
@@ -300,7 +297,7 @@ const FeedbackColumn = forwardRef<FeedbackColumnHandle, FeedbackColumnProps>((pr
       isGroupedCarouselItem: false,
     };
 
-    addFeedbackItems(columnId, [feedbackItem], /*shouldBroadcast*/ false, /*newlyCreated*/ true, /*showAddedAnimation*/ false, /*shouldHaveFocus*/ false, /*hideFeedbackItems*/ false);
+    addFeedbackItems(columnId, [feedbackItem], /*newlyCreated*/ true, /*showAddedAnimation*/ false, /*shouldHaveFocus*/ false, /*hideFeedbackItems*/ false);
   }, [workflowPhase, currentColumnItems, boardId, columnId, isBoardAnonymous, addFeedbackItems]);
 
   const handleColumnDoubleClick = useCallback(

@@ -22,6 +22,10 @@ export interface IFeedbackBoardDocument {
   modifiedDate?: Date;
   modifiedBy?: IdentityRef;
   activePhase: WorkflowPhase;
+  /**
+   * Set each time someone moves everyone to a phase, so polling clients follow even when the phase itself is unchanged.
+   */
+  activePhaseUpdatedDate?: Date;
   isIncludeTeamEffectivenessMeasurement?: boolean;
   teamAssessmentQuestions?: ITeamAssessmentQuestion[];
   isAnonymous?: boolean;

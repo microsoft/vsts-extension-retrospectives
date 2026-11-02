@@ -1,11 +1,11 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { mocked } from "jest-mock";
 import { TeamMember } from "azure-devops-extension-api/WebApi";
 import type { WebApiTeam } from "azure-devops-extension-api/Core";
-import { FeedbackBoardContainer, deduplicateTeamMembers } from "../feedbackBoardContainer";
+import { FeedbackBoardContainer, deduplicateTeamMembers, hasEveryoneBeenMoved, isPolledBoardUpToDate, mergePolledBoard, mergePolledBoardList } from "../feedbackBoardContainer";
 import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions, IFeedbackItemDocument } from "../../interfaces/feedback";
 import { WorkflowPhase } from "../../interfaces/workItem";
 import { IdentityRef } from "azure-devops-extension-api/WebApi";
@@ -19,9 +19,10 @@ import { getBoardUrl } from "../../utilities/boardUrlHelper";
 import { shareBoardHelper } from "../../utilities/shareBoardHelper";
 import { copyToClipboard } from "../../utilities/clipboardHelper";
 import { setLocale } from "../../utilities/localization";
-import { reflectBackendService } from "../../dal/reflectBackendService";
+import { BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS, BOARD_LIST_POLL_INTERVAL_MS, DEFAULT_IDLE_AFTER_UNCHANGED_POLLS, LIVE_SYNC_IDLE_POLL_INTERVAL_MS, LIVE_SYNC_POLL_INTERVAL_MS } from "../../utilities/pollingLoop";
 import { workService } from "../../dal/azureDevOpsWorkService";
 import { teamSettingsService } from "../../dal/teamSettingsService";
+import { appInsights } from "../../utilities/telemetryClient";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -101,7 +102,6 @@ jest.mock("../../utilities/telemetryClient", () => ({
 }));
 
 jest.mock("../../dal/boardDataService");
-jest.mock("../../dal/reflectBackendService");
 jest.mock("../../dal/azureDevOpsCoreService");
 jest.mock("../../dal/azureDevOpsWorkItemService");
 jest.mock("../../dal/userDataService");
@@ -240,6 +240,12 @@ const baseContainerProps: FeedbackBoardContainerTestProps = {
   isHostedAzureDevOps: false,
   projectId: "1",
 };
+
+// The container polls through the strict getters, so serve them from whatever each test configured for getBoardsForTeam.
+beforeEach(() => {
+  mocked(BoardDataService.getBoardsForTeamStrict).mockImplementation(teamId => BoardDataService.getBoardsForTeam(teamId));
+  mocked(BoardDataService.getBoardForTeamByIdStrict).mockImplementation(async (teamId, boardId) => (await BoardDataService.getBoardsForTeam(teamId))?.find(board => board.id === boardId));
+});
 
 describe("Feedback Board Container ", () => {
   it("can be rendered without content.", () => {
@@ -485,7 +491,6 @@ describe("FeedbackBoardContainer integration", () => {
     const groupBoard = { ...ownerBoard, activePhase: WorkflowPhase.Group };
 
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
-    mocked(reflectBackendService.startConnection).mockResolvedValue(true);
     mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([mockTeam as WebApiTeam]);
     mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(mockTeam as WebApiTeam);
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
@@ -508,7 +513,6 @@ describe("FeedbackBoardContainer integration", () => {
     fireEvent.click(moveEveryoneButton);
 
     await waitFor(() => expect(BoardDataService.updateActivePhase).toHaveBeenCalledWith("t1", "b1", WorkflowPhase.Group));
-    expect(reflectBackendService.broadcastUpdatedBoard).toHaveBeenCalledWith("t1", "b1");
     expect(await screen.findByText("Everyone was moved to Group.")).toBeInTheDocument();
   });
 
@@ -996,9 +1000,7 @@ describe("FeedbackBoardContainer integration", () => {
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
-      teamId === "default-team" ? [defaultBoard, olderDefaultBoard] : [mockBoard],
-    );
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "default-team" ? [defaultBoard, olderDefaultBoard] : [mockBoard]));
     mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
@@ -1069,16 +1071,12 @@ describe("FeedbackBoardContainer integration", () => {
 
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
     mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
-    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
-      forCurrentUserOnly ? [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam] : [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam, defaultTeam as WebApiTeam],
-    );
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) => (forCurrentUserOnly ? [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam] : [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam, defaultTeam as WebApiTeam]));
     mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
-      teamId === "a-team" ? [alphaBoard] : teamId === "b-team" ? [betaBoard] : [mockBoard],
-    );
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "a-team" ? [alphaBoard] : teamId === "b-team" ? [betaBoard] : [mockBoard]));
     mocked(itemDataService.getBoardItem).mockResolvedValue(alphaBoard);
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
@@ -1118,9 +1116,7 @@ describe("FeedbackBoardContainer integration", () => {
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "outside-team", boardId: "outside-board" } as any);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
-      teamId === "z-default" ? [defaultBoard] : [alphaBoard],
-    );
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "z-default" ? [defaultBoard] : [alphaBoard]));
     mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
@@ -1156,19 +1152,13 @@ describe("FeedbackBoardContainer integration", () => {
 
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() } as any);
     mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
-    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
-      forCurrentUserOnly ? [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam] : [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam, defaultTeam as WebApiTeam],
-    );
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) => (forCurrentUserOnly ? [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam] : [firstUserTeam as WebApiTeam, secondUserTeam as WebApiTeam, defaultTeam as WebApiTeam]));
     mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "z-default", boardId: "board-alpha" } as any);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
-      teamId === "z-default" ? [goodToDoneBoard] : teamId === "a-team" ? [alphaBoard] : [mockBoard],
-    );
-    mocked(itemDataService.getBoardItem).mockImplementation(async (_teamId, boardId) =>
-      boardId === "board-alpha" ? alphaBoard : goodToDoneBoard,
-    );
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "z-default" ? [goodToDoneBoard] : teamId === "a-team" ? [alphaBoard] : [mockBoard]));
+    mocked(itemDataService.getBoardItem).mockImplementation(async (_teamId, boardId) => (boardId === "board-alpha" ? alphaBoard : goodToDoneBoard));
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
     mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
@@ -1199,9 +1189,7 @@ describe("FeedbackBoardContainer integration", () => {
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "beta-team", boardId: "board-last-visited" } as any);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId =>
-      teamId === "beta-team" ? [lastVisitedBoard] : [mockBoard],
-    );
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "beta-team" ? [lastVisitedBoard] : [mockBoard]));
     mocked(itemDataService.getBoardItem).mockResolvedValue(lastVisitedBoard);
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
@@ -1271,11 +1259,11 @@ describe("FeedbackBoardContainer integration", () => {
     mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
     mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([defaultTeam as WebApiTeam]);
     mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
-    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => teamId === "alternate-team" ? alternateTeam as WebApiTeam : null);
+    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => (teamId === "alternate-team" ? (alternateTeam as WebApiTeam) : null));
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue({ teamId: "default-team", boardId: "board-default" } as any);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "alternate-team" ? [alternateBoard] : [mockBoard]);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "alternate-team" ? [alternateBoard] : [mockBoard]));
     mocked(itemDataService.getBoardItem).mockResolvedValue(alternateBoard);
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
@@ -1306,11 +1294,11 @@ describe("FeedbackBoardContainer integration", () => {
     mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
     mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([defaultTeam as WebApiTeam]);
     mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
-    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => teamId === "alternate-team" ? alternateTeam as WebApiTeam : null);
+    mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => (teamId === "alternate-team" ? (alternateTeam as WebApiTeam) : null));
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "alternate-team" ? [alternateBoard] : [mockBoard]);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "alternate-team" ? [alternateBoard] : [mockBoard]));
     mocked(itemDataService.getBoardItem).mockResolvedValue(alternateBoard);
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
@@ -1349,15 +1337,13 @@ describe("FeedbackBoardContainer integration", () => {
     // In the filtered "My teams" experience, the linked default team remains selectable and the current selection matches the URL.
     mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue("#teamId=default-team&boardId=board-default"), setHash: jest.fn() } as any);
     mocked(getConfiguration).mockReturnValue({ team: defaultTeam });
-    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) =>
-      forCurrentUserOnly ? [alternateTeam as WebApiTeam] : [alternateTeam as WebApiTeam, defaultTeam as WebApiTeam],
-    );
+    mocked(azureDevOpsCoreService.getAllTeams).mockImplementation(async (_projectId, forCurrentUserOnly) => (forCurrentUserOnly ? [alternateTeam as WebApiTeam] : [alternateTeam as WebApiTeam, defaultTeam as WebApiTeam]));
     mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(defaultTeam as WebApiTeam);
     mocked(azureDevOpsCoreService.getTeam).mockImplementation(async (_p, teamId) => (teamId === "default-team" ? defaultTeam : teamId === "alternate-team" ? alternateTeam : null) as WebApiTeam | null);
     mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
     mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
     mocked(userDataService.addVisit).mockResolvedValue(undefined);
-    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => teamId === "default-team" ? [defaultBoard] : [mockBoard]);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async teamId => (teamId === "default-team" ? [defaultBoard] : [mockBoard]));
     mocked(itemDataService.getBoardItem).mockResolvedValue(defaultBoard);
     mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
@@ -1509,13 +1495,6 @@ describe("FeedbackBoardContainer - Component lifecycle", () => {
 
     // The component should handle the resize
     expect(true).toBe(true);
-  });
-
-  it("should handle backend service connection states", () => {
-    const { container } = render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
-
-    // Component should render with loading state
-    expect(container.querySelector(".initialization-spinner") || screen.getByText("Loading...")).toBeTruthy();
   });
 
   it("should initialize with correct project ID", () => {
@@ -1675,13 +1654,6 @@ describe("FeedbackBoardContainer - Browser compatibility", () => {
     // Component should manage Edge compatibility message
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
-
-  it("should show TFS live sync issue message when needed", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
-
-    // Component should manage TFS sync message
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
 });
 
 describe("FeedbackBoardContainer - Email and summary features", () => {
@@ -1748,18 +1720,465 @@ describe("FeedbackBoardContainer - Tab navigation", () => {
   });
 });
 
-describe("FeedbackBoardContainer - Real-time collaboration", () => {
-  it("should handle backend service reconnection", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+describe("FeedbackBoardContainer - Live sync polling", () => {
+  const team = { id: "t1", name: "Team 1", projectName: "P", description: "", url: "" } as WebApiTeam;
+  const createdBy: IdentityRef = { ...baseIdentity, id: "creator-id", displayName: "Creator", uniqueName: "creator" };
 
-    // Component should manage reconnection state
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+  const createServerBoard = (overrides: Partial<IFeedbackBoardDocument> = {}): IFeedbackBoardDocument => ({
+    id: "b1",
+    __etag: 1,
+    title: "Board 1",
+    teamId: "t1",
+    createdBy,
+    createdDate: new Date("2024-01-03T00:00:00Z"),
+    activePhase: WorkflowPhase.Collect,
+    columns: [],
+    maxVotesPerUser: 5,
+    boardVoteCollection: {},
+    teamEffectivenessMeasurementVoteCollection: [],
+    permissions: { Teams: [], Members: [] },
+    ...overrides,
   });
 
-  it("should track backend connection status", () => {
-    render(<FeedbackBoardContainer isHostedAzureDevOps={false} projectId="test-project" />);
+  let serverBoards: IFeedbackBoardDocument[];
 
-    // Component should track connection status
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+  const renderLoadedContainer = async (boards: IFeedbackBoardDocument[], hash = "", isHostedAzureDevOps = true) => {
+    serverBoards = boards;
+    mocked(getConfiguration).mockReturnValue({});
+    mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(hash), setHash: jest.fn() } as any);
+    mocked(workService.getRequirementBacklogWorkItemTypeNames).mockResolvedValue([]);
+    mocked(teamSettingsService.getAllowedActionItemWorkItemTypeNames).mockResolvedValue([]);
+    mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([team]);
+    mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(team);
+    mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+    mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+    mocked(userDataService.addVisit).mockResolvedValue(undefined);
+    mocked(BoardDataService.getBoardsForTeam).mockImplementation(async () => serverBoards);
+    mocked(itemDataService.getBoardItem).mockImplementation(async (_teamId, boardId) => serverBoards.find(board => board.id === boardId));
+    mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([]);
+    mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+    mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+
+    render(<FeedbackBoardContainer isHostedAzureDevOps={isHostedAzureDevOps} projectId="1" />);
+    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+  };
+
+  // The polling loops poll right away when the browser comes back online.
+  const pollNow = async () => {
+    await act(async () => {
+      window.dispatchEvent(new Event("online"));
+    });
+  };
+
+  const waitForBoardPollsToSettle = async (minimumBoardPollCount: number) => {
+    await waitFor(() => expect(mocked(BoardDataService.getBoardForTeamByIdStrict).mock.calls.length).toBeGreaterThanOrEqual(minimumBoardPollCount));
+    await act(async () => {
+      await Promise.all([...mocked(BoardDataService.getBoardForTeamByIdStrict).mock.results, ...mocked(BoardDataService.getBoardsForTeamStrict).mock.results].map(result => result.value));
+    });
+  };
+
+  it.each([
+    { host: "Azure DevOps Services", isHostedAzureDevOps: true },
+    { host: "Azure DevOps Server", isHostedAzureDevOps: false },
+  ])("never shows legacy live-sync warnings on $host, including polling failures and recovery", async ({ isHostedAzureDevOps }) => {
+    const expectNoLiveSyncWarnings = () => {
+      expect(screen.getByTestId("feedback-board")).toBeInTheDocument();
+      expect(screen.queryByText(/live sync|live updates|real[ -]time/i)).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /retry live sync|reconnect/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: "Troubleshooting steps" })).not.toBeInTheDocument();
+    };
+
+    await renderLoadedContainer([createServerBoard()], "", isHostedAzureDevOps);
+    await waitForBoardPollsToSettle(1);
+    expectNoLiveSyncWarnings();
+
+    const pollError = new Error("Network unavailable");
+    mocked(BoardDataService.getBoardForTeamByIdStrict).mockRejectedValueOnce(pollError);
+    mocked(BoardDataService.getBoardsForTeamStrict).mockRejectedValueOnce(pollError);
+    await pollNow();
+
+    await waitFor(() => {
+      expect(appInsights.trackException).toHaveBeenCalledWith(pollError, expect.objectContaining({ action: "pollCurrentBoard" }));
+      expect(appInsights.trackException).toHaveBeenCalledWith(pollError, expect.objectContaining({ action: "pollTeamBoards" }));
+    });
+    expect(screen.getByRole("combobox", { name: "Retrospective Board" })).toHaveValue("b1");
+    expectNoLiveSyncWarnings();
+
+    serverBoards = [createServerBoard({ __etag: 2, title: "Updated board" })];
+    await pollNow();
+
+    expect(await screen.findByRole("option", { name: "Updated board" })).toBeInTheDocument();
+    expectNoLiveSyncWarnings();
+  });
+
+  it("follows the phase when someone moves everyone", async () => {
+    await renderLoadedContainer([createServerBoard()]);
+    expect(screen.getByRole("tab", { name: "Collect" })).toHaveAttribute("aria-selected", "true");
+
+    serverBoards = [createServerBoard({ __etag: 2, activePhase: WorkflowPhase.Act, activePhaseUpdatedDate: new Date("2024-01-04T00:00:00Z") })];
+    await pollNow();
+
+    await waitFor(() => expect(screen.getByRole("tab", { name: "Act" })).toHaveAttribute("aria-selected", "true"));
+  });
+
+  it("keeps the phase this user is on and refreshes the vote counts when only votes change", async () => {
+    await renderLoadedContainer([createServerBoard()], "teamId=t1&boardId=b1&phase=Vote");
+    expect(screen.getByRole("tab", { name: "Vote" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTitle("You have used 0 of 5 votes")).toBeInTheDocument();
+    const addVisitCallCount = mocked(userDataService.addVisit).mock.calls.length;
+
+    serverBoards = [createServerBoard({ __etag: 2, boardVoteCollection: { "encrypted-data": 2, "other-user": 3 } })];
+    await pollNow();
+
+    expect(await screen.findByTitle("You have used 2 of 5 votes")).toBeInTheDocument();
+    expect(screen.getByTitle("The team has used 5 of 10 votes")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Vote" })).toHaveAttribute("aria-selected", "true");
+    expect(userDataService.addVisit).toHaveBeenCalledTimes(addVisitCallCount);
+  });
+
+  it("switches to the newest remaining board when someone archives the current one", async () => {
+    const olderBoard = createServerBoard({ id: "b2", title: "Board 2", createdDate: new Date("2024-01-02T00:00:00Z") });
+    await renderLoadedContainer([createServerBoard(), olderBoard]);
+    expect(screen.getByRole("combobox", { name: "Retrospective Board" })).toHaveValue("b1");
+
+    serverBoards = [createServerBoard({ __etag: 2, isArchived: true, archivedBy: { ...baseIdentity, id: "another-user" } }), olderBoard];
+    await pollNow();
+
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Retrospective Board" })).toHaveValue("b2"));
+    expect(screen.queryByRole("option", { name: "Board 1" })).not.toBeInTheDocument();
+  });
+
+  it("switches to the newest remaining board when the current one is deleted", async () => {
+    const olderBoard = createServerBoard({ id: "b2", title: "Board 2", createdDate: new Date("2024-01-02T00:00:00Z") });
+    await renderLoadedContainer([createServerBoard(), olderBoard]);
+
+    serverBoards = [olderBoard];
+    await pollNow();
+
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Retrospective Board" })).toHaveValue("b2"));
+    expect(screen.queryByRole("option", { name: "Board 1" })).not.toBeInTheDocument();
+  });
+
+  it("ignores polled copies that are older than the board already shown", async () => {
+    await renderLoadedContainer([createServerBoard({ __etag: 5 })]);
+
+    serverBoards = [createServerBoard({ __etag: 4, title: "Stale title", activePhase: WorkflowPhase.Act, activePhaseUpdatedDate: new Date("2024-01-04T00:00:00Z") })];
+    await pollNow();
+    await waitForBoardPollsToSettle(2);
+
+    expect(screen.getByRole("tab", { name: "Collect" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("option", { name: "Board 1" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Stale title" })).not.toBeInTheDocument();
+  });
+
+  it("lists boards that teammates create when the board list is polled", async () => {
+    jest.useFakeTimers();
+    try {
+      await renderLoadedContainer([createServerBoard()]);
+      expect(screen.queryByRole("option", { name: "Board 2" })).not.toBeInTheDocument();
+
+      serverBoards = [createServerBoard(), createServerBoard({ id: "b2", title: "Board 2", createdDate: new Date("2024-01-04T00:00:00Z") })];
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(BOARD_LIST_POLL_INTERVAL_MS);
+      });
+
+      expect(screen.getByRole("option", { name: "Board 2" })).toBeInTheDocument();
+      expect(screen.getByRole("combobox", { name: "Retrospective Board" })).toHaveValue("b1");
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  describe("pace of the polling", () => {
+    const advance = (ms: number) =>
+      act(async () => {
+        await jest.advanceTimersByTimeAsync(ms);
+      });
+    const boardPollCount = () => mocked(BoardDataService.getBoardForTeamByIdStrict).mock.calls.length;
+    const boardListPollCount = () => mocked(BoardDataService.getBoardsForTeamStrict).mock.calls.length;
+    const boardWithTeammatesBoard = () => [createServerBoard(), createServerBoard({ id: "b2", title: "Board 2", createdDate: new Date("2024-01-04T00:00:00Z") })];
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("polls the board less often while nothing changes and returns to the regular pace once the board changes", async () => {
+      await renderLoadedContainer([createServerBoard()]);
+      // The poll that this triggers is already the first one that finds nothing new.
+      await pollNow();
+      const baseline = boardPollCount();
+      const regularPollsBeforeIdle = DEFAULT_IDLE_AFTER_UNCHANGED_POLLS - 1;
+
+      await advance(LIVE_SYNC_POLL_INTERVAL_MS * regularPollsBeforeIdle);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle);
+
+      await advance(LIVE_SYNC_IDLE_POLL_INTERVAL_MS - 1);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle);
+      await advance(1);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle + 1);
+
+      serverBoards = [createServerBoard({ __etag: 2, title: "Updated board" })];
+      await advance(LIVE_SYNC_IDLE_POLL_INTERVAL_MS);
+      expect(screen.getByRole("option", { name: "Updated board" })).toBeInTheDocument();
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle + 2);
+
+      await advance(LIVE_SYNC_POLL_INTERVAL_MS - 1);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle + 2);
+      await advance(1);
+      expect(boardPollCount() - baseline).toBe(regularPollsBeforeIdle + 3);
+    });
+
+    it("polls the board list only every couple of minutes", async () => {
+      await renderLoadedContainer([createServerBoard()]);
+      await pollNow();
+      const baseline = boardListPollCount();
+
+      await advance(BOARD_LIST_POLL_INTERVAL_MS - 1);
+      expect(boardListPollCount() - baseline).toBe(0);
+      await advance(1);
+      expect(boardListPollCount() - baseline).toBe(1);
+      await advance(BOARD_LIST_POLL_INTERVAL_MS);
+      expect(boardListPollCount() - baseline).toBe(2);
+    });
+
+    describe("when the board picker gets focus", () => {
+      const focusBoardPicker = () =>
+        act(async () => {
+          fireEvent.focus(screen.getByRole("combobox", { name: "Retrospective Board" }));
+        });
+
+      it("does not fetch the board list again right after it was loaded", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        const baseline = boardListPollCount();
+
+        await focusBoardPicker();
+
+        expect(boardListPollCount()).toBe(baseline);
+      });
+
+      it("lists the boards that teammates created in the meantime", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        await advance(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS);
+        expect(screen.queryByRole("option", { name: "Board 2" })).not.toBeInTheDocument();
+
+        serverBoards = boardWithTeammatesBoard();
+        await focusBoardPicker();
+
+        expect(screen.getByRole("option", { name: "Board 2" })).toBeInTheDocument();
+        expect(screen.getByRole("combobox", { name: "Retrospective Board" })).toHaveValue("b1");
+      });
+
+      it("fetches the board list at most once per refresh window", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        await advance(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS);
+        const baseline = boardListPollCount();
+
+        await focusBoardPicker();
+        expect(boardListPollCount() - baseline).toBe(1);
+
+        await focusBoardPicker();
+        await advance(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS - 1);
+        await focusBoardPicker();
+        expect(boardListPollCount() - baseline).toBe(1);
+
+        await advance(1);
+        await focusBoardPicker();
+        expect(boardListPollCount() - baseline).toBe(2);
+      });
+
+      it("counts a poll of the board list as a refresh", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        await advance(BOARD_LIST_POLL_INTERVAL_MS);
+        const baseline = boardListPollCount();
+
+        await focusBoardPicker();
+
+        expect(boardListPollCount()).toBe(baseline);
+      });
+
+      it("does not start another refresh when the board picker is focused again while the list is still loading", async () => {
+        await renderLoadedContainer([createServerBoard()]);
+        await advance(BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS);
+        const baseline = boardListPollCount();
+        let finishListPoll: (boards: IFeedbackBoardDocument[]) => void = () => undefined;
+        mocked(BoardDataService.getBoardsForTeamStrict).mockImplementationOnce(() => new Promise(resolve => (finishListPoll = resolve)));
+
+        await focusBoardPicker();
+        await focusBoardPicker();
+        await act(async () => {
+          finishListPoll(boardWithTeammatesBoard());
+        });
+
+        expect(screen.getByRole("option", { name: "Board 2" })).toBeInTheDocument();
+        expect(boardListPollCount() - baseline).toBe(1);
+      });
+    });
+  });
+});
+
+describe("live sync merge helpers", () => {
+  const createdBy: IdentityRef = { ...baseIdentity, id: "creator-id" };
+
+  const createBoard = (overrides: Partial<IFeedbackBoardDocument> = {}): IFeedbackBoardDocument => ({
+    id: "b1",
+    __etag: 1,
+    title: "Board 1",
+    teamId: "t1",
+    createdBy,
+    createdDate: new Date("2024-01-03T00:00:00Z"),
+    activePhase: WorkflowPhase.Collect,
+    columns: [],
+    maxVotesPerUser: 5,
+    boardVoteCollection: {},
+    teamEffectivenessMeasurementVoteCollection: [],
+    ...overrides,
+  });
+
+  describe("isPolledBoardUpToDate", () => {
+    it("treats a polled copy as up to date unless its etag is newer", () => {
+      const appliedBoard = createBoard({ __etag: 3 });
+
+      expect(isPolledBoardUpToDate(appliedBoard, createBoard({ __etag: 2, title: "Older" }))).toBe(true);
+      expect(isPolledBoardUpToDate(appliedBoard, createBoard({ __etag: 3 }))).toBe(true);
+      expect(isPolledBoardUpToDate(appliedBoard, createBoard({ __etag: 4 }))).toBe(false);
+    });
+
+    it("compares the content when the copies have no etag", () => {
+      const appliedBoard = createBoard({ __etag: undefined });
+
+      expect(isPolledBoardUpToDate(appliedBoard, createBoard({ __etag: undefined }))).toBe(true);
+      expect(isPolledBoardUpToDate(appliedBoard, createBoard({ __etag: undefined, title: "Renamed" }))).toBe(false);
+    });
+  });
+
+  describe("hasEveryoneBeenMoved", () => {
+    const movedDate = new Date("2024-01-05T00:00:00Z");
+
+    it("needs a previous server copy to compare with", () => {
+      expect(hasEveryoneBeenMoved(undefined, createBoard({ activePhase: WorkflowPhase.Act, activePhaseUpdatedDate: movedDate }))).toBe(false);
+    });
+
+    it("detects a move to another phase and a repeated move to the same phase", () => {
+      const previousServerBoard = createBoard({ activePhaseUpdatedDate: movedDate });
+
+      expect(hasEveryoneBeenMoved(previousServerBoard, { ...previousServerBoard, activePhase: WorkflowPhase.Vote })).toBe(true);
+      expect(hasEveryoneBeenMoved(previousServerBoard, { ...previousServerBoard, activePhaseUpdatedDate: new Date("2024-01-06T00:00:00Z") })).toBe(true);
+    });
+
+    it("ignores other changes, including the same move date serialized as a string", () => {
+      const previousServerBoard = createBoard({ activePhaseUpdatedDate: movedDate });
+      const polledBoard = { ...previousServerBoard, title: "Renamed", activePhaseUpdatedDate: movedDate.toISOString() as unknown as Date };
+
+      expect(hasEveryoneBeenMoved(previousServerBoard, polledBoard)).toBe(false);
+    });
+  });
+
+  describe("mergePolledBoard", () => {
+    it("applies server changes but keeps the phase this user is on", () => {
+      const previousServerBoard = createBoard();
+      const localBoard = { ...previousServerBoard, activePhase: WorkflowPhase.Vote };
+      const serverBoard = createBoard({ __etag: 2, title: "Renamed", boardVoteCollection: { voter: 1 } });
+
+      const mergedBoard = mergePolledBoard(localBoard, serverBoard, previousServerBoard, "user-1");
+
+      expect(mergedBoard).toEqual({ ...serverBoard, activePhase: WorkflowPhase.Vote });
+    });
+
+    it("follows the server phase when everyone was moved, even to the phase the board was already in", () => {
+      const previousServerBoard = createBoard();
+      const localBoard = { ...previousServerBoard, activePhase: WorkflowPhase.Vote };
+      const serverBoard = createBoard({ __etag: 2, activePhaseUpdatedDate: new Date("2024-01-05T00:00:00Z") });
+
+      expect(mergePolledBoard(localBoard, serverBoard, previousServerBoard, "user-1").activePhase).toBe(WorkflowPhase.Collect);
+    });
+
+    it("keeps the email summary and the column objects while the board settings are unchanged", () => {
+      const modifiedDate = new Date("2024-01-05T00:00:00Z");
+      const previousServerBoard = createBoard({ modifiedDate, columns: [{ id: "c1", title: "Good", accentColor: "#000000" }] });
+      const localBoard = { ...previousServerBoard, emailContent: "summary" };
+      const serverBoard = createBoard({ __etag: 2, modifiedDate: modifiedDate.toISOString() as unknown as Date, columns: [{ id: "c1", title: "Good", accentColor: "#000000" }] });
+
+      const mergedBoard = mergePolledBoard(localBoard, serverBoard, previousServerBoard, "user-1");
+
+      expect(mergedBoard.emailContent).toBe("summary");
+      expect(mergedBoard.columns).toBe(localBoard.columns);
+      expect(mergedBoard.modifiedDate).toBe(modifiedDate);
+    });
+
+    it("takes the server columns when the board settings changed", () => {
+      const previousServerBoard = createBoard({ modifiedDate: new Date("2024-01-05T00:00:00Z"), columns: [{ id: "c1", title: "Good", accentColor: "#000000" }] });
+      const serverColumns = [{ id: "c1", title: "Went well", accentColor: "#000000" }];
+      const serverBoard = createBoard({ __etag: 2, modifiedDate: new Date("2024-01-06T00:00:00Z"), columns: serverColumns });
+
+      const mergedBoard = mergePolledBoard(previousServerBoard, serverBoard, previousServerBoard, "user-1");
+
+      expect(mergedBoard.columns).toBe(serverColumns);
+      expect(mergedBoard.modifiedDate).toBe(serverBoard.modifiedDate);
+    });
+
+    it("keeps the current user's unsaved team assessment answers", () => {
+      const savedAnswers = { userId: "encrypted-data", responses: [{ questionId: 1, selection: 3 }] };
+      const unsavedAnswers = { userId: "encrypted-data", responses: [{ questionId: 1, selection: 4 }] };
+      const otherAnswers = { userId: "someone-else", responses: [{ questionId: 1, selection: 5 }] };
+      const previousServerBoard = createBoard({ teamEffectivenessMeasurementVoteCollection: [savedAnswers] });
+      const localBoard = { ...previousServerBoard, teamEffectivenessMeasurementVoteCollection: [unsavedAnswers] };
+
+      expect(mergePolledBoard(localBoard, createBoard({ __etag: 2, teamEffectivenessMeasurementVoteCollection: [savedAnswers, otherAnswers] }), previousServerBoard, "user-1").teamEffectivenessMeasurementVoteCollection).toEqual([unsavedAnswers, otherAnswers]);
+      expect(mergePolledBoard(localBoard, createBoard({ __etag: 2, teamEffectivenessMeasurementVoteCollection: [otherAnswers] }), previousServerBoard, "user-1").teamEffectivenessMeasurementVoteCollection).toEqual([otherAnswers, unsavedAnswers]);
+    });
+
+    it("takes the server answers once the local answers are saved", () => {
+      const savedAnswers = { userId: "encrypted-data", responses: [{ questionId: 1, selection: 3 }] };
+      const previousServerBoard = createBoard({ teamEffectivenessMeasurementVoteCollection: [savedAnswers] });
+
+      const mergedBoard = mergePolledBoard(previousServerBoard, createBoard({ __etag: 2, teamEffectivenessMeasurementVoteCollection: undefined }), previousServerBoard, "user-1");
+
+      expect(mergedBoard.teamEffectivenessMeasurementVoteCollection).toEqual([]);
+    });
+  });
+
+  describe("mergePolledBoardList", () => {
+    it("lists the boards the user can see, newest first, and reuses entries that did not change", () => {
+      const currentBoard = createBoard({ id: "current", createdDate: new Date("2024-01-01T00:00:00Z") });
+      const removedBoard = createBoard({ id: "removed", createdDate: new Date("2024-01-02T00:00:00Z") });
+      const newBoard = createBoard({ id: "new", createdDate: new Date("2024-01-04T00:00:00Z") });
+      const archivedBoard = createBoard({ id: "archived", isArchived: true });
+      const privateBoard = createBoard({ id: "private", isPublic: false, permissions: { Teams: ["other-team"], Members: ["someone-else"] } });
+
+      const boards = mergePolledBoardList([removedBoard, currentBoard], [{ ...currentBoard }, newBoard, archivedBoard, privateBoard], ["t1"], "user-1", "current");
+
+      expect(boards.map(board => board.id)).toEqual(["new", "current"]);
+      expect(boards[1]).toBe(currentBoard);
+    });
+
+    it("replaces entries that changed on the server", () => {
+      const renamedBoard = createBoard({ __etag: 2, title: "Renamed" });
+
+      expect(mergePolledBoardList([createBoard()], [renamedBoard], ["t1"], "user-1", "b1")).toEqual([renamedBoard]);
+    });
+
+    it("returns the previous list when nothing changed", () => {
+      const previousBoards = [createBoard({ id: "newer", createdDate: new Date("2024-01-04T00:00:00Z") }), createBoard({ id: "older" })];
+
+      expect(
+        mergePolledBoardList(
+          previousBoards,
+          previousBoards.map(board => ({ ...board })),
+          ["t1"],
+          "user-1",
+          "newer",
+        ),
+      ).toBe(previousBoards);
+    });
+
+    it("keeps the current board listed so the board poll can handle its removal", () => {
+      const previousBoards = [createBoard()];
+
+      expect(mergePolledBoardList(previousBoards, [createBoard({ __etag: 2, isArchived: true })], ["t1"], "user-1", "b1")).toBe(previousBoards);
+    });
   });
 });

@@ -114,6 +114,35 @@ describe("WorkItemService", () => {
   });
 
   describe("getWorkItemsByIds", () => {
+    it("should not call the API when no IDs are requested", async () => {
+      expect(await workItemService.getWorkItemsByIds([])).toEqual([]);
+      expect(await workItemService.getWorkItemsByIds(undefined)).toEqual([]);
+      expect(mockHttpClient.getWorkItems).not.toHaveBeenCalled();
+    });
+
+    it("should request work items in batches of 200 IDs", async () => {
+      const ids = Array.from({ length: 450 }, (_, index) => index + 1);
+      mockHttpClient.getWorkItems.mockImplementation(async (batch: number[]) => batch.map(id => ({ id }) as unknown as WorkItem));
+
+      const result: WorkItem[] = await workItemService.getWorkItemsByIds(ids);
+
+      expect(mockHttpClient.getWorkItems).toHaveBeenCalledTimes(3);
+      expect(mockHttpClient.getWorkItems).toHaveBeenNthCalledWith(1, ids.slice(0, 200), "test-project-id", undefined, undefined, WorkItemExpand.All, WorkItemErrorPolicy.Omit);
+      expect(mockHttpClient.getWorkItems).toHaveBeenNthCalledWith(2, ids.slice(200, 400), "test-project-id", undefined, undefined, WorkItemExpand.All, WorkItemErrorPolicy.Omit);
+      expect(mockHttpClient.getWorkItems).toHaveBeenNthCalledWith(3, ids.slice(400), "test-project-id", undefined, undefined, WorkItemExpand.All, WorkItemErrorPolicy.Omit);
+      expect(result.map(workItem => workItem.id)).toEqual(ids);
+    });
+
+    it("should skip a batch that returns no work items", async () => {
+      const ids = Array.from({ length: 250 }, (_, index) => index + 1);
+      mockHttpClient.getWorkItems.mockImplementation(async (batch: number[]) => (batch[0] === 1 ? batch.map(id => ({ id }) as unknown as WorkItem) : undefined));
+
+      const result: WorkItem[] = await workItemService.getWorkItemsByIds(ids);
+
+      expect(mockHttpClient.getWorkItems).toHaveBeenCalledTimes(2);
+      expect(result.map(workItem => workItem.id)).toEqual(ids.slice(0, 200));
+    });
+
     it("should get work items by IDs and filter out null items", async () => {
       const mockWorkItems = [{ id: 1, title: "Item 1" }, null, { id: 3, title: "Item 3" }];
       mockHttpClient.getWorkItems.mockResolvedValue(mockWorkItems as any); // eslint-disable-line @typescript-eslint/no-explicit-any

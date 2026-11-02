@@ -62,11 +62,6 @@ export const TelemetryEvents = {
   ExtensionLaunched: "Extension launched",
   FeedbackItemCarouselLaunched: "Feedback item carousel launched",
   TeamAssessmentHistoryViewed: "Team assessment history viewed",
-  LiveSyncConnectionClosed: "Live sync connection closed",
-  LiveSyncReconnecting: "Live sync reconnecting",
-  LiveSyncReconnected: "Live sync reconnected",
-  LiveSyncManualRetry: "Live sync manual retry",
-  LiveSyncManualRetryFailed: "Live sync manual retry failed",
 };
 
 export { reactPlugin, appInsights };
