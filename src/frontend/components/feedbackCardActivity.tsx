@@ -6,13 +6,36 @@ export interface IFeedbackCardActivityProps {
   profileImageSrc?: string;
 }
 
-// Mirrors the cleanup Fluent's Persona applied: "Jane Smith (Contoso)" and "Jane Smith 🚀" are both shown as "JS".
+const OPENING_BRACKETS = "([{<";
+const CLOSING_BRACKETS = ")]}>";
+
 // Built with the constructor because the ES5 test tsconfig rejects the "u" flag on regex literals.
-const ENCLOSED_TEXT = /[([{<][^)\]}>]*[)\]}>]/g;
 const NON_ALPHANUMERIC = new RegExp("[^\\p{L}\\p{N}\\s]", "gu");
 
+// Drops bracketed text such as "(Contoso)" or "<jane@contoso.com>": any closing bracket ends it, and an opening bracket that is never closed is kept.
+// A loop instead of a regex replace, because CodeQL reports removing "<...>" with a regex as an incomplete HTML sanitizer.
+const removeEnclosedText = (name: string): string => {
+  let kept = "";
+  let enclosureStart = -1;
+
+  for (let index = 0; index < name.length; index++) {
+    const character = name[index];
+
+    if (enclosureStart === -1 && OPENING_BRACKETS.includes(character)) {
+      enclosureStart = index;
+    } else if (enclosureStart === -1) {
+      kept += character;
+    } else if (CLOSING_BRACKETS.includes(character)) {
+      enclosureStart = -1;
+    }
+  }
+
+  return enclosureStart === -1 ? kept : kept + name.slice(enclosureStart);
+};
+
+// Mirrors the cleanup Fluent's Persona applied: "Jane Smith (Contoso)" and "Jane Smith 🚀" are both shown as "JS".
 export const getInitials = (name: string): string => {
-  const words = name.replace(ENCLOSED_TEXT, "").replace(NON_ALPHANUMERIC, "").split(/\s+/).filter(Boolean);
+  const words = removeEnclosedText(name).replace(NON_ALPHANUMERIC, "").split(/\s+/).filter(Boolean);
   const initialsSource = words.length > 1 ? [words[0], words[words.length - 1]] : words;
 
   return initialsSource

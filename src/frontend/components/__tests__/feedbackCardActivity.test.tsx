@@ -28,6 +28,11 @@ describe("getInitials", () => {
     ["Jane Smith 🚀", "JS"],
     ["🚀 Jane", "J"],
     ["Jane Smith (Contoso", "JC"],
+    ["Jane (Contoso (EMEA)) Smith", "JS"],
+    ["Jane (Contoso] Smith", "JS"],
+    ["Jane) Smith (Contoso)", "JS"],
+    ["Jane (IT) Smith (Contoso) Doe", "JD"],
+    ["<<script>script>alert(1)</script>", "S"],
   ])("ignores enclosed text and symbols in %j", (name, expected) => {
     expect(getInitials(name)).toBe(expected);
   });
