@@ -24,7 +24,7 @@
     "stats": "CODECOV_TOKEN= npx webpack --mode=production --profile --json > stats.json && npx webpack-bundle-analyzer stats.json dist"
   },
   "dependencies": {
-    "@fluentui/react": "8.125.7",
+    "@fluentui/react": "8.125.8",
     "@microsoft/applicationinsights-react-js": "19.4.2",
     "@microsoft/applicationinsights-web": "3.4.4",
     "@microsoft/signalr": "10.0.11",
