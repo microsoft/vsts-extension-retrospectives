@@ -50,7 +50,7 @@
     "jest-environment-jsdom": "30.5.2",
     "jest-junit": "17.0.0",
     "markdownlint-cli2": "0.24.0",
-    "postcss": "8.5.28",
+    "postcss": "8.5.32",
     "postcss-cli": "12.0.0",
     "prettier": "3.9.9",
     "process": "0.11.10",
