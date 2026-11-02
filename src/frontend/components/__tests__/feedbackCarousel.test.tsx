@@ -1,6 +1,8 @@
 import React from "react";
+import "@testing-library/jest-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import FeedbackCarousel, { getPivotItemKey, getSelectedCarouselColumnKey, type FocusModeModel } from "../../components/feedbackCarousel";
+import userEvent from "@testing-library/user-event";
+import FeedbackCarousel, { getSelectedCarouselColumnKey, type FocusModeModel } from "../../components/feedbackCarousel";
 import { testGroupColumnProps, testColumnProps } from "../__mocks__/mocked_components/mockedFeedbackColumn";
 import { mockUuid } from "../__mocks__/uuid/v4";
 import * as icons from "../../components/icons";
@@ -12,9 +14,11 @@ jest.mock("../../utilities/telemetryClient", () => ({
   },
 }));
 
+const mockTrackActivity = jest.fn();
+
 jest.mock("@microsoft/applicationinsights-react-js", () => ({
   withAITracking: (_plugin: any, Component: any) => Component,
-  useTrackMetric: () => jest.fn(),
+  useTrackMetric: () => mockTrackActivity,
 }));
 
 const buildFocusModeModel = (columnPropsList: Array<typeof testColumnProps>): FocusModeModel => {
@@ -74,8 +78,6 @@ describe("Feedback Carousel ", () => {
       expect(getSelectedCarouselColumnKey("selected", [{ columnId: "first" }])).toBe("selected");
       expect(getSelectedCarouselColumnKey(undefined, [{ columnId: "first" }])).toBe("first");
       expect(getSelectedCarouselColumnKey(undefined, [])).toBeUndefined();
-      expect(getPivotItemKey({ props: { itemKey: "pivot-key" } })).toBe("pivot-key");
-      expect(getPivotItemKey(null)).toBeUndefined();
     });
   });
 
@@ -237,6 +239,161 @@ describe("Feedback Carousel ", () => {
       rerender(<FeedbackCarousel focusModeModel={model} isFocusModalHidden={true} />);
 
       expect(container.textContent).toContain("Test Column");
+    });
+  });
+
+  describe("column tabs", () => {
+    const renderThreeColumns = () => {
+      const columnItems: typeof testColumnProps.columnItems = [];
+      const columns = [
+        { ...testColumnProps, columnId: "col1", columnName: "Went well", columnItems },
+        { ...testColumnProps, columnId: "col2", columnName: "To improve", columnItems },
+        { ...testColumnProps, columnId: "col3", columnName: "Ideas", columnItems },
+      ];
+
+      return render(<FeedbackCarousel focusModeModel={buildFocusModeModel(columns)} isFocusModalHidden={false} />);
+    };
+
+    const getTab = (name: string) => screen.getByRole("tab", { name });
+
+    it("renders one tab per column with the first one selected", () => {
+      renderThreeColumns();
+
+      expect(screen.getByRole("tablist", { name: "Feedback columns" })).toBeInTheDocument();
+      expect(screen.getAllByRole("tab").map(tab => tab.textContent)).toEqual(["All", "Went well", "To improve", "Ideas"]);
+      expect(getTab("All")).toHaveAttribute("aria-selected", "true");
+      expect(getTab("Went well")).toHaveAttribute("aria-selected", "false");
+    });
+
+    it("keeps only the selected tab in the tab order", () => {
+      renderThreeColumns();
+
+      expect(getTab("All")).toHaveAttribute("tabindex", "0");
+      expect(getTab("Went well")).toHaveAttribute("tabindex", "-1");
+
+      fireEvent.click(getTab("Went well"));
+
+      expect(getTab("All")).toHaveAttribute("tabindex", "-1");
+      expect(getTab("Went well")).toHaveAttribute("tabindex", "0");
+    });
+
+    it("renders only the selected column in a panel labelled by its tab", () => {
+      const { container } = renderThreeColumns();
+
+      expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
+      expect(screen.getByRole("tabpanel", { name: "All" })).toBeInTheDocument();
+      expect(container.querySelector("#carousel-all-columns")).toBeTruthy();
+
+      fireEvent.click(getTab("To improve"));
+
+      expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
+      expect(screen.getByRole("tabpanel", { name: "To improve" })).toBeInTheDocument();
+      expect(container.querySelector("#carousel-col2")).toBeTruthy();
+      expect(container.querySelector("#carousel-all-columns")).toBeNull();
+    });
+
+    it("moves focus with the arrow, Home and End keys without changing the selection", () => {
+      renderThreeColumns();
+      const [all, wentWell, toImprove, ideas] = ["All", "Went well", "To improve", "Ideas"].map(getTab);
+
+      all.focus();
+
+      expect(fireEvent.keyDown(all, { key: "ArrowRight" })).toBe(false);
+      expect(wentWell).toHaveFocus();
+
+      fireEvent.keyDown(wentWell, { key: "ArrowRight" });
+      expect(toImprove).toHaveFocus();
+
+      fireEvent.keyDown(toImprove, { key: "ArrowLeft" });
+      expect(wentWell).toHaveFocus();
+
+      fireEvent.keyDown(wentWell, { key: "End" });
+      expect(ideas).toHaveFocus();
+
+      fireEvent.keyDown(ideas, { key: "Home" });
+      expect(all).toHaveFocus();
+
+      expect(all).toHaveAttribute("aria-selected", "true");
+      expect(wentWell).toHaveAttribute("aria-selected", "false");
+    });
+
+    it("does not wrap around at the first and last tab", () => {
+      renderThreeColumns();
+      const first = getTab("All");
+      const last = getTab("Ideas");
+
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowLeft" });
+      expect(first).toHaveFocus();
+
+      last.focus();
+      fireEvent.keyDown(last, { key: "ArrowRight" });
+      expect(last).toHaveFocus();
+    });
+
+    it("ignores keys that do not move focus", () => {
+      renderThreeColumns();
+      const tab = getTab("All");
+
+      tab.focus();
+
+      expect(fireEvent.keyDown(tab, { key: "a" })).toBe(true);
+      expect(tab).toHaveFocus();
+    });
+
+    it.each(["altKey", "ctrlKey", "metaKey"])("leaves browser shortcuts using %s alone", modifier => {
+      renderThreeColumns();
+      const tab = getTab("All");
+
+      tab.focus();
+
+      expect(fireEvent.keyDown(tab, { key: "ArrowRight", [modifier]: true })).toBe(true);
+      expect(tab).toHaveFocus();
+    });
+
+    it("still reports user activity from the tab list", () => {
+      renderThreeColumns();
+      const tab = getTab("All");
+
+      fireEvent.keyDown(tab, { key: "ArrowRight" });
+      fireEvent.mouseMove(tab);
+      fireEvent.touchStart(tab);
+
+      expect(mockTrackActivity).toHaveBeenCalledTimes(3);
+    });
+
+    it("renders no tabs or panel when there are no columns", () => {
+      const emptyModel = buildFocusModeModel([] as unknown as Array<typeof testColumnProps>);
+      emptyModel.columnIds = [];
+      emptyModel.columns = {} as any;
+
+      render(<FeedbackCarousel focusModeModel={emptyModel} isFocusModalHidden={false} />);
+
+      expect(screen.queryAllByRole("tab")).toHaveLength(0);
+      expect(screen.queryByRole("tabpanel")).toBeNull();
+    });
+
+    it("selects the focused tab with Enter or Space and leaves the tablist with Tab", async () => {
+      const user = userEvent.setup();
+      renderThreeColumns();
+
+      await user.tab();
+      expect(getTab("All")).toHaveFocus();
+
+      await user.keyboard("{ArrowRight}");
+      expect(getTab("Went well")).toHaveFocus();
+      expect(getTab("Went well")).toHaveAttribute("aria-selected", "false");
+
+      await user.keyboard("{Enter}");
+      expect(getTab("Went well")).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByRole("tabpanel", { name: "Went well" })).toBeInTheDocument();
+
+      await user.keyboard("{ArrowRight}");
+      await user.keyboard(" ");
+      expect(getTab("To improve")).toHaveAttribute("aria-selected", "true");
+
+      await user.tab();
+      expect(document.activeElement).not.toHaveAttribute("role", "tab");
     });
   });
 

@@ -2432,7 +2432,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                                 </button>
                               </div>
                               <div className="subText">
-                                <div className="ms-Dialog-inner">
+                                <div>
                                   <div className="team-effectiveness-section-information">
                                     {getIconElement("info")}
                                     All answers will be saved anonymously

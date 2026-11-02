@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
-import { DocumentCard, DocumentCardActivity } from "@fluentui/react/lib/DocumentCard";
-import { SearchBox } from "@fluentui/react/lib/SearchBox";
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { WorkItem, WorkItemType } from "azure-devops-extension-api/WorkItemTracking/WorkItemTracking";
 import { WebApiTeam } from "azure-devops-extension-api/Core";
@@ -8,6 +6,7 @@ import { WebApiTeam } from "azure-devops-extension-api/Core";
 import { WorkflowPhase } from "../interfaces/workItem";
 import ActionItemDisplay from "./actionItemDisplay";
 import EditableDocumentCardTitle from "./editableDocumentCardTitle";
+import FeedbackCardActivity from "./feedbackCardActivity";
 import FeedbackItemTimer from "./feedbackItemTimer";
 import GroupedFeedbackList from "./groupedFeedbackList";
 import { IFeedbackItemDocument } from "../interfaces/feedback";
@@ -542,7 +541,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       return <div className="anonymous-created-date">{formattedCreatedDate}</div>;
     }
 
-    return <DocumentCardActivity activity={formattedCreatedDate} people={[{ name: props.createdBy, profileImageSrc: props.createdByProfileImage }]} />;
+    return <FeedbackCardActivity name={props.createdBy} activity={formattedCreatedDate} profileImageSrc={props.createdByProfileImage} />;
   }, [props.createdBy, props.createdByProfileImage, props.createdDate]);
 
   const deleteFeedbackItem = useCallback(() => {
@@ -1015,7 +1014,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
       }}
     >
       <div className="document-card-wrapper">
-        <DocumentCard className={`feedback-card-surface ${isMainItem ? "mainItemCard" : "groupedItemCard"}`} draggable={workflowState.isGroupPhase && !state.isMarkedForDeletion}>
+        <div role="group" className={`feedback-card-surface ${isMainItem ? "mainItemCard" : "groupedItemCard"}`} draggable={workflowState.isGroupPhase && !state.isMarkedForDeletion}>
           <div className="card-integral-part" style={{ borderLeftColor: props.accentColor }}>
             <div className="card-header">
               {mainGroupedItemInFocusMode && renderGroupButton(groupItemsCount, true)}
@@ -1129,7 +1128,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
           </div>
           {isGroupedCarouselItem && isMainItem && state.isShowingGroupedChildrenTitles && <GroupedFeedbackList childrenIds={childrenIds} columnItems={columnItems} columns={props.columns} currentColumnId={props.columnId} workflowPhase={props.workflowPhase} hideFeedbackItems={props.hideFeedbackItems} isFocusModalHidden={props.isFocusModalHidden} />}
           <div className="action-items">{workflowState.isActPhase && <ActionItemDisplay feedbackItemId={props.id} feedbackItemTitle={props.title} team={props.team} boardId={props.boardId} boardTitle={props.boardTitle} defaultAreaPath={props.defaultActionItemAreaPath} defaultIteration={props.defaultActionItemIteration} actionItems={props.actionItems} onUpdateActionItem={onUpdateActionItem} nonHiddenWorkItemTypes={props.nonHiddenWorkItemTypes} allWorkItemTypes={props.allWorkItemTypes} allowAddNewActionItem={isMainItem} shouldFocusActionItems={props.isFocusModalHidden} />}</div>
-        </DocumentCard>
+        </div>
       </div>
       <dialog ref={deleteFeedbackDialogRef} className="delete-feedback-item-dialog dialog-width-sm" aria-label="Delete Feedback" onClose={() => setStateMerge({ isDeleteItemConfirmationDialogHidden: true })}>
         <div className="header">
@@ -1191,7 +1190,7 @@ const FeedbackItem = forwardRef<FeedbackItemHandle, IFeedbackItemProps>((props, 
         <label className="subText" htmlFor="feedback-item-search-input">
           Search and select the feedback under which to group the current feedback.
         </label>
-        <SearchBox id="feedback-item-search-input" placeholder="Enter the feedback title" aria-label="Enter the feedback title" onChange={handleFeedbackItemSearchInputChange} />
+        <input id="feedback-item-search-input" className="feedback-search-input" type="search" placeholder="Enter the feedback title" aria-label="Enter the feedback title" onChange={event => handleFeedbackItemSearchInputChange(event, event.target.value)} />
         <div className="output-container">
           {!state.searchedFeedbackItems.length && state.searchTerm && <p className="no-matching-feedback-message">No feedback with title containing your input.</p>}
           {state.searchedFeedbackItems.map((searchItem, index) => {

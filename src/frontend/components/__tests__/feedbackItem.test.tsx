@@ -445,7 +445,7 @@ describe("Feedback Item", () => {
       const props = { ...baseProps, workflowPhase: "Group", isInteractable: true };
       const { container } = render(<FeedbackItem {...(props as any)} />);
       const item = container.querySelector(".feedbackItem");
-      const card = container.querySelector(".ms-DocumentCard");
+      const card = container.querySelector(".feedback-card-surface");
       expect(item?.getAttribute("draggable")).toBe("true");
       expect(card?.getAttribute("draggable")).toBe("true");
     });
@@ -7544,7 +7544,7 @@ describe("Feedback Item", () => {
       expect(container.querySelector(".anonymous-created-date")).toBeInTheDocument();
     });
 
-    test("renders DocumentCardActivity when createdBy is provided", async () => {
+    test("renders the creator activity row when createdBy is provided", async () => {
       const mockItem: IFeedbackItemDocument = {
         id: "non-anon-item",
         boardId: testBoardId,
@@ -7614,8 +7614,10 @@ describe("Feedback Item", () => {
         expect(itemDataService.getFeedbackItem).toHaveBeenCalled();
       });
 
-      // Check for ms-DocumentCardActivity class which is used when createdBy is provided
-      expect(container.querySelector(".ms-DocumentCardActivity")).toBeInTheDocument();
+      const activity = container.querySelector(".feedback-card-activity") as HTMLElement;
+      expect(activity).toBeInTheDocument();
+      expect(activity).toHaveTextContent("Test User");
+      expect(activity.querySelector("img")).toHaveAttribute("src", "https://example.com/avatar.png");
     });
   });
 
@@ -8755,10 +8757,9 @@ describe("FeedbackItem additional coverage (merged)", () => {
 
     fireEvent.change(searchBox1, { target: { value: "hello" } });
     await waitFor(() => {
-      expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalled();
+      expect(itemDataService.getFeedbackItemsForBoard).toHaveBeenCalledWith(boardId);
+      expect(document.querySelectorAll(".feedback-item-search-result-item").length).toBe(1);
     });
-
-    expect(document.querySelectorAll(".feedback-item-search-result-item").length).toBe(1);
 
     const result = document.querySelector(".feedback-item-search-result-item") as HTMLButtonElement;
     fireEvent.click(result);
@@ -11022,7 +11023,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     expect(screen.getByText("Search Existing Column")).toBeInTheDocument();
-    expect(document.querySelector(".feedback-item-search-result-item .ms-Icon, .feedback-item-search-result-item i, .feedback-item-search-result-item svg")).toBeTruthy();
+    expect(document.querySelector(".feedback-item-search-result-item i, .feedback-item-search-result-item svg")).toBeTruthy();
   });
 
   test("timerSwitch handles null update payloads in both start and stop branches", async () => {
@@ -11322,7 +11323,7 @@ describe("FeedbackItem additional coverage (merged)", () => {
     });
 
     expect(screen.getByText("Search Existing Column Fallback Icon")).toBeInTheDocument();
-    expect(container.querySelector(".feedback-item-search-result-item svg, .feedback-item-search-result-item i, .feedback-item-search-result-item .ms-Icon")).toBeTruthy();
+    expect(container.querySelector(".feedback-item-search-result-item svg, .feedback-item-search-result-item i")).toBeTruthy();
 
     iconSpy.mockRestore();
   });

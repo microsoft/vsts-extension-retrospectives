@@ -15,6 +15,7 @@ From [GitHub PR #1895](https://github.com/microsoft/vsts-extension-retrospective
 * The Board selection dropdown now refreshes for other users within about 2 minutes, or as soon as they open it, when a retrospective is created, archived, or restored, and anyone viewing a retrospective that is archived or deleted is moved to the most recent retrospective.
 * Reduced the network traffic of open boards: checks slow down while nothing changes, and the list of retrospectives, which is the largest response, is checked every 2 minutes instead of every 30 seconds.
 * Fixed the vote counters showing zero votes when a retrospective is first opened.
+* Removed the last Fluent UI components and replaced them with native HTML elements: the frame and author row of every feedback card, the search box in the Group Feedback dialog, the column list when creating or editing a retrospective, and the column tabs in Focus mode. This makes the extension download about 225 KB smaller (about 70 KB when compressed).
 
 ## v1.92.59
 

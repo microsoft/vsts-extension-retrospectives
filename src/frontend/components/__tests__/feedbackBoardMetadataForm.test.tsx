@@ -1465,20 +1465,28 @@ describe("FeedbackBoardMetadataForm - Column Operations Extended", () => {
     const user = userEvent.setup();
     render(<FeedbackBoardMetadataForm {...mockedProps} />);
 
-    const moveUpButtons = screen.getAllByTitle("Move Up");
-    const moveDownButtons = screen.getAllByTitle("Move Down");
+    const getColumnTitles = () => screen.getAllByRole("listitem").map(item => item.textContent);
+    const [firstTitle, secondTitle] = getColumnTitles();
+    expect(firstTitle).not.toBe(secondTitle);
 
-    // Second column's move up should be enabled
-    if (moveUpButtons.length > 1) {
-      expect(moveUpButtons[1]).not.toBeDisabled();
-      await user.click(moveUpButtons[1]);
-    }
+    await user.click(screen.getAllByTitle("Move Up")[1]);
+    expect(getColumnTitles().slice(0, 2)).toEqual([secondTitle, firstTitle]);
 
-    // First column's move down should be enabled
-    if (moveDownButtons.length > 0) {
-      expect(moveDownButtons[0]).not.toBeDisabled();
-      await user.click(moveDownButtons[0]);
-    }
+    await user.click(screen.getAllByTitle("Move Down")[0]);
+    expect(getColumnTitles().slice(0, 2)).toEqual([firstTitle, secondTitle]);
+  });
+
+  it("keeps each column's row when columns are reordered", async () => {
+    const user = userEvent.setup();
+    render(<FeedbackBoardMetadataForm {...mockedProps} />);
+
+    const [firstRow, secondRow] = screen.getAllByRole("listitem");
+
+    await user.click(within(firstRow).getByTitle("Move Down"));
+
+    const rows = screen.getAllByRole("listitem");
+    expect(rows[0]).toBe(secondRow);
+    expect(rows[1]).toBe(firstRow);
   });
 });
 
@@ -1809,7 +1817,7 @@ describe("FeedbackBoardMetadataForm - Dialog Dismissal", () => {
     expect(screen.getByText(/choose column icon/i)).toBeInTheDocument();
 
     // Find the close button in the dialog
-    const closeButton = container.querySelector('.ms-Dialog-button--close, button[aria-label="Close"]');
+    const closeButton = container.querySelector('button[aria-label="Close"]');
     if (closeButton) {
       await user.click(closeButton as HTMLElement);
       await waitFor(() => {
