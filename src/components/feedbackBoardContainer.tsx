@@ -8,6 +8,7 @@ import BoardSummaryTable from "./boardSummaryTable";
 import FeedbackBoardMetadataForm from "./feedbackBoardMetadataForm";
 import FeedbackBoard from "../components/feedbackBoard";
 import FeedbackCarousel, { type FocusModeModel } from "./feedbackCarousel";
+import Avatar from "./avatar";
 
 import { azureDevOpsCoreService } from "../dal/azureDevOpsCoreService";
 import { workItemService } from "../dal/azureDevOpsWorkItemService";
@@ -2738,7 +2739,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
               <div className="retro-summary-section-header">{t("feedback_board_basic_settings")}</div>
               <div id="retro-summary-created-date">{t("feedback_board_created_date", { date: formatDate(new Date(state.currentBoard.createdDate), { year: "numeric", month: "short", day: "numeric" }) })}</div>
               <div id="retro-summary-created-by">
-                {t("feedback_board_created_by")} <img className="avatar" src={state.currentBoard?.createdBy.imageUrl} alt={state.currentBoard?.createdBy.displayName} /> {state.currentBoard?.createdBy.displayName}{" "}
+                {t("feedback_board_created_by")} <Avatar imageUrl={state.currentBoard.createdBy.imageUrl} name={state.currentBoard.createdBy.displayName} /> {state.currentBoard.createdBy.displayName}{" "}
               </div>
             </section>
             <section className="retro-summary-section">
@@ -2749,7 +2750,7 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
                 <div className="retro-summary-contributors-section">
                   {state.contributors.map(contributor => (
                     <div key={contributor.id} className="retro-summary-contributor">
-                      <img className="avatar" src={contributor.imageUrl} alt={contributor.name} /> {contributor.name}
+                      <Avatar imageUrl={contributor.imageUrl} name={contributor.name} /> {contributor.name}
                     </div>
                   ))}
                 </div>

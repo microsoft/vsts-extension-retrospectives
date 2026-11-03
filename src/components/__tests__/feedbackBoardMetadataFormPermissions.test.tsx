@@ -848,9 +848,46 @@ describe("Board Metadata Form Permissions", () => {
       });
 
       const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
-      const memberImage = container.querySelector('.permission-image[src="https://example.com/avatar.jpg"]');
+      const memberImage = container.querySelector('.permission-image img[src="https://example.com/avatar.jpg"]');
 
       expect(memberImage).toBeInTheDocument();
+    });
+
+    it.each([undefined, null, ""])("should show member initials when the image URL is %j", thumbnailUrl => {
+      const props = makeProps({
+        permissionOptions: [{ id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member", thumbnailUrl }],
+      });
+
+      const { container, getByText } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+
+      expect(container.querySelector(".permission-image .avatar-initials")).toHaveTextContent("UO");
+      expect(container.querySelector(".permission-image img")).toBeNull();
+      expect(getByText("User One")).toBeVisible();
+    });
+
+    it("should keep a failed image's initials while permissions change without affecting other members", () => {
+      const props = makeProps({
+        permissionOptions: [
+          { id: "user1", name: "User One", uniqueName: "user1@example.com", type: "member", thumbnailUrl: "https://example.com/missing.jpg" },
+          { id: "user2", name: "User Two", uniqueName: "user2@example.com", type: "member", thumbnailUrl: "https://example.com/user2.jpg" },
+        ],
+      });
+      const { container } = render(<FeedbackBoardMetadataFormPermissions {...props} />);
+      const checkbox = container.querySelector("#permission-option-user1")!;
+      const memberRow = checkbox.closest("tr")!;
+
+      fireEvent.error(memberRow.querySelector("img")!);
+
+      expect(memberRow.querySelector(".avatar-initials")).toHaveTextContent("UO");
+      expect(memberRow.querySelector(".permission-image")).toHaveAttribute("aria-hidden", "true");
+
+      fireEvent.click(checkbox);
+
+      expect(checkbox).toBeChecked();
+      expect(props.onPermissionChanged).toHaveBeenLastCalledWith({ permissions: { Teams: [], Members: ["user1"] } });
+      expect(memberRow.querySelector("img")).toBeNull();
+      expect(memberRow.querySelector(".avatar-initials")).toHaveTextContent("UO");
+      expect(container.querySelector('img[src="https://example.com/user2.jpg"]')).toBeInTheDocument();
     });
   });
 
