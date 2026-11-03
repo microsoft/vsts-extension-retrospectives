@@ -2266,14 +2266,64 @@ body {
 }
 
 .retro-toast {
-  @apply pointer-events-auto min-w-72 max-w-88;
+  --retro-toast-accent: var(--color-primary);
+  --retro-toast-surface: #eff6fc;
+  @apply pointer-events-auto w-88 max-w-full overflow-hidden rounded text-black/80 shadow-lg;
+  background-color: var(--retro-toast-surface);
+  border-left: 4px solid var(--retro-toast-accent);
+
+  & .retro-message-bar {
+    @apply items-start gap-2 py-2.5 text-sm bg-transparent text-inherit;
+  }
+
+  & .retro-message-bar__content {
+    @apply flex-1 min-w-0 wrap-break-word;
+  }
+
+  & .retro-message-bar__dismiss {
+    @apply flex items-center justify-center shrink-0 w-6 h-6 -my-0.5 -mr-1 p-0 rounded-sm border-0 bg-transparent text-lg leading-none text-inherit cursor-pointer;
+
+    & span {
+      @apply flex-none;
+    }
+
+    &:hover {
+      @apply bg-black/10;
+    }
+
+    &:focus-visible {
+      @apply outline-2 outline-primary;
+    }
+  }
 }
 
+.retro-toast--success {
+  --retro-toast-accent: var(--color-success);
+  --retro-toast-surface: #dff6dd;
+}
+
+.retro-toast--warning {
+  --retro-toast-accent: var(--color-task-yellow-darker);
+  --retro-toast-surface: #fff4ce;
+}
+
+.retro-toast--error {
+  --retro-toast-accent: var(--color-error);
+  --retro-toast-surface: #fde7e9;
+}
+
+/* The board header spans the top of the page, so board toasts sit in the bottom corner. */
 .retro-toast-container {
-  @apply fixed top-6 right-6 z-10 flex flex-col gap-2 pointer-events-none;
+  @apply fixed bottom-6 right-6 z-20 flex flex-col items-end gap-2 max-w-[calc(100%-3rem)] pointer-events-none;
+}
+
+/* Inside a dialog, stay below its header so neither the close button nor the footer actions are covered. */
+dialog > .retro-toast-container {
+  @apply top-14 bottom-auto right-5 max-w-[calc(100%-2.5rem)];
 }
 
 .retro-toast-progress {
-  @apply h-1 bg-primary animate-[retro-toast-progress-shrink] ease-linear;
+  @apply h-1 animate-[retro-toast-progress-shrink] ease-linear;
+  background-color: var(--retro-toast-accent);
   animation-fill-mode: forwards;
 }

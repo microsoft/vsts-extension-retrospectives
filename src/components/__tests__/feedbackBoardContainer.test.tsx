@@ -23,6 +23,7 @@ import { BOARD_LIST_FOCUS_REFRESH_MIN_AGE_MS, BOARD_LIST_POLL_INTERVAL_MS, DEFAU
 import { workService } from "../../dal/azureDevOpsWorkService";
 import { teamSettingsService } from "../../dal/teamSettingsService";
 import { appInsights } from "../../utilities/telemetryClient";
+import { toast } from "../toastNotifications";
 
 const mockUserIdentity = {
   id: "mock-user-id",
@@ -513,7 +514,7 @@ describe("FeedbackBoardContainer integration", () => {
     fireEvent.click(moveEveryoneButton);
 
     await waitFor(() => expect(BoardDataService.updateActivePhase).toHaveBeenCalledWith("t1", "b1", WorkflowPhase.Group));
-    expect(await screen.findByText("Everyone was moved to Group.")).toBeInTheDocument();
+    expect(await screen.findByText("Sent a signal to move everyone to Group. Participants will follow in a moment.")).toBeInTheDocument();
   });
 
   it("searches feedback in all boards from the Board Actions menu", async () => {
@@ -1867,8 +1868,9 @@ describe("FeedbackBoardContainer - Live sync polling", () => {
     mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
     mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
 
-    render(<FeedbackBoardContainer isHostedAzureDevOps={isHostedAzureDevOps} projectId="1" />);
-    expect(await screen.findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    const view = render(<FeedbackBoardContainer isHostedAzureDevOps={isHostedAzureDevOps} projectId="1" />);
+    expect(await within(view.container).findByRole("heading", { name: "Retrospectives" })).toBeInTheDocument();
+    return view;
   };
 
   // The polling loops poll right away when the browser comes back online.
@@ -1884,6 +1886,106 @@ describe("FeedbackBoardContainer - Live sync polling", () => {
       await Promise.all([...mocked(BoardDataService.getBoardForTeamByIdStrict).mock.results, ...mocked(BoardDataService.getBoardsForTeamStrict).mock.results].map(result => result.value));
     });
   };
+
+  describe("Move Everyone delivery", () => {
+    const ownerId = mockUserIdentity.id;
+
+    beforeEach(() => {
+      act(() => toast.dismiss());
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      act(() => toast.dismiss());
+      mockUserIdentity.id = ownerId;
+      jest.useRealTimers();
+    });
+
+    it.each([WorkflowPhase.Collect, WorkflowPhase.Group, WorkflowPhase.Vote, WorkflowPhase.Act])("moves another participant to %s on a regular poll, including repeated moves", async phase => {
+      const board = createServerBoard({ createdBy: { ...createdBy, id: ownerId } });
+      const ownerView = await renderLoadedContainer([board]);
+      mockUserIdentity.id = "participant-id";
+      const participantView = await renderLoadedContainer([board]);
+      await waitForBoardPollsToSettle(2);
+      const owner = within(ownerView.container);
+      const participant = within(participantView.container);
+
+      mocked(BoardDataService.updateActivePhase).mockImplementation(async (_teamId, boardId, activePhase) => {
+        const savedBoard = {
+          ...serverBoards.find(item => item.id === boardId)!,
+          __etag: serverBoards[0].__etag + 1,
+          activePhase,
+          activePhaseUpdatedDate: new Date(Date.now()),
+        };
+        serverBoards = [savedBoard];
+        return savedBoard;
+      });
+
+      fireEvent.click(owner.getByRole("tab", { name: phase }));
+      const otherPhase = phase === WorkflowPhase.Vote ? WorkflowPhase.Group : WorkflowPhase.Vote;
+
+      for (let move = 1; move <= 2; move++) {
+        fireEvent.click(participant.getByRole("tab", { name: otherPhase }));
+        expect(participant.getByRole("tab", { name: otherPhase })).toHaveAttribute("aria-selected", "true");
+        expect(participant.queryByRole("button", { name: `Move everyone to ${otherPhase}` })).not.toBeInTheDocument();
+
+        await act(async () => {
+          fireEvent.click(owner.getByRole("button", { name: `Move everyone to ${phase}` }));
+        });
+
+        expect(BoardDataService.updateActivePhase).toHaveBeenCalledTimes(move);
+        expect(BoardDataService.updateActivePhase).toHaveBeenLastCalledWith("t1", "b1", phase);
+        expect(owner.getByText(`Sent a signal to move everyone to ${phase}. Participants will follow in a moment.`)).toBeInTheDocument();
+        expect(participant.getByRole("tab", { name: otherPhase })).toHaveAttribute("aria-selected", "true");
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(LIVE_SYNC_IDLE_POLL_INTERVAL_MS);
+        });
+
+        expect(participant.getByRole("tab", { name: phase })).toHaveAttribute("aria-selected", "true");
+      }
+    });
+
+    it.each(["missing result", "rejection"])("reports a save failure instead of success for a %s", async failure => {
+      const view = await renderLoadedContainer([createServerBoard({ createdBy: { ...createdBy, id: ownerId } })]);
+      const owner = within(view.container);
+      if (failure === "rejection") {
+        mocked(BoardDataService.updateActivePhase).mockRejectedValue(new Error("Save failed"));
+      } else {
+        mocked(BoardDataService.updateActivePhase).mockResolvedValue(undefined);
+      }
+
+      await act(async () => {
+        fireEvent.click(owner.getByRole("button", { name: "Move everyone to Collect" }));
+      });
+
+      expect(owner.getByText("Could not move everyone to Collect. Try again.")).toBeInTheDocument();
+      expect(owner.queryByText("Sent a signal to move everyone to Collect. Participants will follow in a moment.")).not.toBeInTheDocument();
+      expect(appInsights.trackException).toHaveBeenCalledWith(expect.any(Error), expect.objectContaining({ action: "moveEveryoneToSelectedPhase" }));
+      expect(owner.getByRole("button", { name: "Move everyone to Collect" })).toBeEnabled();
+      expect(serverBoards[0].activePhaseUpdatedDate).toBeUndefined();
+    });
+
+    it("waits for the save to finish before confirming the request", async () => {
+      const board = createServerBoard({ createdBy: { ...createdBy, id: ownerId } });
+      const view = await renderLoadedContainer([board]);
+      const owner = within(view.container);
+      let finishSave: (board: IFeedbackBoardDocument) => void;
+      mocked(BoardDataService.updateActivePhase).mockImplementation(() => new Promise(resolve => (finishSave = resolve)));
+
+      fireEvent.click(owner.getByRole("button", { name: "Move everyone to Collect" }));
+
+      expect(owner.getByRole("button", { name: "Move everyone to Collect" })).toBeDisabled();
+      expect(owner.queryByText("Sent a signal to move everyone to Collect. Participants will follow in a moment.")).not.toBeInTheDocument();
+
+      await act(async () => {
+        finishSave({ ...board, __etag: 2, activePhaseUpdatedDate: new Date(Date.now()) });
+      });
+
+      expect(owner.getByText("Sent a signal to move everyone to Collect. Participants will follow in a moment.")).toBeInTheDocument();
+      expect(owner.getByRole("button", { name: "Move everyone to Collect" })).toBeEnabled();
+    });
+  });
 
   it.each([
     { host: "Azure DevOps Services", isHostedAzureDevOps: true },
