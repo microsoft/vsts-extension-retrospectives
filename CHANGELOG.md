@@ -17,6 +17,7 @@ From [GitHub PR #1895](https://github.com/microsoft/vsts-extension-retrospective
 * Fixed the vote counters showing zero votes when a retrospective is first opened.
 * Removed the last Fluent UI components and replaced them with native HTML elements: the frame and author row of every feedback card, the search box in the Group Feedback dialog, the column list when creating or editing a retrospective, and the column tabs in Focus mode. This makes the extension download about 225 KB smaller (about 70 KB when compressed).
 * Moved the app directly into `src/` and placed its HTML and styles in `src/assets/`, with matching updates to build, test, and publishing paths.
+* Fixed broken user images in the retrospective summary and Permissions tab by showing colored initials when a profile image is missing or cannot be loaded.
 
 ## v1.92.59
 

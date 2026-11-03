@@ -3,6 +3,7 @@ import { IFeedbackBoardDocument, IFeedbackBoardDocumentPermissions } from "../in
 import { useTrackMetric } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin } from "../utilities/telemetryClient";
 import { getIconElement, PeopleIcon } from "./icons";
+import Avatar from "./avatar";
 
 export interface IFeedbackBoardMetadataFormPermissionsProps {
   board: IFeedbackBoardDocument;
@@ -213,7 +214,7 @@ function FeedbackBoardMetadataFormPermissions(props: Readonly<IFeedbackBoardMeta
       return <PeopleIcon />;
     }
 
-    return <img className="permission-image" src={props.option.thumbnailUrl} alt={`Permission for ${props.option.name}`} />;
+    return <Avatar className="permission-image" imageUrl={props.option.thumbnailUrl} name={props.option.name} />;
   };
 
   useEffect(() => {

@@ -632,6 +632,10 @@ body {
 
         & .permission-image {
           @apply w-11 min-w-11 max-w-11 h-11 rounded-full flex items-center justify-center text-(--text-primary-color) bg-(--background-color);
+
+          & .avatar-initials {
+            @apply text-lg;
+          }
         }
       }
 
@@ -1335,8 +1339,8 @@ body {
   }
 }
 
-.retro-summary-dialog img.avatar {
-  @apply h-6 rounded-full align-middle -mt-1.5 inline;
+.retro-summary-dialog .avatar {
+  @apply -mt-1.5;
 }
 
 .retro-summary-dialog .retro-summary-effectiveness-scores {
@@ -1985,16 +1989,11 @@ body {
   @apply flex items-start gap-2.5 px-4 py-2;
 }
 
-.feedback-card-activity-avatar {
-  @apply relative -ml-0.5 size-8 shrink-0;
-
-  &::after {
-    @apply absolute -inset-px rounded-full border-2 border-white;
-    content: "";
-  }
+.avatar {
+  @apply inline-flex size-6 shrink-0 align-middle;
 
   & img,
-  & .feedback-card-activity-initials {
+  & .avatar-initials {
     @apply size-full rounded-full;
   }
 
@@ -2003,8 +2002,21 @@ body {
   }
 }
 
-.feedback-card-activity-initials {
-  @apply flex items-center justify-center text-sm font-semibold text-white;
+.avatar-initials {
+  @apply flex items-center justify-center text-xs font-semibold text-white;
+}
+
+.feedback-card-activity-avatar {
+  @apply relative -ml-0.5 size-8;
+
+  &::after {
+    @apply absolute -inset-px rounded-full border-2 border-white;
+    content: "";
+  }
+
+  & .avatar-initials {
+    @apply text-sm;
+  }
 }
 
 .feedback-card-activity-details {

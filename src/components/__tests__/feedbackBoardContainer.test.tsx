@@ -636,6 +636,114 @@ describe("FeedbackBoardContainer integration", () => {
     await waitFor(() => expect(copyToClipboard).toHaveBeenCalledWith("mock email body"));
   });
 
+  describe("retrospective summary avatars", () => {
+    let board: IFeedbackBoardDocument;
+    let feedbackItem: IFeedbackItemDocument;
+
+    beforeEach(() => {
+      const team: WebApiTeam = { ...mockTeam, projectId: "1", identityUrl: "", identity: null };
+      board = {
+        ...mockBoard,
+        createdBy: { ...mockIdentity, displayName: "Board Owner", imageUrl: "https://example.com/owner.png" },
+      };
+      feedbackItem = {
+        id: "feedback-1",
+        boardId: board.id,
+        title: "Test feedback",
+        columnId: "good",
+        originalColumnId: "good",
+        upvotes: 0,
+        voteCollection: {},
+        createdBy: { ...mockIdentity, id: "contributor-1", displayName: "Jane Smith (Contoso)", imageUrl: "https://example.com/jane.png" },
+        createdDate: new Date("2026-01-01T00:00:00Z"),
+        userIdRef: "contributor-1",
+        timerSecs: 0,
+        timerState: false,
+        timerId: null,
+        groupIds: [],
+        isGroupedCarouselItem: false,
+        associatedActionItemIds: [],
+      };
+
+      mocked(getService).mockResolvedValue({ getHash: jest.fn().mockResolvedValue(""), setHash: jest.fn() });
+      mocked(azureDevOpsCoreService.getAllTeams).mockResolvedValue([team]);
+      mocked(azureDevOpsCoreService.getDefaultTeam).mockResolvedValue(team);
+      mocked(azureDevOpsCoreService.getMembers).mockResolvedValue([]);
+      mocked(userDataService.getMostRecentVisit).mockResolvedValue(null);
+      mocked(userDataService.addVisit).mockResolvedValue(undefined);
+      mocked(BoardDataService.getBoardsForTeam).mockResolvedValue([board]);
+      mocked(BoardDataService.getBoardForTeamById).mockResolvedValue(board);
+      mocked(itemDataService.getBoardItem).mockResolvedValue(board);
+      mocked(itemDataService.getFeedbackItemsForBoard).mockResolvedValue([feedbackItem]);
+      mocked(workItemService.getWorkItemTypesForCurrentProject).mockResolvedValue([]);
+      mocked(workItemService.getHiddenWorkItemTypes).mockResolvedValue([]);
+    });
+
+    const openSummary = async () => {
+      render(<FeedbackBoardContainer {...props} />);
+
+      await screen.findByRole("heading", { name: "Retrospectives" });
+      fireEvent.click(screen.getByLabelText("Board Actions Menu"));
+      fireEvent.click(screen.getByText("Show retrospective summary"));
+
+      return screen.findByRole("dialog", { name: "Retrospective summary" });
+    };
+
+    it("shows owner and contributor pictures and falls back independently when either fails", async () => {
+      const dialog = await openSummary();
+      const owner = dialog.querySelector("#retro-summary-created-by")!;
+      const contributor = dialog.querySelector(".retro-summary-contributor")!;
+
+      expect(owner.querySelector("img")).toHaveAttribute("src", "https://example.com/owner.png");
+      expect(contributor.querySelector("img")).toHaveAttribute("src", "https://example.com/jane.png");
+
+      fireEvent.error(owner.querySelector("img")!);
+
+      expect(owner.querySelector("img")).toBeNull();
+      expect(owner.querySelector(".avatar-initials")).toHaveTextContent("BO");
+      expect(contributor.querySelector("img")).toBeInTheDocument();
+
+      fireEvent.error(contributor.querySelector("img")!);
+
+      expect(contributor.querySelector("img")).toBeNull();
+      expect(contributor.querySelector(".avatar-initials")).toHaveTextContent("JS");
+      expect(owner).toHaveTextContent("Board Owner");
+      expect(within(dialog).getByText("Jane Smith (Contoso)")).toBeVisible();
+    });
+
+    it.each([undefined, null, ""])("shows owner and contributor initials when image URLs are %j", async imageUrl => {
+      board.createdBy.imageUrl = imageUrl;
+      feedbackItem.createdBy.imageUrl = imageUrl;
+
+      const dialog = await openSummary();
+
+      expect(dialog.querySelectorAll(".avatar img")).toHaveLength(0);
+      expect(dialog.querySelector("#retro-summary-created-by .avatar-initials")).toHaveTextContent("BO");
+      expect(dialog.querySelector(".retro-summary-contributor .avatar-initials")).toHaveTextContent("JS");
+    });
+
+    it("handles feedback without a stored contributor identity", async () => {
+      feedbackItem.createdBy = undefined;
+
+      const dialog = await openSummary();
+      const contributor = dialog.querySelector(".retro-summary-contributor")!;
+
+      expect(contributor.querySelector("img")).toBeNull();
+      expect(contributor.querySelector(".avatar-initials")).toBeEmptyDOMElement();
+      expect(within(dialog).getByText("Contributors: 1 participant(s)")).toBeInTheDocument();
+    });
+
+    it("keeps contributor identities hidden for anonymous boards", async () => {
+      board.isAnonymous = true;
+
+      const dialog = await openSummary();
+
+      expect(dialog.querySelector(".retro-summary-contributor")).toBeNull();
+      expect(within(dialog).queryByText("Jane Smith (Contoso)")).not.toBeInTheDocument();
+      expect(dialog.querySelector("#retro-summary-created-by img")).toBeInTheDocument();
+    });
+  });
+
   it("shows all project teams in the team selector when enabled from settings", async () => {
     const otherTeam = { ...mockTeam, id: "t2", name: "Other Team" };
 
