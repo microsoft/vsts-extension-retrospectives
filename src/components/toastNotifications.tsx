@@ -165,7 +165,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ className, toast
   const toastContainer = (
     <div className={classNames("retro-toast-container", className)}>
       {records.map(record => (
-        <div key={record.id} className={classNames("retro-toast", toastClassName)}>
+        <div key={record.id} className={classNames("retro-toast", `retro-toast--${record.intent}`, toastClassName)}>
           <div className={`retro-message-bar retro-message-bar--${record.intent}`} role={roleForIntent(record.intent)} aria-live={roleForIntent(record.intent) === "alert" ? "assertive" : "polite"}>
             <div className="retro-message-bar__content">{record.content}</div>
             <button type="button" className="retro-message-bar__dismiss" onClick={() => toast.dismiss(record.id)} aria-label="Dismiss notification">

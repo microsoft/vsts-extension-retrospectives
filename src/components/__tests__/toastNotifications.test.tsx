@@ -152,6 +152,19 @@ describe("toastNotifications", () => {
 
       expect(container.querySelectorAll(".retro-toast").length).toBe(1);
     });
+
+    it.each(["info", "success", "warning", "error"] as const)("marks the %s toast so its accent, background, and progress bar match the intent", intent => {
+      const { container } = render(<ToastContainer />);
+
+      act(() => {
+        toast(`${intent} message`, { intent, autoClose: null });
+      });
+
+      const toastElement = container.querySelector(".retro-toast");
+      expect(toastElement).toHaveClass(`retro-toast--${intent}`);
+      expect(toastElement.querySelector(".retro-message-bar__content")).toHaveTextContent(`${intent} message`);
+      expect(toastElement.querySelector(".retro-message-bar__dismiss")).toHaveAccessibleName("Dismiss notification");
+    });
   });
 
   describe("update functionality", () => {
@@ -201,6 +214,8 @@ describe("toastNotifications", () => {
       });
 
       expect(container.querySelector(".retro-message-bar--error")).toBeTruthy();
+      expect(container.querySelector(".retro-toast")).toHaveClass("retro-toast--error");
+      expect(container.querySelector(".retro-toast")).not.toHaveClass("retro-toast--info");
     });
 
     it("updates only autoClose when only autoClose is passed", () => {
