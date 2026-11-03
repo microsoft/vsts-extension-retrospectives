@@ -7,7 +7,11 @@ const TimeFrame = {
 } as const;
 
 jest.mock("azure-devops-extension-api/Work", () => ({
-  TimeFrame,
+  TimeFrame: {
+    Past: 0,
+    Current: 1,
+    Future: 2,
+  },
 }));
 
 const mockCreateBoardForTeam = jest.fn();

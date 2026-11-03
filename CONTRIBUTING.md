@@ -345,8 +345,20 @@ To share a change with other users, save it through the data services in [src/da
 React Component tests are written using the following packages:
 
 - [Jest Testing Framework](https://jestjs.io/)
-- [Enzyme Testing utility](https://enzymejs.github.io/enzyme/)
-- [Enzyme to JSON](https://github.com/adriantoine/enzyme-to-json)
+- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+- [SWC Jest transformer](https://swc.rs/docs/usage/jest)
+
+SWC transforms TypeScript for test execution without checking types. Run
+`npm run typecheck` from `src` to check application and test types separately.
+CI runs both tests and type checking.
+
+The frontend CI workflow runs for pull requests changing `src/**`,
+`.github/workflows/ci_cd_frontend.yml`, or `.github/workflows/publish_frontend.yml`.
+Manual runs and calls from other workflows remain available regardless of paths.
+Within that workflow, the change-detection output gates the separate development
+publishing job on changes under `src/`; it does not filter validation steps.
+Do not require this path-filtered workflow's checks for every pull request in
+branch protection: skipped workflows can leave required checks pending.
 
 ---
 
@@ -360,7 +372,8 @@ To automatically generate the test coverage report, add the `--coverage` flag to
 #### Test Execution
 
 - `npm install` must be executed before running any tests.
-- `npm run test` is the default test execution method defined in the [package.json](src/package.json) file. This will automatically run all of the tests in files suffixed with `.test.tsx` inside of the [tests folder](src/components/__tests__).
+- `npm run test` is the default test execution method defined in the [package.json](src/package.json) file. This runs the `.test.ts` and `.test.tsx` suites with jsdom and coverage.
+- `npm run typecheck` checks application and test types without emitting JavaScript.
 - `jest --env=jsdom --silent -ci --testResultsProcessor=jest-junit {FULL_FILE_PATH}` can be used to run tests only in the specified file. Wildcards also work instead of a fully qualified path.
 
 ---

@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
-    "charset": "utf8",
     "experimentalDecorators": true,
-    "module": "amd",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strict": true,
     "strictNullChecks": false,
-    "target": "es5",
-    "downlevelIteration": true,
+    "target": "es2022",
     "rootDir": ".",
     "outDir": "dist/",
-    "jsx": "react",
-    "lib": ["es5", "es6", "dom", "es2015.promise"],
+    "jsx": "react-jsx",
+    "lib": ["es2022", "dom", "dom.iterable"],
     "types": ["react", "jest", "node"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -23,8 +21,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": false,
-    "noEmit": false
+    "noEmit": true
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "coverage", "reports"]
 }

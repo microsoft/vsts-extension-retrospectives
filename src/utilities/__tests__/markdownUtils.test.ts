@@ -1,7 +1,13 @@
 import React from "react";
 import * as markdownUtils from "../markdownUtils";
+import * as markdownTokenizer from "../markdownTokenizer";
 
 const { isValidUrl, escapeHtml, tokenizeMarkdown, parseMarkdown, hasMarkdownFormatting, stripMarkdown } = markdownUtils;
+
+jest.mock("../markdownTokenizer", () => ({
+  __esModule: true,
+  ...jest.requireActual("../markdownTokenizer"),
+}));
 
 describe("markdownUtils", () => {
   describe("isValidUrl", () => {
@@ -243,7 +249,7 @@ describe("markdownUtils", () => {
     });
 
     it("should return input text when tokenizer yields no tokens", () => {
-      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([]);
+      const tokenizeSpy = jest.spyOn(markdownTokenizer, "tokenizeMarkdown").mockReturnValue([]);
 
       expect(parseMarkdown("noop" as unknown as string)).toBe("noop");
 
@@ -348,7 +354,7 @@ describe("markdownUtils", () => {
     });
 
     it("should default image alt text to empty string when missing", () => {
-      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([{ type: "image", content: "", url: "https://example.com/img.png" }] as unknown as ReturnType<typeof tokenizeMarkdown>);
+      const tokenizeSpy = jest.spyOn(markdownTokenizer, "tokenizeMarkdown").mockReturnValue([{ type: "image", content: "", url: "https://example.com/img.png" }] as unknown as ReturnType<typeof tokenizeMarkdown>);
 
       const result = parseMarkdown("![missing-alt](https://example.com/img.png)");
 
@@ -366,7 +372,7 @@ describe("markdownUtils", () => {
 
     it("should use empty string fallback when image token.alt is undefined (line 105 branch)", () => {
       // Mock tokenizeMarkdown to return an image token without the alt property at all
-      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([
+      const tokenizeSpy = jest.spyOn(markdownTokenizer, "tokenizeMarkdown").mockReturnValue([
         { type: "image", content: "alt content", url: "https://example.com/img.png" },
         // Note: alt property is intentionally omitted to test the || "" fallback
       ] as unknown as ReturnType<typeof tokenizeMarkdown>);
@@ -388,7 +394,7 @@ describe("markdownUtils", () => {
 
     it("should use empty string when token.alt is explicitly undefined (line 105)", () => {
       // Create a token where alt property is explicitly undefined
-      const tokenizeSpy = jest.spyOn(markdownUtils, "tokenizeMarkdown").mockReturnValue([{ type: "image", content: "test", url: "https://example.com/img.png", alt: undefined }] as unknown as ReturnType<typeof tokenizeMarkdown>);
+      const tokenizeSpy = jest.spyOn(markdownTokenizer, "tokenizeMarkdown").mockReturnValue([{ type: "image", content: "test", url: "https://example.com/img.png", alt: undefined }] as unknown as ReturnType<typeof tokenizeMarkdown>);
 
       const result = parseMarkdown("![undefined-alt](https://example.com/img.png)");
 

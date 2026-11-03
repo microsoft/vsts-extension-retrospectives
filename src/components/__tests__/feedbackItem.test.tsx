@@ -9,6 +9,22 @@ import localStorageHelper from "../../utilities/localStorageHelper";
 import * as dialogHelper from "../../utilities/dialogHelper";
 import * as Icons from "../icons";
 
+jest.mock("../../utilities/dialogHelper", () => ({
+  __esModule: true,
+  ...jest.requireActual("../../utilities/dialogHelper"),
+}));
+
+jest.mock("../icons", () => ({
+  __esModule: true,
+  ...jest.requireActual("../icons"),
+}));
+
+jest.mock("react", () => {
+  const react = { ...jest.requireActual("react"), __esModule: true };
+  react.default = react;
+  return react;
+});
+
 // Mock HTMLDialogElement for JSDOM
 beforeAll(() => {
   if (!(window as unknown as { HTMLDialogElement?: typeof HTMLDialogElement }).HTMLDialogElement) {

@@ -7,6 +7,11 @@ import { testGroupColumnProps, testColumnProps } from "../__mocks__/mocked_compo
 import { mockUuid } from "../__mocks__/uuid/v4";
 import * as icons from "../../components/icons";
 
+jest.mock("../../components/icons", () => ({
+  __esModule: true,
+  ...jest.requireActual("../../components/icons"),
+}));
+
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
     trackMetric: jest.fn(),

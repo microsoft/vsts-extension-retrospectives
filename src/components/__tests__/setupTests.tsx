@@ -45,6 +45,8 @@ jest.mock("azure-devops-extension-api/Common", () => {
   return mockCommon;
 });
 
+jest.mock("azure-devops-extension-api/Common/CommonServices", () => mockCommon);
+
 jest.mock("uuid", () => {
   return mockUuid;
 });

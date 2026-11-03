@@ -1,4 +1,4 @@
-const CommonServiceIds = {
+export const CommonServiceIds = {
   ExtensionDataService: "ms.vss-features.extension-data-service",
   GlobalMessagesService: "ms.vss-tfs-web.tfs-global-messages-service",
   HostNavigationService: "ms.vss-features.host-navigation-service",

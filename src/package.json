@@ -10,10 +10,11 @@
   "author": "Microsoft",
   "license": "MIT",
   "scripts": {
-    "test": "node --no-deprecation ./node_modules/jest/bin/jest.js --env=jsdom --silent -ci --reporters=default --reporters=jest-junit --coverage",
+    "test": "node --no-deprecation ./node_modules/jest/bin/jest.js --env=jsdom --silent --ci --reporters=default --reporters=jest-junit --coverage",
     "test:fuzz": "jest --env=jsdom --testMatch='**/*.fuzz.test.{ts,tsx}' --verbose",
+    "typecheck": "tsc --project tsconfig.test.json --noEmit",
     "build": "npm run clean && npm run compile && npx webpack --mode=production",
-    "check": "npm run ncu && npm run format && cd ../ && pre-commit run --all-files && cd - && npm run test",
+    "check": "npm run ncu && npm run format && cd ../ && pre-commit run --all-files && cd - && npm run typecheck && npm run test",
     "clean": "npx rimraf ./dist ./coverage ./reports",
     "compile": "npx postcss ./assets/index.css -o ./assets/bundle.css --config ./postcss.config.js --no-map",
     "format": "npx prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
@@ -33,6 +34,8 @@
   },
   "devDependencies": {
     "@codecov/webpack-plugin": "2.0.1",
+    "@swc/core": "1.16.21",
+    "@swc/jest": "0.2.39",
     "@tailwindcss/postcss": "4.3.4",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
@@ -59,7 +62,6 @@
     "tailwindcss": "4.3.4",
     "terser-webpack-plugin": "5.6.1",
     "tfx-cli": "0.24.2",
-    "ts-jest": "29.4.15",
     "ts-loader": "9.6.2",
     "typescript": "6.0.3",
     "webpack": "5.112.2",
@@ -80,9 +82,23 @@
     ],
     "transform": {
       ".+\\.(js|ts|tsx|jsx)$": [
-        "ts-jest",
+        "@swc/jest",
         {
-          "tsconfig": "tsconfig.test.json"
+          "jsc": {
+            "parser": {
+              "syntax": "typescript",
+              "tsx": true
+            },
+            "transform": {
+              "react": {
+                "runtime": "automatic"
+              }
+            },
+            "target": "es2022"
+          },
+          "module": {
+            "type": "commonjs"
+          }
         }
       ]
     },
@@ -98,7 +114,6 @@
     "moduleNameMapper": {
       ".+\\.(css|less)$": "<rootDir>/components/__mocks__/cssTestStub.tsx"
     },
-    "preset": "ts-jest/presets/js-with-babel",
     "resetMocks": true,
     "collectCoverage": true,
     "coverageReporters": [

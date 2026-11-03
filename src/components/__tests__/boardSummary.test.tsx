@@ -5,6 +5,12 @@ import { getService } from "azure-devops-extension-sdk";
 import { mockWorkItem, mockWorkItemType } from "../__mocks__/mocked_components/mockedWorkItemTracking";
 import BoardSummary, { IBoardSummaryProps, sortActionItemsByColumn } from "../boardSummary";
 
+jest.mock("react", () => {
+  const react = { ...jest.requireActual("react"), __esModule: true };
+  react.default = react;
+  return react;
+});
+
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
     trackMetric: jest.fn(),

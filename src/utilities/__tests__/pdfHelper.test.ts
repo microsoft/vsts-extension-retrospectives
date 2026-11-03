@@ -1,6 +1,11 @@
-import * as pdfHelper from "../pdfHelper";
+import * as paragraphWrapper from "../wrapParagraph";
 import { escapePdfText, wrapParagraph, createPdfFromText, generatePdfFileName, downloadPdf, downloadPdfBlob } from "../pdfHelper";
 import { TextEncoder, TextDecoder } from "util";
+
+jest.mock("../wrapParagraph", () => ({
+  __esModule: true,
+  ...jest.requireActual("../wrapParagraph"),
+}));
 
 // Polyfill TextEncoder for Node.js test environment
 if (typeof globalThis.TextEncoder === "undefined") {
@@ -233,7 +238,7 @@ describe("pdfHelper", () => {
 
     it("should handle case where lines array results in zero pages and push empty page (line 81)", async () => {
       // Mock wrapParagraph to return an empty array to trigger pages.length === 0
-      const wrapParagraphSpy = jest.spyOn(pdfHelper, "wrapParagraph").mockReturnValue([]);
+      const wrapParagraphSpy = jest.spyOn(paragraphWrapper, "wrapParagraph").mockReturnValue([]);
 
       const result = createPdfFromText("any text", "Test");
       const text = await blobToText(result);

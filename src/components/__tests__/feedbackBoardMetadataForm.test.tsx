@@ -547,7 +547,6 @@ describe("FeedbackBoardMetadataForm - Form Submission", () => {
     fireEvent.click(screen.getByRole("tab", { name: /permissions/i }));
     expect(screen.getByText(/only the board owner or a team admin can edit retrospective settings\./i)).toBeInTheDocument();
   });
-
 });
 
 describe("FeedbackBoardMetadataForm - Column Management", () => {
@@ -2358,6 +2357,8 @@ describe("FeedbackBoardMetadataForm - Null ref branch coverage", () => {
       if (closeButton) {
         await user.click(closeButton);
       }
+
+      await user.click(colorButtons[0] as HTMLButtonElement);
 
       const colorChoiceButton = container.querySelector(".choose-feedback-column-accent-color-button") as HTMLButtonElement | null;
       expect(colorChoiceButton).toBeInTheDocument();

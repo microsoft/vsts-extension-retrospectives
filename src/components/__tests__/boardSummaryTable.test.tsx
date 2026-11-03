@@ -15,6 +15,11 @@ import { IFeedbackBoardDocument } from "../../interfaces/feedback";
 import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
 import * as userIdentityHelper from "../../utilities/userIdentityHelper";
 
+jest.mock("../../utilities/userIdentityHelper", () => ({
+  __esModule: true,
+  ...jest.requireActual("../../utilities/userIdentityHelper"),
+}));
+
 jest.mock("../../utilities/telemetryClient", () => {
   return {
     appInsights: {

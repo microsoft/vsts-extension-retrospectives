@@ -6,6 +6,10 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "src/**"
+      - ".github/workflows/ci_cd_frontend.yml"
+      - ".github/workflows/publish_frontend.yml"
     types:
       - opened
       - synchronize
@@ -21,12 +25,13 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: "Build, Test and Publish"
+  checks:
+    name: "Lint and documentation checks"
     runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.detect_frontend_changes.outputs.changed }}
     permissions:
       contents: read
-      id-token: write
       issues: read
       pull-requests: read
       statuses: write
@@ -39,6 +44,30 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         name: "Check out repository"
+
+      - name: "Detect frontend changes for dev publishing"
+        id: detect_frontend_changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${EVENT_NAME}" == "pull_request" ]]; then
+            changed_files=$(gh api --paginate "repos/${REPOSITORY}/pulls/${PR_NUMBER}/files" --jq '.[] | .filename, (.previous_filename // empty)')
+          else
+            git fetch --no-tags --depth=1 origin "${DEFAULT_BRANCH}"
+            changed_files=$(git diff --name-only FETCH_HEAD "${GITHUB_SHA}")
+          fi
+
+          if grep -Eq '^src/' <<< "${changed_files}"; then
+            echo "changed=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "changed=false" >> "${GITHUB_OUTPUT}"
+          fi
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         name: "Setup node"
@@ -66,45 +95,17 @@ jobs:
           echo "::error::Add either '${updated_label}' or '${not_required_label}' to this PR."
           exit 1
 
-      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
-        id: changes
+      - name: "Cache pre-commit environments"
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          filters: |
-            src:
-              - "src/**"
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - if: steps.changes.outputs.src == 'true'
-        name: "Install dependencies"
-        run: npm ci
-        working-directory: "src"
-
-      - if: steps.changes.outputs.src == 'true'
-        name: "Run pre-commit hooks"
+      - name: "Run pre-commit hooks"
         run: |
-          sudo apt install pipx -y
-          sudo apt install shellcheck -y
-
           pipx install pre-commit
 
           pre-commit run --all-files || true
-
-      - if: steps.changes.outputs.src == 'true'
-        name: "Build (bundle analysis)"
-        run: npm run build
-        working-directory: "src"
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - if: steps.changes.outputs.src == 'true'
-        name: "Run tests"
-        run: npm test
-        working-directory: "src"
-
-      - if: success() || failure()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: "Upload jest test results"
-          path: src/reports/jest-junit.xml
 
       - name: "Markdown lint"
         run: |
@@ -183,15 +184,112 @@ jobs:
           echo "ZTNA" >> base.txt
           npx -y spellchecker-cli --config ./.github/.spellcheckerrc.yaml
 
-      - if: steps.changes.outputs.src == 'true'
-        name: "OpenSSF Score Card"
+      - name: "OpenSSF Score Card"
         run: |
           #!/bin/bash
           set -e
           docker run -e GITHUB_AUTH_TOKEN=${{ github.token }} gcr.io/openssf/scorecard:stable@sha256:54c7ea4ddec6e3941887cb7933898c352f59e7f59e17a7a730f97ed348a8dfce --repo=https://github.com/microsoft/vsts-extension-retrospectives || true
 
-      - if: steps.changes.outputs.src == 'true'
-        name: "Upload coverage to Codecov"
+  build:
+    name: "Build with bundle analysis"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        name: "Check out repository"
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        name: "Setup node"
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: src/package-lock.json
+
+      - name: "Install dependencies"
+        run: npm ci
+        working-directory: "src"
+
+      - name: "Build (bundle analysis)"
+        run: npm run build
+        working-directory: "src"
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  typecheck:
+    name: "Check types"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        name: "Check out repository"
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        name: "Setup node"
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: src/package-lock.json
+
+      - name: "Install dependencies"
+        run: npm ci
+        working-directory: "src"
+
+      - name: "Check frontend and test types"
+        run: npm run typecheck
+        working-directory: "src"
+
+  test:
+    name: "Run tests with coverage"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+      statuses: write
+      checks: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        name: "Check out repository"
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        name: "Setup node"
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: src/package-lock.json
+
+      - name: "Install dependencies"
+        run: npm ci
+        working-directory: "src"
+
+      - name: "Run tests"
+        run: npm test
+        working-directory: "src"
+
+      - if: success() || failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: "Upload jest test results"
+          path: src/reports/jest-junit.xml
+
+      - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           name: frontend
@@ -201,32 +299,55 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
-      - if: steps.changes.outputs.src == 'true'
-        name: "Log in to Azure"
+  publish_dev:
+    name: "Publish extension to dev environment"
+    needs: [checks, build, typecheck, test]
+    if: needs.checks.outputs.frontend_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        name: "Check out repository"
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        name: "Setup node"
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: src/package-lock.json
+
+      - name: "Install dependencies"
+        run: npm ci
+        working-directory: "src"
+
+      - name: "Log in to Azure"
         uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
 
-      - if: steps.changes.outputs.src == 'true'
-        name: "Get Azure DevOps Marketplace token"
+      - name: "Get Azure DevOps Marketplace token"
         run: |
           token=$(az account get-access-token --tenant "${{ secrets.AZURE_TENANT_ID }}" --resource "${{ secrets.AZURE_RESOURCE_ID }}" --query accessToken --output tsv)
           echo "::add-mask::${token}"
           echo "AZURE_DEVOPS_TOKEN=${token}" >> "${GITHUB_ENV}"
 
-      - if: steps.changes.outputs.src == 'true'
-        name: "Show Azure DevOps Marketplace profile"
+      - name: "Show Azure DevOps Marketplace profile"
         run: |
           profile_id=$(az rest --method get --url "https://app.vssps.visualstudio.com/_apis/profile/profiles/me" --resource "${{ secrets.AZURE_RESOURCE_ID }}" --query id --output tsv)
           echo "Azure DevOps Marketplace profile ID: ${profile_id}"
 
-      - if: steps.changes.outputs.src == 'true'
-        name: "Publish extension to dev environment"
+      - name: "Publish extension to dev environment"
         env:
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           AZURE_RESOURCE_ID: ${{ secrets.AZURE_RESOURCE_ID }}
           REACT_APP_APP_INSIGHTS_INSTRUMENTATION_KEY: ${{ secrets.AI_INSTRUMENTATION_KEY }}
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: make publish

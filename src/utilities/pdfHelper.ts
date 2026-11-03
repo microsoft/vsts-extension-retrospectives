@@ -1,3 +1,7 @@
+import { wrapParagraph } from "./wrapParagraph";
+
+export { wrapParagraph } from "./wrapParagraph";
+
 export interface PdfOptions {
   pageWidth?: number;
   pageHeight?: number;
@@ -16,49 +20,6 @@ const DEFAULT_OPTIONS: Required<PdfOptions> = {
 
 export const escapePdfText = (text: string): string => {
   return text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
-};
-
-export const wrapParagraph = (paragraph: string, maxCharsPerLine: number): string[] => {
-  if (paragraph.trim().length === 0) {
-    return [" "];
-  }
-
-  const words = paragraph.split(/\s+/);
-  const lines: string[] = [];
-  let current = "";
-
-  const pushCurrent = () => {
-    if (current.length > 0) {
-      lines.push(current);
-      current = "";
-    }
-  };
-
-  for (let word of words) {
-    if (word.length > maxCharsPerLine) {
-      pushCurrent();
-      while (word.length > 0) {
-        lines.push(word.slice(0, maxCharsPerLine));
-        word = word.slice(maxCharsPerLine);
-      }
-      continue;
-    }
-
-    if (current.length === 0) {
-      current = word;
-      continue;
-    }
-
-    if (current.length + 1 + word.length <= maxCharsPerLine) {
-      current = `${current} ${word}`;
-    } else {
-      pushCurrent();
-      current = word;
-    }
-  }
-
-  pushCurrent();
-  return lines;
 };
 
 export const createPdfFromText = (text: string, title: string, options: PdfOptions = {}): Blob => {

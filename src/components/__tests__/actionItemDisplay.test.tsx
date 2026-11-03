@@ -8,8 +8,8 @@ const mockGetService = jest.fn(() => ({
 }));
 
 jest.mock("azure-devops-extension-sdk", () => ({
-  getService: mockGetService,
-  getUser: mockGetUser,
+  getService: (...args: Parameters<typeof mockGetService>) => mockGetService(...args),
+  getUser: (...args: Parameters<typeof mockGetUser>) => mockGetUser(...args),
 }));
 
 jest.mock("azure-devops-extension-api/WorkItemTracking", () => ({
@@ -24,7 +24,7 @@ jest.mock("azure-devops-extension-api/WorkItemTracking", () => ({
 const mockAddAssociatedActionItem = jest.fn();
 jest.mock("../../dal/itemDataService", () => ({
   itemDataService: {
-    addAssociatedActionItem: mockAddAssociatedActionItem,
+    addAssociatedActionItem: (...args: unknown[]) => mockAddAssociatedActionItem(...args),
   },
 }));
 
@@ -35,7 +35,7 @@ jest.mock("../../utilities/boardUrlHelper", () => ({
 const mockTrackEvent = jest.fn();
 jest.mock("../../utilities/telemetryClient", () => ({
   appInsights: {
-    trackEvent: mockTrackEvent,
+    trackEvent: (...args: unknown[]) => mockTrackEvent(...args),
   },
   TelemetryEvents: {
     WorkItemCreated: "WorkItemCreated",
@@ -53,8 +53,8 @@ const mockGetWorkItemsByIds = jest.fn();
 const mockCreateWorkItem = jest.fn();
 jest.mock("../../dal/azureDevOpsWorkItemService", () => ({
   workItemService: {
-    getWorkItemsByIds: mockGetWorkItemsByIds,
-    createWorkItem: mockCreateWorkItem,
+    getWorkItemsByIds: (...args: unknown[]) => mockGetWorkItemsByIds(...args),
+    createWorkItem: (...args: unknown[]) => mockCreateWorkItem(...args),
   },
 }));
 

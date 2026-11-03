@@ -12,6 +12,17 @@ import localStorageHelper from "../../utilities/localStorageHelper";
 import { appInsights, TelemetryEvents } from "../../utilities/telemetryClient";
 import * as dialogHelper from "../../utilities/dialogHelper";
 
+jest.mock("../../utilities/dialogHelper", () => ({
+  __esModule: true,
+  ...jest.requireActual("../../utilities/dialogHelper"),
+}));
+
+jest.mock("react", () => {
+  const react = { ...jest.requireActual("react"), __esModule: true };
+  react.default = react;
+  return react;
+});
+
 jest.mock("../../utilities/telemetryClient", () => ({
   reactPlugin: {
     trackMetric: jest.fn(),
@@ -5030,6 +5041,38 @@ describe("Feedback Column ", () => {
       }).not.toThrow();
 
       useRefSpy.mockRestore();
+    });
+
+    test("skips keyboard listener setup when the column ref remains null after mounting", () => {
+      const assignColumnRef = jest.fn();
+      const columnRef = Object.defineProperty({ current: null }, "current", {
+        get: () => null,
+        set: assignColumnRef,
+      });
+      const useRefSpy = jest.spyOn(React, "useRef").mockReturnValueOnce(columnRef);
+      const addListenerSpy = jest.spyOn(HTMLElement.prototype, "addEventListener");
+      const removeListenerSpy = jest.spyOn(HTMLElement.prototype, "removeEventListener");
+
+      try {
+        const { container, unmount } = render(<FeedbackColumn {...testColumnProps} columnItems={[]} />);
+        const column = container.querySelector(".feedback-column") as HTMLElement;
+
+        expect(column).toBeTruthy();
+        expect(assignColumnRef).toHaveBeenCalledWith(column);
+        expect(columnRef.current).toBeNull();
+        expect(addListenerSpy.mock.contexts).not.toContain(column);
+
+        const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+        column.dispatchEvent(event);
+        expect(event.defaultPrevented).toBe(false);
+
+        unmount();
+        expect(removeListenerSpy.mock.contexts).not.toContain(column);
+      } finally {
+        useRefSpy.mockRestore();
+        addListenerSpy.mockRestore();
+        removeListenerSpy.mockRestore();
+      }
     });
 
     test("renders collapsed class when isCollapsed state is true", () => {
