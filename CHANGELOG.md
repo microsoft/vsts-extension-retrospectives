@@ -19,7 +19,7 @@ From [GitHub PR #1895](https://github.com/microsoft/vsts-extension-retrospective
 * Moved the app directly into `src/` and placed its HTML and styles in `src/assets/`, with matching updates to build, test, and publishing paths.
 * Fixed broken user images in the retrospective summary and Permissions tab by showing colored initials when a profile image is missing or cannot be loaded.
 * Clarified the Move Everyone confirmation: it confirms the request to change phase, rather than claiming that every participant has already switched. Open boards follow on their next live update.
-* Fixed notifications covering the Prime Directive, Data, Help, and Settings menu: notifications now appear in the bottom-right corner of the board (or below the title inside a dialog), use a different color for success, information, warning, and error messages, and keep the close button at a consistent, easier-to-click size at the right edge.
+* Fixed notifications covering the Prime Directive, Data, Help, and Settings menu: notifications now appear in the top-right corner just below the board header (or below the title inside a dialog), stay behind any open menu, use a different color for success, information, warning, and error messages, and keep the close button at a consistent, easier-to-click size at the right edge.
 
 ## v1.92.59
 

@@ -2312,14 +2312,14 @@ body {
   --retro-toast-surface: #fde7e9;
 }
 
-/* The board header spans the top of the page, so board toasts sit in the bottom corner. */
+/* Board toasts sit in the top-right corner, 24px below the 88px board header so they don't cover its controls, and under open (z-10) menus. */
 .retro-toast-container {
-  @apply fixed bottom-6 right-6 z-20 flex flex-col items-end gap-2 max-w-[calc(100%-3rem)] pointer-events-none;
+  @apply fixed top-28 right-6 z-5 flex flex-col items-end gap-2 max-w-[calc(100%-3rem)] pointer-events-none;
 }
 
-/* Inside a dialog, stay below its header so neither the close button nor the footer actions are covered. */
+/* Inside a dialog, stay below its header so the close button isn't covered. */
 dialog > .retro-toast-container {
-  @apply top-14 bottom-auto right-5 max-w-[calc(100%-2.5rem)];
+  @apply top-14 right-5 max-w-[calc(100%-2.5rem)];
 }
 
 .retro-toast-progress {
