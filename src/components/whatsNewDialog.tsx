@@ -6,22 +6,13 @@ interface IWhatsNewDialogProps {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
 }
 
-const WHATS_NEW_HEADER_TEXT = "Highlights from releases v1.92.60, v1.92.59, v1.92.58, and v1.92.57 include:";
+const WHATS_NEW_HEADER_TEXT = "Highlights from release v1.92.60 include:";
 
 const WHATS_NEW_ITEMS = [
+  "Fixed Move Everyone so board managers can change the phase for everyone; other open boards follow on their next live update.",
   "Improved deep-linked board navigation so the correct team stays visible even when the user is not a member of that team.",
-  "Added a Move Everyone control so board managers can move all participants to the selected retrospective phase.",
-  "Expanded feedback search to include archived boards.",
-  "Fixed a Focus Mode render loop that could cause constant CPU usage.",
-  "Optimized board and Team Assessment History rendering to reduce unnecessary updates.",
-  "Improved team and board loading, including default-team lookup and recovery from local-network access restrictions.",
-  "Fixed retrospective board links for Azure DevOps organizations.",
-  "Added longer column titles.",
-  "Added sort-direction indicators to History table.",
-  "Restricted editing of retrospective settings to the Board Owner and Team Admin.",
-  "Fixed the email summary Copy to clipboard action so it works reliably from the preview dialog.",
-  "Extended permissions so team admins can also update column notes and edit or delete feedback cards.",
-  "Improved hidden feedback behavior to display blurred feedback while announcing \"feedback blurred\".",
+  "Improved live updates across all retrospective phases, with automatic recovery from temporary sync failures.",
+  "Improved notifications so they stay visible without covering open menus.",
 ];
 
 const WHATS_NEW_FOOTER_TEXT = "Refer to the Changelog for a complete history of updates.";
