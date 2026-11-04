@@ -4,22 +4,29 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.60
 
-* Removed 45 redundant icon definitions, added missing mapping for 8 legacy icons, and updated internal names for 4 icons. From [GitHub PR #1873](https://github.com/microsoft/vsts-extension-retrospectives/pull/1873)
-* Improved startup team and board selection so shared links and valid recent visits open the correct retrospective, with project-default and My Teams fallback.
-* Updated Show My Teams to preserve the current team and board when viewing a team outside the user's memberships.
+* Removed 45 redundant icon definitions, added 8 legacy icon mappings, and renamed 4 icons. From [GitHub PR #1873](https://github.com/microsoft/vsts-extension-retrospectives/pull/1873)
+
+* Improved startup team and board selection for shared links and recent visits, with project-default and My Teams fallbacks.
+* Kept the selected team and board when Show My Teams displays teams outside the user's memberships.
 
 From [GitHub PR #1895](https://github.com/microsoft/vsts-extension-retrospectives/pull/1895)
 
-* Removed the separate live sync service. Boards now check Azure DevOps for changes from other users, including Move Everyone phase changes, every 2 seconds in every retrospective phase, or every 6 seconds while nothing has changed for a while (previously every 10 seconds and only in the Collect phase when the live sync connection was unavailable). Live updates no longer need an extra connection that some networks and proxies blocked, and they work the same way on Azure DevOps Server.
-* Improved live update reliability: a failed check no longer empties the board and is retried automatically with an increasing delay, and checks pause while the browser tab is hidden.
-* The Board selection dropdown now refreshes for other users within about 2 minutes, or as soon as they open it, when a retrospective is created, archived, or restored, and anyone viewing a retrospective that is archived or deleted is moved to the most recent retrospective.
-* Reduced the network traffic of open boards: checks slow down while nothing changes, and the list of retrospectives, which is the largest response, is checked every 2 minutes instead of every 30 seconds.
-* Fixed the vote counters showing zero votes when a retrospective is first opened.
-* Removed the last Fluent UI components and replaced them with native HTML elements: the frame and author row of every feedback card, the search box in the Group Feedback dialog, the column list when creating or editing a retrospective, and the column tabs in Focus mode. This makes the extension download about 225 KB smaller (about 70 KB when compressed).
-* Moved the app directly into `src/` and placed its HTML and styles in `src/assets/`, with matching updates to build, test, and publishing paths.
-* Fixed broken user images in the retrospective summary and Permissions tab by showing colored initials when a profile image is missing or cannot be loaded.
-* Clarified the Move Everyone confirmation: it confirms the request to change phase, rather than claiming that every participant has already switched. Open boards follow on their next live update.
-* Fixed notifications covering the Prime Directive, Data, Help, and Settings menu: notifications now appear in the top-right corner just below the board header (or below the title inside a dialog), stay behind any open menu, use a different color for success, information, warning, and error messages, and keep the close button at a consistent, easier-to-click size at the right edge.
+* Replaced live sync with polling across every phase. Updates arrive within 2 seconds (up to 6 seconds while idle), without an extra connection, and work on Azure DevOps Server.
+* Improved live-update reliability: failed checks retry without clearing the board, and polling pauses while the browser tab is hidden.
+* Refreshed the Board dropdown within 2 minutes, or when opened, after retrospectives are created, archived, or restored. Viewers of archived or deleted retrospectives are redirected to the latest one.
+* Reduced network traffic by refreshing the retrospective list every 2 minutes instead of every 30 seconds.
+* Fixed vote counters that initially showed zero.
+* Fixed Move Everyone so board managers can change the phase for everyone; other open boards follow on their next update.
+
+From [GitHub PR #1966](https://github.com/microsoft/vsts-extension-retrospectives/pull/1966)
+
+* Replaced the remaining Fluent UI components with native HTML, reducing the extension download by about 225 KB (70 KB compressed). From [GitHub PR #1971](https://github.com/microsoft/vsts-extension-retrospectives/pull/1971)
+
+* Moved the app into `src/` and updated build, test, and publishing paths. From [GitHub PR #1973](https://github.com/microsoft/vsts-extension-retrospectives/pull/1973)
+
+* Added colored-initial fallbacks for missing profile images in the summary and Permissions tab. From [GitHub PR #1980](https://github.com/microsoft/vsts-extension-retrospectives/pull/1980)
+
+* Repositioned notifications to avoid covering menus and standardized their colors and close button. From [GitHub PR #1981](https://github.com/microsoft/vsts-extension-retrospectives/pull/1981)
 
 ## v1.92.59
 
