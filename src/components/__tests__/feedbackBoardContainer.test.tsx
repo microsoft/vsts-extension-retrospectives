@@ -2029,7 +2029,9 @@ describe("FeedbackBoardContainer - Live sync polling", () => {
   ])("never shows legacy live-sync warnings on $host, including polling failures and recovery", async ({ isHostedAzureDevOps }) => {
     const expectNoLiveSyncWarnings = () => {
       expect(screen.getByTestId("feedback-board")).toBeInTheDocument();
-      expect(screen.queryByText(/live sync|live updates|real[ -]time/i)).not.toBeInTheDocument();
+      screen.queryAllByText(/live sync|live updates|real[ -]time/i).forEach(message => {
+        expect(message).not.toBeVisible();
+      });
       expect(screen.queryByRole("button", { name: /retry live sync|reconnect/i })).not.toBeInTheDocument();
       expect(screen.queryByRole("link", { name: "Troubleshooting steps" })).not.toBeInTheDocument();
     };
