@@ -4,6 +4,8 @@ You can find the changelog of the Retrospective Extension below.
 
 ## v1.92.60
 
+* Added a notification for participants when a board manager uses Move Everyone, explaining why their phase changed.
+
 * Removed 45 redundant icon definitions, added 8 legacy icon mappings, and renamed 4 icons. From [GitHub PR #1873](https://github.com/microsoft/vsts-extension-retrospectives/pull/1873)
 
 * Improved startup team and board selection for shared links and recent visits, with project-default and My Teams fallbacks.

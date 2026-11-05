@@ -89,6 +89,17 @@ describe("localization", () => {
     expect(t("workflow_move_everyone_to_phase_success", { phase: "Vote" })).toBe(expectedMessage);
   });
 
+  it.each([
+    ["en-US", "You were moved to Vote because a board manager used Move Everyone."],
+    ["es-ES", "Se te ha movido a Vote porque un administrador del tablero uso Mover a todos."],
+    ["de-DE", "Sie wurden zu Vote verschoben, weil ein Board-Manager Alle verschieben verwendet hat."],
+    ["fr-FR", "Vous avez ete deplace vers Vote car un gestionnaire du tableau a utilise Deplacer tout le monde."],
+  ])("explains the received phase change for %s", (locale, expectedMessage) => {
+    setLocale(locale);
+
+    expect(t("workflow_moved_to_phase", { phase: "Vote" })).toBe(expectedMessage);
+  });
+
   it("prefers the document locale when initializeLocale is called without an argument", () => {
     document.documentElement.lang = "es-MX";
     setNavigatorLocale(["fr-FR"], "fr-FR");

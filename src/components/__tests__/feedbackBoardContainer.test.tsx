@@ -1909,6 +1909,9 @@ describe("FeedbackBoardContainer - Live sync polling", () => {
       await waitForBoardPollsToSettle(2);
       const owner = within(ownerView.container);
       const participant = within(participantView.container);
+      const movedMessage = `You were moved to ${phase} because a board manager used Move Everyone.`;
+
+      expect(participant.queryByText(movedMessage)).not.toBeInTheDocument();
 
       mocked(BoardDataService.updateActivePhase).mockImplementation(async (_teamId, boardId, activePhase) => {
         const savedBoard = {
@@ -1937,13 +1940,46 @@ describe("FeedbackBoardContainer - Live sync polling", () => {
         expect(BoardDataService.updateActivePhase).toHaveBeenLastCalledWith("t1", "b1", phase);
         expect(owner.getByText(`Sent a signal to move everyone to ${phase}. Participants will follow in a moment.`)).toBeInTheDocument();
         expect(participant.getByRole("tab", { name: otherPhase })).toHaveAttribute("aria-selected", "true");
+        expect(owner.queryByText(movedMessage)).not.toBeInTheDocument();
 
         await act(async () => {
           await jest.advanceTimersByTimeAsync(LIVE_SYNC_IDLE_POLL_INTERVAL_MS);
         });
 
         expect(participant.getByRole("tab", { name: phase })).toHaveAttribute("aria-selected", "true");
+        expect(participant.getAllByText(movedMessage)).toHaveLength(1);
+        expect(participant.getByText(movedMessage).closest(".retro-toast")).toHaveClass("retro-toast--info");
+
+        await pollNow();
+        expect(participant.getAllByText(movedMessage)).toHaveLength(1);
+        act(() => toast.dismiss());
       }
+    });
+
+    it("notifies a participant when Move Everyone targets the tab they already selected", async () => {
+      await renderLoadedContainer([createServerBoard()], "teamId=t1&boardId=b1&phase=Vote");
+      await waitForBoardPollsToSettle(1);
+      expect(screen.queryByText(/You were moved to/)).not.toBeInTheDocument();
+
+      serverBoards = [createServerBoard({ __etag: 2, activePhase: WorkflowPhase.Vote, activePhaseUpdatedDate: new Date("2024-01-04T00:00:00Z") })];
+      await pollNow();
+
+      expect(screen.getByRole("tab", { name: "Vote" })).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByText("You were moved to Vote because a board manager used Move Everyone.")).toBeInTheDocument();
+    });
+
+    it("does not notify for manual tab changes or unrelated board updates", async () => {
+      await renderLoadedContainer([createServerBoard()]);
+      await waitForBoardPollsToSettle(1);
+
+      fireEvent.click(screen.getByRole("tab", { name: "Group" }));
+      expect(screen.queryByText(/You were moved to/)).not.toBeInTheDocument();
+
+      serverBoards = [createServerBoard({ __etag: 2, boardVoteCollection: { "other-user": 1 } })];
+      await pollNow();
+
+      expect(screen.getByRole("tab", { name: "Group" })).toHaveAttribute("aria-selected", "true");
+      expect(screen.queryByText(/You were moved to/)).not.toBeInTheDocument();
     });
 
     it.each(["missing result", "rejection"])("reports a save failure instead of success for a %s", async failure => {
