@@ -942,6 +942,10 @@ export function FeedbackBoardContainer({ isHostedAzureDevOps, projectId }: { isH
         };
       });
 
+      if (hasEveryoneBeenMoved(previousServerBoard, serverBoard)) {
+        toast(t("workflow_moved_to_phase", { phase: serverBoard.activePhase }), { intent: "info" });
+      }
+
       return true;
     },
     [handleBoardRemoved],

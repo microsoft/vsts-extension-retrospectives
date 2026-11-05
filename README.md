@@ -118,6 +118,7 @@ Use the **Settings** menu in the header to adjust how teams and boards are displ
 The number of columns in each retrospective is determined by the selection made when making the new board. Regardless of the template, they still follow the same sequence of phases.
 
 Board managers can select a phase and use **Move Everyone** to move all participants to that phase.
+Participants receive a notification naming the destination phase and explaining that a board manager used **Move Everyone**.
 
 #### The Prime Directive
 
